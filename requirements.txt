@@ -1,0 +1,40 @@
+# Core Dependencies
+requests>=2.31.0
+python-dotenv>=1.0.0
+pandas>=2.0.0
+openai>=1.0.0
+
+# Web Scraping
+beautifulsoup4>=4.12.0
+selenium>=4.0.0
+webdriver-manager>=4.0.0
+lxml>=4.9.0
+
+# Configuration Management (NEW - for vendor configs)
+PyYAML>=6.0.0
+
+# Flask Application
+Flask>=3.0.0
+Flask-CORS>=4.0.0
+
+# Excel Support
+openpyxl>=3.1.0
+
+# Optional: Advanced Features
+# python-slugify>=8.0.0  # SEO-friendly slugs
+# deep-translator>=1.11.0  # Multilingual support
+Pillow>=10.0.0  # Image processing (SVSE audit)
+ImageHash>=4.3.1  # Perceptual hashing
+open-clip-torch>=2.24.0  # CLIP embeddings
+torch>=2.1.0  # CLIP runtime
+numpy>=1.26.0  # Embedding arrays
+scikit-learn>=1.3.0  # Clustering
+
+# CLI Framework
+typer>=0.21.0
+rich>=14.0.0
+
+# Development & Testing (Optional)
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+# requests-mock>=1.11.0
