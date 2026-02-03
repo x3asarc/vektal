@@ -1,0 +1,6 @@
+src\app.py:16: unused import 'send_from_directory' (90% confidence)
+src\bot_server.py:4: unused import 'asyncio' (90% confidence)
+src\core\image_verifier.py:15: unused import 'Tuple' (90% confidence)
+src\core\image_verifier.py:247: unused variable 'shopify_client' (100% confidence)
+src\core\image_verifier.py:353: unused variable 'shopify_client' (100% confidence)
+src\core\pipeline.py:11: unused import 'generate_vision_alt_text' (90% confidence)
