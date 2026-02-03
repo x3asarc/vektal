@@ -7,13 +7,13 @@
 
 ### Codebase Cleanup (CLEAN)
 
-- [ ] **CLEAN-01**: Archive 30+ one-off scripts to `archive/2026-scripts/` (apply_*, scrape_*, fix_*, dry_run_*)
-- [ ] **CLEAN-02**: Consolidate 5 duplicate CLI update scripts into unified interface
-- [ ] **CLEAN-03**: Move all test files to `tests/` directory with pytest structure
-- [ ] **CLEAN-04**: Create comprehensive ARCHITECTURE.md from codebase analysis
-- [ ] **CLEAN-05**: Run Vulture + deadcode autonomous dead code detection
-- [ ] **CLEAN-06**: Agent-driven cleanup with specialist subagents (Archiver, Consolidator, Test Migrator)
-- [ ] **CLEAN-07**: Document scraper strategy (Python vs JavaScript boundaries and integration)
+- [x] **CLEAN-01**: Archive 30+ one-off scripts to `archive/2026-scripts/` (apply_*, scrape_*, fix_*, dry_run_*)
+- [x] **CLEAN-02**: Consolidate 5 duplicate CLI update scripts into unified interface
+- [x] **CLEAN-03**: Move all test files to `tests/` directory with pytest structure
+- [x] **CLEAN-04**: Create comprehensive ARCHITECTURE.md from codebase analysis
+- [x] **CLEAN-05**: Run Vulture + deadcode autonomous dead code detection
+- [x] **CLEAN-06**: Agent-driven cleanup with specialist subagents (Archiver, Consolidator, Test Migrator)
+- [x] **CLEAN-07**: Document scraper strategy (Python vs JavaScript boundaries and integration)
 
 ### Docker Architecture (DOCKER)
 
