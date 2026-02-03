@@ -1,0 +1,6 @@
+{
+  "project_name": "Shopify Multi-Supplier Platform",
+  "model_profile": "balanced",
+  "commit_docs": true,
+  "autonomous_cleanup_enabled": true
+}
