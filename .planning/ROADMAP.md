@@ -38,12 +38,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. New developer can understand system architecture by reading ARCHITECTURE.md
   4. CLI operations use unified interface instead of 5+ separate scripts
   5. Scraper strategy (Python vs JavaScript boundaries) documented and clear
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 01-01: Agent-driven script classification and archival
-- [ ] 01-02: CLI consolidation and test migration
-- [ ] 01-03: Architecture documentation and scraper strategy
+- [ ] 01-01-PLAN.md - Archive 50+ scripts to archive/2026-scripts/ with categorization (Wave 1)
+- [ ] 01-02-PLAN.md - Typer CLI consolidation and pytest test migration (Wave 1)
+- [ ] 01-03-PLAN.md - ARCHITECTURE.md and scraper strategy documentation (Wave 2)
 
 ### Phase 2: Docker Infrastructure Foundation
 **Goal**: Establish containerized service architecture with proper boundaries and production server configuration
@@ -245,11 +245,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → ... → 13
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Codebase Cleanup & Analysis | 0/3 | Not started | - |
+| 1. Codebase Cleanup & Analysis | 0/3 | Planned | - |
 | 2. Docker Infrastructure Foundation | 0/3 | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
