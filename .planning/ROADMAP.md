@@ -12,7 +12,8 @@ This roadmap transforms an organically-grown monolithic Python application into 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Codebase Cleanup & Analysis** - Foundation cleanup before building
+- [x] **Phase 1: Codebase Cleanup & Analysis** - Foundation cleanup before building
+- [ ] **Phase 1.1: Root Documentation Organization (INSERTED)** - Complete root directory cleanup
 - [ ] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
 - [ ] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
 - [ ] **Phase 4: Authentication & User Management** - User system in containerized environment
@@ -41,13 +42,34 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 01-01-PLAN.md - Archive 50+ scripts to archive/2026-scripts/ with categorization (Wave 1)
-- [ ] 01-02-PLAN.md - Typer CLI consolidation and pytest test migration (Wave 1)
-- [ ] 01-03-PLAN.md - ARCHITECTURE.md and scraper strategy documentation (Wave 2)
+- [x] 01-01-PLAN.md - Archive 50+ scripts to archive/2026-scripts/ with categorization (Wave 1)
+- [x] 01-02-PLAN.md - Typer CLI consolidation and pytest test migration (Wave 1)
+- [x] 01-03-PLAN.md - ARCHITECTURE.md and scraper strategy documentation (Wave 2)
+
+### Phase 1.1: Root Documentation Organization (INSERTED)
+**Goal**: Complete root directory cleanup by organizing ALL 70 items (42 files + 28 directories) in root
+**Depends on**: Phase 1
+**Requirements**: CLEAN-01 (complete), CLEAN-04 (complete)
+**Success Criteria** (what must be TRUE):
+  1. Root directory contains only essential project files (README.md, ARCHITECTURE.md, requirements.txt, pyproject.toml, .env files, .gitignore, demo_framework.py)
+  2. All 11 CSV files organized in data/csv/ or results/csv/
+  3. All 6 JSON result files organized in results/scraping/ or data/test/
+  4. All 12 loose markdown docs organized in docs/ subdirectories (guides/, reference/, legacy/)
+  5. All questionable directories investigated and either kept, moved, archived, or deleted
+  6. Documentation index created (docs/INDEX.md) for easy navigation
+  7. Developer can understand root structure at a glance
+**Plans**: 3 plans in 3 waves
+
+Plans:
+- [ ] 01.1-01-PLAN.md — Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
+- [ ] 01.1-02-PLAN.md — Investigate and organize 13 questionable directories (Wave 2)
+- [ ] 01.1-03-PLAN.md — Create documentation index and verify complete cleanup (Wave 3)
+
+**Insertion Reason**: Phase 1 archived scripts but left 42 loose files and 13 questionable directories unorganized in root. User feedback: "Only addressed 20 files but there are 70 ITEMS in root." Must handle ALL items before Docker phase.
 
 ### Phase 2: Docker Infrastructure Foundation
 **Goal**: Establish containerized service architecture with proper boundaries and production server configuration
-**Depends on**: Phase 1
+**Depends on**: Phase 1.1
 **Requirements**: DOCKER-01, DOCKER-02, DOCKER-08, DOCKER-09, DOCKER-12, DOCKER-13, DOCKER-14
 **Success Criteria** (what must be TRUE):
   1. Developer can start entire stack with single docker compose up command
@@ -245,11 +267,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13
+Phases execute in numeric order: 1 -> 1.1 -> 2 -> 3 -> ... -> 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Codebase Cleanup & Analysis | 3/3 | Complete | 2026-02-03 |
+| 1.1. Root Documentation Organization | 0/3 | Not started | - |
 | 2. Docker Infrastructure Foundation | 0/3 | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
