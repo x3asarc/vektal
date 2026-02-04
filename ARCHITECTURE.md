@@ -516,13 +516,15 @@ A: `build_diff_and_plan()` generates change preview. Human approves via `approve
 
 ## Further Reading
 
-- **[SCRAPER_STRATEGY.md](docs/SCRAPER_STRATEGY.md)** - Python vs JavaScript scraper decision criteria
-- **[CRITICAL_SAFEGUARDS.md](CRITICAL_SAFEGUARDS.md)** - Approval workflows and rollback procedures
-- **[ROADMAP.md](.planning/ROADMAP.md)** - Future development plans
+- **[docs/INDEX.md](docs/INDEX.md)** - Complete documentation index
+- **[docs/DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** - Project directory organization
+- **[docs/SCRAPER_STRATEGY.md](docs/SCRAPER_STRATEGY.md)** - Python vs JavaScript scraper decision criteria
+- **[docs/guides/CRITICAL_SAFEGUARDS.md](docs/guides/CRITICAL_SAFEGUARDS.md)** - Approval workflows and rollback procedures
+- **[.planning/ROADMAP.md](.planning/ROADMAP.md)** - Future development plans
 - **[archive/2026-scripts/MANIFEST.md](archive/2026-scripts/MANIFEST.md)** - Index of archived scripts
 
 ---
 
-*Document version: 1.0*
-*Last updated: 2026-02-03*
+*Document version: 1.1*
+*Last updated: 2026-02-04 (Phase 1.1 - Root Documentation Organization)*
 *Maintained by: Development team*
