@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 1 of 13 (Codebase Cleanup & Analysis)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-03 — Completed 01-03-PLAN.md (Architecture & Scraper Strategy Documentation)
+Phase: 1.1 of 13 (Root Documentation Organization)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-04 — Completed 01.1-01-PLAN.md (Root File Organization)
 
-Progress: [███░░░░░░░] 10% (3/30 plans)
+Progress: [███░░░░░░░] 13% (4/30 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 21 min
-- Total execution time: 1.1 hours
+- Total plans completed: 4
+- Average duration: 18 min
+- Total execution time: 1.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-codebase-cleanup-analysis | 3 | 64 min | 21 min |
+| 01.1-root-documentation-organization | 1 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (19 min), 01-02 (35 min), 01-03 (10 min)
-- Trend: Accelerating (documentation tasks faster than code tasks)
+- Last 5 plans: 01-01 (19 min), 01-02 (35 min), 01-03 (10 min), 01.1-01 (8 min)
+- Trend: Accelerating (file organization tasks very fast)
 
 *Updated after each plan completion*
 
@@ -52,6 +53,13 @@ Recent decisions affecting current work:
 - Python primary scraper (01-03): Python for static HTML, JavaScript for SPAs/dynamic sites
 - Architecture documentation pattern (01-03): matklad pattern (bird's eye view → code map → invariants → ADRs)
 - Architectural invariants (01-03): 8 rules codified (src/core/ protection, approval gates, Vision AI caching, German SEO, YAML config)
+- Three-tier documentation structure (01.1-01): docs/ organized into guides/ (users), reference/ (technical), legacy/ (historical)
+- Input/output separation (01.1-01): data/ for inputs, results/ for outputs - clearer intent
+- Keep demo_framework.py in root (01.1-01): Documentation example referenced in guides
+
+### Roadmap Evolution
+
+- Phase 1.1 inserted after Phase 1: Root Documentation Organization (URGENT) - Phase 1 archived scripts but left 20+ documentation/data files unorganized
 
 ### Pending Todos
 
@@ -63,6 +71,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-03 20:12:31Z
-Stopped at: Completed 01-03-PLAN.md (Architecture & Scraper Strategy Documentation) - Phase 1 complete
+Last session: 2026-02-04 18:52:32Z
+Stopped at: Completed 01.1-01-PLAN.md (Root File Organization) - Phase 1.1 in progress (1/3 plans complete)
 Resume file: None
