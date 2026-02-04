@@ -61,9 +61,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 01.1-01-PLAN.md — Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
-- [ ] 01.1-02-PLAN.md — Investigate and organize 13 questionable directories (Wave 2)
-- [ ] 01.1-03-PLAN.md — Create documentation index and verify complete cleanup (Wave 3)
+- [x] 01.1-01-PLAN.md — Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
+- [x] 01.1-02-PLAN.md — Investigate and organize 13 questionable directories (Wave 2)
+- [x] 01.1-03-PLAN.md — Create documentation index and verify complete cleanup (Wave 3)
 
 **Insertion Reason**: Phase 1 archived scripts but left 42 loose files and 13 questionable directories unorganized in root. User feedback: "Only addressed 20 files but there are 70 ITEMS in root." Must handle ALL items before Docker phase.
 
@@ -272,7 +272,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 3 -> ... -> 13
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Codebase Cleanup & Analysis | 3/3 | Complete | 2026-02-03 |
-| 1.1. Root Documentation Organization | 0/3 | Not started | - |
+| 1.1. Root Documentation Organization | 3/3 | Complete | 2026-02-04 |
 | 2. Docker Infrastructure Foundation | 0/3 | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
