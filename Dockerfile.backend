@@ -31,6 +31,10 @@ COPY src/ ./src/
 COPY utils/ ./utils/
 COPY config/ ./config/
 
+# Create data directories with proper ownership
+RUN mkdir -p /app/data/input /app/data/output /app/uploads && \
+    chown -R appuser:appuser /app
+
 # Switch to non-root user
 USER appuser
 
