@@ -50,3 +50,7 @@ batch_*_preview.csv
 # Temporary and debug directories
 temp/
 screenshots/
+
+# Docker secrets (never commit actual secrets)
+secrets/*
+!secrets/.gitkeep
