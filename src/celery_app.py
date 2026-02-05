@@ -14,6 +14,7 @@ Usage:
 """
 import os
 from celery import Celery
+from src.core.secrets import get_secret
 
 # Create Celery app
 app = Celery('shopify_platform')
