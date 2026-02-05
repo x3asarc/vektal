@@ -1,0 +1,42 @@
+# Flask backend container
+# Base image: Debian-slim (not Alpine) for better Python wheel compatibility
+# Note: Single-stage build for development simplicity. Multi-stage optimization in Phase 13.
+FROM python:3.12-slim
+
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser
+
+WORKDIR /app
+
+# Install system dependencies for Python packages
+# Some packages (Pillow, lxml) need these build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install Python dependencies first (layer caching)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Gunicorn and Celery (not in requirements.txt yet)
+RUN pip install --no-cache-dir gunicorn celery redis psycopg2-binary
+
+# Copy Gunicorn configuration
+COPY gunicorn_config.py .
+
+# Copy application code
+# Note: In development, this is overridden by bind mounts
+COPY src/ ./src/
+COPY utils/ ./utils/
+COPY config/ ./config/
+
+# Switch to non-root user
+USER appuser
+
+# Expose Flask port
+EXPOSE 5000
+
+# Default command - development mode uses Flask dev server
+# Production (Phase 13) switches to: gunicorn -c gunicorn_config.py src.app:app
+CMD ["flask", "run", "--host=0.0.0.0", "--reload"]
