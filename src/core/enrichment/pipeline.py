@@ -12,8 +12,9 @@ from .families.grouper import ProductFamilyGrouper
 from .quality.scorer import QualityScorer, QualityGate
 from .embeddings.generator import EmbeddingGenerator
 from .templating.engine import TemplateEngine
-from .config import QUALITY_THRESHOLDS
+from .config import QUALITY_THRESHOLDS, COLOR_MAP
 from .vendor_integration import VendorEnrichmentConfig, detect_vendor_from_product, load_vendor_enrichment_config
+from .color_learning import load_store_colors
 
 
 class EnrichmentPipeline:
@@ -22,7 +23,8 @@ class EnrichmentPipeline:
     def __init__(self,
                  openrouter_api_key: str = None,
                  openrouter_model: str = "google/gemini-flash-1.5",
-                 checkpoint_dir: str = "data/enrichment_checkpoints"):
+                 checkpoint_dir: str = "data/enrichment_checkpoints",
+                 store_profile_path: str = None):
         """
         Initialize pipeline components.
 
@@ -30,14 +32,29 @@ class EnrichmentPipeline:
             openrouter_api_key: API key for AI description generation
             openrouter_model: Model to use for descriptions
             checkpoint_dir: Directory for saving intermediate checkpoints
+            store_profile_path: Path to store profile JSON (for learned colors)
+                               Default: data/store_profile.json
         """
         self.openrouter_api_key = openrouter_api_key
         self.openrouter_model = openrouter_model
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
+        # Load store-specific colors learned from catalog analysis
+        store_colors = load_store_colors(store_profile_path)
+
+        # Merge with base COLOR_MAP (base takes precedence)
+        combined_color_map = dict(COLOR_MAP)
+        combined_color_map.update(store_colors)
+
+        # Log color expansion
+        if store_colors:
+            print(f"Loaded {len(store_colors)} store-specific colors from catalog analysis")
+            print(f"Total color vocabulary: {len(combined_color_map)} colors")
+
         # Initialize components (lazy loaded where expensive)
-        self.extractor = AttributeExtractor()
+        # Pass combined color map to extractor for dynamic recognition
+        self.extractor = AttributeExtractor(custom_color_map=combined_color_map)
         self.seo_generator = SEOGenerator()
         self.family_grouper = ProductFamilyGrouper()
         self.quality_scorer = QualityScorer()

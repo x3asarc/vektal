@@ -12,10 +12,20 @@ from ..config import COLOR_MAP, CATEGORY_KEYWORDS, USE_CASE_PATTERNS
 class AttributeExtractor:
     """Extract structured attributes from product text (German-first)"""
 
-    def __init__(self):
-        """Initialize extractor with compiled regex patterns"""
-        # Color patterns: all keys from COLOR_MAP + special colors
-        color_keys = '|'.join(COLOR_MAP.keys())
+    def __init__(self, custom_color_map: Optional[Dict[str, str]] = None):
+        """
+        Initialize extractor with compiled regex patterns.
+
+        Args:
+            custom_color_map: Optional color map to use instead of default.
+                             Pass merged map (base + store-learned colors) for
+                             dynamic color recognition.
+        """
+        # Use custom color map if provided, otherwise use default
+        self.color_map = custom_color_map if custom_color_map is not None else COLOR_MAP
+
+        # Color patterns: all keys from color_map + special colors
+        color_keys = '|'.join(self.color_map.keys())
         self.color_patterns = [
             re.compile(r'\b(' + color_keys + r')\b', re.IGNORECASE),
             re.compile(
@@ -80,7 +90,7 @@ class AttributeExtractor:
             match = pattern.search(title_lower)
             if match:
                 raw_color = match.group(1).lower()
-                result['extracted_color'] = COLOR_MAP.get(raw_color, raw_color.capitalize())
+                result['extracted_color'] = self.color_map.get(raw_color, raw_color.capitalize())
                 break
 
         # Extract size and unit
