@@ -35,12 +35,16 @@ COPY config/ ./config/
 RUN mkdir -p /app/data/input /app/data/output /app/uploads && \
     chown -R appuser:appuser /app
 
+# Set Flask app entry point for migrations
+ENV FLASK_APP=src/app_factory.py
+
 # Switch to non-root user
 USER appuser
 
 # Expose Flask port
 EXPOSE 5000
 
-# Default command - development mode uses Flask dev server
-# Production (Phase 13) switches to: gunicorn -c gunicorn_config.py src.app:app
-CMD ["flask", "run", "--host=0.0.0.0", "--reload"]
+# Run migrations then start application
+# Development mode: flask db upgrade && flask run
+# Production mode (Phase 13): flask db upgrade && gunicorn
+CMD ["sh", "-c", "flask db upgrade && flask run --host=0.0.0.0 --reload"]
