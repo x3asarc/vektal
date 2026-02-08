@@ -43,6 +43,7 @@ from .firecrawl_client import (
     CrawlResult,
     ScrapeResult
 )
+from .gsd_populator import GSDPopulator
 
 __all__ = [
     "validate_sku",
@@ -75,5 +76,6 @@ __all__ = [
     "FirecrawlAPIError",
     "FirecrawlRateLimitError",
     "CrawlResult",
-    "ScrapeResult"
+    "ScrapeResult",
+    "GSDPopulator"
 ]
