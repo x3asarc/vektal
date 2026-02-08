@@ -36,6 +36,13 @@ from .local_classifier import LocalVendorClassifier, ClassificationResult
 from .ai_inference import OpenRouterInference, InferenceResult
 from .pipeline import VendorDiscoveryPipeline, DiscoveryResult
 from .site_recon import SiteReconnaissance
+from .firecrawl_client import (
+    FirecrawlClient,
+    FirecrawlAPIError,
+    FirecrawlRateLimitError,
+    CrawlResult,
+    ScrapeResult
+)
 
 __all__ = [
     "validate_sku",
@@ -63,5 +70,10 @@ __all__ = [
     "InferenceResult",
     "VendorDiscoveryPipeline",
     "DiscoveryResult",
-    "SiteReconnaissance"
+    "SiteReconnaissance",
+    "FirecrawlClient",
+    "FirecrawlAPIError",
+    "FirecrawlRateLimitError",
+    "CrawlResult",
+    "ScrapeResult"
 ]
