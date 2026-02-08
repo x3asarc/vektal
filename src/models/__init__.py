@@ -37,4 +37,33 @@ class TimestampMixin:
     )
 
 
-__all__ = ['db', 'TimestampMixin']
+# Import all models for Alembic migration detection
+from src.models.user import User, UserTier
+from src.models.shopify import ShopifyStore, ShopifyCredential
+from src.models.vendor import Vendor, VendorCatalogItem
+from src.models.product import Product, ProductEnrichment, ProductImage
+from src.models.job import Job, JobResult, JobStatus, JobType
+
+
+__all__ = [
+    'db',
+    'TimestampMixin',
+    # User models
+    'User',
+    'UserTier',
+    # Shopify models
+    'ShopifyStore',
+    'ShopifyCredential',
+    # Vendor models
+    'Vendor',
+    'VendorCatalogItem',
+    # Product models
+    'Product',
+    'ProductEnrichment',
+    'ProductImage',
+    # Job models
+    'Job',
+    'JobResult',
+    'JobStatus',
+    'JobType',
+]
