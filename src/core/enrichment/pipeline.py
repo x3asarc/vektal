@@ -147,17 +147,17 @@ class EnrichmentPipeline:
             passed, report = self._step_quality_gate(products, force)
 
         if not passed and not force:
-            print("\n⛔ Pipeline halted at quality gate.")
+            print("\n[BLOCKED] Pipeline halted at quality gate.")
             return products, report
 
-        print("\n✅ Pipeline complete!")
+        print("\n[SUCCESS] Pipeline complete!")
         self._print_summary(products)
 
         return products, report
 
     def _step_extract_attributes(self, products: List[dict]) -> List[dict]:
         """Step 1: Extract color, size, material, category"""
-        print("\n🔍 Step 1: Extracting attributes...")
+        print("\n[Step 1] Extracting attributes...")
 
         for product in products:
             attrs = self.extractor.extract_all(
@@ -168,14 +168,14 @@ class EnrichmentPipeline:
             product['enrichment_status'] = 'extracted'
 
         extracted_colors = sum(1 for p in products if p.get('extracted_color'))
-        print(f"  ✓ Extracted color for {extracted_colors}/{len(products)} products")
+        print(f"  * Extracted color for {extracted_colors}/{len(products)} products")
 
         return products
 
     def _step_apply_templates(self, products: List[dict],
                              vendor_config: dict) -> List[dict]:
         """Step 2: Apply vendor YAML content templates"""
-        print("\n📝 Step 2: Applying vendor templates...")
+        print("\n[Step 2] Applying vendor templates...")
 
         for product in products:
             rendered = self.template_engine.render_product_content(
@@ -193,7 +193,7 @@ class EnrichmentPipeline:
     def _step_ai_generation(self, products: List[dict],
                            max_products: int = None) -> List[dict]:
         """Step 3: Generate AI descriptions for low-quality products"""
-        print("\n🤖 Step 3: AI description generation...")
+        print("\n[Step 3] AI description generation...")
 
         # Find products needing AI help
         needs_ai = [
@@ -224,18 +224,18 @@ class EnrichmentPipeline:
                     product['ai_model_used'] = self.openrouter_model
                     product['enrichment_status'] = 'ai_generated'
             except Exception as e:
-                print(f"  ⚠️ AI generation failed for {product.get('title', 'unknown')}: {e}")
+                print(f"  WARNING: AI generation failed for {product.get('title', 'unknown')}: {e}")
 
         return products
 
     def _step_create_families(self, products: List[dict]) -> List[dict]:
         """Step 4: Group variants into families"""
-        print("\n👥 Step 4: Creating product families...")
+        print("\n[Step 4] Creating product families...")
         return self.family_grouper.create_families(products)
 
     def _step_generate_embeddings(self, products: List[dict]) -> List[dict]:
         """Step 5: Generate 768-dim embeddings for semantic search"""
-        print("\n🧮 Step 5: Generating embeddings...")
+        print("\n[Step 5] Generating embeddings...")
 
         embeddings = self.embedding_generator.generate_batch(
             products, show_progress=True
@@ -249,24 +249,24 @@ class EnrichmentPipeline:
 
     def _step_calculate_scores(self, products: List[dict]) -> List[dict]:
         """Step 6: Calculate quality scores"""
-        print("\n📊 Step 6: Calculating quality scores...")
+        print("\n[Step 6] Calculating quality scores...")
 
         for product in products:
             product['data_quality_score'] = self.quality_scorer.calculate_score(product)
 
         avg_score = sum(p['data_quality_score'] for p in products) / len(products)
-        print(f"  ✓ Average quality score: {avg_score:.1f}/100")
+        print(f"  * Average quality score: {avg_score:.1f}/100")
 
         return products
 
     def _step_quality_gate(self, products: List[dict],
                           force: bool = False) -> tuple:
         """Step 7: Quality gate validation"""
-        print("\n🛡️ Step 7: Quality gate validation...")
+        print("\n[Step 7] Quality gate validation...")
         passed, report = self.quality_gate.validate(products)
 
         if not passed and force:
-            print("  ⚠️ Quality gate failed but --force enabled")
+            print("  WARNING: Quality gate failed but --force enabled")
             return True, report
 
         return passed, report
@@ -286,7 +286,7 @@ class EnrichmentPipeline:
         with open(checkpoint_path, 'w', encoding='utf-8') as f:
             json.dump(serializable, f, ensure_ascii=False, indent=2)
 
-        print(f"  💾 Checkpoint: {checkpoint_path.name}")
+        print(f"  * Checkpoint saved: {checkpoint_path.name}")
 
     def load_checkpoint(self, step_name: str) -> List[dict]:
         """Load products from checkpoint"""
