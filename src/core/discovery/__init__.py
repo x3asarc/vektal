@@ -24,11 +24,14 @@ from .sku_validator import (
     infer_size_from_sku,
     SKUInfo
 )
+from .local_patterns import LocalPatternMatcher, PatternMatchResult
 
 __all__ = [
     "validate_sku",
     "normalize_sku",
     "extract_sku_info",
     "infer_size_from_sku",
-    "SKUInfo"
+    "SKUInfo",
+    "LocalPatternMatcher",
+    "PatternMatchResult"
 ]

@@ -5,7 +5,7 @@ Pydantic models for store profile validation and serialization.
 Represents the intelligence extracted from Shopify catalogs.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -110,7 +110,8 @@ class StoreProfile(BaseModel):
         description="Content patterns learned from catalog (title/description templates)"
     )
 
-    class Config:
-        json_encoders = {
+    model_config = ConfigDict(
+        json_encoders={
             datetime: lambda v: v.isoformat()
         }
+    )
