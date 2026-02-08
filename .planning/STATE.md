@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-Phase: 2.1 of 15 (Universal Vendor Scraping Engine - INSERTED)
-Plan: 11 of 11 (All plans complete, verification PASSED)
-Status: Phase complete - Verified
-Last activity: 2026-02-08 — Phase 2.1 COMPLETE (11/11 plans, 10/10 success criteria verified)
+Phase: 2.2 of 15 (Product Enrichment Pipeline)
+Plan: 4 of 6 (In progress)
+Status: In progress
+Last activity: 2026-02-08 — Completed 02.2-04-PLAN.md (Vision-Based Image Analysis)
 
-Progress: [█████░░░░░] 53% (19/36 plans estimated)
+Progress: [█████░░░░░] 55% (20/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -33,9 +33,9 @@ Progress: [█████░░░░░] 53% (19/36 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 20
 - Average duration: 13 min
-- Total execution time: 3.8 hours
+- Total execution time: 4.1 hours
 
 **By Phase:**
 
@@ -45,10 +45,11 @@ Progress: [█████░░░░░] 53% (19/36 plans estimated)
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
+| 02.2-product-enrichment-pipeline | 4 | 76 min | 19 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.1-07 (21 min), 02.1-08 (14 min), 02.1-09 (11 min), 02.1-10 (0 min - doc only), 02.1-11 (9 min)
-- Trend: Phase 2.1 COMPLETE - Adaptive learning tasks very fast (9 min with 19 tests)
+- Last 5 plans: 02.1-11 (9 min), 02.2-01 (18 min), 02.2-02 (19 min), 02.2-03 (20 min), 02.2-04 (19 min)
+- Trend: Phase 2.2 in progress - Embedding generation with 15 tests (19 min)
 
 *Updated after each plan completion*
 
@@ -119,6 +120,10 @@ Recent decisions affecting current work:
 - Pragmatic adaptive rules (02.1-11): Rate limits → +50% delay, Timeouts → +25% timeout, Selector failures → fallback selectors
 - Rediscovery thresholds (02.1-11): >5 selector failures in 10 attempts OR <50% success rate triggers config refresh
 - Exponential backoff with jitter (02.1-11): delay × (2^attempt) ± 20% jitter, max 30s for human-like behavior
+- Embedding model selection (02.2-04): paraphrase-multilingual-mpnet-base-v2 for 768-dim multilingual embeddings
+- Field weighting approach (02.2-04): Text repetition (title 2x, tags 1.5x) for simple, interpretable weighting
+- Lazy model loading (02.2-04): Load on first use to avoid 2-3s startup cost if not using embeddings
+- Content hashing strategy (02.2-04): Hash title+description+tags only; price/inventory changes don't trigger re-embedding
 
 ### Roadmap Evolution
 
@@ -137,12 +142,13 @@ None yet.
 - Gap 2: FirecrawlClient + GSDPopulator auto-populate YAML mappings (Plan 10, 6 min, 16 tests)
 - Gap 3: ScrapeMetrics + AdaptiveRetryEngine enable dynamic improvement (Plan 11, 9 min, 19 tests)
 
-**Phase 2.1 COMPLETE (11/11 plans, verification PASSED).** Ready for Phase 2.2 (Product Enrichment Pipeline).
+**Phase 2.1 COMPLETE (11/11 plans, verification PASSED).**
+**Phase 2.2 IN PROGRESS (4/6 plans complete):** Embedding generation complete with 15 passing tests.
 
 ## Session Continuity
 
-Last session: 2026-02-08 17:46:37Z
-Stopped at: Completed 02.1-11-PLAN.md (Adaptive Learning & Success Rate Tracking) - Phase 2.1 COMPLETE
+Last session: 2026-02-08 18:07:06Z
+Stopped at: Completed 02.2-04-PLAN.md (Vision-Based Image Analysis)
 Resume file: None
 
 Config (if exists):
