@@ -96,27 +96,27 @@ class ProductFamilyGrouper:
         Removes:
         - Size patterns: 20ml, 50g, 100cm
         - Dimension patterns: 14x14cm
-        - Color names: rot, blau, grün, jade, ruby
+        - Color names: rot, blau, grün, jade, ruby, red, blue
         """
         title = product.get('title', '')
 
-        # Remove size patterns: 20ml, 50g, etc.
-        key = re.sub(r'\d+[.,]?\d*\s*(ml|l|g|kg|cm|mm|m²|m2|pcs|stk|piece)',
+        # Remove dimension patterns: 14x14cm (must be before size patterns)
+        key = re.sub(r'\d+\s*x\s*\d+\s*(cm|mm)?',
                      '', title, flags=re.IGNORECASE)
 
-        # Remove dimension patterns: 14x14cm
-        key = re.sub(r'\d+\s*x\s*\d+\s*(cm|mm)',
+        # Remove size patterns: 20ml, 50g, etc.
+        key = re.sub(r'\d+[.,]?\d*\s*(ml|l|g|kg|cm|mm|m²|m2|pcs|stk|piece)',
                      '', key, flags=re.IGNORECASE)
 
-        # Remove standalone color names
-        color_pattern = r'\b(rot|blau|grün|gelb|schwarz|weiß|gold|silber|bronze|jade|ruby|emerald)\b'
+        # Remove standalone color names (German and common English)
+        color_pattern = r'\b(rot|blau|grün|gelb|schwarz|weiß|gold|silber|bronze|jade|ruby|emerald|red|blue|green|yellow|black|white|pink|purple|orange)\b'
         key = re.sub(color_pattern, '', key, flags=re.IGNORECASE)
 
         # Normalize whitespace
         key = re.sub(r'\s+', ' ', key).strip().lower()
 
-        # Sanity check - if too short, use original
-        if len(key) < 10:
+        # Sanity check - if too short after cleaning, use original
+        if len(key) < 5:
             key = title.lower()
 
         return key
