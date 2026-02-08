@@ -14,7 +14,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Codebase Cleanup & Analysis** - Foundation cleanup before building
 - [x] **Phase 1.1: Root Documentation Organization (INSERTED)** - Complete root directory cleanup
-- [ ] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
+- [x] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
+- [ ] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
+- [ ] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** - AI-powered enrichment with embeddings
 - [ ] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
 - [ ] **Phase 4: Authentication & User Management** - User system in containerized environment
 - [ ] **Phase 5: Backend API Design** - RESTful API structure and contracts
@@ -26,6 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 11: Product Search & Discovery** - Advanced search and version tracking
 - [ ] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
 - [ ] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
+- [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
 
 ## Phase Details
 
@@ -83,11 +86,78 @@ Plans:
 - [x] 02-01-PLAN.md — Foundation files: .gitattributes, Dockerfile.backend, gunicorn config, .env.example (Wave 1)
 - [x] 02-02-PLAN.md — Docker Compose with 6 services and Nginx reverse proxy (Wave 1)
 - [x] 02-03-PLAN.md — Documentation, frontend placeholder, and stack verification (Wave 2)
-- [ ] 02-04-PLAN.md — Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
+- [x] 02-04-PLAN.md — Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
+
+### Phase 2.1: Universal Vendor Scraping Engine (INSERTED)
+**Goal**: Self-learning AI-powered vendor discovery with zero-configuration setup and niche-aware safety
+**Depends on**: Phase 2
+**Requirements**: TBD (will be defined during discussion phase)
+**Success Criteria** (what must be TRUE):
+  1. User provides ONLY SKU/barcode → System auto-discovers vendor (confidence >70%)
+  2. System learns vendor site structure and auto-generates YAML config
+  3. Onboarding questionnaire builds store profile (niche, keywords, vendor scope)
+  4. Niche mismatch detection prevents wrong vendors (car parts in arts store)
+  5. Context-aware search uses store keywords + SKU (not SKU alone)
+  6. User confirmation required when confidence <70% or niche mismatch
+  7. Firecrawl discovery extracts direct product URLs from collection pages
+  8. GSD optimization (pre-mapped URLs) makes scraping 10x faster
+  9. Batch processing achieves >80% success rate with retry logic
+  10. Future customers with ANY vendor work seamlessly
+**Plans**: 8 plans in 4 waves
+
+Plans:
+- [ ] 02.1-01-PLAN.md — Core Pydantic schemas and YAML loader (Wave 1)
+- [ ] 02.1-02-PLAN.md — Store profile analyzer with TF-IDF extraction (Wave 1)
+- [ ] 02.1-03-PLAN.md — Local pattern matching and SKU validation (Wave 1)
+- [ ] 02.1-04-PLAN.md — Web search and niche validation (Wave 2)
+- [ ] 02.1-05-PLAN.md — AI inference and vendor discovery pipeline (Wave 2)
+- [ ] 02.1-06-PLAN.md — Multi-strategy scraping engine (Wave 3)
+- [ ] 02.1-07-PLAN.md — YAML auto-generation and verification (Wave 3)
+- [ ] 02.1-08-PLAN.md — Chat interface routing (Wave 4)
+
+**Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
+
+**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog ≥50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
+
+**Context Document**: See `.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md` for detailed vision, architectural decisions, and open questions captured from user discussion.
+
+### Phase 2.2: Product Enrichment Pipeline (INSERTED)
+**Goal**: AI-powered product enrichment with description generation, attribute extraction, quality scoring, and embedding generation
+**Depends on**: Phase 2.1
+**Requirements**: TBD (will be defined during discussion phase)
+**Success Criteria** (what must be TRUE):
+  1. Scraped products are enriched using vendor YAML config (keywords, tags, content templates)
+  2. AI generates German-language descriptions following store's content framework
+  3. Attributes extracted automatically (colors, materials, techniques) from title/description
+  4. Quality score (0-100) assigned to each product based on completeness
+  5. Vector embeddings generated for semantic search (sentence-transformers)
+  6. Content templates ensure brand consistency across all products
+  7. SEO optimization applied (meta titles, descriptions, URL handles)
+  8. Image alt text generated following vendor patterns
+  9. Products grouped into families (variants linked to base product)
+  10. Enrichment achieves >85% quality score on average
+**Plans**: TBD
+
+Plans:
+- [ ] TBD - Migrate side-project enrichment pipeline to src/core/enrichment/
+- [ ] TBD - Integrate with vendor YAML enrichment config
+- [ ] TBD - AI description generation via OpenRouter
+- [ ] TBD - Embedding generation and storage
+
+**Insertion Reason**: Product enrichment is critical before database design (Phase 3). The `/side-project` folder contains a mature 7-step enrichment pipeline that should be integrated. Vendor YAML now includes enrichment config (sections 12-22). Embeddings needed for semantic search in Phase 11. Keeps Phase 2.1 focused on discovery/scraping.
+
+**Source Integration**: Integrates patterns from `/side-project/src/data_pipeline/` including:
+- OpenRouter integration (75-95% cheaper than direct API)
+- sentence-transformers for embeddings
+- German-first extraction patterns
+- Quality scoring (0-100)
+- Variant/family grouping
+
+**Context Document**: See `.planning/phases/02.2-product-enrichment-pipeline/02.2-CONTEXT.md` (to be created during discuss phase).
 
 ### Phase 3: Database Migration (SQLite to PostgreSQL)
 **Goal**: Replace SQLite with PostgreSQL while preserving encrypted credentials and establishing connection pooling
-**Depends on**: Phase 2
+**Depends on**: Phase 2.2
 **Requirements**: DOCKER-05, DOCKER-07
 **Success Criteria** (what must be TRUE):
   1. All Shopify OAuth tokens and API keys remain decryptable after migration
@@ -265,16 +335,50 @@ Plans:
 - [ ] 13-02: Cost monitoring and fallback strategies
 - [ ] 13-03: Production deployment and monitoring infrastructure
 
+### Phase 14: Continuous Optimization & Learning
+**Goal**: Build self-improving system with ML-driven optimization, autonomous agents, and intelligent performance enhancement
+**Depends on**: All previous phases (1-13) - Must have full context
+**Requirements**: TBD (will be defined during discussion phase)
+**Success Criteria** (what must be TRUE):
+  1. System identifies performance bottlenecks automatically and suggests optimizations
+  2. Machine learning models learn from user behavior patterns and optimize hot paths
+  3. Autonomous agents execute frequently-repeated tasks without manual intervention
+  4. Predictive prefetching reduces perceived latency for common workflows
+  5. System cost-per-operation decreases over time through intelligent optimization
+  6. A/B testing framework validates optimization effectiveness automatically
+  7. Self-healing mechanisms detect and fix common issues without human intervention
+  8. Telemetry shows measurable improvement week-over-week in key metrics
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: Performance profiling, telemetry, and bottleneck identification
+- [ ] 14-02: Machine learning from user behavior and usage patterns
+- [ ] 14-03: Autonomous optimization agents and self-healing systems
+- [ ] 14-04: Predictive intelligence and cost optimization
+
+**Phase Purpose**: This phase reviews ALL previous work (Phases 1-13) and implements continuous improvement mechanisms. The system should get faster, smarter, and more efficient over time by:
+- Learning what users do most frequently and optimizing those paths
+- Identifying slow operations and automatically improving them
+- Caching intelligently based on access patterns
+- Predicting user needs before they ask
+- Reducing API costs through smart batching and caching
+- Self-diagnosing and fixing common issues
+- Running optimization experiments automatically (A/B tests)
+
+This is the "system that learns" - it should improve itself continuously without manual intervention, becoming more valuable the longer it runs.
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 1.1 -> 2 -> 3 -> ... -> 13
+Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 14
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Codebase Cleanup & Analysis | 3/3 | Complete | 2026-02-03 |
 | 1.1. Root Documentation Organization | 3/3 | Complete | 2026-02-04 |
-| 2. Docker Infrastructure Foundation | 3/4 | Gap closure | - |
+| 2. Docker Infrastructure Foundation | 4/4 | Complete | 2026-02-05 |
+| 2.1. Universal Vendor Scraping Engine | 0/8 | Planned | - |
+| 2.2. Product Enrichment Pipeline | 0/TBD | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
 | 5. Backend API Design | 0/2 | Not started | - |
@@ -286,3 +390,4 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 3 -> ... -> 13
 | 11. Product Search & Discovery | 0/2 | Not started | - |
 | 12. Tier System Architecture | 0/3 | Not started | - |
 | 13. Integration Hardening & Deployment | 0/3 | Not started | - |
+| 14. Continuous Optimization & Learning | 0/4 | Not started | - |
