@@ -5,23 +5,37 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 1 - Codebase Cleanup & Analysis
+**Current focus:** Phase 2.1 - Universal Vendor Scraping Engine
 
 ## Current Position
 
-Phase: 2 of 13 (Docker Infrastructure Foundation)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-05 — Completed 02-04-PLAN.md (Docker Secrets Implementation - Gap Closure)
+Phase: 2.1 of 15 (Universal Vendor Scraping Engine - INSERTED)
+Plan: 02 of 8 (Store Profile Analyzer)
+Status: In progress - Plan 02 complete
+Last activity: 2026-02-08 — Completed 02.1-02-PLAN.md (Store Profile Analyzer)
 
-Progress: [███░░░░░░░] 33% (10/30 plans)
+Progress: [███░░░░░░░] 31% (11/32 plans estimated)
+
+## Recent Session Summary (2026-02-08)
+
+**Phase 2.1 Discussion Completed:**
+- Discovery strategy: Hybrid (local patterns → known vendors → web search → AI)
+- Chat routing: Pattern matcher → LLM classifier (Gemini Flash) → handlers
+- AI integration: Local-first, aggressive caching, API fallback
+- YAML generation: Auto-generate with LLM verification + user review
+- Created comprehensive vendor template: `config/vendors/_template.yaml` (700+ lines)
+
+**Phase 2.2 Created:**
+- Product Enrichment Pipeline (AI descriptions, embeddings, quality scoring)
+- Integrates `/side-project` patterns
+- Runs after 2.1, before Phase 3 database design
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 19 min
-- Total execution time: 3.3 hours
+- Total plans completed: 11
+- Average duration: 18 min
+- Total execution time: 3.5 hours
 
 **By Phase:**
 
@@ -30,10 +44,11 @@ Progress: [███░░░░░░░] 33% (10/30 plans)
 | 01-codebase-cleanup-analysis | 3 | 64 min | 21 min |
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
+| 02.1-universal-vendor-scraping-engine | 1 | 11 min | 11 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (28 min), 02-02 (plan not tracked), 02-03 (81 min), 02-04 (5 min)
-- Trend: Gap closure plans faster than greenfield (02-04: 5 min vs 02-03: 81 min)
+- Last 5 plans: 02-02 (not tracked), 02-03 (81 min), 02-04 (5 min), 02.1-02 (11 min)
+- Trend: Well-scoped plans execute quickly (02.1-02: 11 min with 3 tasks)
 
 *Updated after each plan completion*
 
@@ -70,10 +85,16 @@ Recent decisions affecting current work:
 - Directory ownership in Dockerfile (02-03): Create data directories with proper ownership before USER switch to prevent permission errors
 - Learning-first documentation (02-03): Apartment building analogy and beginner-friendly explanations for Docker concepts
 - File-based Docker secrets (02-04): Secrets stored in /run/secrets/ files instead of environment variables to prevent docker inspect exposure
+- Catalog-first intelligence (02.1-02): 50+ products = high confidence, <10 = questionnaire needed
+- TF-IDF for keyword extraction (02.1-02): sklearn TfidfVectorizer with German stop words and special character support
+- Pattern learning from SKUs (02.1-02): Pre-defined templates matched against existing SKUs with min_occurrences=5
+- Niche detection via keyword scoring (02.1-02): Multiple signals (title/tags/types) more reliable than single field
 
 ### Roadmap Evolution
 
 - Phase 1.1 inserted after Phase 1: Root Documentation Organization (URGENT) - Phase 1 archived scripts but left 20+ documentation/data files unorganized
+- Phase 2.1 inserted after Phase 2: Universal Vendor Scraping Engine (URGENT) - Current image_scraper.py lacks strict SKU matching; /quickcleanup proved better patterns (SKU validation, Firecrawl discovery, batch processing, retry logic). Must become vendor-agnostic system before Phase 3 database schema design.
+- Phase 14 added as final phase: Continuous Optimization & Learning - Self-improving system with ML-driven optimization, autonomous agents, and intelligent performance enhancement. Must be last to have full context of all previous phases.
 
 ### Pending Todos
 
@@ -81,12 +102,15 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+**Plan 02.1-01 dependency:**
+- Plan 02.1-02 created stub implementations of store_profile_schema.py, vendor_schema.py, and loader.py
+- Plan 02.1-01 should be executed to replace stubs with full implementations
+- Current stubs sufficient for 02.1-02 functionality, but full schema validation needed for vendor YAML configs
 
 ## Session Continuity
 
-Last session: 2026-02-05 22:14:15Z
-Stopped at: Completed 02-04-PLAN.md (Docker Secrets Implementation - Gap Closure) - Phase 2 COMPLETE (4/4 plans)
+Last session: 2026-02-08 14:33:24Z
+Stopped at: Completed 02.1-02-PLAN.md (Store Profile Analyzer) - Phase 2.1 Plan 02 COMPLETE (1/8 plans)
 Resume file: None
 
 Config (if exists):
