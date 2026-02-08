@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 from typing import Union
 
-from .vendor_schema import VendorConfig, SKUPattern, VendorInfo, VendorURLs, ScrapingConfig
+from .vendor_schema import VendorConfig, SKUPattern, VendorURLs, ScrapingConfig
 from .store_profile_schema import StoreProfile
 
 
