@@ -144,6 +144,10 @@ Recent decisions affecting current work:
 - Vendor auto-detection (02.2-06): Detect vendor from product['vendor'] field, normalize to slug for YAML lookup
 - Conditional OR support (02.2-06): Support OR logic in tagging rules to reduce YAML duplication (vintage OR retro → style:vintage)
 - Vendor rules after extraction (02.2-06): Apply vendor enrichment as Step 1.5 so rules can reference extracted attributes
+- Dynamic color learning (02.2 enhancement): ColorLearner extracts colors from Shopify catalog during Phase 2.1 store analysis, merges with base COLOR_MAP for automatic recognition
+- Store-specific color vocabulary (02.2 enhancement): AttributeExtractor accepts custom_color_map, EnrichmentPipeline auto-loads from data/store_profile.json (typical 38 base → 85-150 total colors)
+- Color filtering heuristics (02.2 enhancement): Min 2 occurrences to filter typos, false positive removal (format, papier, vintage), 3-char minimum length
+- Color auto-normalization (02.2 enhancement): mintgrün → Mint Grün, sky-blue → Sky Blue for consistent data quality
 
 ### Roadmap Evolution
 
