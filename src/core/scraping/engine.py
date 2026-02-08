@@ -24,6 +24,8 @@ from src.core.discovery.sku_validator import normalize_sku, extract_sku_info, in
 from .strategies.base import BaseStrategy, StrategyResult
 from .strategies.playwright_strategy import PlaywrightStrategy
 from .strategies.requests_strategy import RequestsStrategy
+from .metrics import ScrapeMetrics, FailureReason
+from .adaptive import AdaptiveRetryEngine
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +69,15 @@ class ScrapeResult:
     error: Optional[str] = None
 
 
+@dataclass
+class BatchResult:
+    """Result from batch scraping operation."""
+    results: list[ScrapeResult]
+    success_rate: float
+    failure_breakdown: dict[str, int]
+    recommendations: list[str] = field(default_factory=list)
+
+
 class UniversalScraper:
     """
     Universal scraping engine that works with any vendor config.
@@ -79,7 +90,9 @@ class UniversalScraper:
     def __init__(
         self,
         vendor_config_dir: str = "config/vendors",
-        max_retries: int = 4
+        max_retries: int = 4,
+        metrics: Optional[ScrapeMetrics] = None,
+        adaptive: Optional[AdaptiveRetryEngine] = None
     ):
         """
         Initialize scraper.
@@ -87,12 +100,18 @@ class UniversalScraper:
         Args:
             vendor_config_dir: Directory with vendor YAML configs
             max_retries: Maximum retry attempts
+            metrics: Optional ScrapeMetrics instance
+            adaptive: Optional AdaptiveRetryEngine instance
         """
         self.vendor_config_dir = Path(vendor_config_dir)
         self.max_retries = max_retries
 
         # Strategy instances
         self._strategies: dict[str, BaseStrategy] = {}
+
+        # Metrics and adaptive learning
+        self.metrics = metrics or ScrapeMetrics()
+        self.adaptive = adaptive or AdaptiveRetryEngine(self.metrics)
 
     def _get_strategy(self, strategy_name: str) -> BaseStrategy:
         """Get or create strategy instance."""
@@ -192,6 +211,25 @@ class UniversalScraper:
 
                     elapsed = int((time.time() - start_time) * 1000)
 
+                    # Track success (or validation failure)
+                    if not validated:
+                        self.metrics.track_result(
+                            vendor_name=vendor_config.vendor.name,
+                            sku=sku,
+                            success=False,
+                            failure_reason=FailureReason.VALIDATION_FAILED.value,
+                            retry_count=attempts - 1,
+                            duration_ms=elapsed
+                        )
+                    else:
+                        self.metrics.track_result(
+                            vendor_name=vendor_config.vendor.name,
+                            sku=sku,
+                            success=True,
+                            retry_count=attempts - 1,
+                            duration_ms=elapsed
+                        )
+
                     return ScrapeResult(
                         success=True,
                         sku=sku,
@@ -226,6 +264,33 @@ class UniversalScraper:
 
         # All strategies failed
         elapsed = int((time.time() - start_time) * 1000)
+
+        # Categorize failure
+        failure_reason = self._categorize_failure(last_error or "All strategies failed")
+
+        # Track failure
+        self.metrics.track_result(
+            vendor_name=vendor_config.vendor.name,
+            sku=sku,
+            success=False,
+            failure_reason=failure_reason,
+            retry_count=attempts - 1,
+            duration_ms=elapsed
+        )
+
+        # Learn from failure
+        self.adaptive.learn_from_failure(
+            vendor_name=vendor_config.vendor.name,
+            failure_reason=failure_reason,
+            current_params={'delay_ms': 2000, 'timeout_ms': 30000}
+        )
+
+        # Check if rediscovery needed
+        if self.adaptive.should_trigger_rediscovery(vendor_config.vendor.name):
+            logger.warning(
+                f"{vendor_config.vendor.name}: Rediscovery recommended - "
+                "run vendor discovery to update selectors"
+            )
 
         return ScrapeResult(
             success=False,
@@ -320,13 +385,42 @@ class UniversalScraper:
 
         return len(errors) == 0, errors
 
+    def _categorize_failure(self, error_msg: str) -> str:
+        """
+        Categorize failure reason from error message.
+
+        Args:
+            error_msg: Error message
+
+        Returns:
+            FailureReason value
+        """
+        error_lower = error_msg.lower()
+
+        if any(pattern in error_lower for pattern in ['429', 'rate limit', 'too many']):
+            return FailureReason.RATE_LIMIT.value
+
+        if any(pattern in error_lower for pattern in ['timeout', 'timed out']):
+            return FailureReason.TIMEOUT.value
+
+        if any(pattern in error_lower for pattern in ['selector', 'element not found', 'not found']):
+            return FailureReason.SELECTOR_FAILED.value
+
+        if any(pattern in error_lower for pattern in ['network', 'connection', 'dns', 'unreachable']):
+            return FailureReason.NETWORK_ERROR.value
+
+        if any(pattern in error_lower for pattern in ['sku mismatch', 'placeholder', 'validation']):
+            return FailureReason.VALIDATION_FAILED.value
+
+        return FailureReason.UNKNOWN.value
+
     async def scrape_batch(
         self,
         skus: list[str],
         vendor_config: VendorConfig,
         batch_size: int = 10,
         delay_between_batches_ms: int = 5000
-    ) -> list[ScrapeResult]:
+    ) -> BatchResult:
         """
         Scrape multiple SKUs in batches.
 
@@ -337,7 +431,7 @@ class UniversalScraper:
             delay_between_batches_ms: Delay between batches
 
         Returns:
-            List of ScrapeResult for each SKU
+            BatchResult with results and metrics
         """
         results = []
 
@@ -356,7 +450,36 @@ class UniversalScraper:
             if i + batch_size < len(skus):
                 await asyncio.sleep(delay_between_batches_ms / 1000)
 
-        return results
+        # Calculate metrics
+        success_rate = self.metrics.get_success_rate(vendor_config.vendor.name)
+        failure_breakdown = self.metrics.get_failure_breakdown(vendor_config.vendor.name)
+
+        # Generate recommendations
+        recommendations = []
+        if self.adaptive.should_trigger_rediscovery(vendor_config.vendor.name):
+            recommendations.append(
+                f"Vendor {vendor_config.vendor.name} needs rediscovery - "
+                "selectors may be outdated"
+            )
+
+        if success_rate < 0.8:
+            recommendations.append(
+                f"Success rate {success_rate:.1%} below target (80%) - "
+                "consider adjusting configuration"
+            )
+
+        # Log summary
+        logger.info(
+            f"Batch scrape complete: {len(skus)} SKUs, "
+            f"success rate {success_rate:.1%}"
+        )
+
+        return BatchResult(
+            results=results,
+            success_rate=success_rate,
+            failure_breakdown=failure_breakdown,
+            recommendations=recommendations
+        )
 
     async def close(self):
         """Clean up all strategy resources."""
