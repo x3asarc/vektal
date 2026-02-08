@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 2.1 of 15 (Universal Vendor Scraping Engine - INSERTED)
-Plan: 08 of 8 (Chat Routing Infrastructure)
-Status: In progress - Plan 08 complete
-Last activity: 2026-02-08 — Completed 02.1-08-PLAN.md (Chat Routing Infrastructure - Backend Only)
+Plan: 9 of 11 in current phase
+Status: In progress
+Last activity: 2026-02-08 — Completed 02.1-10-PLAN.md (Firecrawl Integration & GSD Auto-Population)
 
-Progress: [████░░░░░░] 44% (14/32 plans estimated)
+Progress: [█████░░░░░] 47% (15/32 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -33,9 +33,9 @@ Progress: [████░░░░░░] 44% (14/32 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 15 min
-- Total execution time: 4.6 hours
+- Total plans completed: 17
+- Average duration: 14 min
+- Total execution time: 4.7 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [████░░░░░░] 44% (14/32 plans estimated)
 | 01-codebase-cleanup-analysis | 3 | 64 min | 21 min |
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
-| 02.1-universal-vendor-scraping-engine | 8 | 73 min | 9 min |
+| 02.1-universal-vendor-scraping-engine | 9 | 79 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.1-06 (18 min), 02.1-07 (21 min), 02.1-08 (14 min)
-- Trend: Backend infrastructure tasks averaging 14-21 min (routing, handlers, tests)
+- Last 5 plans: 02.1-07 (21 min), 02.1-08 (14 min), 02.1-10 (6 min)
+- Trend: API integration and testing tasks very efficient (6-14 min)
 
 *Updated after each plan completion*
 
@@ -109,6 +109,9 @@ Recent decisions affecting current work:
 - 3-tier chat classification (02.1-08): Pattern (80%, free) → Local LLM (15%, free) → API LLM (5%, paid)
 - Structured responses without LLM (02.1-08): Handlers generate JSON-ready responses from data, no LLM overhead for formatting
 - Backend-only chat infrastructure (02.1-08): Phase 5 exposes via REST API, Phase 10 builds ChatGPT-style UI
+- Firecrawl for collection crawling (02.1-10): Async job polling with exponential backoff for reliable discovery
+- Non-destructive mapping merge (02.1-10): GSDPopulator never overwrites existing mappings to preserve manual corrections
+- SKU extraction strategy (02.1-10): URL patterns first (fastest), fall back to page content scraping
 
 ### Roadmap Evolution
 
@@ -122,12 +125,12 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 2.1 complete (8/8 plans). Ready for next phase.
+None - Phase 2.1 in progress (9/11 plans complete).
 
 ## Session Continuity
 
-Last session: 2026-02-08 14:37:45Z
-Stopped at: Completed 02.1-08-PLAN.md (Chat Routing Infrastructure - Backend Only) - Phase 2.1 COMPLETE (8/8 plans)
+Last session: 2026-02-08 14:21:21Z
+Stopped at: Completed 02.1-10-PLAN.md (Firecrawl Integration & GSD Auto-Population)
 Resume file: None
 
 Config (if exists):
