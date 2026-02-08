@@ -10,22 +10,23 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 3 of 15 (Database Migration - SQLite to PostgreSQL)
-Plan: 2 of 5 (Plan 03-02 complete)
+Plan: 3 of 5 (Plan 03-03 complete)
 Status: In progress
-Last activity: 2026-02-08 — Completed 03-02-PLAN.md (SQLAlchemy ORM Models)
+Last activity: 2026-02-08 — Completed 03-03-PLAN.md (Migrations, Backups & Encryption)
 
-Progress: [██████░░░░] 75% (27/36 plans estimated)
+Progress: [██████░░░░] 78% (28/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
 **Phase 3 Execution In Progress:**
 - Plan 03-01 complete: Flask-SQLAlchemy + PostgreSQL Setup (5 minutes)
 - Plan 03-02 complete: SQLAlchemy ORM Models (5 minutes)
-- Created 10 ORM models: User, ShopifyStore, Vendor, Product, ProductEnrichment, Job, etc.
-- Encrypted token storage with deferred imports to avoid circular dependencies
+- Plan 03-03 complete: Migrations, Backups & Encryption (7 minutes)
+- Flask-Migrate initialized with 11-table migration (users, stores, vendors, products, jobs)
+- Backup/restore scripts with pg_dump compression and 5-minute restore target
+- Fernet encryption helpers for OAuth token storage
+- 25+ indexes for performance (composite, foreign key, unique)
 - PostgreSQL ARRAY types for tags, colors, materials, embeddings
-- Composite indexes for fast vendor catalog lookups
-- One-to-one User-ShopifyStore relationship (v1.0)
 
 **Phase 2.2 Execution Completed:**
 - Wave 1 (4 plans in parallel): Attribute extraction, AI descriptions, product families, embeddings
@@ -63,11 +64,11 @@ Progress: [██████░░░░] 75% (27/36 plans estimated)
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
-| 03-database-migration-sqlite-to-postgresql | 2 | 10 min | 5 min |
+| 03-database-migration-sqlite-to-postgresql | 3 | 17 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.2-04 (19 min), 02.2-05 (9 min), 02.2-06 (5 min), 03-01 (5 min), 03-02 (5 min)
-- Trend: Phase 3 in progress - database models created (5 min)
+- Last 5 plans: 02.2-05 (9 min), 02.2-06 (5 min), 03-01 (5 min), 03-02 (5 min), 03-03 (7 min)
+- Trend: Phase 3 in progress - migrations and backup infrastructure ready (6 min avg)
 
 *Updated after each plan completion*
 
@@ -168,6 +169,12 @@ Recent decisions affecting current work:
 - PostgreSQL ARRAY types (03-02): Native array support for tags, colors, materials, embeddings eliminates junction tables, simpler queries
 - Composite index on VendorCatalogItem (03-02): Index on (vendor_id, sku, barcode) enables fast catalog lookups during product matching
 - One-to-one User-ShopifyStore (03-02): unique=True on user_id enforces v1.0 requirement at database level, multi-store support deferred to v2.0
+- Flask app factory for CLI (03-03): src/app_factory.py provides Flask app instance for flask db migrate/upgrade commands without running full application server
+- Custom format pg_dump with compression level 6 (03-03): Custom format (-Fc) enables selective restore and better compression; level 6 balances speed vs size for frequent backups
+- 5-backup retention by default (03-03): Keeps last 5 backups automatically to prevent disk space issues while maintaining reasonable history
+- Confirmation prompt in restore script (03-03): Prevents accidental data loss by requiring explicit confirmation before destructive restore operation
+- Fernet for OAuth token encryption (03-03): Industry-standard symmetric encryption with HMAC authentication; simpler than asymmetric encryption for database storage use case
+- Return None on decryption failure (03-03): Graceful error handling allows application to detect and handle corrupted/expired tokens without crashing
 
 ### Roadmap Evolution
 
@@ -196,8 +203,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08 18:03:25Z
-Stopped at: Completed 03-02-PLAN.md (SQLAlchemy ORM Models)
+Last session: 2026-02-08 20:38:36Z
+Stopped at: Completed 03-03-PLAN.md (Migrations, Backups & Encryption)
 Resume file: None
 
 Config (if exists):
