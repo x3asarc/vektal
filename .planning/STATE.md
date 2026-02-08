@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 3 of 15 (Database Migration - SQLite to PostgreSQL)
-Plan: 3 of 5 (Plan 03-03 complete)
+Plan: 4 of 5 (Plan 03-04 complete)
 Status: In progress
-Last activity: 2026-02-08 — Completed 03-03-PLAN.md (Migrations, Backups & Encryption)
+Last activity: 2026-02-08 — Completed 03-04-PLAN.md (Pentart Import & Auto-Migrations)
 
-Progress: [██████░░░░] 78% (28/36 plans estimated)
+Progress: [██████░░░░] 81% (29/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -22,9 +22,12 @@ Progress: [██████░░░░] 78% (28/36 plans estimated)
 - Plan 03-01 complete: Flask-SQLAlchemy + PostgreSQL Setup (5 minutes)
 - Plan 03-02 complete: SQLAlchemy ORM Models (5 minutes)
 - Plan 03-03 complete: Migrations, Backups & Encryption (7 minutes)
+- Plan 03-04 complete: Pentart Import & Auto-Migrations (3 minutes)
 - Flask-Migrate initialized with 11-table migration (users, stores, vendors, products, jobs)
 - Backup/restore scripts with pg_dump compression and 5-minute restore target
 - Fernet encryption helpers for OAuth token storage
+- Pentart import script for initial vendor catalog data (barcode, SKU, weight only)
+- Docker auto-migration on container startup (flask db upgrade)
 - 25+ indexes for performance (composite, foreign key, unique)
 - PostgreSQL ARRAY types for tags, colors, materials, embeddings
 
@@ -51,9 +54,9 @@ Progress: [██████░░░░] 78% (28/36 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 29
 - Average duration: 10 min
-- Total execution time: 4.4 hours
+- Total execution time: 4.7 hours
 
 **By Phase:**
 
@@ -64,11 +67,11 @@ Progress: [██████░░░░] 78% (28/36 plans estimated)
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
-| 03-database-migration-sqlite-to-postgresql | 3 | 17 min | 6 min |
+| 03-database-migration-sqlite-to-postgresql | 4 | 20 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.2-05 (9 min), 02.2-06 (5 min), 03-01 (5 min), 03-02 (5 min), 03-03 (7 min)
-- Trend: Phase 3 in progress - migrations and backup infrastructure ready (6 min avg)
+- Last 5 plans: 02.2-06 (5 min), 03-01 (5 min), 03-02 (5 min), 03-03 (7 min), 03-04 (3 min)
+- Trend: Phase 3 in progress - Pentart import and auto-migration infrastructure ready (5 min avg)
 
 *Updated after each plan completion*
 
@@ -175,6 +178,9 @@ Recent decisions affecting current work:
 - Confirmation prompt in restore script (03-03): Prevents accidental data loss by requiring explicit confirmation before destructive restore operation
 - Fernet for OAuth token encryption (03-03): Industry-standard symmetric encryption with HMAC authentication; simpler than asymmetric encryption for database storage use case
 - Return None on decryption failure (03-03): Graceful error handling allows application to detect and handle corrupted/expired tokens without crashing
+- Import Pentart as initial vendor catalog data, NOT SQLite migration (03-04): Per CONTEXT.md, SQLite is temporary; production schema designed from requirements
+- Import only 3 columns from Pentart CSV (03-04): Barcode, SKU, weight only - titles were Hungarian and other columns not applicable
+- Auto-run migrations on container startup (03-04): flask db upgrade runs before server starts; ensures schema is always up-to-date, fails fast on errors
 
 ### Roadmap Evolution
 
@@ -203,8 +209,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08 20:38:36Z
-Stopped at: Completed 03-03-PLAN.md (Migrations, Backups & Encryption)
+Last session: 2026-02-08 20:45:54Z
+Stopped at: Completed 03-04-PLAN.md (Pentart Import & Auto-Migrations)
 Resume file: None
 
 Config (if exists):
