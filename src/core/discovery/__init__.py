@@ -32,6 +32,9 @@ from .niche_validator import (
     NicheValidationResult
 )
 from .web_search import WebSearchClient, SearchResult, WebSearchResponse
+from .local_classifier import LocalVendorClassifier, ClassificationResult
+from .ai_inference import OpenRouterInference, InferenceResult
+from .pipeline import VendorDiscoveryPipeline, DiscoveryResult
 
 __all__ = [
     "validate_sku",
@@ -47,5 +50,11 @@ __all__ = [
     "NicheValidationResult",
     "WebSearchClient",
     "SearchResult",
-    "WebSearchResponse"
+    "WebSearchResponse",
+    "LocalVendorClassifier",
+    "ClassificationResult",
+    "OpenRouterInference",
+    "InferenceResult",
+    "VendorDiscoveryPipeline",
+    "DiscoveryResult"
 ]
