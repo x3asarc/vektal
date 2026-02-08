@@ -26,26 +26,28 @@ class AttributeExtractor:
         ]
 
         # Size patterns: various formats (20ml, 50g, 14x14cm, A4)
+        # Order matters: check dimension patterns before simple sizes to avoid partial matches
         self.size_patterns = [
-            # Simple: 20ml, 50g, 100pcs
-            re.compile(r'(\d+(?:[.,]\d+)?)\s*(ml|l|g|kg|cm|mm|m²|m2|pcs|stk|stück|piece|pack|set)', re.IGNORECASE),
-            # Dimensions: 14x14cm
+            # Paper formats: A4, A3, A5 (check first - very specific)
+            re.compile(r'\b(A[0-9]|DIN\s*A[0-9])\b', re.IGNORECASE),
+            # Dimensions: 14x14cm (check before simple sizes)
             re.compile(r'(\d+)\s*x\s*(\d+)\s*(cm|mm)', re.IGNORECASE),
-            # German comma format: 14, 14cm
-            re.compile(r'(\d+),\s*(\d+)\s*(cm|mm)', re.IGNORECASE),
             # Verbose: 10cm x 15cm
             re.compile(r'(\d+)\s*(cm|mm)\s*x\s*(\d+)\s*(cm|mm)', re.IGNORECASE),
-            # Paper formats: A4, A3, A5
-            re.compile(r'\b(A[0-9]|DIN\s*A[0-9])\b', re.IGNORECASE)
+            # German comma format: 14, 14cm
+            re.compile(r'(\d+),\s*(\d+)\s*(cm|mm)', re.IGNORECASE),
+            # Simple: 20ml, 50g, 100pcs (check last - most general)
+            re.compile(r'(\d+(?:[.,]\d+)?)\s*(ml|l|g|kg|cm|mm|m²|m2|pcs|stk|stück|piece|pack|set)', re.IGNORECASE)
         ]
 
         # Material patterns
+        # Note: Using \b on start but not end to catch compound words like "Epoxidharz"
         self.material_patterns = [
             re.compile(
-                r'\b(acryl|acrylfarbe|öl|ölfarbe|harz|epoxid|epoxy|'
-                r'wasserbasis|wasserbasiert|alkohol|textil|textilfarbe|'
+                r'\b(acrylfarbe|acryl|ölfarbe|öl|epoxidharz|epoxid|epoxy|harz|'
+                r'textilfarbe|textil|wasserbasiert|wasserbasis|alkohol|'
                 r'holz|glas|metall|kunststoff|papier|pappe|stoff|leder|'
-                r'keramik|porzellan)\b',
+                r'keramik|porzellan)',
                 re.IGNORECASE
             )
         ]
@@ -85,18 +87,21 @@ class AttributeExtractor:
         for pattern in self.size_patterns:
             match = pattern.search(title_lower)
             if match:
+                matched_text = match.group(0).lower()
+                num_groups = len(match.groups())
+
                 # Handle paper format (A4, A3, etc.)
-                if 'A' in match.group(0).upper() or 'DIN' in match.group(0).upper():
+                if 'a' in matched_text or 'din' in matched_text:
                     result['extracted_size'] = match.group(1).upper()
                     result['extracted_unit'] = 'format'
-                # Handle dimension format (14x14cm)
-                elif 'x' in match.group(0).lower() and len(match.groups()) >= 3:
-                    if match.lastindex >= 3:
-                        result['extracted_size'] = f"{match.group(1)}x{match.group(2)}"
-                        result['extracted_unit'] = match.group(3).lower()
-                    else:
-                        result['extracted_size'] = match.group(1)
-                        result['extracted_unit'] = match.group(2).lower()
+                # Handle dimension format (14x14cm) - has 3 groups
+                elif 'x' in matched_text and num_groups == 3:
+                    result['extracted_size'] = f"{match.group(1)}x{match.group(2)}"
+                    result['extracted_unit'] = match.group(3).lower()
+                # Handle verbose dimension (10cm x 15cm) - has 4 groups
+                elif 'x' in matched_text and num_groups == 4:
+                    result['extracted_size'] = f"{match.group(1)}x{match.group(3)}"
+                    result['extracted_unit'] = match.group(2).lower()
                 # Simple size (20ml, 50g)
                 else:
                     result['extracted_size'] = match.group(1).replace(',', '.')
@@ -111,11 +116,11 @@ class AttributeExtractor:
                 # Normalize common materials
                 if material in ['acrylfarbe', 'acryl']:
                     material = 'Acryl'
-                elif material in ['öl', 'ölfarbe']:
+                elif material in ['ölfarbe', 'öl']:
                     material = 'Öl'
-                elif material in ['textil', 'textilfarbe']:
+                elif material in ['textilfarbe', 'textil']:
                     material = 'Textil'
-                elif material in ['harz', 'epoxid', 'epoxy']:
+                elif material in ['epoxidharz', 'epoxid', 'epoxy', 'harz']:
                     material = 'Harz'
                 else:
                     material = material.capitalize()
