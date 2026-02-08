@@ -1,0 +1,34 @@
+"""
+Discovery Module
+
+Vendor discovery and SKU pattern matching.
+"""
+
+# Placeholder for existing imports that might be referenced
+try:
+    from .store_analyzer import StoreProfileAnalyzer
+    from .catalog_extractor import (
+        extract_keywords,
+        detect_niche,
+        learn_sku_patterns,
+        extract_vendors
+    )
+except ImportError:
+    # These will be implemented in future plans
+    pass
+
+from .sku_validator import (
+    validate_sku,
+    normalize_sku,
+    extract_sku_info,
+    infer_size_from_sku,
+    SKUInfo
+)
+
+__all__ = [
+    "validate_sku",
+    "normalize_sku",
+    "extract_sku_info",
+    "infer_size_from_sku",
+    "SKUInfo"
+]
