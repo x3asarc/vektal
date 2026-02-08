@@ -103,23 +103,31 @@ Plans:
   8. GSD optimization (pre-mapped URLs) makes scraping 10x faster
   9. Batch processing achieves >80% success rate with retry logic
   10. Future customers with ANY vendor work seamlessly
-**Plans**: 8 plans in 4 waves
+**Plans**: 11 plans in 5 waves
 
 Plans:
-- [ ] 02.1-01-PLAN.md — Core Pydantic schemas and YAML loader (Wave 1)
-- [ ] 02.1-02-PLAN.md — Store profile analyzer with TF-IDF extraction (Wave 1)
-- [ ] 02.1-03-PLAN.md — Local pattern matching and SKU validation (Wave 1)
-- [ ] 02.1-04-PLAN.md — Web search and niche validation (Wave 2)
-- [ ] 02.1-05-PLAN.md — AI inference and vendor discovery pipeline (Wave 2)
-- [ ] 02.1-06-PLAN.md — Multi-strategy scraping engine (Wave 3)
-- [ ] 02.1-07-PLAN.md — YAML auto-generation and verification (Wave 3)
-- [ ] 02.1-08-PLAN.md — Chat interface routing (Wave 4)
+- [x] 02.1-01-PLAN.md — Core Pydantic schemas and YAML loader (Wave 1)
+- [x] 02.1-02-PLAN.md — Store profile analyzer with TF-IDF extraction (Wave 1)
+- [x] 02.1-03-PLAN.md — Local pattern matching and SKU validation (Wave 1)
+- [x] 02.1-04-PLAN.md — Web search and niche validation (Wave 2)
+- [x] 02.1-05-PLAN.md — AI inference and vendor discovery pipeline (Wave 2)
+- [x] 02.1-06-PLAN.md — Multi-strategy scraping engine (Wave 3)
+- [x] 02.1-07-PLAN.md — YAML auto-generation and verification (Wave 3)
+- [x] 02.1-08-PLAN.md — Chat interface routing (Wave 4)
+- [ ] 02.1-09-PLAN.md — Site reconnaissance and selector discovery (Wave 5, Gap Closure)
+- [ ] 02.1-10-PLAN.md — Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
+- [ ] 02.1-11-PLAN.md — Metrics tracking and adaptive learning (Wave 5, Gap Closure)
 
 **Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
 
 **Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog ≥50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
 
 **Context Document**: See `.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md` for detailed vision, architectural decisions, and open questions captured from user discussion.
+
+**Gap Closure Plans (Wave 5)**: Three verification gaps addressed:
+- Plan 09: Site reconnaissance that discovers selectors from actual pages (Gap 1: Site Structure Learning)
+- Plan 10: Firecrawl API integration with GSD mappings auto-population (Gap 2: Firecrawl Integration)
+- Plan 11: Success rate metrics and adaptive retry learning (Gap 3: Success Rate Measurement + Dynamic Improvement)
 
 ### Phase 2.2: Product Enrichment Pipeline (INSERTED)
 **Goal**: AI-powered product enrichment with description generation, attribute extraction, quality scoring, and embedding generation
@@ -377,7 +385,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 1. Codebase Cleanup & Analysis | 3/3 | Complete | 2026-02-03 |
 | 1.1. Root Documentation Organization | 3/3 | Complete | 2026-02-04 |
 | 2. Docker Infrastructure Foundation | 4/4 | Complete | 2026-02-05 |
-| 2.1. Universal Vendor Scraping Engine | 0/8 | Planned | - |
+| 2.1. Universal Vendor Scraping Engine | 8/11 | In Progress (Gap Closure) | - |
 | 2.2. Product Enrichment Pipeline | 0/TBD | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
