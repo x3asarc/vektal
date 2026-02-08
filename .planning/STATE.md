@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 2.1 of 15 (Universal Vendor Scraping Engine - INSERTED)
 Plan: 9 of 11 in current phase
 Status: In progress
-Last activity: 2026-02-08 — Completed 02.1-10-PLAN.md (Firecrawl Integration & GSD Auto-Population)
+Last activity: 2026-02-08 — Completed 02.1-09-PLAN.md (Site Reconnaissance)
 
 Progress: [█████░░░░░] 47% (15/32 plans estimated)
 
@@ -33,9 +33,9 @@ Progress: [█████░░░░░] 47% (15/32 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 15
 - Average duration: 14 min
-- Total execution time: 4.7 hours
+- Total execution time: 3.6 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [█████░░░░░] 47% (15/32 plans estimated)
 | 01-codebase-cleanup-analysis | 3 | 64 min | 21 min |
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
-| 02.1-universal-vendor-scraping-engine | 9 | 79 min | 9 min |
+| 02.1-universal-vendor-scraping-engine | 9 | 84 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.1-07 (21 min), 02.1-08 (14 min), 02.1-10 (6 min)
-- Trend: API integration and testing tasks very efficient (6-14 min)
+- Last 5 plans: 02.1-06 (18 min), 02.1-07 (21 min), 02.1-08 (14 min), 02.1-09 (11 min)
+- Trend: Discovery infrastructure tasks averaging 11-21 min (recon, generation, routing)
 
 *Updated after each plan completion*
 
@@ -109,9 +109,11 @@ Recent decisions affecting current work:
 - 3-tier chat classification (02.1-08): Pattern (80%, free) → Local LLM (15%, free) → API LLM (5%, paid)
 - Structured responses without LLM (02.1-08): Handlers generate JSON-ready responses from data, no LLM overhead for formatting
 - Backend-only chat infrastructure (02.1-08): Phase 5 exposes via REST API, Phase 10 builds ChatGPT-style UI
-- Firecrawl for collection crawling (02.1-10): Async job polling with exponential backoff for reliable discovery
-- Non-destructive mapping merge (02.1-10): GSDPopulator never overwrites existing mappings to preserve manual corrections
-- SKU extraction strategy (02.1-10): URL patterns first (fastest), fall back to page content scraping
+- Lazy playwright import (02.1-09): Avoid requiring installation if unused, graceful degradation
+- Selector scoring algorithm (02.1-09): 0.0-2.0 range with content type validation for reliability
+- Multi-sample validation (02.1-09): Test selectors on 3-5 products, require 80% success rate
+- JavaScript detection via content size (02.1-09): >20% increase indicates JS requirement
+- SKU pattern inference from samples (02.1-09): Extract and validate against 5 pre-defined patterns
 
 ### Roadmap Evolution
 
@@ -125,12 +127,14 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Phase 2.1 in progress (9/11 plans complete).
+**Gap 1 from VERIFICATION.md CLOSED** - VendorConfigGenerator now has site reconnaissance mechanism via SiteReconnaissance.discover().
+
+Phase 2.1 in progress (9/11 plans complete).
 
 ## Session Continuity
 
-Last session: 2026-02-08 14:21:21Z
-Stopped at: Completed 02.1-10-PLAN.md (Firecrawl Integration & GSD Auto-Population)
+Last session: 2026-02-08 16:11:27Z
+Stopped at: Completed 02.1-09-PLAN.md (Site Reconnaissance)
 Resume file: None
 
 Config (if exists):
