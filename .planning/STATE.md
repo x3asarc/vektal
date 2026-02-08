@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 2.1 of 15 (Universal Vendor Scraping Engine - INSERTED)
-Plan: 01 of 8 (Vendor Config Schema)
-Status: In progress - Plan 01 complete
-Last activity: 2026-02-08 — Completed 02.1-01-PLAN.md (Vendor Config Schema)
+Plan: 05 of 8 (AI Inference & Discovery Pipeline)
+Status: In progress - Plan 05 complete
+Last activity: 2026-02-08 — Completed 02.1-05-PLAN.md (AI Inference & Discovery Pipeline)
 
-Progress: [███░░░░░░░] 31% (10/32 plans estimated)
+Progress: [███░░░░░░░] 34% (11/32 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -33,9 +33,9 @@ Progress: [███░░░░░░░] 31% (10/32 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 17 min
-- Total execution time: 3.7 hours
+- Total plans completed: 13
+- Average duration: 16 min
+- Total execution time: 3.8 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Progress: [███░░░░░░░] 31% (10/32 plans estimated)
 | 01-codebase-cleanup-analysis | 3 | 64 min | 21 min |
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
-| 02.1-universal-vendor-scraping-engine | 1 | 12 min | 12 min |
+| 02.1-universal-vendor-scraping-engine | 2 | 20 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-04 (5 min), 02.1-01 (12 min)
-- Trend: Well-scoped plans execute quickly (12 min with 3 tasks)
+- Last 5 plans: 02-04 (5 min), 02.1-01 (12 min), 02.1-05 (8 min)
+- Trend: Efficient execution with well-defined AI components (8 min with 3 tasks)
 
 *Updated after each plan completion*
 
@@ -94,6 +94,10 @@ Recent decisions affecting current work:
 - _meta field alias (02.1-01): Pydantic v2 doesn't allow leading underscores, use meta with alias="_meta" for YAML compatibility
 - Early regex validation (02.1-01): SKU patterns validated at schema level to catch configuration errors immediately
 - URL placeholder validation (02.1-01): Product URL templates must contain {sku} placeholder to prevent misconfiguration
+- Local-first AI (02.1-05): sentence-transformers for free local classification before paid API calls
+- Multi-stage discovery (02.1-05): Pattern → Web → Local LLM → API LLM with early exit on high confidence
+- Aggressive caching (02.1-05): LRU caches (1000 local, 500 API) prevent repeated queries
+- Confidence thresholds (02.1-05): Pattern >=0.90, Search >=0.80, Local LLM >=0.85 for early exit
 
 ### Roadmap Evolution
 
@@ -107,12 +111,12 @@ None yet.
 
 ### Blockers/Concerns
 
-None - Plan 02.1-01 complete, full schema validation now available.
+None - AI inference pipeline complete and tested. Ready for chat routing (Plan 06).
 
 ## Session Continuity
 
-Last session: 2026-02-08 13:37:11Z
-Stopped at: Completed 02.1-01-PLAN.md (Vendor Config Schema) - Phase 2.1 Plan 01 COMPLETE (1/8 plans)
+Last session: 2026-02-08 15:04:42Z
+Stopped at: Completed 02.1-05-PLAN.md (AI Inference & Discovery Pipeline) - Phase 2.1 Plan 05 COMPLETE (2/8 plans)
 Resume file: None
 
 Config (if exists):
