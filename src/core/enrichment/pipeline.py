@@ -13,9 +13,7 @@ from .quality.scorer import QualityScorer, QualityGate
 from .embeddings.generator import EmbeddingGenerator
 from .templating.engine import TemplateEngine
 from .config import QUALITY_THRESHOLDS
-
-# NOTE: VendorEnrichmentConfig will be added by Plan 06 after this file exists
-# Plan 05 creates the pipeline structure; Plan 06 adds vendor config integration
+from .vendor_integration import VendorEnrichmentConfig, detect_vendor_from_product, load_vendor_enrichment_config
 
 
 class EnrichmentPipeline:
@@ -67,6 +65,16 @@ class EnrichmentPipeline:
             self._embedding_generator = EmbeddingGenerator()
         return self._embedding_generator
 
+    def _load_vendor_config(self, vendor_slug: str) -> Optional[dict]:
+        """Load vendor config from YAML file by slug.
+
+        This enables the vendor_slug parameter in run() to auto-load config.
+        """
+        config = load_vendor_enrichment_config(vendor_slug)
+        if config:
+            return config.raw_config
+        return None
+
     def run(self,
             products: List[dict],
             vendor_config: dict = None,
@@ -113,10 +121,18 @@ class EnrichmentPipeline:
         print(f"Products: {len(products)}")
         print(f"AI Model: {self.openrouter_model}")
 
+        # Auto-load vendor config if vendor_slug provided
+        if vendor_slug and not vendor_config:
+            vendor_config = self._load_vendor_config(vendor_slug)
+
         # Step 1: Extract attributes
         if not skip_extraction:
             products = self._step_extract_attributes(products)
             self._save_checkpoint(products, 'extraction')
+
+        # Step 1.5: Apply vendor-specific enrichment rules
+        products = self._step_apply_vendor_rules(products)
+        self._save_checkpoint(products, 'vendor_rules')
 
         # Step 2: Apply vendor templates (if config provided)
         if vendor_config:
@@ -169,6 +185,27 @@ class EnrichmentPipeline:
 
         extracted_colors = sum(1 for p in products if p.get('extracted_color'))
         print(f"  * Extracted color for {extracted_colors}/{len(products)} products")
+
+        return products
+
+    def _step_apply_vendor_rules(self, products: List[dict]) -> List[dict]:
+        """Apply vendor-specific enrichment rules from YAML"""
+        print("\n[Step 1.5] Applying vendor enrichment rules...")
+
+        # Group products by vendor
+        vendor_configs = {}
+
+        for product in products:
+            vendor_slug = detect_vendor_from_product(product)
+            if vendor_slug and vendor_slug not in vendor_configs:
+                config = load_vendor_enrichment_config(vendor_slug)
+                vendor_configs[vendor_slug] = config
+
+            if vendor_slug and vendor_configs.get(vendor_slug):
+                vendor_configs[vendor_slug].enrich_product(product)
+
+        applied_count = sum(1 for p in products if p.get('vendor_keywords'))
+        print(f"  * Applied vendor rules to {applied_count}/{len(products)} products")
 
         return products
 
