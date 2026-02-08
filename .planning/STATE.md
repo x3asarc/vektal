@@ -10,20 +10,22 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 3 of 15 (Database Migration - SQLite to PostgreSQL)
-Plan: 1 of 5 (Plan 03-01 complete)
+Plan: 2 of 5 (Plan 03-02 complete)
 Status: In progress
-Last activity: 2026-02-08 — Completed 03-01-PLAN.md (Flask-SQLAlchemy + PostgreSQL Setup)
+Last activity: 2026-02-08 — Completed 03-02-PLAN.md (SQLAlchemy ORM Models)
 
-Progress: [██████░░░░] 72% (26/36 plans estimated)
+Progress: [██████░░░░] 75% (27/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
-**Phase 3 Execution Started:**
+**Phase 3 Execution In Progress:**
 - Plan 03-01 complete: Flask-SQLAlchemy + PostgreSQL Setup (5 minutes)
-- Added database dependencies: Flask-SQLAlchemy 3.1+, Flask-Migrate, psycopg3
-- Created SQLAlchemy instance with naming convention for Alembic
-- Application factory with development-friendly pool settings (5+2)
-- Upgraded PostgreSQL container to version 16
+- Plan 03-02 complete: SQLAlchemy ORM Models (5 minutes)
+- Created 10 ORM models: User, ShopifyStore, Vendor, Product, ProductEnrichment, Job, etc.
+- Encrypted token storage with deferred imports to avoid circular dependencies
+- PostgreSQL ARRAY types for tags, colors, materials, embeddings
+- Composite indexes for fast vendor catalog lookups
+- One-to-one User-ShopifyStore relationship (v1.0)
 
 **Phase 2.2 Execution Completed:**
 - Wave 1 (4 plans in parallel): Attribute extraction, AI descriptions, product families, embeddings
@@ -48,9 +50,9 @@ Progress: [██████░░░░] 72% (26/36 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
-- Average duration: 11 min
-- Total execution time: 4.3 hours
+- Total plans completed: 27
+- Average duration: 10 min
+- Total execution time: 4.4 hours
 
 **By Phase:**
 
@@ -61,11 +63,11 @@ Progress: [██████░░░░] 72% (26/36 plans estimated)
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
-| 03-database-migration-sqlite-to-postgresql | 1 | 5 min | 5 min |
+| 03-database-migration-sqlite-to-postgresql | 2 | 10 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.2-03 (20 min), 02.2-04 (19 min), 02.2-05 (9 min), 02.2-06 (5 min), 03-01 (5 min)
-- Trend: Phase 3 started - database foundation setup (5 min)
+- Last 5 plans: 02.2-04 (19 min), 02.2-05 (9 min), 02.2-06 (5 min), 03-01 (5 min), 03-02 (5 min)
+- Trend: Phase 3 in progress - database models created (5 min)
 
 *Updated after each plan completion*
 
@@ -161,6 +163,11 @@ Recent decisions affecting current work:
 - PostgreSQL 16 (03-01): Latest stable version with performance improvements per RESEARCH.md recommendations
 - Naming convention for Alembic (03-01): Explicit MetaData naming convention prevents "unnamed constraint" errors during schema changes
 - Automatic psycopg3 URL conversion (03-01): Auto-convert postgresql:// to postgresql+psycopg:// to ensure psycopg3 driver usage
+- Separate ProductEnrichment table (03-02): AI-generated SEO and attributes can be regenerated independently without affecting core product data
+- Deferred imports for encryption (03-02): Import encryption functions inside methods to avoid circular dependency between models and core modules
+- PostgreSQL ARRAY types (03-02): Native array support for tags, colors, materials, embeddings eliminates junction tables, simpler queries
+- Composite index on VendorCatalogItem (03-02): Index on (vendor_id, sku, barcode) enables fast catalog lookups during product matching
+- One-to-one User-ShopifyStore (03-02): unique=True on user_id enforces v1.0 requirement at database level, multi-store support deferred to v2.0
 
 ### Roadmap Evolution
 
@@ -189,8 +196,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-08 17:58:24Z
-Stopped at: Completed 03-01-PLAN.md (Flask-SQLAlchemy + PostgreSQL Setup)
+Last session: 2026-02-08 18:03:25Z
+Stopped at: Completed 03-02-PLAN.md (SQLAlchemy ORM Models)
 Resume file: None
 
 Config (if exists):
