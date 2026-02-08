@@ -12,26 +12,28 @@ import json
 import hmac
 import hashlib
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, request, jsonify, session, redirect, render_template, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import pandas as pd
 from dotenv import load_dotenv
-import sqlite3
 from threading import Thread
 import time
 
+# SQLAlchemy imports
+from src.database import create_app, db
+from src.models import User, ShopifyStore, Job, JobResult, Vendor, VendorCatalogItem, JobStatus, JobType
+
 # Local imports
-from utils.pentart_db import PentartDatabase
 from src.core.paths import DB_PATH
 from src.core.secrets import get_secret
 
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__, static_folder='web/static', template_folder='web/templates')
-app.secret_key = get_secret('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
+# Create Flask app with database initialization
+app = create_app()
 CORS(app)
 
 # Shopify App Configuration
@@ -40,115 +42,6 @@ SHOPIFY_API_SECRET = get_secret('SHOPIFY_API_SECRET') or os.getenv('SHOPIFY_CLIE
 SHOPIFY_API_SCOPES = 'read_products,write_products,read_inventory,write_inventory,write_files'
 SHOPIFY_API_VERSION = os.getenv('API_VERSION', '2024-01')
 APP_URL = os.getenv('APP_URL', 'http://localhost:5000')
-
-def init_db():
-    """Initialize SQLite database for jobs and results."""
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    
-    # Jobs table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS jobs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            shop_domain TEXT NOT NULL,
-            status TEXT NOT NULL,
-            total_products INTEGER,
-            processed INTEGER DEFAULT 0,
-            successful INTEGER DEFAULT 0,
-            failed INTEGER DEFAULT 0,
-            created_count INTEGER DEFAULT 0,
-            updated_count INTEGER DEFAULT 0,
-            inventory_set_count INTEGER DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            csv_filename TEXT
-        )
-    ''')
-    
-    # Job results table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS job_results (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            job_id INTEGER,
-            handle TEXT,
-            sku TEXT,
-            vendor TEXT,
-            status TEXT,
-            image_url TEXT,
-            price REAL,
-            error_message TEXT,
-            product_created BOOLEAN DEFAULT 0,
-            product_id TEXT,
-            variant_id TEXT,
-            inventory_set BOOLEAN DEFAULT 0,
-            inventory_quantity INTEGER DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (job_id) REFERENCES jobs (id)
-        )
-    ''')
-
-    # Pentart products catalog table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS pentart_products (
-            id INTEGER PRIMARY KEY,
-            description TEXT NOT NULL,
-            article_number TEXT UNIQUE,
-            ean TEXT,
-            product_weight REAL,
-            density REAL,
-            product_volume REAL,
-            inner_qty TEXT,
-            inner_weight REAL,
-            pcs_per_carton REAL,
-            carton_weight REAL,
-            carton_size TEXT,
-            packaging_mat_weight REAL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-
-    # Indexes for fast lookups
-    c.execute('CREATE INDEX IF NOT EXISTS idx_article_number ON pentart_products(article_number)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_ean ON pentart_products(ean)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_description ON pentart_products(description)')
-
-    # Migration: Add new columns to existing databases
-    try:
-        # Check if new columns exist, add if not
-        c.execute("PRAGMA table_info(job_results)")
-        columns = [col[1] for col in c.fetchall()]
-
-        if 'product_created' not in columns:
-            c.execute('ALTER TABLE job_results ADD COLUMN product_created BOOLEAN DEFAULT 0')
-        if 'product_id' not in columns:
-            c.execute('ALTER TABLE job_results ADD COLUMN product_id TEXT')
-        if 'variant_id' not in columns:
-            c.execute('ALTER TABLE job_results ADD COLUMN variant_id TEXT')
-        if 'inventory_set' not in columns:
-            c.execute('ALTER TABLE job_results ADD COLUMN inventory_set BOOLEAN DEFAULT 0')
-        if 'inventory_quantity' not in columns:
-            c.execute('ALTER TABLE job_results ADD COLUMN inventory_quantity INTEGER DEFAULT 0')
-
-        # Check jobs table
-        c.execute("PRAGMA table_info(jobs)")
-        job_columns = [col[1] for col in c.fetchall()]
-
-        if 'created_count' not in job_columns:
-            c.execute('ALTER TABLE jobs ADD COLUMN created_count INTEGER DEFAULT 0')
-        if 'updated_count' not in job_columns:
-            c.execute('ALTER TABLE jobs ADD COLUMN updated_count INTEGER DEFAULT 0')
-        if 'inventory_set_count' not in job_columns:
-            c.execute('ALTER TABLE jobs ADD COLUMN inventory_set_count INTEGER DEFAULT 0')
-
-        conn.commit()
-    except Exception as e:
-        print(f"Migration warning: {e}")
-
-    conn.commit()
-    conn.close()
-
-init_db()
 
 # Import scraping functions from image_scraper
 from src.core.image_scraper import (
@@ -171,8 +64,13 @@ def index():
 
 @app.route('/health')
 def health():
-    """Health check endpoint."""
-    return jsonify({'status': 'ok'})
+    """Health check endpoint with database connectivity check."""
+    try:
+        # Test database connection
+        db.session.execute(db.text('SELECT 1'))
+        return jsonify({'status': 'ok', 'database': 'connected'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'database': 'disconnected', 'error': str(e)}), 500
 
 @app.route('/auth/shopify')
 def shopify_auth():
@@ -197,17 +95,49 @@ def shopify_auth():
     
     return redirect(auth_url)
 
+def get_current_user():
+    """
+    Get or create user for current shop session.
+
+    Returns:
+        User object for authenticated shop
+
+    Note:
+        This is temporary until Phase 4 (proper authentication).
+        Creates users automatically based on shop domain for OAuth flow.
+    """
+    shop = session.get('shop')
+    if not shop:
+        return None
+
+    # Try to find existing store
+    store = ShopifyStore.query.filter_by(shop_domain=shop).first()
+
+    if store:
+        return store.user
+
+    # Create new user and store (temporary for Phase 3)
+    # In Phase 4: proper user registration/login
+    user = User(
+        email=f"{shop.replace('.myshopify.com', '')}@shopify.auto",
+        password_hash='oauth-user',  # Placeholder
+    )
+    db.session.add(user)
+    db.session.flush()  # Get user.id before creating store
+
+    return user
+
 @app.route('/auth/callback')
 def shopify_callback():
     """Handle Shopify OAuth callback."""
     code = request.args.get('code')
     state = request.args.get('state')
     shop = request.args.get('shop')
-    
+
     # Verify state
     if state != session.get('oauth_state'):
         return jsonify({'error': 'Invalid state parameter'}), 400
-    
+
     # Exchange code for access token
     token_url = f"https://{shop}/admin/oauth/access_token"
     payload = {
@@ -215,20 +145,44 @@ def shopify_callback():
         'client_secret': SHOPIFY_API_SECRET,
         'code': code
     }
-    
+
     try:
         response = requests.post(token_url, json=payload)
         response.raise_for_status()
         data = response.json()
         access_token = data.get('access_token')
-        
-        # Store access token in session (in production, use database)
+
+        # Store access token in database with encryption
+        store = ShopifyStore.query.filter_by(shop_domain=shop).first()
+
+        if not store:
+            # Create user and store
+            user = User(
+                email=f"{shop.replace('.myshopify.com', '')}@shopify.auto",
+                password_hash='oauth-user',  # Placeholder until Phase 4
+            )
+            db.session.add(user)
+            db.session.flush()
+
+            store = ShopifyStore(
+                user_id=user.id,
+                shop_domain=shop,
+                shop_name=shop.split('.')[0]
+            )
+            db.session.add(store)
+
+        # Encrypt and store access token
+        store.set_access_token(access_token)
+        db.session.commit()
+
+        # Store in session for compatibility
         session['shop'] = shop
         session['access_token'] = access_token
-        
+
         # Redirect to app
         return redirect(f'/')
     except Exception as e:
+        db.session.rollback()
         return jsonify({'error': f'Authentication failed: {str(e)}'}), 500
 
 def verify_webhook(data, hmac_header):
