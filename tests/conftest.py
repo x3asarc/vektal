@@ -7,8 +7,11 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
-# Ensure src/ is importable
-src_path = Path(__file__).parent.parent / "src"
+# Ensure both project root and src/ are importable
+# This supports both "from src.core..." and "from core..." imports
+project_root = Path(__file__).parent.parent
+src_path = project_root / "src"
+sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(src_path))
 
 
