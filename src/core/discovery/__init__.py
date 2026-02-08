@@ -25,6 +25,13 @@ from .sku_validator import (
     SKUInfo
 )
 from .local_patterns import LocalPatternMatcher, PatternMatchResult
+from .niche_validator import (
+    validate_niche_match,
+    detect_niche_from_text,
+    get_niche_keywords,
+    NicheValidationResult
+)
+from .web_search import WebSearchClient, SearchResult, WebSearchResponse
 
 __all__ = [
     "validate_sku",
@@ -33,5 +40,12 @@ __all__ = [
     "infer_size_from_sku",
     "SKUInfo",
     "LocalPatternMatcher",
-    "PatternMatchResult"
+    "PatternMatchResult",
+    "validate_niche_match",
+    "detect_niche_from_text",
+    "get_niche_keywords",
+    "NicheValidationResult",
+    "WebSearchClient",
+    "SearchResult",
+    "WebSearchResponse"
 ]
