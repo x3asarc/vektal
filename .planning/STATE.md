@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 2.2 of 15 (Product Enrichment Pipeline)
-Plan: 4 of 6 (In progress)
+Plan: 1 of 6 (Completed)
 Status: In progress
-Last activity: 2026-02-08 — Completed 02.2-04-PLAN.md (Vision-Based Image Analysis)
+Last activity: 2026-02-08 — Completed 02.2-01-PLAN.md (Enrichment Module Foundation)
 
-Progress: [█████░░░░░] 55% (20/36 plans estimated)
+Progress: [█████░░░░░] 50% (18/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -33,9 +33,9 @@ Progress: [█████░░░░░] 55% (20/36 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 13 min
-- Total execution time: 4.1 hours
+- Total plans completed: 17
+- Average duration: 12 min
+- Total execution time: 3.5 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [█████░░░░░] 55% (20/36 plans estimated)
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
-| 02.2-product-enrichment-pipeline | 4 | 76 min | 19 min |
+| 02.2-product-enrichment-pipeline | 1 | 22 min | 22 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.1-11 (9 min), 02.2-01 (18 min), 02.2-02 (19 min), 02.2-03 (20 min), 02.2-04 (19 min)
-- Trend: Phase 2.2 in progress - Embedding generation with 15 tests (19 min)
+- Last 5 plans: 02.1-09 (11 min), 02.1-10 (0 min), 02.1-11 (9 min), 02.2-01 (22 min)
+- Trend: Phase 2.2 started - Attribute extraction with 34 tests (22 min)
 
 *Updated after each plan completion*
 
@@ -120,10 +120,10 @@ Recent decisions affecting current work:
 - Pragmatic adaptive rules (02.1-11): Rate limits → +50% delay, Timeouts → +25% timeout, Selector failures → fallback selectors
 - Rediscovery thresholds (02.1-11): >5 selector failures in 10 attempts OR <50% success rate triggers config refresh
 - Exponential backoff with jitter (02.1-11): delay × (2^attempt) ± 20% jitter, max 30s for human-like behavior
-- Embedding model selection (02.2-04): paraphrase-multilingual-mpnet-base-v2 for 768-dim multilingual embeddings
-- Field weighting approach (02.2-04): Text repetition (title 2x, tags 1.5x) for simple, interpretable weighting
-- Lazy model loading (02.2-04): Load on first use to avoid 2-3s startup cost if not using embeddings
-- Content hashing strategy (02.2-04): Hash title+description+tags only; price/inventory changes don't trigger re-embedding
+- German-first color map (02.2-01): All colors normalized to German (Rot, Grün, etc.) for German market SEO
+- Pattern priority ordering (02.2-01): Size patterns ordered specific → general to avoid partial matches (14x14cm before 20ml)
+- Compound word materials (02.2-01): Partial word boundaries for German compound words like Epoxidharz
+- Quality score formula (02.2-01): 40/30/20/10 weighting (description > structured data > categorization > tags)
 
 ### Roadmap Evolution
 
@@ -143,12 +143,12 @@ None yet.
 - Gap 3: ScrapeMetrics + AdaptiveRetryEngine enable dynamic improvement (Plan 11, 9 min, 19 tests)
 
 **Phase 2.1 COMPLETE (11/11 plans, verification PASSED).**
-**Phase 2.2 IN PROGRESS (4/6 plans complete):** Embedding generation complete with 15 passing tests.
+**Phase 2.2 IN PROGRESS (1/6 plans complete):** Attribute extraction complete with 34 passing tests. German-first design with regex-based extraction for colors, sizes, materials, and categories.
 
 ## Session Continuity
 
-Last session: 2026-02-08 18:07:06Z
-Stopped at: Completed 02.2-04-PLAN.md (Vision-Based Image Analysis)
+Last session: 2026-02-08 16:51:59Z
+Stopped at: Completed 02.2-01-PLAN.md (Enrichment Module Foundation)
 Resume file: None
 
 Config (if exists):
