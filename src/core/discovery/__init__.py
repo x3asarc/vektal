@@ -35,6 +35,7 @@ from .web_search import WebSearchClient, SearchResult, WebSearchResponse
 from .local_classifier import LocalVendorClassifier, ClassificationResult
 from .ai_inference import OpenRouterInference, InferenceResult
 from .pipeline import VendorDiscoveryPipeline, DiscoveryResult
+from .site_recon import SiteReconnaissance
 
 __all__ = [
     "validate_sku",
@@ -61,5 +62,6 @@ __all__ = [
     "OpenRouterInference",
     "InferenceResult",
     "VendorDiscoveryPipeline",
-    "DiscoveryResult"
+    "DiscoveryResult",
+    "SiteReconnaissance"
 ]
