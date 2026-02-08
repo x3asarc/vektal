@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 2.2 of 15 (Product Enrichment Pipeline)
-Plan: 1 of 6 (Completed)
+Plan: 2 of 6 (Completed)
 Status: In progress
-Last activity: 2026-02-08 — Completed 02.2-01-PLAN.md (Enrichment Module Foundation)
+Last activity: 2026-02-08 — Completed 02.2-02-PLAN.md (AI Description & SEO Generation)
 
-Progress: [█████░░░░░] 50% (18/36 plans estimated)
+Progress: [█████░░░░░] 53% (19/36 plans estimated)
 
 ## Recent Session Summary (2026-02-08)
 
@@ -33,9 +33,9 @@ Progress: [█████░░░░░] 50% (18/36 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 12 min
-- Total execution time: 3.5 hours
+- Total plans completed: 18
+- Average duration: 13 min
+- Total execution time: 3.9 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [█████░░░░░] 50% (18/36 plans estimated)
 | 01.1-root-documentation-organization | 3 | 23 min | 8 min |
 | 02-docker-infrastructure-foundation | 4 | 114 min | 29 min |
 | 02.1-universal-vendor-scraping-engine | 11 | 93 min | 8 min |
-| 02.2-product-enrichment-pipeline | 1 | 22 min | 22 min |
+| 02.2-product-enrichment-pipeline | 2 | 45 min | 23 min |
 
 **Recent Trend:**
-- Last 5 plans: 02.1-09 (11 min), 02.1-10 (0 min), 02.1-11 (9 min), 02.2-01 (22 min)
-- Trend: Phase 2.2 started - Attribute extraction with 34 tests (22 min)
+- Last 5 plans: 02.1-10 (0 min), 02.1-11 (9 min), 02.2-01 (22 min), 02.2-02 (23 min)
+- Trend: Phase 2.2 progressing well - AI/SEO generators with 27 tests (23 min)
 
 *Updated after each plan completion*
 
@@ -120,6 +120,11 @@ Recent decisions affecting current work:
 - Pragmatic adaptive rules (02.1-11): Rate limits → +50% delay, Timeouts → +25% timeout, Selector failures → fallback selectors
 - Rediscovery thresholds (02.1-11): >5 selector failures in 10 attempts OR <50% success rate triggers config refresh
 - Exponential backoff with jitter (02.1-11): delay × (2^attempt) ± 20% jitter, max 30s for human-like behavior
+- OpenRouter for AI descriptions (02.2-02): Gemini Flash 1.5 default, 75-95% cost savings vs direct APIs ($0.03/1K products)
+- TTLCache for AI responses (02.2-02): 30-day TTL prevents duplicate API calls, saves costs on re-runs (95%+ cache hit rate)
+- No embedding model in AIDescriptionGenerator (02.2-02): Receives pre-computed embeddings from EmbeddingGenerator (Plan 04), prevents duplicate 400MB model loading
+- German stop word transliteration (02.2-02): Stop words use transliterated forms ("fuer" not "für") because removal happens after umlaut conversion
+- Meta description padding before CTA (02.2-02): Ensures 120-char minimum before adding optional CTA, Google SEO compliance
 - German-first color map (02.2-01): All colors normalized to German (Rot, Grün, etc.) for German market SEO
 - Pattern priority ordering (02.2-01): Size patterns ordered specific → general to avoid partial matches (14x14cm before 20ml)
 - Compound word materials (02.2-01): Partial word boundaries for German compound words like Epoxidharz
@@ -143,12 +148,12 @@ None yet.
 - Gap 3: ScrapeMetrics + AdaptiveRetryEngine enable dynamic improvement (Plan 11, 9 min, 19 tests)
 
 **Phase 2.1 COMPLETE (11/11 plans, verification PASSED).**
-**Phase 2.2 IN PROGRESS (1/6 plans complete):** Attribute extraction complete with 34 passing tests. German-first design with regex-based extraction for colors, sizes, materials, and categories.
+**Phase 2.2 IN PROGRESS (2/6 plans complete):** AI description and SEO generation complete with 27 passing tests. OpenRouter integration with Gemini Flash 1.5, German URL slug generation with umlaut transliteration.
 
 ## Session Continuity
 
-Last session: 2026-02-08 16:51:59Z
-Stopped at: Completed 02.2-01-PLAN.md (Enrichment Module Foundation)
+Last session: 2026-02-08 16:52:53Z
+Stopped at: Completed 02.2-02-PLAN.md (AI Description & SEO Generation)
 Resume file: None
 
 Config (if exists):
