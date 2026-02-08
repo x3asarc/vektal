@@ -26,7 +26,6 @@ from src.database import create_app, db
 from src.models import User, ShopifyStore, Job, JobResult, Vendor, VendorCatalogItem, JobStatus, JobType
 
 # Local imports
-from src.core.paths import DB_PATH
 from src.core.secrets import get_secret
 
 # Load environment variables
@@ -223,57 +222,71 @@ def get_status():
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     """Get all jobs for the current shop."""
-    shop = session.get('shop')
-    if not shop:
+    user = get_current_user()
+    if not user:
         return jsonify({'error': 'Not authenticated'}), 401
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT * FROM jobs 
-        WHERE shop_domain = ? 
-        ORDER BY created_at DESC 
-        LIMIT 50
-    ''', (shop,))
-    
-    jobs = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
-    return jsonify({'jobs': jobs})
+
+    jobs = Job.query.filter_by(user_id=user.id).order_by(Job.created_at.desc()).limit(50).all()
+
+    jobs_data = [{
+        'id': job.id,
+        'job_type': job.job_type.value if job.job_type else None,
+        'job_name': job.job_name,
+        'status': job.status.value,
+        'total_items': job.total_items,
+        'processed_items': job.processed_items,
+        'successful_items': job.successful_items,
+        'failed_items': job.failed_items,
+        'created_at': job.created_at.isoformat() if job.created_at else None,
+        'started_at': job.started_at.isoformat() if job.started_at else None,
+        'completed_at': job.completed_at.isoformat() if job.completed_at else None,
+        'error_message': job.error_message
+    } for job in jobs]
+
+    return jsonify({'jobs': jobs_data})
 
 @app.route('/api/jobs/<int:job_id>', methods=['GET'])
 def get_job(job_id):
     """Get specific job details."""
-    shop = session.get('shop')
-    if not shop:
+    user = get_current_user()
+    if not user:
         return jsonify({'error': 'Not authenticated'}), 401
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    c = conn.cursor()
-    
-    c.execute('SELECT * FROM jobs WHERE id = ? AND shop_domain = ?', (job_id, shop))
-    job = c.fetchone()
-    
+
+    job = Job.query.filter_by(id=job_id, user_id=user.id).first()
+
     if not job:
-        conn.close()
         return jsonify({'error': 'Job not found'}), 404
-    
+
     # Get results for this job
-    c.execute('''
-        SELECT * FROM job_results 
-        WHERE job_id = ? 
-        ORDER BY created_at DESC
-    ''', (job_id,))
-    
-    results = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
+    results = JobResult.query.filter_by(job_id=job_id).order_by(JobResult.created_at.desc()).all()
+
+    job_data = {
+        'id': job.id,
+        'job_type': job.job_type.value if job.job_type else None,
+        'job_name': job.job_name,
+        'status': job.status.value,
+        'total_items': job.total_items,
+        'processed_items': job.processed_items,
+        'successful_items': job.successful_items,
+        'failed_items': job.failed_items,
+        'created_at': job.created_at.isoformat() if job.created_at else None,
+        'started_at': job.started_at.isoformat() if job.started_at else None,
+        'completed_at': job.completed_at.isoformat() if job.completed_at else None,
+        'error_message': job.error_message
+    }
+
+    results_data = [{
+        'id': result.id,
+        'item_sku': result.item_sku,
+        'item_barcode': result.item_barcode,
+        'status': result.status,
+        'error_message': result.error_message,
+        'created_at': result.created_at.isoformat() if result.created_at else None
+    } for result in results]
+
     return jsonify({
-        'job': dict(job),
-        'results': results
+        'job': job_data,
+        'results': results_data
     })
 
 @app.route('/job/<int:job_id>')
@@ -336,29 +349,30 @@ def pipeline_push():
 @app.route('/api/jobs', methods=['POST'])
 def create_job():
     """Create a new scraping job from uploaded CSV."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Not authenticated'}), 401
+
     shop = session.get('shop')
     access_token = session.get('access_token')
-    
-    if not shop or not access_token:
-        return jsonify({'error': 'Not authenticated'}), 401
-    
+
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
-    
+
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
-    
+
     if not file.filename.endswith('.csv'):
         return jsonify({'error': 'File must be a CSV'}), 400
-    
+
     try:
         # Save uploaded file
-        filename = secure_filename(f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
+        filename = secure_filename(f"{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{file.filename}")
         filepath = os.path.join('uploads', filename)
         os.makedirs('uploads', exist_ok=True)
         file.save(filepath)
-        
+
         # Read CSV
         df = pd.read_csv(filepath)
         required_columns = ['Handle', 'SKU', 'Vendor']
@@ -366,41 +380,48 @@ def create_job():
             return jsonify({
                 'error': f'CSV must contain columns: {", ".join(required_columns)}'
             }), 400
-        
-        # Create job record
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('''
-            INSERT INTO jobs (shop_domain, status, total_products, csv_filename)
-            VALUES (?, ?, ?, ?)
-        ''', (shop, 'pending', len(df), filename))
-        job_id = c.lastrowid
-        conn.commit()
-        conn.close()
-        
+
+        # Create job record using SQLAlchemy
+        job = Job(
+            user_id=user.id,
+            job_type=JobType.VENDOR_SCRAPE,
+            job_name=f"CSV Upload: {file.filename}",
+            status=JobStatus.PENDING,
+            total_items=len(df),
+            parameters={'csv_filename': filename, 'shop_domain': shop}
+        )
+        db.session.add(job)
+        db.session.commit()
+
         # Start background processing
-        thread = Thread(target=process_job, args=(job_id, shop, access_token, filepath, df))
+        thread = Thread(target=process_job, args=(job.id, shop, access_token, filepath, df))
         thread.daemon = True
         thread.start()
-        
+
         return jsonify({
-            'job_id': job_id,
-            'status': 'pending',
+            'job_id': job.id,
+            'status': job.status.value,
             'message': 'Job created and processing started'
         }), 201
-        
+
     except Exception as e:
+        db.session.rollback()
         return jsonify({'error': f'Error creating job: {str(e)}'}), 500
 
 def process_job(job_id, shop_domain, access_token, csv_path, df):
     """Background job processor - runs scraping in separate thread."""
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
+    # Use app context for database access in background thread
+    with app.app_context():
+        try:
+            # Update job status
+            job = Job.query.get(job_id)
+            if not job:
+                print(f"Error: Job {job_id} not found")
+                return
 
-    try:
-        # Update job status
-        c.execute('UPDATE jobs SET status = ? WHERE id = ?', ('processing', job_id))
-        conn.commit()
+            job.status = JobStatus.RUNNING
+            job.started_at = datetime.now(timezone.utc)
+            db.session.commit()
 
         # Initialize Shopify client with OAuth token
         shopify = ShopifyClient()
@@ -423,16 +444,11 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
         except Exception as e:
             print(f"Warning: Could not get default location: {e}")
 
-        # Load processed SKUs
-        processed_skus = load_processed_skus()
+            # Load processed SKUs
+            processed_skus = load_processed_skus()
 
-        # Initialize Pentart database for fast lookups
-        pentart_db = None
-        try:
-            pentart_db = PentartDatabase(DB_PATH)
-            print(f"Pentart database initialized successfully")
-        except Exception as e:
-            print(f"Warning: Could not initialize Pentart database: {e}")
+            # Get Pentart vendor for catalog lookups
+            pentart_vendor = Vendor.query.filter_by(code='PENTART').first()
 
         successful = 0
         failed = 0
@@ -459,33 +475,34 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
                 
                 clean = clean_sku(raw_sku)
 
-                # Check if Pentart product - use database lookup first
+                # Check if Pentart product - use catalog lookup first
                 vendor_normalized = str(vendor).lower().strip()
                 is_pentart = "pentart" in vendor_normalized
                 db_hit = False
 
-                if is_pentart and pentart_db:
-                    # Try database lookup for Pentart products
-                    try:
-                        db_product = pentart_db.get_by_article_number(clean)
-                        if db_product:
-                            # Found in database - use this data instead of scraping
-                            print(f"  Database hit for Pentart product: {clean}")
-                            db_hit = True
-                            scrape_data = {
-                                "image_url": None,  # Database doesn't have images, still need to scrape for that
-                                "scraped_sku": db_product.get("ean"),  # Use EAN as barcode
-                                "price": None,  # Database doesn't have prices
-                                "title": db_product.get("description"),
-                                "country": "HU",  # Pentart is Hungarian
-                                "weight": db_product.get("product_weight")  # Extra field for weight
-                            }
-                        else:
-                            print(f"  Pentart product {clean} not found in database, falling back to scraping")
-                    except Exception as e:
-                        print(f"  Database lookup error for {clean}: {e}")
+                if is_pentart and pentart_vendor:
+                    # Try catalog lookup for Pentart products
+                    catalog_item = VendorCatalogItem.query.filter_by(
+                        vendor_id=pentart_vendor.id,
+                        sku=clean
+                    ).first()
 
-                # If not Pentart or not found in database, use web scraping
+                    if catalog_item:
+                        # Found in catalog - use this data instead of scraping
+                        print(f"  Catalog hit for Pentart product: {clean}")
+                        db_hit = True
+                        scrape_data = {
+                            "image_url": catalog_item.image_url,
+                            "scraped_sku": catalog_item.barcode,  # Use barcode from catalog
+                            "price": float(catalog_item.price) if catalog_item.price else None,
+                            "title": catalog_item.name or catalog_item.description,
+                            "country": "HU",  # Pentart is Hungarian
+                            "weight": float(catalog_item.weight_kg) * 1000 if catalog_item.weight_kg else None  # Convert kg to grams
+                        }
+                    else:
+                        print(f"  Pentart product {clean} not found in catalog, falling back to scraping")
+
+                # If not Pentart or not found in catalog, use web scraping
                 if not is_pentart or not db_hit:
                     scrape_data = scrape_product_info(clean, vendor)
 
@@ -624,64 +641,81 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
                         status = "Error"
                         failed += 1
 
-                # Save result with new columns
-                c.execute('''
-                    INSERT INTO job_results
-                    (job_id, handle, sku, vendor, status, image_url, price, error_message,
-                     product_created, product_id, variant_id, inventory_set, inventory_quantity)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (job_id, handle, raw_sku, vendor, status, image_url, scraped_price, error_message,
-                      product_created, product_id, variant_id, inventory_set, inventory_quantity))
-                
+                # Save result using SQLAlchemy
+                result = JobResult(
+                    job_id=job_id,
+                    item_sku=raw_sku,
+                    item_barcode=scraped_barcode,
+                    item_identifier=handle,
+                    status=status,
+                    error_message=error_message,
+                    result_data={
+                        'image_url': image_url,
+                        'price': scraped_price,
+                        'vendor': vendor,
+                        'product_created': product_created,
+                        'product_id': product_id,
+                        'variant_id': variant_id,
+                        'inventory_set': inventory_set,
+                        'inventory_quantity': inventory_quantity
+                    }
+                )
+                db.session.add(result)
+
                 processed += 1
 
-                # Update job progress with new counters
-                c.execute('''
-                    UPDATE jobs
-                    SET processed = ?, successful = ?, failed = ?,
-                        created_count = ?, updated_count = ?, inventory_set_count = ?,
-                        updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                ''', (processed, successful, failed, created_count, updated_count, inventory_set_count, job_id))
-                conn.commit()
+                # Update job progress
+                job.processed_items = processed
+                job.successful_items = successful
+                job.failed_items = failed
+                db.session.commit()
                 
                 time.sleep(0.3)  # Rate limiting
                 
             except Exception as e:
                 error_message = str(e)
-                c.execute('''
-                    INSERT INTO job_results 
-                    (job_id, handle, sku, vendor, status, error_message)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (job_id, row.get("Handle", ""), row.get("SKU", ""), row.get("Vendor", ""), "Error", error_message))
+                result = JobResult(
+                    job_id=job_id,
+                    item_sku=row.get("SKU", ""),
+                    item_identifier=row.get("Handle", ""),
+                    status="Error",
+                    error_message=error_message,
+                    result_data={'vendor': row.get("Vendor", "")}
+                )
+                db.session.add(result)
                 failed += 1
                 processed += 1
-                conn.commit()
-        
-        # Mark job as complete
-        c.execute('UPDATE jobs SET status = ? WHERE id = ?', ('completed', job_id))
-        conn.commit()
-        
-    except Exception as e:
-        c.execute('UPDATE jobs SET status = ? WHERE id = ?', ('failed', job_id))
-        conn.commit()
-    finally:
-        conn.close()
+
+                job.processed_items = processed
+                job.failed_items = failed
+                db.session.commit()
+
+            # Mark job as complete
+            job.status = JobStatus.COMPLETED
+            job.completed_at = datetime.now(timezone.utc)
+            db.session.commit()
+
+        except Exception as e:
+            job.status = JobStatus.FAILED
+            job.error_message = str(e)
+            job.completed_at = datetime.now(timezone.utc)
+            db.session.commit()
 
 @app.route('/api/jobs/<int:job_id>/cancel', methods=['POST'])
 def cancel_job(job_id):
     """Cancel a running job."""
-    shop = session.get('shop')
-    if not shop:
+    user = get_current_user()
+    if not user:
         return jsonify({'error': 'Not authenticated'}), 401
-    
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('UPDATE jobs SET status = ? WHERE id = ? AND shop_domain = ?', 
-              ('cancelled', job_id, shop))
-    conn.commit()
-    conn.close()
-    
+
+    job = Job.query.filter_by(id=job_id, user_id=user.id).first()
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+
+    job.status = JobStatus.CANCELLED
+    job.completed_at = datetime.now(timezone.utc)
+    db.session.commit()
+
     return jsonify({'message': 'Job cancelled'})
 
 if __name__ == '__main__':
