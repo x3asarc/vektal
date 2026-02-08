@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Codebase Cleanup & Analysis** - Foundation cleanup before building
 - [x] **Phase 1.1: Root Documentation Organization (INSERTED)** - Complete root directory cleanup
 - [x] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
-- [ ] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
+- [x] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
 - [ ] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** - AI-powered enrichment with embeddings
 - [ ] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
 - [ ] **Phase 4: Authentication & User Management** - User system in containerized environment
@@ -114,9 +114,9 @@ Plans:
 - [x] 02.1-06-PLAN.md — Multi-strategy scraping engine (Wave 3)
 - [x] 02.1-07-PLAN.md — YAML auto-generation and verification (Wave 3)
 - [x] 02.1-08-PLAN.md — Chat interface routing (Wave 4)
-- [ ] 02.1-09-PLAN.md — Site reconnaissance and selector discovery (Wave 5, Gap Closure)
-- [ ] 02.1-10-PLAN.md — Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
-- [ ] 02.1-11-PLAN.md — Metrics tracking and adaptive learning (Wave 5, Gap Closure)
+- [x] 02.1-09-PLAN.md — Site reconnaissance and selector discovery (Wave 5, Gap Closure)
+- [x] 02.1-10-PLAN.md — Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
+- [x] 02.1-11-PLAN.md — Metrics tracking and adaptive learning (Wave 5, Gap Closure)
 
 **Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
 
@@ -385,7 +385,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 1. Codebase Cleanup & Analysis | 3/3 | Complete | 2026-02-03 |
 | 1.1. Root Documentation Organization | 3/3 | Complete | 2026-02-04 |
 | 2. Docker Infrastructure Foundation | 4/4 | Complete | 2026-02-05 |
-| 2.1. Universal Vendor Scraping Engine | 8/11 | In Progress (Gap Closure) | - |
+| 2.1. Universal Vendor Scraping Engine | 11/11 | Complete | 2026-02-08 |
 | 2.2. Product Enrichment Pipeline | 0/TBD | Not started | - |
 | 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
