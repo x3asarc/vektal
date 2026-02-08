@@ -125,9 +125,10 @@ def extract_sku_info(sku: str) -> SKUInfo:
     base_sku = normalized
 
     # Check for trailing size indicators
+    # Order matters: XL must be checked before L to avoid matching the L in XL
     size_suffix_patterns = [
-        (r'([A-Z0-9]+)(L)$', 'L'),      # L = Large (A3)
         (r'([A-Z0-9]+)(XL)$', 'XL'),    # XL = Extra Large (A2)
+        (r'([A-Z0-9]+)(L)$', 'L'),      # L = Large (A3)
         (r'([A-Z0-9]+)(S)$', 'S'),      # S = Small (A5)
         (r'([A-Z0-9]+)(M)$', 'M'),      # M = Medium (A4)
     ]
