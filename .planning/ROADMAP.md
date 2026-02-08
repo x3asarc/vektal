@@ -147,12 +147,12 @@ Plans:
 **Plans**: 6 plans in 2 waves
 
 Plans:
-- [ ] 02.2-01-PLAN.md — Attribute extraction and quality scoring foundation (Wave 1)
-- [ ] 02.2-02-PLAN.md — AI description generation and SEO content (Wave 1)
-- [ ] 02.2-03-PLAN.md — Product family grouping and quality gate (Wave 1)
-- [ ] 02.2-04-PLAN.md — Vector embedding generation (Wave 1)
-- [ ] 02.2-05-PLAN.md — EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
-- [ ] 02.2-06-PLAN.md — Vendor YAML enrichment integration (Wave 2)
+- [x] 02.2-01-PLAN.md — Attribute extraction and quality scoring foundation (Wave 1)
+- [x] 02.2-02-PLAN.md — AI description generation and SEO content (Wave 1)
+- [x] 02.2-03-PLAN.md — Product family grouping and quality gate (Wave 1)
+- [x] 02.2-04-PLAN.md — Vector embedding generation (Wave 1)
+- [x] 02.2-05-PLAN.md — EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
+- [x] 02.2-06-PLAN.md — Vendor YAML enrichment integration (Wave 2)
 
 **Insertion Reason**: Product enrichment is critical before database design (Phase 3). The `/side-project` folder contains a mature 7-step enrichment pipeline that should be integrated. Vendor YAML now includes enrichment config (sections 12-22). Embeddings needed for semantic search in Phase 11. Keeps Phase 2.1 focused on discovery/scraping.
 
@@ -166,7 +166,7 @@ Plans:
 **Context Document**: See `.planning/phases/02.2-product-enrichment-pipeline/02.2-CONTEXT.md` (to be created during discuss phase).
 
 ### Phase 3: Database Migration (SQLite to PostgreSQL)
-**Goal**: Replace SQLite with PostgreSQL while preserving encrypted credentials and establishing connection pooling
+**Goal**: Set up production PostgreSQL database with fresh schema designed from v1.0 requirements, Flask-SQLAlchemy ORM, and disaster recovery capability
 **Depends on**: Phase 2.2
 **Requirements**: DOCKER-05, DOCKER-07
 **Success Criteria** (what must be TRUE):
@@ -175,11 +175,17 @@ Plans:
   3. Developer can restore database from backup within 5 minutes
   4. All production data migrated with zero data loss verified by row counts
   5. Connection pool limits prevent PostgreSQL max_connections exhaustion
-**Plans**: TBD
+**Plans**: 4 plans in 4 waves
 
 Plans:
-- [ ] 03-01: PostgreSQL container setup with migration scripts
-- [ ] 03-02: Encryption key preservation and connection pool tuning
+- [ ] 03-01-PLAN.md — Database dependencies, Flask-SQLAlchemy setup, application factory (Wave 1)
+- [ ] 03-02-PLAN.md — SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 2)
+- [ ] 03-03-PLAN.md — Flask-Migrate setup, initial migration, backup/restore scripts (Wave 3)
+- [ ] 03-04-PLAN.md — Pentart data import, app.py refactor to SQLAlchemy, verification (Wave 4)
+
+**Context Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md` for implementation decisions and deferred items.
+
+**Research Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-RESEARCH.md` for standard stack (Flask-SQLAlchemy, Flask-Migrate, psycopg3), architecture patterns, and backup strategy.
 
 ### Phase 4: Authentication & User Management
 **Goal**: Implement user authentication system compatible with containerized architecture
@@ -389,7 +395,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 2. Docker Infrastructure Foundation | 4/4 | Complete | 2026-02-05 |
 | 2.1. Universal Vendor Scraping Engine | 11/11 | Complete | 2026-02-08 |
 | 2.2. Product Enrichment Pipeline | 6/6 | Complete | 2026-02-08 |
-| 3. Database Migration (SQLite to PostgreSQL) | 0/2 | Not started | - |
+| 3. Database Migration (SQLite to PostgreSQL) | 0/4 | Not started | - |
 | 4. Authentication & User Management | 0/2 | Not started | - |
 | 5. Backend API Design | 0/2 | Not started | - |
 | 6. Job Processing Infrastructure (Celery) | 0/2 | Not started | - |
