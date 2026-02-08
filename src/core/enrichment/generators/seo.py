@@ -16,8 +16,8 @@ class SEOGenerator:
         'Ä': 'Ae', 'Ö': 'Oe', 'Ü': 'Ue'
     }
 
-    # Stop words to remove from URLs
-    GERMAN_STOP_WORDS = ['der', 'die', 'das', 'und', 'für', 'mit', 'von', 'in', 'zu', 'auf', 'an']
+    # Stop words to remove from URLs (after transliteration)
+    GERMAN_STOP_WORDS = ['der', 'die', 'das', 'und', 'fuer', 'mit', 'von', 'in', 'zu', 'auf', 'an']
 
     # Call-to-action phrases for meta descriptions (rotated for variety)
     CTAS = [
@@ -102,16 +102,21 @@ class SEOGenerator:
         if size:
             desc += f" {size}."
 
-        # Add CTA if space allows
+        # Ensure minimum length - pad with generic text if needed BEFORE CTA
+        if len(desc) < min_length:
+            padding = " Ideal für kreative Bastelprojekte und Handarbeiten aller Art."
+            if len(desc + padding) <= max_length:
+                desc += padding
+            elif len(desc) < min_length:
+                # Still too short, add shorter padding
+                padding = " Hochwertiges Bastelmaterial für kreative Projekte."
+                if len(desc + padding) <= max_length:
+                    desc += padding
+
+        # Add CTA if space allows (after padding)
         cta = self._get_next_cta()
         if len(desc + " " + cta) <= max_length:
             desc += f" {cta}"
-
-        # Ensure minimum length - pad with generic text if needed
-        if len(desc) < min_length:
-            padding = " Ideal für kreative Bastelprojekte."
-            if len(desc + padding) <= max_length:
-                desc += padding
 
         return desc[:max_length]
 
