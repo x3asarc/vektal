@@ -198,14 +198,15 @@ Plans:
   3. User sessions persist across backend container restarts
   4. API endpoints reject requests without valid authentication tokens
   5. User tier assignment determines which features are accessible
-**Plans**: 5 plans in 3 waves
+**Plans**: 6 plans in 4 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
-- [ ] 04-02-PLAN.md — Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
-- [ ] 04-03-PLAN.md — Registration, login/logout, email verification endpoints (Wave 2)
-- [ ] 04-04-PLAN.md — Stripe billing: checkout, webhooks, tier upgrades/downgrades (Wave 2)
-- [ ] 04-05-PLAN.md — Shopify OAuth refactor with retry logic and error handling (Wave 3)
+- [x] 04-01-PLAN.md — Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
+- [x] 04-02-PLAN.md — Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
+- [x] 04-03-PLAN.md — Login/logout, email verification endpoints (Wave 2)
+- [x] 04-04-PLAN.md — Stripe checkout session creation (Wave 2)
+- [x] 04-05-PLAN.md — Stripe webhooks, subscription management (Wave 3)
+- [x] 04-06-PLAN.md — Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
 
 **Context Document**: See `.planning/phases/04-authentication-user-management/04-CONTEXT.md` for standalone SaaS architecture decisions, registration flow, and tier system design.
 
@@ -404,7 +405,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 2.1. Universal Vendor Scraping Engine | 11/11 | Complete | 2026-02-08 |
 | 2.2. Product Enrichment Pipeline | 6/6 | Complete | 2026-02-08 |
 | 3. Database Migration (SQLite to PostgreSQL) | 5/5 | Complete | 2026-02-08 |
-| 4. Authentication & User Management | 0/5 | Planned | - |
+| 4. Authentication & User Management | 6/6 | Complete | 2026-02-09 |
 | 5. Backend API Design | 0/2 | Not started | - |
 | 6. Job Processing Infrastructure (Celery) | 0/2 | Not started | - |
 | 7. Frontend Framework Setup (Next.js) | 0/3 | Not started | - |
