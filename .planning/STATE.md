@@ -12,13 +12,21 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 Phase: 5 of 15 (Backend API Design)
 Plan: 3 of 5 complete
 Status: In progress
-Last activity: 2026-02-09 — Completed 05-03-PLAN.md (SSE Infrastructure for Real-Time Job Progress)
+Last activity: 2026-02-09 — Completed 05-02-PLAN.md (API Routes and OpenAPI Documentation)
 
 Progress: [███████░░░] 93% (42/45 plans estimated)
 
 ## Recent Session Summary (2026-02-09)
 
 **Phase 5 In Progress - Backend API Design:**
+- Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
+- Flask-OpenAPI3 integration with Swagger UI at /api/docs
+- Versioned API routes under /api/v1/ (auth, billing, oauth, webhooks)
+- Backward-compatible legacy routes preserved
+- CORS configuration for localhost:3000 and localhost:5000
+- Response compression (gzip) for JSON responses
+- 3 new dependencies: flask-openapi3, flask-compress, flask-limiter
+- 1 file created, 2 files modified
 - Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
 - MessageAnnouncer pattern for thread-safe SSE broadcasting
 - SSE streaming endpoint at /<job_id>/stream with EventSource support
@@ -30,7 +38,6 @@ Progress: [███████░░░] 93% (42/45 plans estimated)
 - Cursor and offset pagination helpers
 - Tier-based rate limiting (100/500/2000 per day)
 - Redis backend for distributed rate limiting
-- 3 new dependencies: flask-openapi3, flask-limiter, flask-compress
 - 5 new files: src/api/core/{__init__, errors, pagination, rate_limit}.py
 
 **Phase 4 Complete - Authentication & User Management:**
@@ -103,13 +110,13 @@ Progress: [███████░░░] 93% (42/45 plans estimated)
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
 | 03-database-migration-sqlite-to-postgresql | 5 | 20 min | 4 min |
 | 04-authentication-user-management | 6 | N/A | N/A |
-| 05-backend-api-design | 3 | 14 min | 5 min |
+| 05-backend-api-design | 3 | 28 min | 9 min |
 
 **Recent Trend:**
-- Last plan: 05-03 (SSE Infrastructure for Real-Time Job Progress) - 5 minutes
-- Phase 5 in progress: 3 of 5 plans complete (API Core, SSE Infrastructure)
+- Last plan: 05-02 (API Routes and OpenAPI Documentation) - 14 minutes
+- Phase 5 in progress: 3 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure)
 - Phase 4 complete: Authentication infrastructure with UAT verification (10/10 tests passed)
-- Backend operational with 22+ registered endpoints across auth, billing, and OAuth
+- Backend operational with 45+ registered endpoints (21 v1 + 24 legacy) across auth, billing, and OAuth
 
 *Updated after each plan completion*
 
@@ -224,6 +231,10 @@ Recent decisions affecting current work:
 - Tier-based rate limits (05-01): Rate limits tied to UserTier (100/500/2000 per day) - prevents abuse, enforces billing tier value proposition
 - Redis rate limit storage (05-01): Redis backend for distributed rate limiting - shared state across containers, persistent counters
 - Production error sanitization (05-01): Generic errors in production, detailed errors in development - prevents information disclosure via stack traces
+- Flask-OpenAPI3 for documentation (05-02): Automatic OpenAPI schema generation with Swagger UI - Pydantic integration, modern OpenAPI 3.0 support, interactive testing
+- Versioned API routes (05-02): All API routes under /api/v1/ prefix - enables future API versioning (v2, v3) without breaking existing clients
+- Legacy route preservation (05-02): Backward-compatible routes (/auth, /billing, /oauth, /webhooks) - zero downtime migration, dual registration until frontend migrated
+- Session-based auth in OpenAPI (05-02): SessionAuth security scheme (cookie authentication) - aligns with Flask-Login, works for embedded Shopify app
 - SSE over WebSockets (05-03): Server-Sent Events for real-time job progress - simpler than WebSockets, unidirectional updates sufficient, works over HTTP/1.1
 - MessageAnnouncer pattern (05-03): Queue-based broadcasting with thread-safety - handles multiple concurrent clients, auto-removes slow clients (maxsize=5)
 - Polling fallback endpoint (05-03): /status endpoint alongside SSE - corporate firewalls may block SSE, graceful degradation needed
@@ -270,15 +281,17 @@ None yet.
 
 **Phase 5 IN PROGRESS (3/5 plans complete):**
 - Plan 05-01 complete: API Core Infrastructure (9 minutes)
+- Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
 - Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
 - RFC 7807 error handling, cursor/offset pagination, tier-based rate limiting
+- Flask-OpenAPI3 with Swagger UI, versioned routes (/api/v1/), legacy route preservation
 - MessageAnnouncer pattern for SSE broadcasting, streaming + polling endpoints
-- Next: Plan 05-04 or 05-05 (remaining API routes)
+- Next: Plan 05-04 (Domain API Routes - Products, Jobs, Vendors)
 
 ## Session Continuity
 
-Last session: 2026-02-09 20:25:05Z
-Stopped at: Completed 05-03-PLAN.md (SSE Infrastructure for Real-Time Job Progress)
+Last session: 2026-02-09 21:01:06Z
+Stopped at: Completed 05-02-PLAN.md (API Routes and OpenAPI Documentation)
 Resume file: None
 
 Config (if exists):
