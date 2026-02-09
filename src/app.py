@@ -13,8 +13,8 @@ import hmac
 import hashlib
 import requests
 from datetime import datetime, timezone
-from flask import Flask, request, jsonify, session, redirect, render_template, send_from_directory
-from flask_cors import CORS
+from flask import Flask, request, jsonify, session, redirect, render_template, send_from_directory, url_for
+from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import pandas as pd
 from dotenv import load_dotenv
@@ -22,7 +22,8 @@ from threading import Thread
 import time
 
 # SQLAlchemy imports
-from src.database import create_app, db
+from src.api.app import create_openapi_app
+from src.database import db
 from src.models import User, ShopifyStore, Job, JobResult, Vendor, VendorCatalogItem, JobStatus, JobType
 
 # Local imports
@@ -31,9 +32,8 @@ from src.core.secrets import get_secret
 # Load environment variables
 load_dotenv()
 
-# Create Flask app with database initialization
-app = create_app()
-CORS(app)
+# Create Flask app with OpenAPI support
+app = create_openapi_app()
 
 # Shopify App Configuration
 SHOPIFY_API_KEY = get_secret('SHOPIFY_API_KEY') or os.getenv('SHOPIFY_CLIENT_ID')
@@ -49,15 +49,54 @@ from src.core.image_scraper import (
     DEFAULT_COUNTRY_OF_ORIGIN, get_hs_code
 )
 
+def get_request_user():
+    """
+    Resolve the current user for this request.
+
+    Prefers Flask-Login's current_user, with legacy session fallback.
+    """
+    if current_user.is_authenticated:
+        return current_user
+
+    shop = session.get('shop')
+    if not shop:
+        return None
+
+    store = ShopifyStore.query.filter_by(shop_domain=shop).first()
+    return store.user if store else None
+
+
+def get_shopify_context():
+    """
+    Resolve Shopify context for this request.
+
+    Returns:
+        (shop_domain, access_token) or (None, None) if unavailable.
+
+    Supports legacy session values for backward compatibility.
+    """
+    shop = session.get('shop')
+    access_token = session.get('access_token')
+    if shop and access_token:
+        return shop, access_token
+
+    if current_user.is_authenticated:
+        store = ShopifyStore.query.filter_by(user_id=current_user.id, is_active=True).first()
+        if store:
+            try:
+                return store.shop_domain, store.get_access_token()
+            except Exception:
+                return store.shop_domain, None
+
+    return None, None
+
+
 @app.route('/')
 def index():
     """Main app page - will be embedded in Shopify."""
     # Check if authenticated
-    if not session.get('shop') or not session.get('access_token'):
-        # Redirect to auth if not authenticated
-        shop = request.args.get('shop')
-        if shop:
-            return redirect(f'/auth/shopify?shop={shop}')
+    shop, access_token = get_shopify_context()
+    if not shop or not access_token:
         return render_template('auth_required.html')
     return render_template('index.html')
 
@@ -72,117 +111,15 @@ def health():
         return jsonify({'status': 'error', 'database': 'disconnected', 'error': str(e)}), 500
 
 @app.route('/auth/shopify')
-def shopify_auth():
-    """Initiate Shopify OAuth flow."""
-    shop = request.args.get('shop')
-    if not shop:
-        return jsonify({'error': 'Missing shop parameter'}), 400
-    
-    # Generate state for CSRF protection
-    state = os.urandom(16).hex()
-    session['oauth_state'] = state
-    session['shop'] = shop
-    
-    # Build authorization URL
-    auth_url = (
-        f"https://{shop}/admin/oauth/authorize?"
-        f"client_id={SHOPIFY_API_KEY}&"
-        f"scope={SHOPIFY_API_SCOPES}&"
-        f"redirect_uri={APP_URL}/auth/callback&"
-        f"state={state}"
-    )
-    
-    return redirect(auth_url)
+def legacy_shopify_auth():
+    """Redirect legacy OAuth URL to new endpoint."""
+    return redirect(url_for('oauth.initiate_shopify_oauth', **request.args))
 
-def get_current_user():
-    """
-    Get or create user for current shop session.
-
-    Returns:
-        User object for authenticated shop
-
-    Note:
-        This is temporary until Phase 4 (proper authentication).
-        Creates users automatically based on shop domain for OAuth flow.
-    """
-    shop = session.get('shop')
-    if not shop:
-        return None
-
-    # Try to find existing store
-    store = ShopifyStore.query.filter_by(shop_domain=shop).first()
-
-    if store:
-        return store.user
-
-    # Create new user and store (temporary for Phase 3)
-    # In Phase 4: proper user registration/login
-    user = User(
-        email=f"{shop.replace('.myshopify.com', '')}@shopify.auto",
-        password_hash='oauth-user',  # Placeholder
-    )
-    db.session.add(user)
-    db.session.flush()  # Get user.id before creating store
-
-    return user
 
 @app.route('/auth/callback')
-def shopify_callback():
-    """Handle Shopify OAuth callback."""
-    code = request.args.get('code')
-    state = request.args.get('state')
-    shop = request.args.get('shop')
-
-    # Verify state
-    if state != session.get('oauth_state'):
-        return jsonify({'error': 'Invalid state parameter'}), 400
-
-    # Exchange code for access token
-    token_url = f"https://{shop}/admin/oauth/access_token"
-    payload = {
-        'client_id': SHOPIFY_API_KEY,
-        'client_secret': SHOPIFY_API_SECRET,
-        'code': code
-    }
-
-    try:
-        response = requests.post(token_url, json=payload)
-        response.raise_for_status()
-        data = response.json()
-        access_token = data.get('access_token')
-
-        # Store access token in database with encryption
-        store = ShopifyStore.query.filter_by(shop_domain=shop).first()
-
-        if not store:
-            # Create user and store
-            user = User(
-                email=f"{shop.replace('.myshopify.com', '')}@shopify.auto",
-                password_hash='oauth-user',  # Placeholder until Phase 4
-            )
-            db.session.add(user)
-            db.session.flush()
-
-            store = ShopifyStore(
-                user_id=user.id,
-                shop_domain=shop,
-                shop_name=shop.split('.')[0]
-            )
-            db.session.add(store)
-
-        # Encrypt and store access token
-        store.set_access_token(access_token)
-        db.session.commit()
-
-        # Store in session for compatibility
-        session['shop'] = shop
-        session['access_token'] = access_token
-
-        # Redirect to app
-        return redirect(f'/')
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': f'Authentication failed: {str(e)}'}), 500
+def legacy_shopify_callback():
+    """Redirect legacy callback URL to new endpoint."""
+    return redirect(url_for('oauth.shopify_callback', **request.args))
 
 def verify_webhook(data, hmac_header):
     """Verify Shopify webhook signature."""
@@ -200,29 +137,29 @@ def webhook_orders_create():
     """Handle order creation webhook (example)."""
     data = request.get_data(as_text=True)
     hmac_header = request.headers.get('X-Shopify-Hmac-Sha256')
-    
+
     if not verify_webhook(data, hmac_header):
         return jsonify({'error': 'Invalid webhook signature'}), 401
-    
+
     # Process webhook data
     order_data = json.loads(data)
     # Add your webhook processing logic here
-    
+
     return jsonify({'status': 'ok'}), 200
 
 @app.route('/api/status', methods=['GET'])
 def get_status():
     """Get authentication status."""
-    shop = session.get('shop')
+    shop, access_token = get_shopify_context()
     return jsonify({
-        'authenticated': bool(shop and session.get('access_token')),
+        'authenticated': bool(shop and access_token),
         'shop': shop
     })
 
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     """Get all jobs for the current shop."""
-    user = get_current_user()
+    user = get_request_user()
     if not user:
         return jsonify({'error': 'Not authenticated'}), 401
 
@@ -248,7 +185,7 @@ def get_jobs():
 @app.route('/api/jobs/<int:job_id>', methods=['GET'])
 def get_job(job_id):
     """Get specific job details."""
-    user = get_current_user()
+    user = get_request_user()
     if not user:
         return jsonify({'error': 'Not authenticated'}), 401
 
@@ -297,8 +234,7 @@ def job_detail_page(job_id):
 @app.route('/api/pipeline/dry-run', methods=['POST'])
 def pipeline_dry_run():
     # Run unified pipeline dry-run for a single identifier.
-    shop = session.get('shop')
-    access_token = session.get('access_token')
+    shop, access_token = get_shopify_context()
 
     if not shop or not access_token:
         return jsonify({'error': 'Not authenticated'}), 401
@@ -326,8 +262,7 @@ def pipeline_dry_run():
 @app.route('/api/pipeline/push', methods=['POST'])
 def pipeline_push():
     # Push an approved payload (no re-run).
-    shop = session.get('shop')
-    access_token = session.get('access_token')
+    shop, access_token = get_shopify_context()
 
     if not shop or not access_token:
         return jsonify({'error': 'Not authenticated'}), 401
@@ -349,12 +284,11 @@ def pipeline_push():
 @app.route('/api/jobs', methods=['POST'])
 def create_job():
     """Create a new scraping job from uploaded CSV."""
-    user = get_current_user()
+    user = get_request_user()
     if not user:
         return jsonify({'error': 'Not authenticated'}), 401
 
-    shop = session.get('shop')
-    access_token = session.get('access_token')
+    shop, access_token = get_shopify_context()
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
@@ -412,16 +346,15 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
     """Background job processor - runs scraping in separate thread."""
     # Use app context for database access in background thread
     with app.app_context():
-        try:
-            # Update job status
-            job = Job.query.get(job_id)
-            if not job:
-                print(f"Error: Job {job_id} not found")
-                return
+        # Update job status
+        job = Job.query.get(job_id)
+        if not job:
+            print(f"Error: Job {job_id} not found")
+            return
 
-            job.status = JobStatus.RUNNING
-            job.started_at = datetime.now(timezone.utc)
-            db.session.commit()
+        job.status = JobStatus.RUNNING
+        job.started_at = datetime.now(timezone.utc)
+        db.session.commit()
 
         # Initialize Shopify client with OAuth token
         shopify = ShopifyClient()
@@ -444,11 +377,11 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
         except Exception as e:
             print(f"Warning: Could not get default location: {e}")
 
-            # Load processed SKUs
-            processed_skus = load_processed_skus()
+        # Load processed SKUs
+        processed_skus = load_processed_skus()
 
-            # Get Pentart vendor for catalog lookups
-            pentart_vendor = Vendor.query.filter_by(code='PENTART').first()
+        # Get Pentart vendor for catalog lookups
+        pentart_vendor = Vendor.query.filter_by(code='PENTART').first()
 
         successful = 0
         failed = 0
@@ -690,21 +623,19 @@ def process_job(job_id, shop_domain, access_token, csv_path, df):
                 job.failed_items = failed
                 db.session.commit()
 
-            # Mark job as complete
-            job.status = JobStatus.COMPLETED
-            job.completed_at = datetime.now(timezone.utc)
-            db.session.commit()
-
-        except Exception as e:
-            job.status = JobStatus.FAILED
-            job.error_message = str(e)
-            job.completed_at = datetime.now(timezone.utc)
-            db.session.commit()
+        # Mark job as complete
+        job.status = JobStatus.COMPLETED
+        job.completed_at = datetime.now(timezone.utc)
+        job.successful_items = successful
+        job.failed_items = failed
+        job.created_count = created_count
+        job.updated_count = updated_count
+        db.session.commit()
 
 @app.route('/api/jobs/<int:job_id>/cancel', methods=['POST'])
 def cancel_job(job_id):
     """Cancel a running job."""
-    user = get_current_user()
+    user = get_request_user()
     if not user:
         return jsonify({'error': 'Not authenticated'}), 401
 
@@ -721,4 +652,5 @@ def cancel_job(job_id):
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     debug = os.getenv('FLASK_ENV') == 'development'
-    app.run(debug=debug, host='0.0.0.0', port=port)
+    # Use threaded=True for SSE support
+    app.run(debug=debug, host='0.0.0.0', port=port, threaded=True)
