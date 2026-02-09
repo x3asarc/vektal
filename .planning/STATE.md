@@ -10,13 +10,22 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 5 of 15 (Backend API Design)
-Plan: Ready to begin
-Status: Phase 4 complete, UAT passed (10/10 tests)
-Last activity: 2026-02-09 — Completed Phase 4 UAT verification and endpoint testing
+Plan: 1 of 5 complete
+Status: In progress
+Last activity: 2026-02-09 — Completed 05-01-PLAN.md (API Core Infrastructure)
 
-Progress: [███████░░░] 90% (40/44 plans estimated)
+Progress: [███████░░░] 91% (41/45 plans estimated)
 
 ## Recent Session Summary (2026-02-09)
+
+**Phase 5 In Progress - Backend API Design:**
+- Plan 05-01 complete: API Core Infrastructure (9 minutes)
+- RFC 7807 error handling with ProblemDetails class
+- Cursor and offset pagination helpers
+- Tier-based rate limiting (100/500/2000 per day)
+- Redis backend for distributed rate limiting
+- 3 new dependencies: flask-openapi3, flask-limiter, flask-compress
+- 5 new files: src/api/core/{__init__, errors, pagination, rate_limit}.py
 
 **Phase 4 Complete - Authentication & User Management:**
 - Plan 04-01 complete: Database Models Extension (auth fields, OAuthAttempt, enums)
@@ -73,9 +82,9 @@ Progress: [███████░░░] 90% (40/44 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 8 min
-- Total execution time: 5.1 hours
+- Total execution time: 5.3 hours
 
 **By Phase:**
 
@@ -88,9 +97,11 @@ Progress: [███████░░░] 90% (40/44 plans estimated)
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
 | 03-database-migration-sqlite-to-postgresql | 5 | 20 min | 4 min |
 | 04-authentication-user-management | 6 | N/A | N/A |
+| 05-backend-api-design | 1 | 9 min | 9 min |
 
 **Recent Trend:**
-- Last 6 plans: Phase 4 plans (04-01 through 04-06) completed from previous session
+- Last plan: 05-01 (API Core Infrastructure) - 9 minutes
+- Phase 5 started: Backend API Design in progress
 - Phase 4 complete: Authentication infrastructure with UAT verification (10/10 tests passed)
 - Backend operational with 22+ registered endpoints across auth, billing, and OAuth
 
@@ -202,6 +213,11 @@ Recent decisions affecting current work:
 - Import Pentart as initial vendor catalog data, NOT SQLite migration (03-04): Per CONTEXT.md, SQLite is temporary; production schema designed from requirements
 - Import only 3 columns from Pentart CSV (03-04): Barcode, SKU, weight only - titles were Hungarian and other columns not applicable
 - Auto-run migrations on container startup (03-04): flask db upgrade runs before server starts; ensures schema is always up-to-date, fails fast on errors
+- RFC 7807 error format (05-01): Use Problem Details for all API errors - industry standard, machine-readable, consistent responses
+- Cursor pagination for large datasets (05-01): Products, jobs, vendors use cursor pagination - stable under concurrent modifications, no page drift
+- Tier-based rate limits (05-01): Rate limits tied to UserTier (100/500/2000 per day) - prevents abuse, enforces billing tier value proposition
+- Redis rate limit storage (05-01): Redis backend for distributed rate limiting - shared state across containers, persistent counters
+- Production error sanitization (05-01): Generic errors in production, detailed errors in development - prevents information disclosure via stack traces
 
 ### Roadmap Evolution
 
@@ -243,12 +259,15 @@ None yet.
 - Backend container optimized: Runtime dependency installation avoids full rebuild
 - All endpoints verified operational: /auth/login, /billing/plans, /oauth/status
 
-**Ready for Phase 5: Backend API Design**
+**Phase 5 IN PROGRESS (1/5 plans complete):**
+- Plan 05-01 complete: API Core Infrastructure (9 minutes)
+- RFC 7807 error handling, cursor/offset pagination, tier-based rate limiting
+- Next: Plan 05-02 (API Routes and OpenAPI Documentation)
 
 ## Session Continuity
 
-Last session: 2026-02-09 16:30:00Z
-Stopped at: Completed Phase 4 UAT verification (10/10 tests passed, 0 issues) + endpoint testing
+Last session: 2026-02-09 20:16:15Z
+Stopped at: Completed 05-01-PLAN.md (API Core Infrastructure)
 Resume file: None
 
 Config (if exists):
