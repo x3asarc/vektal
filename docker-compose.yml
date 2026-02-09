@@ -42,6 +42,8 @@ services:
       - ./src:/app/src
       - ./utils:/app/utils
       - ./config:/app/config
+      - ./migrations:/app/migrations
+      - ./web:/app/web
       # Persistent volumes
       - backend_uploads:/app/uploads
       - backend_data:/app/data
@@ -51,6 +53,7 @@ services:
       - FLASK_APP=src/app.py
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       # AI service keys
@@ -62,6 +65,11 @@ services:
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
       - API_VERSION=${API_VERSION:-2024-01}
+    # Install missing Phase 4 auth dependencies before starting
+    command: >
+      sh -c "pip install --no-cache-dir flask-login flask-session[redis] flask-bcrypt redis itsdangerous flask-mail stripe tenacity &&
+             python -m flask db upgrade &&
+             gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - src.app:app"
     depends_on:
       db:
         condition: service_healthy
@@ -83,10 +91,12 @@ services:
       - ./src:/app/src
       - ./utils:/app/utils
       - ./config:/app/config
+      - ./migrations:/app/migrations
       - backend_uploads:/app/uploads
       - backend_data:/app/data
     environment:
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       # AI service keys (for scraping tasks)
