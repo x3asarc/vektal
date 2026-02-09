@@ -10,15 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 5 of 15 (Backend API Design)
-Plan: 3 of 5 complete
+Plan: 4 of 5 complete
 Status: In progress
-Last activity: 2026-02-09 — Completed 05-02-PLAN.md (API Routes and OpenAPI Documentation)
+Last activity: 2026-02-09 — Completed 05-04-PLAN.md (Domain API Routes - Products, Jobs, Vendors)
 
-Progress: [███████░░░] 93% (42/45 plans estimated)
+Progress: [███████░░░] 96% (43/45 plans estimated)
 
 ## Recent Session Summary (2026-02-09)
 
 **Phase 5 In Progress - Backend API Design:**
+- Plan 05-04 complete: Domain API Routes - Products, Jobs, Vendors (6 minutes)
+- Domain-driven blueprint structure: src/api/v1/{products,jobs,vendors}/
+- Products API: List (cursor paginated), detail, vendor filtering
+- Jobs API: List (status/type filters), detail with results, cancellation
+- Vendors API: List with counts, detail by ID or code
+- User ownership filtering on all user-scoped endpoints (current_user.id)
+- SSE stream_url included in job responses for real-time progress
+- 10 files created, 1 file modified (complete v1 API registration)
+- Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
+- MessageAnnouncer pattern for thread-safe SSE broadcasting
+- SSE streaming endpoint at /<job_id>/stream with EventSource support
+- Polling fallback endpoint at /<job_id>/status for corporate firewalls
+- broadcast_job_progress() helper for background job integration
+- 4 new files: src/api/core/sse.py, src/api/jobs/{__init__, schemas, events}.py
 - Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
 - Flask-OpenAPI3 integration with Swagger UI at /api/docs
 - Versioned API routes under /api/v1/ (auth, billing, oauth, webhooks)
@@ -27,12 +41,6 @@ Progress: [███████░░░] 93% (42/45 plans estimated)
 - Response compression (gzip) for JSON responses
 - 3 new dependencies: flask-openapi3, flask-compress, flask-limiter
 - 1 file created, 2 files modified
-- Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
-- MessageAnnouncer pattern for thread-safe SSE broadcasting
-- SSE streaming endpoint at /<job_id>/stream with EventSource support
-- Polling fallback endpoint at /<job_id>/status for corporate firewalls
-- broadcast_job_progress() helper for background job integration
-- 4 new files: src/api/core/sse.py, src/api/jobs/{__init__, schemas, events}.py
 - Plan 05-01 complete: API Core Infrastructure (9 minutes)
 - RFC 7807 error handling with ProblemDetails class
 - Cursor and offset pagination helpers
@@ -95,9 +103,9 @@ Progress: [███████░░░] 93% (42/45 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 41
-- Average duration: 8 min
-- Total execution time: 5.3 hours
+- Total plans completed: 43
+- Average duration: 7 min
+- Total execution time: 5.4 hours
 
 **By Phase:**
 
@@ -110,13 +118,13 @@ Progress: [███████░░░] 93% (42/45 plans estimated)
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
 | 03-database-migration-sqlite-to-postgresql | 5 | 20 min | 4 min |
 | 04-authentication-user-management | 6 | N/A | N/A |
-| 05-backend-api-design | 3 | 28 min | 9 min |
+| 05-backend-api-design | 4 | 34 min | 9 min |
 
 **Recent Trend:**
-- Last plan: 05-02 (API Routes and OpenAPI Documentation) - 14 minutes
-- Phase 5 in progress: 3 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure)
+- Last plan: 05-04 (Domain API Routes - Products, Jobs, Vendors) - 6 minutes
+- Phase 5 in progress: 4 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure, Domain Routes)
 - Phase 4 complete: Authentication infrastructure with UAT verification (10/10 tests passed)
-- Backend operational with 45+ registered endpoints (21 v1 + 24 legacy) across auth, billing, and OAuth
+- Backend operational with domain APIs: Products, Jobs, Vendors under /api/v1/
 
 *Updated after each plan completion*
 
@@ -238,6 +246,10 @@ Recent decisions affecting current work:
 - SSE over WebSockets (05-03): Server-Sent Events for real-time job progress - simpler than WebSockets, unidirectional updates sufficient, works over HTTP/1.1
 - MessageAnnouncer pattern (05-03): Queue-based broadcasting with thread-safety - handles multiple concurrent clients, auto-removes slow clients (maxsize=5)
 - Polling fallback endpoint (05-03): /status endpoint alongside SSE - corporate firewalls may block SSE, graceful degradation needed
+- Domain-driven API blueprints (05-04): Separate blueprints per domain (products, jobs, vendors) for clear separation of concerns and independent evolution
+- User ownership filtering (05-04): All user-scoped endpoints filter by current_user.id to enforce multi-tenant isolation at query level
+- Cursor pagination for products (05-04): Products use cursor pagination instead of offset to prevent page drift under concurrent modifications
+- Job state validation (05-04): Cancel endpoint validates job is pending/running before cancellation, returns 409 for invalid state transitions
 
 ### Roadmap Evolution
 
@@ -279,19 +291,22 @@ None yet.
 - Backend container optimized: Runtime dependency installation avoids full rebuild
 - All endpoints verified operational: /auth/login, /billing/plans, /oauth/status
 
-**Phase 5 IN PROGRESS (3/5 plans complete):**
+**Phase 5 IN PROGRESS (4/5 plans complete):**
 - Plan 05-01 complete: API Core Infrastructure (9 minutes)
 - Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
 - Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
+- Plan 05-04 complete: Domain API Routes - Products, Jobs, Vendors (6 minutes)
 - RFC 7807 error handling, cursor/offset pagination, tier-based rate limiting
 - Flask-OpenAPI3 with Swagger UI, versioned routes (/api/v1/), legacy route preservation
 - MessageAnnouncer pattern for SSE broadcasting, streaming + polling endpoints
-- Next: Plan 05-04 (Domain API Routes - Products, Jobs, Vendors)
+- Domain-driven blueprints: products, jobs, vendors with Pydantic schemas
+- Complete v1 API: /api/v1/{products,jobs,vendors} with user ownership filtering
+- Next: Plan 05-05 (Integration Testing for all API endpoints)
 
 ## Session Continuity
 
-Last session: 2026-02-09 21:01:06Z
-Stopped at: Completed 05-02-PLAN.md (API Routes and OpenAPI Documentation)
+Last session: 2026-02-09 20:46:32Z
+Stopped at: Completed 05-04-PLAN.md (Domain API Routes - Products, Jobs, Vendors)
 Resume file: None
 
 Config (if exists):
