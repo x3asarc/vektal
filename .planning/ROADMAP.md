@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
 - [x] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
 - [x] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** - AI-powered enrichment with embeddings
-- [ ] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
+- [x] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
 - [ ] **Phase 4: Authentication & User Management** - User system in containerized environment
 - [ ] **Phase 5: Backend API Design** - RESTful API structure and contracts
 - [ ] **Phase 6: Job Processing Infrastructure (Celery)** - Async task processing foundation
@@ -175,20 +175,21 @@ Plans:
   3. Developer can restore database from backup within 5 minutes
   4. All production data migrated with zero data loss verified by row counts
   5. Connection pool limits prevent PostgreSQL max_connections exhaustion
-**Plans**: 4 plans in 4 waves
+**Plans**: 5 plans in 1 wave
 
 Plans:
-- [ ] 03-01-PLAN.md — Database dependencies, Flask-SQLAlchemy setup, application factory (Wave 1)
-- [ ] 03-02-PLAN.md — SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 2)
-- [ ] 03-03-PLAN.md — Flask-Migrate setup, initial migration, backup/restore scripts (Wave 3)
-- [ ] 03-04-PLAN.md — Pentart data import, app.py refactor to SQLAlchemy, verification (Wave 4)
+- [x] 03-01-PLAN.md — Flask-SQLAlchemy + psycopg3 foundation (Wave 1)
+- [x] 03-02-PLAN.md — SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 1)
+- [x] 03-03-PLAN.md — Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
+- [x] 03-04-PLAN.md — Pentart import script & auto-migrations (Wave 1)
+- [x] 03-05-PLAN.md — app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
 
 **Context Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md` for implementation decisions and deferred items.
 
 **Research Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-RESEARCH.md` for standard stack (Flask-SQLAlchemy, Flask-Migrate, psycopg3), architecture patterns, and backup strategy.
 
 ### Phase 4: Authentication & User Management
-**Goal**: Implement user authentication system compatible with containerized architecture
+**Goal**: Implement complete user authentication system for standalone SaaS with Stripe billing, Redis sessions, and Shopify OAuth integration
 **Depends on**: Phase 3
 **Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
 **Success Criteria** (what must be TRUE):
@@ -197,11 +198,18 @@ Plans:
   3. User sessions persist across backend container restarts
   4. API endpoints reject requests without valid authentication tokens
   5. User tier assignment determines which features are accessible
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 
 Plans:
-- [ ] 04-01: User registration and session management
-- [ ] 04-02: Shopify OAuth containerization and tier assignment
+- [ ] 04-01-PLAN.md — Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
+- [ ] 04-02-PLAN.md — Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
+- [ ] 04-03-PLAN.md — Registration, login/logout, email verification endpoints (Wave 2)
+- [ ] 04-04-PLAN.md — Stripe billing: checkout, webhooks, tier upgrades/downgrades (Wave 2)
+- [ ] 04-05-PLAN.md — Shopify OAuth refactor with retry logic and error handling (Wave 3)
+
+**Context Document**: See `.planning/phases/04-authentication-user-management/04-CONTEXT.md` for standalone SaaS architecture decisions, registration flow, and tier system design.
+
+**Research Document**: See `.planning/phases/04-authentication-user-management/04-RESEARCH.md` for Flask-Login + Flask-Session stack, OAuth 2.1 with PKCE, and Stripe patterns.
 
 ### Phase 5: Backend API Design
 **Goal**: Define RESTful API structure with validation, documentation, and real-time capabilities
@@ -395,8 +403,8 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 2. Docker Infrastructure Foundation | 4/4 | Complete | 2026-02-05 |
 | 2.1. Universal Vendor Scraping Engine | 11/11 | Complete | 2026-02-08 |
 | 2.2. Product Enrichment Pipeline | 6/6 | Complete | 2026-02-08 |
-| 3. Database Migration (SQLite to PostgreSQL) | 0/4 | Not started | - |
-| 4. Authentication & User Management | 0/2 | Not started | - |
+| 3. Database Migration (SQLite to PostgreSQL) | 5/5 | Complete | 2026-02-08 |
+| 4. Authentication & User Management | 0/5 | Planned | - |
 | 5. Backend API Design | 0/2 | Not started | - |
 | 6. Job Processing Infrastructure (Celery) | 0/2 | Not started | - |
 | 7. Frontend Framework Setup (Next.js) | 0/3 | Not started | - |
