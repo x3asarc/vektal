@@ -10,15 +10,23 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 5 of 15 (Backend API Design)
-Plan: 4 of 5 complete
-Status: In progress
-Last activity: 2026-02-09 — Completed 05-04-PLAN.md (Domain API Routes - Products, Jobs, Vendors)
+Plan: 5 of 5 complete
+Status: Phase complete
+Last activity: 2026-02-09 — Completed 05-04-01-PLAN.md (Per-User API Versioning Infrastructure)
 
-Progress: [███████░░░] 96% (43/45 plans estimated)
+Progress: [███████░░░] 98% (44/45 plans estimated)
 
 ## Recent Session Summary (2026-02-09)
 
-**Phase 5 In Progress - Backend API Design:**
+**Phase 5 COMPLETE - Backend API Design:**
+- Plan 05-04-01 complete: Per-User API Versioning Infrastructure (23 minutes)
+- User model: api_version (v1/v2) and api_version_locked_until fields
+- Version enforcement: before_request hook returns RFC 7807 409 on mismatch
+- Migration endpoints: GET /version, POST /migrate-to-v2, POST /rollback-to-v1
+- Rollback safety: 24h lock window after migration, enforced at endpoint level
+- Migration contract: run_user_migration() stub ready for future v2 implementation
+- Response headers: X-API-Version and X-API-Version-Lock-Until on authenticated requests
+- 6 files created, 3 files modified, 16 test cases added
 - Plan 05-04 complete: Domain API Routes - Products, Jobs, Vendors (6 minutes)
 - Domain-driven blueprint structure: src/api/v1/{products,jobs,vendors}/
 - Products API: List (cursor paginated), detail, vendor filtering
@@ -118,13 +126,13 @@ Progress: [███████░░░] 96% (43/45 plans estimated)
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
 | 03-database-migration-sqlite-to-postgresql | 5 | 20 min | 4 min |
 | 04-authentication-user-management | 6 | N/A | N/A |
-| 05-backend-api-design | 4 | 34 min | 9 min |
+| 05-backend-api-design | 5 | 57 min | 11 min |
 
 **Recent Trend:**
-- Last plan: 05-04 (Domain API Routes - Products, Jobs, Vendors) - 6 minutes
-- Phase 5 in progress: 4 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure, Domain Routes)
+- Last plan: 05-04-01 (Per-User API Versioning Infrastructure) - 23 minutes
+- Phase 5 COMPLETE: 5 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure, Domain Routes, Versioning)
 - Phase 4 complete: Authentication infrastructure with UAT verification (10/10 tests passed)
-- Backend operational with domain APIs: Products, Jobs, Vendors under /api/v1/
+- Backend operational with complete v1 API: Products, Jobs, Vendors, User versioning under /api/v1/
 
 *Updated after each plan completion*
 
@@ -250,6 +258,10 @@ Recent decisions affecting current work:
 - User ownership filtering (05-04): All user-scoped endpoints filter by current_user.id to enforce multi-tenant isolation at query level
 - Cursor pagination for products (05-04): Products use cursor pagination instead of offset to prevent page drift under concurrent modifications
 - Job state validation (05-04): Cancel endpoint validates job is pending/running before cancellation, returns 409 for invalid state transitions
+- Per-user API versioning (05-04-01): Version state stored in users table enables gradual v1→v2 migration without forcing all users to upgrade
+- 24-hour rollback window (05-04-01): Users can revert v2→v1 within 24h of migration for safety, prevents indefinite version downgrade
+- RFC 7807 409 for version mismatch (05-04-01): Machine-readable error with suggested_path metadata guides clients to correct endpoint
+- Migration contract pattern (05-04-01): run_user_migration() interface established in Phase 5, implementation deferred until v2 requirements known
 
 ### Roadmap Evolution
 
@@ -291,22 +303,24 @@ None yet.
 - Backend container optimized: Runtime dependency installation avoids full rebuild
 - All endpoints verified operational: /auth/login, /billing/plans, /oauth/status
 
-**Phase 5 IN PROGRESS (4/5 plans complete):**
+**Phase 5 COMPLETE (5/5 plans complete):**
 - Plan 05-01 complete: API Core Infrastructure (9 minutes)
 - Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
 - Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
 - Plan 05-04 complete: Domain API Routes - Products, Jobs, Vendors (6 minutes)
+- Plan 05-04-01 complete: Per-User API Versioning Infrastructure (23 minutes)
 - RFC 7807 error handling, cursor/offset pagination, tier-based rate limiting
 - Flask-OpenAPI3 with Swagger UI, versioned routes (/api/v1/), legacy route preservation
 - MessageAnnouncer pattern for SSE broadcasting, streaming + polling endpoints
 - Domain-driven blueprints: products, jobs, vendors with Pydantic schemas
-- Complete v1 API: /api/v1/{products,jobs,vendors} with user ownership filtering
-- Next: Plan 05-05 (Integration Testing for all API endpoints)
+- Per-user API versioning: v1/v2 state, migration endpoints, 24h rollback window
+- Complete v1 API: /api/v1/{products,jobs,vendors,user} with version enforcement
+- Next: Phase 6 (Frontend - Next.js + React)
 
 ## Session Continuity
 
-Last session: 2026-02-09 20:46:32Z
-Stopped at: Completed 05-04-PLAN.md (Domain API Routes - Products, Jobs, Vendors)
+Last session: 2026-02-09 22:35:41Z
+Stopped at: Completed 05-04-01-PLAN.md (Per-User API Versioning Infrastructure)
 Resume file: None
 
 Config (if exists):
