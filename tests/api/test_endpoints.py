@@ -12,16 +12,25 @@ from src.database import db
 from src.models import User, Job, JobStatus, Vendor, UserTier
 
 
+class TestConfig:
+    """Test configuration for Flask app."""
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {}  # No pool settings for SQLite
+    SECRET_KEY = 'test-secret-key'
+    WTF_CSRF_ENABLED = False
+
+
 @pytest.fixture
 def app():
     """Create test Flask application."""
-    app = create_openapi_app()
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app = create_openapi_app(config_object=TestConfig)
 
     with app.app_context():
         db.create_all()
         yield app
+        db.session.remove()
         db.drop_all()
 
 

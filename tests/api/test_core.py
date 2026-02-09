@@ -117,12 +117,7 @@ class TestPagination:
 
     def test_build_cursor_response_structure(self):
         """build_cursor_response returns correct structure."""
-        items = [{"id": 1}, {"id": 2}]
-
-        # Mock last item with created_at
-        class MockItem:
-            id = 2
-            created_at = "2026-02-09T12:00:00"
+        items = [{"id": 1, "created_at": "2026-02-09T11:00:00"}, {"id": 2, "created_at": "2026-02-09T12:00:00"}]
 
         response = build_cursor_response(
             items=items,
@@ -133,6 +128,9 @@ class TestPagination:
         assert "data" in response
         assert "pagination" in response
         assert response["pagination"]["has_next"] == True
+        # next_cursor should be present when has_next=True
+        if response["pagination"]["has_next"]:
+            assert "next_cursor" in response["pagination"]
 
     def test_build_offset_response_structure(self):
         """build_offset_response returns correct structure."""

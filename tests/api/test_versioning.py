@@ -18,22 +18,27 @@ Fixtures:
 import pytest
 from datetime import datetime, timezone, timedelta
 from unittest.mock import patch
+
 from src.models import db
 from src.models.user import User, UserTier, AccountStatus
 from src.api.app import create_openapi_app
 
 
+class TestConfig:
+    """Test configuration for Flask app."""
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {}  # No pool settings for SQLite
+    SECRET_KEY = 'test-secret-key'
+    WTF_CSRF_ENABLED = False
+    ENABLE_API_VERSION_ENFORCEMENT = True
+
+
 @pytest.fixture
 def app():
     """Create Flask app for testing."""
-    app = create_openapi_app()
-    app.config.update({
-        'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-        'ENABLE_API_VERSION_ENFORCEMENT': True,
-        'SECRET_KEY': 'test-secret-key',
-        'WTF_CSRF_ENABLED': False
-    })
+    app = create_openapi_app(config_object=TestConfig)
 
     with app.app_context():
         db.create_all()
