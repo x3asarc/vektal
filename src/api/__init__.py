@@ -64,6 +64,7 @@ def register_v1_blueprints(app):
     from src.api.v1.jobs import jobs_api_bp
     from src.api.v1.vendors import vendors_bp
     from src.api.jobs import jobs_bp  # SSE streaming
+    from src.api.v1.versioning import versioning_bp
 
     # ===== V1 API Routes (versioned, preferred) =====
     # Register auth blueprints under /api/v1/
@@ -80,6 +81,7 @@ def register_v1_blueprints(app):
     app.register_blueprint(jobs_api_bp, url_prefix='/api/v1/jobs')
     app.register_blueprint(vendors_bp, url_prefix='/api/v1/vendors')
     app.register_blueprint(jobs_bp, url_prefix='/api/v1/jobs')  # SSE routes
+    app.register_blueprint(versioning_bp, url_prefix='/api/v1/user')
 
     # ===== Legacy Routes (backward compatibility) =====
     # Keep /auth and /billing working during transition

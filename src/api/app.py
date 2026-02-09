@@ -128,8 +128,15 @@ def create_openapi_app(config_object=None):
     app.config.setdefault("COMPRESS_LEVEL", 6)  # Balance speed vs compression (1-9)
     app.config.setdefault("COMPRESS_MIN_SIZE", 500)  # Only compress responses >500 bytes
 
+    # Configure API versioning
+    app.config.setdefault("ENABLE_API_VERSION_ENFORCEMENT", True)
+
     # Register error handlers
     register_error_handlers(app)
+
+    # Register API versioning hooks (after auth, before blueprints)
+    from src.api.core.versioning import register_versioning_hooks
+    register_versioning_hooks(app)
 
     # Register blueprints (auth, billing, oauth, jobs, products, vendors)
     from src.api import register_v1_blueprints
