@@ -2,23 +2,40 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-03)
+See: .planning/PROJECT.md (updated 2026-02-09)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 5 - Backend API Design
+**Current focus:** Phase 7 - Frontend Framework Setup (Next.js)
 
 ## Current Position
 
-Phase: 5 of 15 (Backend API Design)
-Plan: 5 of 5 complete
-Status: Phase complete
-Last activity: 2026-02-09 — Completed 05-04-01-PLAN.md (Per-User API Versioning Infrastructure)
+Phase: 7 of 15 (Frontend Framework Setup - Next.js)
+Plan: Phase 6 complete (6/6, UAT approved); Phase 7 kickoff pending
+Status: Phase 6 closed, transitioning to frontend implementation
+Last activity: 2026-02-10 - Phase 6 UAT passed, cancellation/finalizer runtime fixes verified in containers
 
-Progress: [███████░░░] 98% (44/45 plans estimated)
+Progress: 69% (50/72 plans in roadmap complete)
 
-## Recent Session Summary (2026-02-09)
+## Recent Session Summary (2026-02-10)
 
-**Phase 5 COMPLETE - Backend API Design:**
+**Phase 6 COMPLETE - Job Processing Infrastructure (Celery):**
+- Plan 06-01..06-06 complete with verification and UAT closure
+- Runtime UAT executed in Docker with healthy `backend`, `celery_worker`, `celery_scraper`, `flower`, `redis`, `db`
+- End-to-end async flow verified: `POST /api/v1/jobs` returns `202` and executes in background
+- Progress endpoints validated: `/api/v1/jobs/<id>/stream` and `/api/v1/jobs/<id>/status`
+- Cancellation convergence verified in runtime (`cancel_requested` -> `cancelled`)
+- Stability fixes applied during UAT:
+  - Celery task app-context wrapper to prevent Flask context runtime errors
+  - Checkpoint DB bind handling fix for worker sessions
+  - Cancellation/start race-condition hardening with row locks
+  - Active-ingest duplicate create now deterministic `409 active-ingest-exists`
+- Verification status updated: `06-VERIFICATION.md` and `06-UAT.md` marked completed
+
+**Phase 5 COMPLETE - Backend API Design (previous session):**
+- Plan 05-05 complete: API verification and validation closure
+- Test suite status: 38 passed, 0 failed (`tests/api/`)
+- Human verification checklist completed and documented
+- New artifacts: 05-05-SUMMARY.md and phase-level 05-SUMMARY.md
 - Plan 05-04-01 complete: Per-User API Versioning Infrastructure (23 minutes)
 - User model: api_version (v1/v2) and api_version_locked_until fields
 - Version enforcement: before_request hook returns RFC 7807 409 on mismatch
@@ -111,9 +128,9 @@ Progress: [███████░░░] 98% (44/45 plans estimated)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 43
-- Average duration: 7 min
-- Total execution time: 5.4 hours
+- Total plans completed: 50
+- Average duration: N/A (mixed tracked and untracked timings)
+- Total execution time: N/A (phase-level timing data is partially incomplete)
 
 **By Phase:**
 
@@ -126,13 +143,14 @@ Progress: [███████░░░] 98% (44/45 plans estimated)
 | 02.2-product-enrichment-pipeline | 6 | 88 min | 15 min |
 | 03-database-migration-sqlite-to-postgresql | 5 | 20 min | 4 min |
 | 04-authentication-user-management | 6 | N/A | N/A |
-| 05-backend-api-design | 5 | 57 min | 11 min |
+| 05-backend-api-design | 6 | N/A | N/A |
+| 06-job-processing-infrastructure-celery | 6 | N/A | N/A |
 
 **Recent Trend:**
-- Last plan: 05-04-01 (Per-User API Versioning Infrastructure) - 23 minutes
-- Phase 5 COMPLETE: 5 of 5 plans complete (API Core, OpenAPI Routes, SSE Infrastructure, Domain Routes, Versioning)
-- Phase 4 complete: Authentication infrastructure with UAT verification (10/10 tests passed)
-- Backend operational with complete v1 API: Products, Jobs, Vendors, User versioning under /api/v1/
+- Last plan: 06-06 (verification, traceability, UAT closure)
+- Phase 6 COMPLETE: 6 of 6 plans complete (runtime UAT approved)
+- Jobs test suite status: `python -m pytest -p no:cacheprovider tests/jobs -q` -> 30 passed
+- Current transition: Phase 7 kickoff pending (frontend framework setup)
 
 *Updated after each plan completion*
 
@@ -275,6 +293,8 @@ None yet.
 
 ### Blockers/Concerns
 
+Current blockers for Phase 6 closure: None.
+
 **All gaps from VERIFICATION.md CLOSED:**
 - Gap 1: SiteReconnaissance.discover() learns site structure (Plan 09, 11 min, 26 tests)
 - Gap 2: FirecrawlClient + GSDPopulator auto-populate YAML mappings (Plan 10, 6 min, 16 tests)
@@ -303,24 +323,34 @@ None yet.
 - Backend container optimized: Runtime dependency installation avoids full rebuild
 - All endpoints verified operational: /auth/login, /billing/plans, /oauth/status
 
-**Phase 5 COMPLETE (5/5 plans complete):**
+**Phase 5 COMPLETE (6/6 plans complete):**
 - Plan 05-01 complete: API Core Infrastructure (9 minutes)
 - Plan 05-02 complete: API Routes and OpenAPI Documentation (14 minutes)
 - Plan 05-03 complete: SSE Infrastructure for Real-Time Job Progress (5 minutes)
 - Plan 05-04 complete: Domain API Routes - Products, Jobs, Vendors (6 minutes)
 - Plan 05-04-01 complete: Per-User API Versioning Infrastructure (23 minutes)
+- Plan 05-05 complete: Verification and quality closure (tests + checklist)
 - RFC 7807 error handling, cursor/offset pagination, tier-based rate limiting
 - Flask-OpenAPI3 with Swagger UI, versioned routes (/api/v1/), legacy route preservation
 - MessageAnnouncer pattern for SSE broadcasting, streaming + polling endpoints
 - Domain-driven blueprints: products, jobs, vendors with Pydantic schemas
 - Per-user API versioning: v1/v2 state, migration endpoints, 24h rollback window
 - Complete v1 API: /api/v1/{products,jobs,vendors,user} with version enforcement
-- Next: Phase 6 (Frontend - Next.js + React)
+- Verification complete: `python -m pytest tests/api/ -v` -> 38 passed
+
+**Phase 6 COMPLETE (6/6 plans complete, UAT approved):**
+- Celery async orchestration and queue topology validated in running Docker stack
+- End-to-end non-blocking API flow verified (`POST /api/v1/jobs` -> `202` with background execution)
+- Progress streaming/polling validated (`/stream` and `/status`)
+- Cancellation convergence fixed and verified (`cancel_requested` -> `cancelled`)
+- Duplicate active-ingest request now returns deterministic `409 active-ingest-exists`
+- Phase 6 UAT checklist marked complete in `.planning/phases/06-job-processing-infrastructure-celery/06-UAT.md`
+- Next: Phase 7 (Frontend Framework Setup - Next.js)
 
 ## Session Continuity
 
-Last session: 2026-02-09 22:35:41Z
-Stopped at: Completed 05-04-01-PLAN.md (Per-User API Versioning Infrastructure)
+Last session: 2026-02-10
+Stopped at: Phase 6 UAT closure completed and planning files updated for Phase 7 handoff
 Resume file: None
 
 Config (if exists):

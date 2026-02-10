@@ -18,9 +18,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
 - [x] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** - AI-powered enrichment with embeddings
 - [x] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
-- [ ] **Phase 4: Authentication & User Management** - User system in containerized environment
-- [ ] **Phase 5: Backend API Design** - RESTful API structure and contracts
-- [ ] **Phase 6: Job Processing Infrastructure (Celery)** - Async task processing foundation
+- [x] **Phase 4: Authentication & User Management** - User system in containerized environment
+- [x] **Phase 5: Backend API Design** - RESTful API structure and contracts
+- [x] **Phase 6: Job Processing Infrastructure (Celery)** - Async task processing foundation
 - [ ] **Phase 7: Frontend Framework Setup (Next.js)** - Modern React-based UI foundation
 - [ ] **Phase 8: Product Resolution Engine** - Intelligent product lookup and enrichment
 - [ ] **Phase 9: Real-Time Progress Tracking** - Live job monitoring with WebSocket/SSE
@@ -220,13 +220,21 @@ Plans:
   1. Developer can explore all API endpoints via interactive OpenAPI documentation
   2. Invalid request payloads return structured error responses with field-level details
   3. API enforces tier-based rate limiting (different limits per user tier)
-  4. Frontend can establish WebSocket connection for real-time updates
+  4. Frontend can consume SSE stream for real-time updates (with polling fallback)
   5. CORS configuration allows frontend development server to call backend APIs
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
 
 Plans:
-- [ ] 05-01: API structure, validation, and documentation
-- [ ] 05-02: Rate limiting and WebSocket endpoints
+- [x] 05-01-PLAN.md - API core infrastructure (RFC 7807 errors, pagination, rate limits)
+- [x] 05-02-PLAN.md - OpenAPI app factory and versioned route registration
+- [x] 05-03-PLAN.md - SSE infrastructure and polling fallback
+- [x] 05-04-PLAN.md - Domain blueprints (products, jobs, vendors)
+- [x] 05-04-01-PLAN.md - Per-user API versioning and migration lifecycle
+- [x] 05-05-PLAN.md - End-to-end verification and API test completion
+
+**Summary Documents**:
+- `.planning/phases/05-backend-api-design/05-SUMMARY.md`
+- `.planning/phases/05-backend-api-design/05-05-SUMMARY.md`
 
 ### Phase 6: Job Processing Infrastructure (Celery)
 **Goal**: Implement async job processing with monitoring and parallel execution capabilities
@@ -238,11 +246,15 @@ Plans:
   3. Tier 3 user jobs process before Tier 1 user jobs when queue is busy
   4. User can cancel in-progress job and see status change immediately
   5. Job results persist in database and remain accessible after worker restart
-**Plans**: TBD
+**Plans**: 6 plans in 5 waves
 
 Plans:
-- [ ] 06-01: Celery worker and Redis broker setup
-- [ ] 06-02: Job tracking, prioritization, and Flower monitoring
+- [x] 06-01: Schema and model invariants foundation (Wave 1)
+- [x] 06-02: Queue/container/logging/Flower infrastructure closure (Wave 1)
+- [x] 06-03: Ingest orchestration and chunk execution integration (Wave 2)
+- [x] 06-04: Checkpoint outbox dispatcher + finalizer convergence (Wave 3)
+- [x] 06-05: Cancellation, prioritization under load, retention cleanup (Wave 4)
+- [x] 06-06: Verification, requirement traceability, and UAT closure (Wave 5)
 
 ### Phase 7: Frontend Framework Setup (Next.js)
 **Goal**: Build modern React-based UI foundation with routing and progressive onboarding
@@ -406,8 +418,8 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 2.2. Product Enrichment Pipeline | 6/6 | Complete | 2026-02-08 |
 | 3. Database Migration (SQLite to PostgreSQL) | 5/5 | Complete | 2026-02-08 |
 | 4. Authentication & User Management | 6/6 | Complete | 2026-02-09 |
-| 5. Backend API Design | 0/2 | Not started | - |
-| 6. Job Processing Infrastructure (Celery) | 0/2 | Not started | - |
+| 5. Backend API Design | 6/6 | Complete | 2026-02-09 |
+| 6. Job Processing Infrastructure (Celery) | 6/6 | Complete | 2026-02-10 |
 | 7. Frontend Framework Setup (Next.js) | 0/3 | Not started | - |
 | 8. Product Resolution Engine | 0/2 | Not started | - |
 | 9. Real-Time Progress Tracking | 0/2 | Not started | - |
