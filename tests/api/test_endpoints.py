@@ -4,22 +4,11 @@ Integration tests for API endpoints.
 Tests endpoint behavior with Flask test client.
 """
 import pytest
-import json
-from flask import Flask
 
 from src.api.app import create_openapi_app
 from src.database import db
-from src.models import User, Job, JobStatus, Vendor, UserTier
-
-
-class TestConfig:
-    """Test configuration for Flask app."""
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {}  # No pool settings for SQLite
-    SECRET_KEY = 'test-secret-key'
-    WTF_CSRF_ENABLED = False
+from src.models import User, Job, JobStatus, JobType, Vendor, UserTier, AccountStatus
+from tests.api.conftest import TestConfig
 
 
 @pytest.fixture
@@ -48,8 +37,9 @@ def authenticated_client(app, client):
         user = User(
             email='test@example.com',
             tier=UserTier.TIER_1,
-            is_active=True,
-            email_verified=True
+            account_status=AccountStatus.ACTIVE,
+            email_verified=True,
+            api_version='v1'
         )
         user.set_password('testpassword')
         db.session.add(user)
@@ -73,7 +63,7 @@ class TestOpenAPIDocs:
 
     def test_openapi_json_accessible(self, client):
         """OpenAPI JSON spec is accessible."""
-        response = client.get('/api/openapi.json')
+        response = client.get('/api/docs/openapi.json')
         assert response.status_code == 200
         data = response.get_json()
         assert 'openapi' in data
@@ -108,6 +98,7 @@ class TestJobsAPI:
         with client.application.app_context():
             job = Job(
                 user_id=user.id,
+                job_type=JobType.PRODUCT_SYNC,
                 job_name='Test Job',
                 status=JobStatus.PENDING,
                 total_items=10
@@ -145,6 +136,7 @@ class TestVendorsAPI:
         # Create a test vendor
         with client.application.app_context():
             vendor = Vendor(
+                user_id=user.id,
                 code='TEST',
                 name='Test Vendor',
                 is_active=True
