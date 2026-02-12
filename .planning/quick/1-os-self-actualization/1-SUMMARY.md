@@ -20,7 +20,7 @@
 ## Task Commits
 1. **Task 1: Create quick task plan** - `7bcc8ba`
 2. **Task 2: Create OS self-actualization playbook** - `be59372`
-3. **Task 3: Record completion in state + summary** - committed with this summary update
+3. **Task 3: Record completion in state + summary** - `097cde7`
 
 ## Files
 - `.planning/quick/1-os-self-actualization/1-PLAN.md`
