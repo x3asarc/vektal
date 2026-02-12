@@ -4,6 +4,25 @@
 
 This roadmap transforms an organically-grown monolithic Python application into a production-ready containerized SaaS platform. Starting with codebase cleanup to establish a maintainable foundation, we progress through Docker infrastructure setup, database migration to PostgreSQL, backend service containerization, modern Next.js frontend development, and the sophisticated conversational AI interface that serves as the platform's centerpiece. The journey concludes with tier system implementation, external API hardening, and production deployment readiness.
 
+## Governance Baseline v1 (2026-02-12)
+
+Canonical governance spec: `solutionsos/compound-engineering-os-policy.md`
+
+1. Canonical lifecycle file: `.planning/ROADMAP.md` (this file).
+2. Canonical execution state file: `.planning/STATE.md`.
+3. Task closure requires exactly four reports in `reports/<phase>/<task>/`.
+4. Required report fields cannot be empty; use explicit `N/A` when non-applicable.
+5. Merge blocking: `Critical`, `High`, and `Medium` for `Security`/`Dependency`.
+6. Reviewer uses two-pass protocol (`Blind Audit` then `Context Fit`) with timestamp evidence.
+7. `MASTER_MAP.md` must be updated at daily batch and phase-close.
+8. Protected paths (`.planning`, `.rules`, `AGENTS.md`) cannot be auto-moved.
+
+### Phase 7 Governance Task Board
+
+| Task | Purpose | Gate Status | Evidence |
+|---|---|---|---|
+| 07.1-governance-baseline-dry-run | Stand up governance artifacts and evidence flow | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/` |
+
 ## Phases
 
 **Phase Numbering:**
@@ -266,10 +285,11 @@ Plans:
   3. UI responds to mobile and tablet screen sizes without horizontal scrolling
   4. Navigation between routes (chat, dashboard, search, settings) works instantly
   5. Application state persists when user refreshes browser
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 07-01: Next.js setup with routing and API client
+- [x] 07-01: Next.js setup with routing and API client
+- [x] 07.1: Governance baseline dry-run and gate scaffolding
 - [ ] 07-02: Progressive onboarding and responsive layout
 - [ ] 07-03: State management and Module Federation preparation
 

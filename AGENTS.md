@@ -1,0 +1,57 @@
+# Compound Engineering Governance Baseline v1
+
+## Mission and non-negotiables
+1. Deliver every task with binary gate outcomes (`GREEN` or `RED`).
+2. Treat `.planning/ROADMAP.md` as canonical lifecycle state.
+3. Do not close a task without all required evidence artifacts.
+4. Do not bypass gates except PhaseManager emergency protocol.
+5. Keep implementation simple and auditable under KISS policy.
+
+## Role authority boundaries
+1. `PhaseManager`: owns phase state, gate decisions, and closure in `.planning/ROADMAP.md` and `.planning/STATE.md`.
+2. `Builder`: implements scoped task from plan and publishes `self-check.md`.
+3. `Reviewer`: performs two-pass review and publishes findings; cannot merge or close phase.
+4. `StructureGuardian`: audits placement/naming/spec, proposes moves through traceable reports.
+5. `IntegrityWarden`: verifies dependencies/imports/licenses/secrets and blocks unsafe package changes.
+6. `ContextCurator`: owns `docs/MASTER_MAP.md` and three-phase journey synthesis.
+
+## Gate policy and blocking rules
+1. Block on `Critical` and `High`.
+2. Block on `Medium` when category is `Security` or `Dependency`.
+3. Require exactly four task reports at `reports/<phase>/<task>/`:
+   - `self-check.md`
+   - `review.md`
+   - `structure-audit.md`
+   - `integrity-audit.md`
+4. Required report fields cannot be empty; use explicit `N/A` when non-applicable.
+5. `review.md` must include blind-review ordering evidence:
+   - `pass_1_timestamp`
+   - `pass_2_timestamp`
+   - `plan_context_opened_at`
+   - Pass 1 must predate plan-context access by git evidence.
+
+## Emergency bypass protocol
+1. Only PhaseManager may invoke bypass.
+2. Bypass expires in 24 hours.
+3. Bypass requires rollback owner and rollback plan.
+4. Post-mortem must be logged in `.planning/STATE.md` within 48 hours.
+
+## KISS limits
+1. Target per file: `150-400 LOC`.
+2. Warning threshold: `>500 LOC` requires split evaluation.
+3. Exception threshold: `>800 LOC` requires architecture note and manual approval.
+4. Architecture note must include root cause, impact, risk, and refactoring plan.
+5. Any file at `>=800 LOC` must be decomposed into at least two modules in the following phase.
+
+## Artifact contract
+1. Canonical phase state: `.planning/ROADMAP.md`.
+2. Current execution state: `.planning/STATE.md`.
+3. Standards rubric: `STANDARDS.md`.
+4. Structure contract: `ops/STRUCTURE_SPEC.md`.
+5. Context map: `docs/MASTER_MAP.md`.
+6. Failure memory: `FAILURE_JOURNEY.md`.
+7. Task plans: `.planning/phases/<phase>/<task>/PLAN.md`.
+8. Task reports: `reports/<phase>/<task>/`.
+9. Three-phase synthesis: `reports/meta/journey-synthesis-<phase-range>.md`.
+10. Governance blueprint reference: `solutionsos/compound-engineering-os-policy.md`.
+
