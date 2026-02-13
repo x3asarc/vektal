@@ -62,36 +62,12 @@ This phase defines resolution behavior and user-governed change rules; it does n
   - original source trace metadata
 
 ### Execution and Throughput Policy (Locked)
-- Batch apply concurrency is adaptive to available rate-limit budget (including `X-Shopify-Shop-Api-Call-Limit` signals).
+- Batch apply concurrency is adaptive to available rate-limit budget.
 - Rate-limit handling uses dynamic backoff based on response headers/signals.
 - Long-batch auto-pause triggers when critical errors exceed a configured threshold `N` (default policy band, not first error).
 - For scheduled apply conflicts where catalog changed since dry-run:
   - re-run dry-run for conflicted items only
   - avoid full-batch re-run unless conflict scope expands materially.
-- Pre-flight validation runs immediately before apply (target within 60 seconds of first mutation call).
-- Pre-flight validation performs 1:1 existence checks for target Shopify product/variant IDs.
-- Targets missing/deleted since approval are not pushed and are preserved in `Recovery Logs` with actionable restore metadata.
-- Active dry-run review sessions are checked out to one user at a time (batch locking).
-
-### Structural and Variant Policy (Locked)
-- Resolution must evaluate product + variant structure (SKU/barcode/options), not title-only matching.
-- If supplier data introduces variants not present in Shopify, mark as `Structural Conflict: New Variants Detected`.
-- Product type/option-schema mismatches must enter a `Structural Review` state before apply.
-- Default behavior is explicit approval required before creating missing variants.
-- User can opt into auto-create missing variants per supplier/profile rule from Settings.
-- For SKU variant mismatch (for example Shopify has `Red` only, supplier has `Red` + `Blue`), system must ask whether new variant(s) are desired.
-- Safe default for newly created variants is non-live state (`draft` and/or zero inventory) until publish conditions are met.
-- If supplier row maps to no Shopify product, route through `Draft New Product` flow rather than in-place update.
-
-### Multi-User Collaboration Integrity (Locked)
-- Manual overrides and approvals are always attributed to `user_id`.
-- Non-lock owners can view a batch but cannot edit/approve while lock is active.
-- UI should show clear lock ownership and active work indicators to avoid ambiguous ownership.
-
-### Negative Constraints and Exclusion Rules (Locked)
-- Preference store must support exclusion rules (for example: never auto-change price for selected collections/tags/vendors).
-- Exclusion rules override positive auto-apply rules.
-- Dry-run must explain when a proposed change was blocked by an exclusion rule.
 
 ### Explainability and Trust Controls (Locked)
 - Dry-run row reasons are shown as human-readable sentences per change.
@@ -114,17 +90,6 @@ This phase defines resolution behavior and user-governed change rules; it does n
   - auto-applied by rule marked as completed
   - proposed changes marked as awaiting approval
   - manual edits feed rule-learning suggestions
-- Settings/onboarding includes a structured supplier strategy questionnaire (quiz/typeform style) to capture tight, machine-actionable preferences.
-- Questionnaire examples include:
-  - behavior for new variants on matched products (`create as draft`, `ignore`, `ask every time`)
-  - behavior for scraping supplier variants (`all variants` vs `base product only`)
-- Collaboration UX should prefer co-presence indicators + locking over Google-Docs-style live co-editing for lower complexity and clearer ownership.
-- Add two visibility surfaces:
-  - `Currently Happening` for active dry-runs and in-progress apply jobs
-  - `Coming Up Next` for approved scheduled batches waiting to execute
-- User-attributed visual cues (for example color-coded audit/history) should make ownership obvious without enabling concurrent write conflicts.
-- Audit trace should make "Why changed?" explicit as lineage: `Batch -> Rule Version -> User ID/Color Attribution`.
-- Confidence display should include numeric score + badge with reason factors (for example SKU match, title match).
 
 ## Non-Negotiable Requirements
 
@@ -135,7 +100,6 @@ This phase defines resolution behavior and user-governed change rules; it does n
   - image assets must be downloaded and stored/processed as files
   - URL-only image link persistence is not sufficient
   - final Shopify push must use controlled ingested asset source, not external vendor URL directly
-- When approved work cannot be applied due to stale/deleted Shopify targets, preserve the payload and decision context in `Recovery Logs`.
 
 ## Data Lifecycle Note
 

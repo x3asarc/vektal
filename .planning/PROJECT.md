@@ -19,20 +19,6 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 - Agent-driven cleanup and migration (autonomous refactoring where possible)
 - Production deployment-ready containers with clear boundaries
 
-## Execution Snapshot (2026-02-11)
-
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6
-- Current phase: 7 (Frontend Framework Setup - Next.js, context/research wave)
-- Phase 5 outcomes:
-  - OpenAPI/Swagger docs at `/api/docs`
-  - Versioned v1 API domains: products, jobs, vendors, user versioning
-  - RFC 7807 error responses, cursor pagination, tier rate limits, SSE progress streaming
-  - Per-user API version migration lifecycle with rollback window
-  - Verification suite complete (`38 passed` in `tests/api/`)
-- Phase 5 artifacts:
-  - `.planning/phases/05-backend-api-design/05-05-SUMMARY.md`
-  - `.planning/phases/05-backend-api-design/05-SUMMARY.md`
-
 ## Requirements
 
 ### Validated
@@ -45,7 +31,7 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 - ✓ Multi-vendor scraping (Python BeautifulSoup/Selenium + JS Playwright)
 - ✓ Image processing framework (YAML-driven transformations)
 - ✓ Shopify GraphQL API integration (products, variants, media, inventory)
-- ✓ Job tracking and resume capability (PostgreSQL-backed)
+- ✓ Job tracking and resume capability (SQLite databases)
 
 **Proven Workflows:**
 - ✓ Bulk CSV upload → automated processing → results tracking
@@ -56,7 +42,6 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 ### Active
 
 <!-- Milestone v1.0 scope - building toward these -->
-**Note:** The checklist below is historical planning context. Canonical execution state is tracked in `.planning/ROADMAP.md` and `.planning/STATE.md`.
 
 **Phase 1: Codebase Cleanup & Analysis**
 - [ ] Archive 30+ one-off scripts (apply_*, scrape_*, fix_*, dry_run_*)
@@ -138,8 +123,8 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 ### Technical Environment
 
-- **Current:** Python 3.12+, Flask, PostgreSQL, Redis, Selenium/Playwright, OpenAI/Gemini APIs
-- **Target:** Containerized microservices with completed backend API foundation and upcoming Celery job orchestration + Next.js UI phases
+- **Current:** Python 3.12+, Flask, SQLite, Selenium/Playwright, OpenAI/Gemini APIs
+- **Target:** Containerized microservices, modern frontend framework, PostgreSQL, Redis
 - **External:** Shopify GraphQL API, 8 vendor websites, AI APIs (OpenAI, Gemini)
 
 ## Constraints
@@ -164,4 +149,4 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 ---
 *Created: 2026-02-03 after repository evaluation*
-*Last updated: 2026-02-11 after Phase 7 context/research kickoff and codexclaude integration*
+*Last updated: 2026-02-03 during milestone v1.0 initialization*

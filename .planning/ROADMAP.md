@@ -303,13 +303,11 @@ Plans:
   3. Web search ranks results by relevance based on existing product catalog patterns
   4. System automatically detects vendor and selects correct scraping strategy
   5. User previews all changes (prices, descriptions, images) before applying to Shopify
-**Plans**: 4 plans in 3 waves
+**Plans**: TBD
 
 Plans:
-- [x] 08-01: Resolution persistence, policy engine, and checkout locking foundation (Wave 1)
-- [x] 08-02: Multi-source resolver, scoring, structural conflicts, and dry-run compiler APIs (Wave 2)
-- [x] 08-03: Collaborative dry-run review UX, strategy quiz, and rule suggestion inbox (Wave 3)
-- [x] 08-04: Guarded apply engine, pre-flight + Recovery Logs, and image sovereignty pipeline (Wave 3)
+- [ ] 08-01: Multi-source product search implementation
+- [ ] 08-02: Vendor detection, field extraction, and dry-run preview
 
 ### Phase 9: Real-Time Progress Tracking
 **Goal**: Provide live job progress updates with visual feedback and error handling
