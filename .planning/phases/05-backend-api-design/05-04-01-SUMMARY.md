@@ -110,7 +110,7 @@ Implemented complete per-user API versioning infrastructure to enable gradual v1
 - 16 test cases covering full versioning lifecycle
 - Fixtures: `authenticated_user` (v1), `v2_user_with_lock`, `v2_user_expired_lock`
 - Tests: model defaults, enforcement (409 responses), migration, rollback, headers
-- Deterministic: in-memory SQLite, no external dependencies
+- Deterministic: isolated PostgreSQL test database via TEST_DATABASE_URL
 
 ## Key Behaviors
 
@@ -348,7 +348,7 @@ All endpoints require authentication (SessionAuth security scheme).
 
 - Version enforcement adds ~1ms overhead per API request (before_request hook)
 - Index on `api_version` ensures fast filtering (will matter when 1000+ users)
-- Rollback lock check is in-memory (no DB query overhead)
+- Rollback lock check is an in-process datetime comparison on the loaded user record
 - Migration endpoint updates 2 columns + commits (typical <50ms)
 
 ## Security Notes
