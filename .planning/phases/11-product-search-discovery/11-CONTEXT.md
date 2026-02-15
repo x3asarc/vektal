@@ -94,6 +94,36 @@ This phase defines the non-chat operational control surface and safe mutation pr
 - Product history + diff + actor audit trail are mandatory.
 - Images must be downloaded, hashed, and internally stored.
 
+### Precision Workspace UX Contracts (Locked for Planning)
+- Search-and-selection must expose scope explicitly at all times:
+  - visible page,
+  - all filtered results,
+  - explicit checked rows,
+  - frozen selection snapshot at dry-run.
+- Selection toolbar contract must always show:
+  - selected count,
+  - total matching set,
+  - active scope mode,
+  - clear/reset action.
+- Bulk action panel must support operation-first edits:
+  - set, replace, add, remove, clear,
+  - increase/decrease (percent and fixed),
+  - conditional set (if blank),
+  - find-and-replace (text fields),
+  - map-from-column.
+- Diff preview contract must be side-by-side per product:
+  - before,
+  - after,
+  - risk/conflict badge,
+  - policy/rule reason,
+  - per-product exclude override.
+- Apply contract must provide deterministic terminal summary:
+  - success count,
+  - failed count,
+  - deferred count,
+  - retryable subset,
+  - exported recovery payload.
+
 </decisions>
 
 <specifics>
@@ -102,6 +132,108 @@ This phase defines the non-chat operational control surface and safe mutation pr
 - Precision workspace should preserve spreadsheet speed patterns while adding PIM-grade safety and auditability.
 - Kimi-style ASCII preview patterns can be used in specs/prototypes for operator-facing flow validation.
 - The control surface should feel "operations-grade": clear blast-radius display, explicit selection scope, and deterministic preflight/dry-run gates before apply.
+
+### External Benchmark Synthesis (Expanded)
+- Shopify native bulk editor patterns to reuse:
+  - fast table edits and column switching.
+  - familiar checkbox-driven selection model.
+  - low learning curve for merchants already in Shopify admin.
+- Shopify-native gaps to close:
+  - no first-class dry-run diff gate before commit.
+  - weak rollback/recovery semantics after save.
+  - limited pre-apply conflict taxonomy for concurrent catalog changes.
+- Marketplace connector patterns to reuse:
+  - mapping-centric operation model,
+  - channel-aware field transforms,
+  - status/tag/SKU filtering at scale.
+- PIM patterns (Akeneo/Plytix class) to reuse:
+  - operation semantics (add/remove/replace vs raw overwrite),
+  - approval workflow hooks,
+  - asynchronous job-style execution and logs.
+- Spreadsheet patterns to preserve:
+  - fill-handle speed,
+  - keyboard-first interaction,
+  - range edits and bulk apply gestures.
+- Spreadsheet risks to explicitly mitigate:
+  - silent data corruption from accidental fills,
+  - protected field overwrite,
+  - weak source-of-truth guarantees.
+
+### End-to-End Precision Workflow (Planning Contract)
+1. Discovery and scoping:
+   - user builds working set via query + filters.
+   - workspace displays products/variants affected and scope mode.
+2. Staging in precision grid:
+   - user edits via operations or direct cells where allowed.
+   - inline schema and policy checks run continuously.
+3. Dry-run compilation:
+   - latest Shopify state fetched,
+   - per-product diffs computed,
+   - structural and policy conflicts classified.
+4. Approval routing:
+   - action-block approval,
+   - per-product include/exclude and override where allowed.
+5. Safe apply:
+   - adaptive chunk/concurrency execution,
+   - transient retries,
+   - preflight revalidation at execution edge.
+6. Post-apply audit:
+   - deterministic result summary,
+   - downloadable evidence,
+   - actor/rule traceability.
+7. Recovery loop:
+   - failures move into Recovery Logs,
+   - retryable failures get one-click replay path,
+   - non-retryable failures route to fix queue.
+
+### Error and Conflict Taxonomy (Planning Input)
+- Validation errors:
+  - type mismatch, required field missing, invalid value domain.
+  - handled inline before dry-run complete state.
+- Conflict errors:
+  - stale data, concurrent update, structural mismatch.
+  - handled in dry-run conflict panel with resolve/hold path.
+- API/transient failures:
+  - 429, timeout, 5xx transport/service failures.
+  - handled via bounded retry policy and deferred recovery queue.
+- Deferred dependency failures:
+  - image ingest failures, mapping gaps, variant dependency issues.
+  - handled as partial-batch deferrals with explicit replay or edit actions.
+
+### Minimal Data and API Implications (Planning Input)
+- Data structures required:
+  - mutable staging set for proposed edits,
+  - immutable batch manifest records,
+  - per-product pre-image snapshot references,
+  - recovery-log entries with replay metadata.
+- API behavior required:
+  - support both synchronous and background apply modes,
+  - provide chunk-progress stream and final aggregate summary,
+  - return conflict-classified responses for dry-run and preflight.
+
+### Success Metrics to Carry into Plan/Verification
+- Adoption:
+  - precision workspace usage share vs legacy paths.
+- Speed:
+  - time from scoped selection to approved apply.
+- Safety:
+  - dry-run coverage rate (target 100% for mutating operations),
+  - percentage of applies with zero critical conflicts.
+- Correction rate:
+  - frequency of post-apply fixes,
+  - recovery replay success rate.
+
+### V1 vs V2 Boundary (Context Lock)
+- V1 must include:
+  - precision search/filter/scope workspace,
+  - side-by-side dry-run diff gate,
+  - action-block approval + per-product overrides,
+  - adaptive apply with recovery logs,
+  - snapshot lifecycle efficiency model.
+- V2 candidates:
+  - real-time co-edit/cell locks,
+  - predictive AI fill/autocomplete for field suggestions,
+  - anomaly detection for suspicious bulk edits.
 
 </specifics>
 
@@ -120,6 +252,7 @@ This phase defines the non-chat operational control surface and safe mutation pr
 - user_answers_captured: yes
 - external_research_inputs:
   - precisionworkspace.md (Kimi agent mode, Gemini deep research, Grok instant, ChatGPT instant)
+  - synthesis_method: consensus lock + outlier adjudication by user decisions
 
 </discussion_evidence>
 
