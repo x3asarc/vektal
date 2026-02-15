@@ -85,14 +85,15 @@ Owner: ContextCurator
 7. ContextCurator updates this map at daily batch and phase close.
 
 ## Active Plans
-1. Phase 10 closure artifacts:
-   - `.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md`
-   - `.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md`
-   - `.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md`
-   - `.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md`
-   - `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md`
+1. Phase 11 planning artifacts:
+   - `.planning/phases/11-product-search-discovery/11-CONTEXT.md`
+   - `.planning/phases/11-product-search-discovery/11-RESEARCH.md`
+   - `.planning/phases/11-product-search-discovery/11-01-PLAN.md`
+   - `.planning/phases/11-product-search-discovery/11-02-PLAN.md`
+   - `.planning/phases/11-product-search-discovery/11-03-PLAN.md`
+   - `.planning/phases/11-product-search-discovery/11-PLANNING-COVERAGE.md`
 2. Next planned execution:
-   - `.planning/phases/11-product-search-discovery/` (context discussion and research kickoff next)
+   - `.planning/phases/11-product-search-discovery/` (execute wave order next)
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`
