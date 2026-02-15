@@ -14,7 +14,7 @@ Plan: Phase 10 closed (`10-01`..`10-04` + `10-VERIFICATION.md`), Phase 11 discus
 Status: Conversational AI foundation verified; moving into search/discovery context and research
 Last activity: 2026-02-15 - Published `10-VERIFICATION.md` and synchronized roadmap/project/requirements/master-map state
 
-Progress: 89% (66/74 plans in roadmap complete)
+Progress: 88% (66/75 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
@@ -49,6 +49,7 @@ Gate board:
   - `.planning/ROADMAP.md` (Phase 10 + plans marked complete)
   - `.planning/REQUIREMENTS.md` (CHAT requirements marked complete)
   - `.planning/PROJECT.md`, `.planning/MILESTONES.md`, `docs/MASTER_MAP.md`
+- Added Phase 11 snapshot-lifecycle insertion (`11-03`) and locked tiered snapshot policy notes (baseline + delta + dedupe + deterministic recovery chain).
 
 **Phase 10 completed - Chat workspace integration complete (`10-04`):**
 - Replaced `/chat` placeholder with full operator workspace:

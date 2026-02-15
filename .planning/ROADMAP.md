@@ -347,19 +347,21 @@ Plans:
 
 ### Phase 11: Product Search & Discovery
 **Goal**: Enable advanced product search with version history and bulk operations
-**Depends on**: Phase 8
-**Requirements**: SEARCH-01, SEARCH-02, SEARCH-03, SEARCH-04, SEARCH-05, SEARCH-06, SEARCH-07
+**Depends on**: Phase 8, Phase 10
+**Requirements**: SEARCH-01, SEARCH-02, SEARCH-03, SEARCH-04, SEARCH-05, SEARCH-06, SEARCH-07, SNAP-01, SNAP-02, SNAP-03, SNAP-04
 **Success Criteria** (what must be TRUE):
   1. User searches by HS code and finds all products in that tariff category
   2. Filter by vendor, price range, and stock level returns accurate results
   3. Product cards display image, name, SKU, price, and stock at a glance
   4. User views product detail and sees complete change history (what changed when)
   5. User selects 50 products with checkboxes and initiates bulk update operation
-**Plans**: TBD
+  6. Snapshot storage is efficient: periodic full-store baseline + per-batch manifest + touched-product pre-change snapshots with hash dedupe.
+**Plans**: 3 plans in 3 waves
 
 Plans:
 - [ ] 11-01: Multi-field search and advanced filtering
 - [ ] 11-02: Version history, diff visualization, and bulk selection
+- [ ] 11-03: Snapshot lifecycle optimization (baseline + delta + dedupe + retention/recovery index)
 
 ### Phase 12: Tier System Architecture
 **Goal**: Implement multi-tier capability routing from basic LLM calls to full Claude Code agents
@@ -447,7 +449,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 8. Product Resolution Engine | 4/4 | Complete | 2026-02-13 |
 | 9. Real-Time Progress Tracking | 2/2 | Complete | 2026-02-15 |
 | 10. Conversational AI Interface | 4/4 | Complete | 2026-02-15 |
-| 11. Product Search & Discovery | 0/2 | Not started | - |
+| 11. Product Search & Discovery | 0/3 | Not started | - |
 | 12. Tier System Architecture | 0/3 | Not started | - |
 | 13. Integration Hardening & Deployment | 0/3 | Not started | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |

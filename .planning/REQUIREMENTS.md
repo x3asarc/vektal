@@ -74,6 +74,13 @@
 - [ ] **SEARCH-06**: Diff visualization for product changes
 - [ ] **SEARCH-07**: Bulk selection for batch operations (checkboxes)
 
+### Snapshot Lifecycle & Recovery Efficiency (SNAP)
+
+- [ ] **SNAP-01**: Periodic full-store baseline snapshots (not per apply)
+- [ ] **SNAP-02**: Mandatory per-batch manifest + touched-product pre-change snapshots
+- [ ] **SNAP-03**: Hash-based snapshot dedupe with pointer reuse (no duplicate blobs)
+- [ ] **SNAP-04**: Re-baseline triggers + retention policy + Recovery Log restore chain (`batch -> pre-image -> baseline`)
+
 ### Tier System Architecture (TIER)
 
 - [ ] **TIER-01**: Define tier capabilities (Tier 1: LLM orchestrator, Tier 2: Agentic workflows, Tier 3: Full Claude Code agents)
@@ -277,6 +284,10 @@
 | SEARCH-05 | Phase 11 | Pending |
 | SEARCH-06 | Phase 11 | Pending |
 | SEARCH-07 | Phase 11 | Pending |
+| SNAP-01 | Phase 11 | Pending |
+| SNAP-02 | Phase 11 | Pending |
+| SNAP-03 | Phase 11 | Pending |
+| SNAP-04 | Phase 11 | Pending |
 | TIER-01 | Phase 12 | Pending |
 | TIER-02 | Phase 12 | Pending |
 | TIER-03 | Phase 12 | Pending |
@@ -303,8 +314,8 @@
 | DEPLOY-08 | Phase 13 | Pending |
 
 **Coverage:**
-- v1.0 requirements: 82 total
-- Mapped to phases: 82 (100% coverage)
+- v1.0 requirements: 86 total
+- Mapped to phases: 86 (100% coverage)
 - Unmapped: 0
 
 ## Recent Verification Updates (2026-02-15)
@@ -320,6 +331,6 @@
 
 ---
 *Requirements defined: 2026-02-03 after comprehensive questioning and research*
-*Last updated: 2026-02-15 after Phase 9 verification evidence sync*
+*Last updated: 2026-02-15 after Phase 10 closure + Phase 11 snapshot lifecycle insertion*
 
 
