@@ -97,6 +97,11 @@ app.conf.update(
     task_default_queue="control",
     task_queues=tuple(Queue(name) for name in ALL_QUEUES),
     task_routes=TASK_ROUTES,
+    task_annotations={
+        "src.tasks.chat_bulk.run_chat_bulk_action": {
+            "acks_late": True,
+        },
+    },
     beat_schedule={
         "dispatch-pending-audits": {
             "task": "src.tasks.audits.dispatch_pending_audits",

@@ -15,7 +15,9 @@ from sqlalchemy.exc import IntegrityError
 from src.api.core.errors import ProblemDetails
 from src.api.core.sse import format_sse
 from src.api.v1.chat import chat_bp
+from src.api.v1.chat.bulk import BulkPlanError, create_or_get_bulk_job, plan_chunks
 from src.api.v1.chat.schemas import (
+    ChatBulkActionRequest,
     ChatActionResponse,
     ChatBlock,
     ChatMessageCreateRequest,
@@ -467,6 +469,212 @@ def create_message(session_id: int):
     return response.model_dump(), 201
 
 
+@chat_bp.route("/sessions/<int:session_id>/bulk/actions", methods=["POST"])
+@login_required
+def create_bulk_action(session_id: int):
+    session, error = _get_session_or_error(session_id)
+    if error:
+        return error
+
+    if session.status != "active":
+        return ProblemDetails.business_error(
+            "invalid-session-state",
+            "Invalid Session State",
+            "Bulk actions can only be created while the session is active.",
+            status=409,
+        )
+    if session.store_id is None:
+        return ProblemDetails.business_error(
+            "store-not-connected",
+            "Store Not Connected",
+            "Connect a Shopify store before preparing bulk chat actions.",
+            status=409,
+        )
+
+    try:
+        payload = ChatBulkActionRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    if payload.idempotency_key:
+        existing = ChatAction.query.filter_by(idempotency_key=payload.idempotency_key).first()
+        if existing is not None:
+            return ProblemDetails.business_error(
+                "duplicate-idempotency-key",
+                "Duplicate Idempotency Key",
+                "An action with this idempotency key already exists.",
+                status=409,
+            )
+
+    try:
+        chunk_plan = plan_chunks(raw_skus=payload.skus, requested_chunk_size=payload.requested_chunk_size)
+    except BulkPlanError as exc:
+        return ProblemDetails.business_error(
+            exc.error_type,
+            exc.title,
+            exc.detail,
+            status=exc.status,
+        )
+
+    now = datetime.now(timezone.utc)
+    user_message = ChatMessage(
+        session_id=session.id,
+        user_id=current_user.id,
+        role="user",
+        content=payload.content,
+        blocks_json=[
+            {
+                "type": "action",
+                "title": "bulk_request",
+                "data": {
+                    "operation": payload.operation,
+                    "sku_count": chunk_plan.total_skus,
+                    "chunk_count": len(chunk_plan.chunks),
+                },
+            }
+        ],
+        source_metadata={
+            "origin": "chat-bulk-input",
+            "operation": payload.operation,
+            "sku_count": chunk_plan.total_skus,
+        },
+    )
+    db.session.add(user_message)
+    db.session.flush()
+
+    assistant_blocks = [
+        {
+            "type": "text",
+            "text": (
+                f"Prepared bulk {payload.operation} action for {chunk_plan.total_skus} SKU(s) "
+                f"across {len(chunk_plan.chunks)} chunk(s). Approve before apply."
+            ),
+        },
+        {
+            "type": "progress",
+            "title": "bulk_chunk_plan",
+            "data": {
+                "total_skus": chunk_plan.total_skus,
+                "chunk_count": len(chunk_plan.chunks),
+                "target_chunk_size": chunk_plan.target_chunk_size,
+                "max_chunk_inputs": chunk_plan.max_chunk_inputs,
+            },
+        },
+        {
+            "type": "action",
+            "title": "product_scope_approval",
+            "data": {
+                "approval_scope": "product",
+                "dry_run_required": True,
+                "next": ["approve", "apply"],
+            },
+        },
+    ]
+    assistant_message = ChatMessage(
+        session_id=session.id,
+        user_id=current_user.id,
+        role="assistant",
+        content=assistant_blocks[0]["text"],
+        blocks_json=assistant_blocks,
+        source_metadata={
+            "handler_name": "bulk_action",
+            "operation": payload.operation,
+        },
+        intent_type=payload.operation,
+        classification_method="bulk",
+        confidence=1.0,
+    )
+    db.session.add(assistant_message)
+    db.session.flush()
+
+    action = ChatAction(
+        session_id=session.id,
+        user_id=current_user.id,
+        store_id=session.store_id,
+        message_id=assistant_message.id,
+        action_type=payload.operation,
+        status="awaiting_approval",
+        idempotency_key=payload.idempotency_key,
+        payload_json={
+            "bulk": True,
+            "source": "chat_bulk",
+            "operation": payload.operation,
+            "mode": payload.mode or "immediate",
+            "dry_run_required": True,
+            "approval_scope": "product",
+            "requires_product_approval": True,
+            "action_hints": payload.action_hints or {},
+            "admin_concurrency_cap": payload.admin_concurrency_cap,
+            "chunk_plan": chunk_plan.to_payload(),
+            "chunk_results": {},
+        },
+    )
+    db.session.add(action)
+    db.session.flush()
+
+    create_or_get_bulk_job(
+        action=action,
+        total_items=chunk_plan.total_skus,
+        chunk_count=len(chunk_plan.chunks),
+    )
+
+    session.state = "in_house"
+    session.last_message_at = now
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return ProblemDetails.business_error(
+            "duplicate-idempotency-key",
+            "Duplicate Idempotency Key",
+            "An action with this idempotency key already exists.",
+            status=409,
+        )
+
+    message_envelope = ChatStreamEnvelope(
+        session_id=session.id,
+        event="assistant_update",
+        emitted_at=now,
+        payload={
+            "message_id": assistant_message.id,
+            "role": assistant_message.role,
+            "content": assistant_message.content,
+            "blocks": assistant_message.blocks_json,
+            "intent_type": assistant_message.intent_type,
+        },
+    )
+    _CHAT_ANNOUNCER.announce(
+        session.id,
+        json.dumps(message_envelope.model_dump(mode="json")),
+        event_type="message",
+    )
+
+    action_envelope = ChatStreamEnvelope(
+        session_id=session.id,
+        event="action_state",
+        emitted_at=now,
+        payload={
+            "action_id": action.id,
+            "action_type": action.action_type,
+            "status": action.status,
+            "idempotency_key": action.idempotency_key,
+        },
+    )
+    _CHAT_ANNOUNCER.announce(
+        session.id,
+        json.dumps(action_envelope.model_dump(mode="json")),
+        event_type="action",
+    )
+
+    response = ChatMessageCreateResponse(
+        session=_session_to_response(session),
+        user_message=_message_to_response(user_message),
+        assistant_message=_message_to_response(assistant_message),
+        action=_action_to_response(action),
+    )
+    return response.model_dump(), 201
+
+
 @chat_bp.route("/sessions/<int:session_id>/actions/<int:action_id>", methods=["GET"])
 @login_required
 def get_action(session_id: int, action_id: int):
@@ -501,22 +709,44 @@ def approve_action(session_id: int, action_id: int):
     except ValidationError as exc:
         return ProblemDetails.validation_error(exc)
 
-    try:
-        approved_action = approve_product_action(
-            action=action,
-            actor_user_id=current_user.id,
-            selected_change_ids=payload.selected_change_ids,
-            overrides=[item.model_dump() for item in payload.overrides],
-            comment=payload.comment,
-        )
-    except ApprovalError as exc:
-        return ProblemDetails.business_error(
-            exc.error_type,
-            exc.title,
-            exc.detail,
-            status=exc.status,
-            **(exc.extensions or {}),
-        )
+    if bool((action.payload_json or {}).get("bulk")):
+        if action.status not in {"awaiting_approval", "approved"}:
+            return ProblemDetails.business_error(
+                "invalid-action-state",
+                "Invalid Action State",
+                f"Action is {action.status}. Only awaiting_approval actions may be approved.",
+                status=409,
+            )
+        payload_json = dict(action.payload_json or {})
+        payload_json["approval"] = {
+            "scope": "product",
+            "comment": payload.comment,
+            "approved_change_ids": payload.selected_change_ids,
+            "rejected_change_ids": [],
+        }
+        action.payload_json = payload_json
+        action.status = "approved"
+        action.approved_at = datetime.now(timezone.utc)
+        action.error_message = None
+        db.session.commit()
+        approved_action = action
+    else:
+        try:
+            approved_action = approve_product_action(
+                action=action,
+                actor_user_id=current_user.id,
+                selected_change_ids=payload.selected_change_ids,
+                overrides=[item.model_dump() for item in payload.overrides],
+                comment=payload.comment,
+            )
+        except ApprovalError as exc:
+            return ProblemDetails.business_error(
+                exc.error_type,
+                exc.title,
+                exc.detail,
+                status=exc.status,
+                **(exc.extensions or {}),
+            )
 
     action_envelope = ChatStreamEnvelope(
         session_id=session.id,
@@ -554,20 +784,56 @@ def apply_action(session_id: int, action_id: int):
     except ValidationError as exc:
         return ProblemDetails.validation_error(exc)
 
-    try:
-        applied_action = apply_product_action(
-            action=action,
-            actor_user_id=current_user.id,
-            mode=payload.mode,
+    if bool((action.payload_json or {}).get("bulk")):
+        if action.status != "approved":
+            return ProblemDetails.business_error(
+                "approval-required",
+                "Approval Required",
+                "Approve this bulk action before apply.",
+                status=409,
+            )
+        from src.celery_app import app as celery_app
+
+        payload_json = dict(action.payload_json or {})
+        mode = payload.mode or payload_json.get("mode")
+        task_result = celery_app.send_task(
+            "src.tasks.chat_bulk.run_chat_bulk_action",
+            kwargs={
+                "action_id": action.id,
+                "actor_user_id": current_user.id,
+                "mode": mode,
+                "job_id": payload_json.get("job_id"),
+            },
         )
-    except ApprovalError as exc:
-        return ProblemDetails.business_error(
-            exc.error_type,
-            exc.title,
-            exc.detail,
-            status=exc.status,
-            **(exc.extensions or {}),
-        )
+        action.status = "applying"
+        action.applied_at = datetime.now(timezone.utc)
+        action.result_json = {
+            "status": "queued",
+            "task_id": task_result.id,
+            "job_id": payload_json.get("job_id"),
+        }
+        execution = dict(payload_json.get("bulk_execution") or {})
+        execution["task_id"] = task_result.id
+        execution["queued_at"] = datetime.now(timezone.utc).isoformat()
+        payload_json["bulk_execution"] = execution
+        action.payload_json = payload_json
+        db.session.commit()
+        applied_action = action
+    else:
+        try:
+            applied_action = apply_product_action(
+                action=action,
+                actor_user_id=current_user.id,
+                mode=payload.mode,
+            )
+        except ApprovalError as exc:
+            return ProblemDetails.business_error(
+                exc.error_type,
+                exc.title,
+                exc.detail,
+                status=exc.status,
+                **(exc.extensions or {}),
+            )
 
     action_envelope = ChatStreamEnvelope(
         session_id=session.id,

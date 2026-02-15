@@ -114,3 +114,14 @@ class ProductActionApprovalRequest(BaseModel):
 
 class ProductActionApplyRequest(BaseModel):
     mode: Optional[Literal["immediate", "scheduled"]] = None
+
+
+class ChatBulkActionRequest(BaseModel):
+    content: str = Field(default="Bulk product operation", min_length=1, max_length=4000)
+    skus: list[str] = Field(min_length=1)
+    operation: Literal["add_product", "update_product"] = "update_product"
+    idempotency_key: Optional[str] = Field(default=None, max_length=128)
+    action_hints: Optional[dict[str, Any]] = None
+    requested_chunk_size: Optional[int] = Field(default=None, ge=1, le=250)
+    admin_concurrency_cap: Optional[int] = Field(default=None, ge=1, le=10)
+    mode: Optional[Literal["immediate", "scheduled"]] = None

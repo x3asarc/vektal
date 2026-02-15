@@ -79,6 +79,32 @@ def _extract_url(raw_message: str) -> str | None:
     return match.group(1)
 
 
+def extract_bulk_skus(*, action_hints: dict[str, Any] | None, raw_message: str) -> list[str]:
+    """Extract deterministic multi-SKU candidates for bulk chat routing."""
+    hints = action_hints or {}
+    raw_skus = hints.get("skus")
+    values: list[str] = []
+    if isinstance(raw_skus, list):
+        values.extend(str(item).upper().strip() for item in raw_skus)
+    elif isinstance(raw_skus, str):
+        values.extend(part.upper().strip() for part in raw_skus.split(","))
+    else:
+        values.extend(match.group(1).upper() for match in SKU_PATTERN.finditer(raw_message or ""))
+
+    ordered: list[str] = []
+    seen: set[str] = set()
+    for candidate in values:
+        if not candidate or candidate in seen:
+            continue
+        if not SKU_PATTERN.fullmatch(candidate):
+            continue
+        if candidate in SKU_STOPWORDS or candidate.startswith("-"):
+            continue
+        seen.add(candidate)
+        ordered.append(candidate)
+    return ordered
+
+
 def _normalize_variants(raw: Any) -> list[str]:
     if raw is None:
         return []

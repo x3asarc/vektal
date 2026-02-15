@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 ## Current Position
 
 Phase: 10 of 15 (Conversational AI Interface)
-Plan: Phase 10 execution in progress (`10-01`, `10-02` complete; `10-03` next)
-Status: Single-SKU chat orchestration + dry-run/approval/apply safety gates delivered and verified
-Last activity: 2026-02-15 - Executed `10-02`, added chat orchestrator/approvals, enforced dry-run-first single-SKU workflow, and published `10-02-SUMMARY.md`
+Plan: Phase 10 execution in progress (`10-01`, `10-02`, `10-03` complete; `10-04` next)
+Status: Bulk chat orchestration with queue-backed apply, chunking, and fairness gates delivered and verified
+Last activity: 2026-02-15 - Executed `10-03`, added bulk chat planner/task/workflow contracts, and published `10-03-SUMMARY.md`
 
-Progress: 81% (60/74 plans in roadmap complete)
+Progress: 82% (61/74 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-10-03-bulk-chat-orchestration`
-Last completed gate: `Phase 10-02 execution + single-SKU workflow verification (GREEN)`
+Current atomic task: `phase-10-04-chat-workspace-integration`
+Last completed gate: `Phase 10-03 execution + bulk chat workflow verification (GREEN)`
 Current blocker: `N/A`
-Next action: `Execute 10-03 bulk SKU orchestration with chunking/concurrency controls and fairness gates.`
+Next action: `Execute 10-04 chat workspace frontend integration and stream UX hardening.`
 
 Gate board:
 
@@ -42,6 +42,22 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-15)
+
+**Phase 10 advanced - Bulk orchestration complete (`10-03`):**
+- Added `src/api/v1/chat/bulk.py`:
+  - Bulk SKU normalization/dedupe with hard bounds (`<=1000` request, `<=250` per operation payload).
+  - Deterministic chunk lineage metadata (`chunk_id`, `replay_key`) for retry/audit safety.
+  - Adaptive throttle-aware concurrency controller and mixed-duration fairness ordering.
+  - Progress bridge into canonical job payloads via `announce_job_progress`.
+- Added `src/tasks/chat_bulk.py`:
+  - Queue-backed execution task `src.tasks.chat_bulk.run_chat_bulk_action`.
+  - Replay-safe chunk execution using terminal chunk states to skip already-processed chunks.
+  - Conflict isolation with per-chunk summaries and recovery-log linkage.
+- Extended chat routes/schemas for bulk workflows:
+  - `POST /api/v1/chat/sessions/{id}/bulk/actions`
+  - Bulk action approval/apply state handling with queued task dispatch.
+- Verification run:
+  - `21 passed`, `0 failed` across new bulk chunking/fairness/workflow tests plus existing chat contract/single-SKU coverage.
 
 **Phase 10 advanced - Single-SKU workflow complete (`10-02`):**
 - Added `src/api/v1/chat/orchestrator.py`:

@@ -68,3 +68,16 @@ class ChatAction(db.Model, TimestampMixin):
             f"<ChatAction id={self.id} session_id={self.session_id} "
             f"type={self.action_type} status={self.status}>"
         )
+
+    @property
+    def is_bulk(self) -> bool:
+        payload = self.payload_json or {}
+        return bool(payload.get("bulk"))
+
+    @property
+    def chunk_results(self) -> dict:
+        payload = self.payload_json or {}
+        value = payload.get("chunk_results")
+        if isinstance(value, dict):
+            return value
+        return {}
