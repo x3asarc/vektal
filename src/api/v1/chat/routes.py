@@ -26,6 +26,14 @@ from src.api.v1.chat.schemas import (
     ChatSessionListResponse,
     ChatSessionResponse,
     ChatStreamEnvelope,
+    ProductActionApprovalRequest,
+    ProductActionApplyRequest,
+)
+from src.api.v1.chat.approvals import ApprovalError, apply_product_action, approve_product_action
+from src.api.v1.chat.orchestrator import (
+    OrchestrationError,
+    is_mutating_intent,
+    prepare_single_sku_action,
 )
 from src.core.chat import ChatRouter, IntentType, ProductHandler, VendorHandler
 from src.core.chat.handlers.generic import GenericHandler
@@ -170,7 +178,7 @@ def _get_session_or_error(session_id: int):
     return session, None
 
 
-def _build_assistant_blocks(route_result) -> list[dict[str, Any]]:
+def _build_assistant_blocks(route_result, *, extra_blocks: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     response_payload = route_result.response or {}
     blocks: list[ChatBlock] = []
 
@@ -218,7 +226,10 @@ def _build_assistant_blocks(route_result) -> list[dict[str, Any]]:
             )
         )
 
-    return [block.model_dump(exclude_none=True) for block in blocks]
+    output = [block.model_dump(exclude_none=True) for block in blocks]
+    if extra_blocks:
+        output.extend(extra_blocks)
+    return output
 
 
 @chat_bp.route("/sessions", methods=["POST"])
@@ -312,7 +323,40 @@ def create_message(session_id: int):
     except ValidationError as exc:
         return ProblemDetails.validation_error(exc)
 
+    if payload.idempotency_key:
+        existing = ChatAction.query.filter_by(idempotency_key=payload.idempotency_key).first()
+        if existing is not None:
+            return ProblemDetails.business_error(
+                "duplicate-idempotency-key",
+                "Duplicate Idempotency Key",
+                "An action with this idempotency key already exists.",
+                status=409,
+            )
+
     now = datetime.now(timezone.utc)
+    route_result = _CHAT_ROUTER.route(payload.content)
+
+    prepared_action = None
+    if is_mutating_intent(route_result.intent.type.value):
+        try:
+            prepared_action = prepare_single_sku_action(
+                session=session,
+                intent_type=route_result.intent.type.value,
+                intent_entities=route_result.intent.entities,
+                route_response=route_result.response or {},
+                raw_message=payload.content,
+                action_hints=payload.action_hints or {},
+                actor_user_id=current_user.id,
+            )
+        except OrchestrationError as exc:
+            return ProblemDetails.business_error(
+                exc.error_type,
+                exc.title,
+                exc.detail,
+                status=exc.status,
+                **(exc.extensions or {}),
+            )
+
     user_message = ChatMessage(
         session_id=session.id,
         user_id=current_user.id,
@@ -324,8 +368,10 @@ def create_message(session_id: int):
     db.session.add(user_message)
     db.session.flush()
 
-    route_result = _CHAT_ROUTER.route(payload.content)
-    assistant_blocks = _build_assistant_blocks(route_result)
+    assistant_blocks = _build_assistant_blocks(
+        route_result,
+        extra_blocks=prepared_action.assistant_blocks if prepared_action else None,
+    )
     assistant_content = next(
         (block.get("text") for block in assistant_blocks if block.get("type") == "text" and block.get("text")),
         "Acknowledged.",
@@ -350,21 +396,16 @@ def create_message(session_id: int):
     db.session.flush()
 
     action = None
-    if route_result.intent.type not in {IntentType.HELP, IntentType.GET_STATUS, IntentType.UNKNOWN}:
+    if prepared_action is not None:
         action = ChatAction(
             session_id=session.id,
             user_id=current_user.id,
             store_id=session.store_id,
             message_id=assistant_message.id,
-            action_type=route_result.intent.type.value,
-            status="drafted",
+            action_type=prepared_action.action_type,
+            status=prepared_action.status,
             idempotency_key=payload.idempotency_key,
-            payload_json={
-                "intent": route_result.intent.type.value,
-                "entities": route_result.intent.entities,
-                "router_method": route_result.intent.method,
-                "router_response": route_result.response,
-            },
+            payload_json=prepared_action.payload_json,
         )
         db.session.add(action)
         session.state = "in_house"
@@ -440,6 +481,111 @@ def get_action(session_id: int, action_id: int):
         return ProblemDetails.forbidden("You do not have access to this chat action.")
 
     return _action_to_response(action).model_dump(), 200
+
+
+@chat_bp.route("/sessions/<int:session_id>/actions/<int:action_id>/approve", methods=["POST"])
+@login_required
+def approve_action(session_id: int, action_id: int):
+    session, error = _get_session_or_error(session_id)
+    if error:
+        return error
+
+    action = ChatAction.query.filter_by(id=action_id, session_id=session.id).first()
+    if action is None:
+        return ProblemDetails.not_found("chat-action", action_id)
+    if action.user_id != current_user.id:
+        return ProblemDetails.forbidden("You do not have access to this chat action.")
+
+    try:
+        payload = ProductActionApprovalRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    try:
+        approved_action = approve_product_action(
+            action=action,
+            actor_user_id=current_user.id,
+            selected_change_ids=payload.selected_change_ids,
+            overrides=[item.model_dump() for item in payload.overrides],
+            comment=payload.comment,
+        )
+    except ApprovalError as exc:
+        return ProblemDetails.business_error(
+            exc.error_type,
+            exc.title,
+            exc.detail,
+            status=exc.status,
+            **(exc.extensions or {}),
+        )
+
+    action_envelope = ChatStreamEnvelope(
+        session_id=session.id,
+        event="action_state",
+        emitted_at=datetime.now(timezone.utc),
+        payload={
+            "action_id": approved_action.id,
+            "action_type": approved_action.action_type,
+            "status": approved_action.status,
+        },
+    )
+    _CHAT_ANNOUNCER.announce(
+        session.id,
+        json.dumps(action_envelope.model_dump(mode="json")),
+        event_type="action",
+    )
+    return _action_to_response(approved_action).model_dump(), 200
+
+
+@chat_bp.route("/sessions/<int:session_id>/actions/<int:action_id>/apply", methods=["POST"])
+@login_required
+def apply_action(session_id: int, action_id: int):
+    session, error = _get_session_or_error(session_id)
+    if error:
+        return error
+
+    action = ChatAction.query.filter_by(id=action_id, session_id=session.id).first()
+    if action is None:
+        return ProblemDetails.not_found("chat-action", action_id)
+    if action.user_id != current_user.id:
+        return ProblemDetails.forbidden("You do not have access to this chat action.")
+
+    try:
+        payload = ProductActionApplyRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    try:
+        applied_action = apply_product_action(
+            action=action,
+            actor_user_id=current_user.id,
+            mode=payload.mode,
+        )
+    except ApprovalError as exc:
+        return ProblemDetails.business_error(
+            exc.error_type,
+            exc.title,
+            exc.detail,
+            status=exc.status,
+            **(exc.extensions or {}),
+        )
+
+    action_envelope = ChatStreamEnvelope(
+        session_id=session.id,
+        event="action_state",
+        emitted_at=datetime.now(timezone.utc),
+        payload={
+            "action_id": applied_action.id,
+            "action_type": applied_action.action_type,
+            "status": applied_action.status,
+            "result": applied_action.result_json,
+        },
+    )
+    _CHAT_ANNOUNCER.announce(
+        session.id,
+        json.dumps(action_envelope.model_dump(mode="json")),
+        event_type="action",
+    )
+    return _action_to_response(applied_action).model_dump(), 200
 
 
 @chat_bp.route("/sessions/<int:session_id>/stream", methods=["GET"])

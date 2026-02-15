@@ -45,6 +45,7 @@ class ChatSessionListResponse(BaseModel):
 class ChatMessageCreateRequest(BaseModel):
     content: str = Field(min_length=1, max_length=4000)
     idempotency_key: Optional[str] = Field(default=None, max_length=128)
+    action_hints: Optional[dict[str, Any]] = None
 
 
 class ChatMessageResponse(BaseModel):
@@ -98,3 +99,18 @@ class ChatStreamEnvelope(BaseModel):
     event: str
     emitted_at: datetime
     payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class ProductActionFieldOverride(BaseModel):
+    change_id: int
+    after_value: Any
+
+
+class ProductActionApprovalRequest(BaseModel):
+    selected_change_ids: list[int] = Field(default_factory=list)
+    overrides: list[ProductActionFieldOverride] = Field(default_factory=list)
+    comment: Optional[str] = None
+
+
+class ProductActionApplyRequest(BaseModel):
+    mode: Optional[Literal["immediate", "scheduled"]] = None

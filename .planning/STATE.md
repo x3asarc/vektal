@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 ## Current Position
 
 Phase: 10 of 15 (Conversational AI Interface)
-Plan: Phase 10 execution in progress (`10-01` complete; `10-02` next)
-Status: Phase 10 backend chat foundation delivered and verified via targeted API contracts
-Last activity: 2026-02-15 - Executed `10-01`, added chat session/message/action contracts + SSE stream + tests, and published `10-01-SUMMARY.md`
+Plan: Phase 10 execution in progress (`10-01`, `10-02` complete; `10-03` next)
+Status: Single-SKU chat orchestration + dry-run/approval/apply safety gates delivered and verified
+Last activity: 2026-02-15 - Executed `10-02`, added chat orchestrator/approvals, enforced dry-run-first single-SKU workflow, and published `10-02-SUMMARY.md`
 
-Progress: 80% (59/74 plans in roadmap complete)
+Progress: 81% (60/74 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-10-02-single-sku-workflows`
-Last completed gate: `Phase 10-01 execution + contract verification (GREEN)`
+Current atomic task: `phase-10-03-bulk-chat-orchestration`
+Last completed gate: `Phase 10-02 execution + single-SKU workflow verification (GREEN)`
 Current blocker: `N/A`
-Next action: `Execute 10-02 single-SKU draft/approve/apply orchestration on top of 10-01 contracts.`
+Next action: `Execute 10-03 bulk SKU orchestration with chunking/concurrency controls and fairness gates.`
 
 Gate board:
 
@@ -42,6 +42,24 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-15)
+
+**Phase 10 advanced - Single-SKU workflow complete (`10-02`):**
+- Added `src/api/v1/chat/orchestrator.py`:
+  - Converts mutating single-SKU intents into dry-run action proposals.
+  - Enforces draft-first create semantics and explicit publish gating metadata.
+  - Emits variant bulk path contract (`productVariantsBulkCreate`) for multi-variant hints.
+- Added `src/api/v1/chat/approvals.py`:
+  - Product-scoped approve/apply gates with selective field override support.
+  - Hard apply gate: no approval -> `409 approval-required`.
+  - Preflight conflict hold with Recovery Log linkage in action result.
+- Extended chat routes/schemas:
+  - `POST /api/v1/chat/sessions/{id}/actions/{action_id}/approve`
+  - `POST /api/v1/chat/sessions/{id}/actions/{action_id}/apply`
+  - `action_hints` on message POST for explicit create/variant preferences.
+- Added frontend chat contract typings:
+  - `frontend/src/shared/contracts/chat.ts`
+- Verification run:
+  - `24 passed`, `0 failed` for chat contracts/stream/single-sku workflow + endpoint coverage.
 
 **Phase 10 STARTED - Conversational AI Interface (`10-01` complete):**
 - Backend chat foundation shipped with persisted:

@@ -99,8 +99,10 @@ def test_post_message_generates_assistant_blocks_and_action(authenticated_client
     assert payload["assistant_message"]["role"] == "assistant"
     assert payload["assistant_message"]["blocks"][0]["type"] == "text"
     assert payload["action"] is not None
-    assert payload["action"]["status"] == "drafted"
+    assert payload["action"]["status"] == "dry_run_ready"
     assert payload["action"]["idempotency_key"] == "chat-action-1"
+    assert payload["action"]["payload"]["dry_run_required"] is True
+    assert isinstance(payload["action"]["payload"]["dry_run_id"], int)
 
     action_id = payload["action"]["id"]
     action_resp = client.get(f"/api/v1/chat/sessions/{session['id']}/actions/{action_id}")
