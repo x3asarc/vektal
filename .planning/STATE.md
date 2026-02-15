@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-15)
 ## Current Position
 
 Phase: 10 of 15 (Conversational AI Interface)
-Plan: Phase 10 execution in progress (`10-01`, `10-02`, `10-03` complete; `10-04` next)
-Status: Bulk chat orchestration with queue-backed apply, chunking, and fairness gates delivered and verified
-Last activity: 2026-02-15 - Executed `10-03`, added bulk chat planner/task/workflow contracts, and published `10-03-SUMMARY.md`
+Plan: Phase 10 complete (`10-01`..`10-04` delivered and verified)
+Status: Conversational AI interface backend+frontend operator workflow complete for v1 scope
+Last activity: 2026-02-15 - Executed `10-04`, shipped /chat workspace + stream fallback + in-chat action controls, and published `10-04-SUMMARY.md`
 
-Progress: 82% (61/74 plans in roadmap complete)
+Progress: 84% (62/74 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-10-04-chat-workspace-integration`
-Last completed gate: `Phase 10-03 execution + bulk chat workflow verification (GREEN)`
+Current atomic task: `phase-11-next-phase-kickoff`
+Last completed gate: `Phase 10-04 frontend workspace verification (GREEN)`
 Current blocker: `N/A`
-Next action: `Execute 10-04 chat workspace frontend integration and stream UX hardening.`
+Next action: `Start Phase 11 context/research/planning.`
 
 Gate board:
 
@@ -42,6 +42,27 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-15)
+
+**Phase 10 completed - Chat workspace integration complete (`10-04`):**
+- Replaced `/chat` placeholder with full operator workspace:
+  - timeline + composer + action control + bulk submission surfaces
+- Added typed chat frontend stack:
+  - `frontend/src/features/chat/api/chat-api.ts`
+  - `frontend/src/features/chat/hooks/useChatSession.ts`
+  - `frontend/src/features/chat/hooks/useChatStream.ts`
+  - `frontend/src/features/chat/components/{ChatWorkspace,MessageBlockRenderer,ActionCard,BulkRunPanel}.tsx`
+- Implemented stream reliability semantics:
+  - one EventSource per session in-tab via registry
+  - deterministic named-event handling
+  - polling fallback/degraded mode on stream failure
+- Added targeted frontend coverage:
+  - `src/app/(app)/chat/page.test.tsx`
+  - `src/features/chat/components/ChatWorkspace.test.tsx`
+  - `src/features/chat/components/ActionCard.test.tsx`
+  - `src/features/chat/hooks/useChatStream.test.ts`
+- Verification run:
+  - frontend chat tests: `4 passed` files (`7 tests`)
+  - frontend typecheck: pass
 
 **Phase 10 advanced - Bulk orchestration complete (`10-03`):**
 - Added `src/api/v1/chat/bulk.py`:

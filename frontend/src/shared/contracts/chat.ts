@@ -65,3 +65,27 @@ export type ChatMessage = {
   created_at?: string | null;
   updated_at?: string | null;
 };
+
+export type ChatSessionList = {
+  sessions: ChatSession[];
+  total: number;
+};
+
+export type ChatMessageList = {
+  messages: ChatMessage[];
+  total: number;
+};
+
+export type ChatMessageCreateResult = {
+  session: ChatSession;
+  user_message: ChatMessage;
+  assistant_message: ChatMessage;
+  action?: ChatAction | null;
+};
+
+export type ChatStreamEnvelope = {
+  session_id: number;
+  event: string;
+  emitted_at?: string;
+  payload: Record<string, unknown>;
+};
