@@ -38,11 +38,21 @@ class TimestampMixin:
 
 
 # Import all models for Alembic migration detection
-from src.models.user import User, UserTier
+from src.models.user import User, UserTier, AccountStatus
+from src.models.oauth_attempt import OAuthAttempt
 from src.models.shopify import ShopifyStore, ShopifyCredential
 from src.models.vendor import Vendor, VendorCatalogItem
 from src.models.product import Product, ProductEnrichment, ProductImage
 from src.models.job import Job, JobResult, JobStatus, JobType
+from src.models.ingest_chunk import IngestChunk, IngestChunkStatus
+from src.models.audit_checkpoint import AuditCheckpoint, AuditDispatchStatus
+from src.models.resolution_batch import ResolutionBatch, ResolutionItem, ResolutionChange
+from src.models.resolution_rule import ResolutionRule
+from src.models.resolution_snapshot import ResolutionSnapshot
+from src.models.recovery_log import RecoveryLog
+from src.models.chat_session import ChatSession
+from src.models.chat_message import ChatMessage
+from src.models.chat_action import ChatAction
 
 
 __all__ = [
@@ -51,6 +61,8 @@ __all__ = [
     # User models
     'User',
     'UserTier',
+    'AccountStatus',
+    'OAuthAttempt',
     # Shopify models
     'ShopifyStore',
     'ShopifyCredential',
@@ -66,4 +78,17 @@ __all__ = [
     'JobResult',
     'JobStatus',
     'JobType',
+    'IngestChunk',
+    'IngestChunkStatus',
+    'AuditCheckpoint',
+    'AuditDispatchStatus',
+    'ResolutionBatch',
+    'ResolutionItem',
+    'ResolutionChange',
+    'ResolutionRule',
+    'ResolutionSnapshot',
+    'RecoveryLog',
+    'ChatSession',
+    'ChatMessage',
+    'ChatAction',
 ]

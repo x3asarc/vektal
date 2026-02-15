@@ -11,6 +11,12 @@ from src.models import User, Job, JobStatus, JobType, Vendor, UserTier, AccountS
 from tests.api.conftest import TestConfig
 
 
+class RateLimitTestConfig(TestConfig):
+    """Config with rate limiting enabled for enforcement tests."""
+    RATELIMIT_ENABLED = True
+    RATELIMIT_STORAGE_URI = "memory://"
+
+
 @pytest.fixture
 def app():
     """Create test Flask application."""
@@ -52,6 +58,51 @@ def authenticated_client(app, client):
         yield client, user
 
 
+@pytest.fixture
+def ratelimited_app(monkeypatch):
+    """Create app with low tier limits to verify 429 enforcement."""
+    from src.api.core import rate_limit as rate_limit_module
+
+    original_limits = dict(rate_limit_module.TIER_LIMITS)
+    monkeypatch.setitem(rate_limit_module.TIER_LIMITS, UserTier.TIER_1, "2 per minute")
+    monkeypatch.setitem(rate_limit_module.TIER_LIMITS, UserTier.TIER_2, "5 per minute")
+    monkeypatch.setitem(rate_limit_module.TIER_LIMITS, UserTier.TIER_3, "10 per minute")
+
+    app = create_openapi_app(config_object=RateLimitTestConfig)
+
+    with app.app_context():
+        db.create_all()
+        yield app
+        db.session.remove()
+        db.drop_all()
+
+    rate_limit_module.TIER_LIMITS.clear()
+    rate_limit_module.TIER_LIMITS.update(original_limits)
+
+
+@pytest.fixture
+def ratelimited_authenticated_client(ratelimited_app):
+    """Authenticated client for rate-limit tests."""
+    client = ratelimited_app.test_client()
+
+    with ratelimited_app.app_context():
+        user = User(
+            email='ratelimit@example.com',
+            tier=UserTier.TIER_1,
+            account_status=AccountStatus.ACTIVE,
+            email_verified=True,
+            api_version='v1'
+        )
+        user.set_password('testpassword')
+        db.session.add(user)
+        db.session.commit()
+
+        with client.session_transaction() as sess:
+            sess['_user_id'] = str(user.id)
+
+        yield client, user
+
+
 class TestOpenAPIDocs:
     """Tests for OpenAPI documentation endpoints."""
 
@@ -69,6 +120,13 @@ class TestOpenAPIDocs:
         assert 'openapi' in data
         assert 'paths' in data
         assert 'info' in data
+        assert len(data['paths']) > 0
+        assert '/api/v1/jobs' in data['paths']
+        assert '/api/v1/vendors' in data['paths']
+        assert '/api/v1/products' in data['paths']
+        assert '/api/v1/user/version' in data['paths']
+        assert '/api/v1/jobs/{job_id}/stream' in data['paths']
+        assert '/api/v1/chat/sessions' in data['paths']
 
 
 class TestHealthEndpoint:
@@ -180,3 +238,36 @@ class TestCORSHeaders:
         )
         # Should allow the origin
         assert response.status_code in [200, 204]
+        assert response.headers.get('Access-Control-Allow-Origin') == 'http://localhost:3000'
+
+
+class TestRateLimiting:
+    """Tests for tier-based rate limit enforcement."""
+
+    def test_tier_rate_limit_enforced(self, ratelimited_authenticated_client):
+        """Tier 1 user is limited according to configured tier threshold."""
+        client, user = ratelimited_authenticated_client
+
+        with client.application.app_context():
+            db.session.add(
+                Job(
+                    user_id=user.id,
+                    job_type=JobType.PRODUCT_SYNC,
+                    job_name='Rate Limit Test Job',
+                    status=JobStatus.PENDING,
+                    total_items=1
+                )
+            )
+            db.session.commit()
+
+        first = client.get('/api/v1/jobs')
+        second = client.get('/api/v1/jobs')
+        third = client.get('/api/v1/jobs')
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        assert third.status_code == 429
+
+        payload = third.get_json() or {}
+        assert payload.get('status') == 429
+        assert 'rate-limit-exceeded' in payload.get('type', '')

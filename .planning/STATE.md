@@ -2,26 +2,26 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-09)
+See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 8 - Product Resolution Engine
+**Current focus:** Phase 10 - Conversational AI Interface
 
 ## Current Position
 
-Phase: 8 of 15 (Product Resolution Engine)
-Plan: 08-01 through 08-04 executed (wave 3 completed; verification checkpoint next)
-Status: Phase 8 implementation complete with passing targeted backend/frontend suites
-Last activity: 2026-02-13 - Executed 08-03 + 08-04, added summaries, and verified 24 backend + 6 frontend tests
+Phase: 10 of 15 (Conversational AI Interface)
+Plan: Phase 10 execution in progress (`10-01` complete; `10-02` next)
+Status: Phase 10 backend chat foundation delivered and verified via targeted API contracts
+Last activity: 2026-02-15 - Executed `10-01`, added chat session/message/action contracts + SSE stream + tests, and published `10-01-SUMMARY.md`
 
-Progress: 77% (57/74 plans in roadmap complete)
+Progress: 80% (59/74 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-8-goal-verification`
-Last completed gate: `Phase 8 Wave 3 targeted verification (GREEN)`
+Current atomic task: `phase-10-02-single-sku-workflows`
+Last completed gate: `Phase 10-01 execution + contract verification (GREEN)`
 Current blocker: `N/A`
-Next action: `Run /prompts:gsd-verify-work 8 and complete optional manual UX sign-off for lock ownership behavior.`
+Next action: `Execute 10-02 single-SKU draft/approve/apply orchestration on top of 10-01 contracts.`
 
 Gate board:
 
@@ -41,7 +41,60 @@ Gate board:
 
 1. `N/A` (no bypass invoked).
 
-## Recent Session Summary (2026-02-10)
+## Recent Session Summary (2026-02-15)
+
+**Phase 10 STARTED - Conversational AI Interface (`10-01` complete):**
+- Backend chat foundation shipped with persisted:
+  - `ChatSession` (`at_door`/`in_house` state machine),
+  - `ChatMessage` (typed UI blocks),
+  - `ChatAction` (deterministic lifecycle + idempotency key lineage).
+- New authenticated, ownership-scoped chat APIs:
+  - `POST/GET /api/v1/chat/sessions`
+  - `GET/POST /api/v1/chat/sessions/{id}/messages`
+  - `GET /api/v1/chat/sessions/{id}/actions/{action_id}`
+  - `GET /api/v1/chat/sessions/{id}/stream`
+- SSE stream contract added with named chat events (`chat_session_state`, `chat_message`, `chat_action`, `chat_heartbeat`), proxy-safe headers, and `stream_with_context`.
+- New verification artifacts:
+  - `tests/api/test_chat_contract.py`
+  - `tests/api/test_chat_stream.py`
+- Targeted verification run:
+  - `19 passed`, `0 failed`
+
+**Phase 9 COMPLETE + VERIFIED - Real-Time Progress Tracking (`09-01`, `09-02`):**
+- Backend wave (`09-01`) delivered canonical progress payload parity across SSE/polling/list/detail, lifecycle broadcasts, and guarded retry endpoint semantics.
+- Frontend wave (`09-02`) delivered live job detail/onboarding progress UX with ETA, terminal retry controls, and richer terminal notifications with action links.
+- New/updated phase-9 contract tests:
+  - `tests/jobs/test_progress_payload.py`
+  - `tests/api/test_jobs_progress_contract.py`
+  - `tests/api/test_jobs_stream_status_contract.py`
+  - `tests/api/test_jobs_retry.py`
+  - `frontend/src/features/jobs/observer/transport-ladder.test.ts`
+  - `frontend/src/features/jobs/hooks/useJobDetailObserver.test.ts`
+  - `frontend/src/app/(app)/jobs/[id]/page.test.tsx`
+  - `frontend/src/features/jobs/components/JobTerminalNotifications.test.ts`
+  - `frontend/src/features/onboarding/components/OnboardingWizard.test.tsx`
+- Verification run result:
+  - Backend: `33 passed`, `0 failed`
+  - Frontend targeted: `5 files passed`, `9 tests`
+  - Frontend typecheck: pass
+
+**Phase 8 COMPLETE + VERIFIED - Product Resolution Engine:**
+- Plans 08-01 through 08-04 executed and documented with summaries.
+- Verification artifacts created: `08-UAT.md` (8/8 passed) and `08-VERIFICATION.md` (status: passed).
+- Targeted verification green:
+  - Backend: 24 tests passed (`tests/resolution/*`, `tests/api/test_resolution_*` coverage set)
+  - Frontend: 6 tests passed (`review.contract`, `strategy-quiz.contract`) + typecheck pass
+- Core outcomes delivered:
+  - Source priority resolution with supplier verification gates
+  - Collaborative dry-run review UX with lock-aware read-only semantics
+  - Guarded apply engine with preflight, recovery logs, adaptive backoff, and image sovereignty
+
+**Phase 7 COMPLETE + VERIFIED - Frontend Framework Setup:**
+- Plans 07-01 through 07-03 completed and summarized.
+- UAT completed (`07-UAT.md`): 7/7 checks passed.
+- Delivered onboarding flows, responsive shell contracts, route guards, and state-management foundation.
+
+**Earlier sessions:**
 
 **Phase 6 COMPLETE - Job Processing Infrastructure (Celery):**
 - Plan 06-01..06-06 complete with verification and UAT closure
@@ -153,7 +206,7 @@ Gate board:
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 50
+- Total plans completed: 58
 - Average duration: N/A (mixed tracked and untracked timings)
 - Total execution time: N/A (phase-level timing data is partially incomplete)
 
@@ -170,12 +223,16 @@ Gate board:
 | 04-authentication-user-management | 6 | N/A | N/A |
 | 05-backend-api-design | 6 | N/A | N/A |
 | 06-job-processing-infrastructure-celery | 6 | N/A | N/A |
+| 07-frontend-framework-setup | 3 | N/A | N/A |
+| 08-product-resolution-engine | 4 | N/A | N/A |
+| 09-real-time-progress-tracking | 2 | N/A | N/A |
 
 **Recent Trend:**
-- Last plan: 06-06 (verification, traceability, UAT closure)
-- Phase 6 COMPLETE: 6 of 6 plans complete (runtime UAT approved)
-- Jobs test suite status: `python -m pytest -p no:cacheprovider tests/jobs -q` -> 30 passed
-- Current transition: Phase 7 completed and verified; transitioning to Phase 8 execution planning
+- Last plan: 09-02 (frontend live progress UX, notifications, and onboarding linkage)
+- Phase 7 COMPLETE: 3 of 3 plans complete (UAT approved)
+- Phase 8 COMPLETE + VERIFIED: 4 of 4 plans complete (UAT + verification approved)
+- Phase 9 COMPLETE + VERIFIED: 2 of 2 plans complete (verification approved)
+- Current transition: Phase 10 discussion/research/planning kickoff
 
 *Updated after each plan completion*
 
@@ -380,8 +437,8 @@ Current blockers for Phase 6 closure: None.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Phase 7 completion and UAT closure recorded; awaiting Phase 8 kickoff
+Last session: 2026-02-15
+Stopped at: Phase 9 completion and verification closure; Phase 10 context/research/planning is next
 Resume file: None
 
 Config (if exists):

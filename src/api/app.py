@@ -18,10 +18,13 @@ Architecture:
 - Tag definitions for endpoint grouping (auth, billing, jobs, products, vendors, oauth)
 - Blueprint registration delegated to src.api.__init__.register_v1_blueprints()
 """
+import re
+
 from flask_openapi3 import OpenAPI, Info, Tag
 from flask_compress import Compress
 from src.api.core.errors import register_error_handlers
 from src.api.core.rate_limit import create_limiter
+from src.models import db
 
 
 # OpenAPI metadata
@@ -48,6 +51,70 @@ jobs_tag = Tag(name="Jobs", description="Scraping job management and status trac
 products_tag = Tag(name="Products", description="Product catalog operations (CRUD, search, enrichment)")
 vendors_tag = Tag(name="Vendors", description="Vendor configuration and catalog management")
 oauth_tag = Tag(name="OAuth", description="Shopify OAuth integration and store connection")
+chat_tag = Tag(name="Chat", description="Conversational control plane and action orchestration")
+
+_PATH_PARAM_RE = re.compile(r"<(?:[^:<>]+:)?([^<>]+)>")
+
+
+def _to_openapi_path(rule_path: str) -> str:
+    """Convert Flask route params (<int:id>) to OpenAPI params ({id})."""
+    return _PATH_PARAM_RE.sub(r"{\1}", rule_path)
+
+
+def _build_runtime_openapi_spec(app) -> dict:
+    """
+    Build OpenAPI spec from Flask URL map.
+
+    This is used because the project registers standard Flask Blueprints,
+    which are not auto-discovered by flask-openapi3 path generation.
+    """
+    paths: dict[str, dict] = {}
+
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint.startswith("openapi.") or rule.endpoint == "static":
+            continue
+        if not rule.rule.startswith("/api/"):
+            continue
+
+        methods = sorted(m.lower() for m in rule.methods if m not in {"HEAD", "OPTIONS"})
+        if not methods:
+            continue
+
+        openapi_path = _to_openapi_path(rule.rule)
+        path_item = paths.setdefault(openapi_path, {})
+
+        path_params = _PATH_PARAM_RE.findall(rule.rule)
+        parameters = [
+            {
+                "name": param,
+                "in": "path",
+                "required": True,
+                "schema": {"type": "string"},
+            }
+            for param in path_params
+        ]
+
+        for method in methods:
+            operation = {
+                "operationId": f"{rule.endpoint}_{method}",
+                "responses": {"200": {"description": "Success"}},
+            }
+            if parameters:
+                operation["parameters"] = parameters
+            if openapi_path.startswith("/api/v1/"):
+                operation["security"] = [{"SessionAuth": []}]
+            path_item[method] = operation
+
+    return {
+        "openapi": "3.1.0",
+        "info": {
+            "title": info.title,
+            "version": info.version,
+            "description": info.description,
+        },
+        "paths": dict(sorted(paths.items())),
+        "components": {"securitySchemes": security_schemes},
+    }
 
 
 def create_openapi_app(config_object=None):
@@ -142,6 +209,21 @@ def create_openapi_app(config_object=None):
     from src.api import register_v1_blueprints
     register_v1_blueprints(app)
 
+    # Override OpenAPI JSON output to include all registered Flask Blueprint routes.
+    if "openapi.doc_url" in app.view_functions:
+        def runtime_openapi_json():
+            return _build_runtime_openapi_spec(app), 200
+        app.view_functions["openapi.doc_url"] = runtime_openapi_json
+
+    @app.route('/health', methods=['GET'])
+    def health():
+        """Health check endpoint with database connectivity check."""
+        try:
+            db.session.execute(db.text('SELECT 1'))
+            return {'status': 'ok', 'database': 'connected'}, 200
+        except Exception as e:
+            return {'status': 'error', 'database': 'disconnected', 'error': str(e)}, 500
+
     return app
 
 
@@ -149,5 +231,5 @@ def create_openapi_app(config_object=None):
 __all__ = [
     'create_openapi_app',
     'auth_tag', 'billing_tag', 'jobs_tag',
-    'products_tag', 'vendors_tag', 'oauth_tag'
+    'products_tag', 'vendors_tag', 'oauth_tag', 'chat_tag'
 ]

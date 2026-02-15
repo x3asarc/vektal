@@ -11,6 +11,7 @@ URL Structure:
 - /api/v1/products/*   - Product catalog operations
 - /api/v1/jobs/*       - Job management and SSE streaming
 - /api/v1/vendors/*    - Vendor configuration
+- /api/v1/chat/*       - Conversational control plane
 - /auth/*              - Legacy auth endpoints (backward compatibility)
 - /billing/*           - Legacy billing endpoints (backward compatibility)
 - /oauth/*             - Legacy OAuth endpoints (backward compatibility)
@@ -63,8 +64,10 @@ def register_v1_blueprints(app):
     from src.api.v1.products import products_bp
     from src.api.v1.jobs import jobs_api_bp
     from src.api.v1.vendors import vendors_bp
+    from src.api.v1.resolution import resolution_bp
     from src.api.jobs import jobs_bp  # SSE streaming
     from src.api.v1.versioning import versioning_bp
+    from src.api.v1.chat import chat_bp
 
     # ===== V1 API Routes (versioned, preferred) =====
     # Register auth blueprints under /api/v1/
@@ -80,8 +83,10 @@ def register_v1_blueprints(app):
     app.register_blueprint(products_bp, url_prefix='/api/v1/products')
     app.register_blueprint(jobs_api_bp, url_prefix='/api/v1/jobs')
     app.register_blueprint(vendors_bp, url_prefix='/api/v1/vendors')
+    app.register_blueprint(resolution_bp, url_prefix='/api/v1/resolution')
     app.register_blueprint(jobs_bp, url_prefix='/api/v1/jobs')  # SSE routes
     app.register_blueprint(versioning_bp, url_prefix='/api/v1/user')
+    app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
 
     # ===== Legacy Routes (backward compatibility) =====
     # Keep /auth and /billing working during transition
