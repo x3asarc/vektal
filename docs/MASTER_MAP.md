@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-12
+Last batch update: 2026-02-15
 Owner: ContextCurator
 
 ## TOC
@@ -35,7 +35,9 @@ Owner: ContextCurator
 |   |-- meta/
 |   `-- templates/
 |-- ops/
-|   `-- STRUCTURE_SPEC.md
+|   |-- STRUCTURE_SPEC.md
+|   `-- governance/
+|       `-- roles/
 |-- docs/
 |   |-- MASTER_MAP.md
 |   `-- INDEX.md
@@ -56,6 +58,7 @@ Owner: ContextCurator
    - `AGENTS.md`: governance constitution and role boundaries.
    - `STANDARDS.md`: review severity model and two-pass review protocol.
    - `.rules`: machine-checkable policy lines.
+   - `ops/governance/roles/README.md`: canonical role definitions and links.
 2. Planning:
    - `.planning/ROADMAP.md`: canonical phase state and phase details.
    - `.planning/STATE.md`: live state, blockers, gate snapshots.
@@ -82,10 +85,14 @@ Owner: ContextCurator
 7. ContextCurator updates this map at daily batch and phase close.
 
 ## Active Plans
-1. Phase 7:
-   - `.planning/phases/07-frontend-framework-setup/07-02-PLAN.md`
-   - `.planning/phases/07-frontend-framework-setup/07-03-PLAN.md`
-   - `.planning/phases/07-frontend-framework-setup/07.1-governance-baseline/PLAN.md`
+1. Phase 10 closure artifacts:
+   - `.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md`
+   - `.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md`
+   - `.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md`
+   - `.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md`
+   - `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md`
+2. Next planned execution:
+   - `.planning/phases/11-product-search-discovery/` (context discussion and research kickoff next)
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`
@@ -94,6 +101,7 @@ Owner: ContextCurator
 4. Structure spec: `ops/STRUCTURE_SPEC.md`
 5. Canonical roadmap: `.planning/ROADMAP.md`
 6. Canonical state: `.planning/STATE.md`
+7. Canonical role definitions: `ops/governance/roles/README.md`
 
 ## Journey Synthesis Links
 1. Template: `reports/meta/journey-synthesis-template.md`

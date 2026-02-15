@@ -34,35 +34,35 @@
 
 ### Conversational AI Interface (CHAT)
 
-- [ ] **CHAT-01**: Build chat UI component (fullscreen, ChatGPT-style interface)
-- [ ] **CHAT-02**: Implement streaming responses with real-time updates
-- [ ] **CHAT-03**: Context management ("at the door" vs "in the house" context states)
-- [ ] **CHAT-04**: Single SKU intelligent workflow (Shopify → DB → web search → scrape)
-- [ ] **CHAT-05**: Bulk SKU processing (10-100 SKUs with same workflow)
-- [ ] **CHAT-06**: Parallel agent spawning for bulk operations (speed optimization)
-- [ ] **CHAT-07**: Natural language query parsing (extract SKUs, intents, parameters)
-- [ ] **CHAT-08**: Response formatting (structured data presentation in conversational format)
+- [x] **CHAT-01**: Build chat UI component (fullscreen, ChatGPT-style interface)
+- [x] **CHAT-02**: Implement streaming responses with real-time updates
+- [x] **CHAT-03**: Context management ("at the door" vs "in the house" context states)
+- [x] **CHAT-04**: Single SKU intelligent workflow (Shopify â†’ DB â†’ web search â†’ scrape)
+- [x] **CHAT-05**: Bulk SKU processing (up to 1000 SKUs with auto-chunked workflow)
+- [x] **CHAT-06**: Parallel agent spawning for bulk operations (speed optimization)
+- [x] **CHAT-07**: Natural language query parsing (extract SKUs, intents, parameters)
+- [x] **CHAT-08**: Response formatting (structured data presentation in conversational format)
 
 ### Real-Time Progress Tracking (PROGRESS)
 
-- [ ] **PROGRESS-01**: WebSocket or SSE connection for live updates
-- [ ] **PROGRESS-02**: Progress bar component with percentage tracking
-- [ ] **PROGRESS-03**: Step-by-step status display (searching Shopify, searching DB, scraping web...)
-- [ ] **PROGRESS-04**: Visual state transitions with icons/colors
-- [ ] **PROGRESS-05**: Estimated time remaining calculation
-- [ ] **PROGRESS-06**: Error state handling with retry options
-- [ ] **PROGRESS-07**: Success/failure notifications with details
+- [x] **PROGRESS-01**: WebSocket or SSE connection for live updates
+- [x] **PROGRESS-02**: Progress bar component with percentage tracking
+- [x] **PROGRESS-03**: Step-by-step status display (searching Shopify, searching DB, scraping web...)
+- [x] **PROGRESS-04**: Visual state transitions with icons/colors
+- [x] **PROGRESS-05**: Estimated time remaining calculation
+- [x] **PROGRESS-06**: Error state handling with retry options
+- [x] **PROGRESS-07**: Success/failure notifications with details
 
 ### Intelligent Product Resolution (RESOLVE)
 
-- [ ] **RESOLVE-01**: Shopify catalog search by SKU/EAN/barcode/title
-- [ ] **RESOLVE-02**: Supplier CSV database search (uploaded vendor catalogs)
-- [ ] **RESOLVE-03**: Web search with relevance scoring (find closest match based on existing products)
-- [ ] **RESOLVE-04**: Automatic vendor detection and scraping strategy selection
-- [ ] **RESOLVE-05**: Field extraction (SKU, barcode, EAN, name, description, meta, tags, collection, HS code, country, prices, variants, metafields)
-- [ ] **RESOLVE-06**: Vision AI image analysis integration (existing system, verify compatibility)
-- [ ] **RESOLVE-07**: SEO generation (meta title, description, German content)
-- [ ] **RESOLVE-08**: Dry-run preview before applying changes
+- [x] **RESOLVE-01**: Shopify catalog search by SKU/EAN/barcode/title
+- [x] **RESOLVE-02**: Supplier CSV database search (uploaded vendor catalogs)
+- [x] **RESOLVE-03**: Web search with relevance scoring (find closest match based on existing products)
+- [x] **RESOLVE-04**: Automatic vendor detection and scraping strategy selection
+- [x] **RESOLVE-05**: Field extraction (SKU, barcode, EAN, name, description, meta, tags, collection, HS code, country, prices, variants, metafields)
+- [x] **RESOLVE-06**: Vision AI image analysis integration (existing system, verify compatibility)
+- [x] **RESOLVE-07**: SEO generation (meta title, description, German content)
+- [x] **RESOLVE-08**: Dry-run preview before applying changes
 
 ### Product Search & Discovery (SEARCH)
 
@@ -247,29 +247,29 @@
 | FRONTEND-06 | Phase 7 | Complete |
 | FRONTEND-07 | Phase 7 | Complete |
 | FRONTEND-08 | Phase 7 | Complete |
-| RESOLVE-01 | Phase 8 | Pending |
-| RESOLVE-02 | Phase 8 | Pending |
-| RESOLVE-03 | Phase 8 | Pending |
-| RESOLVE-04 | Phase 8 | Pending |
-| RESOLVE-05 | Phase 8 | Pending |
-| RESOLVE-06 | Phase 8 | Pending |
-| RESOLVE-07 | Phase 8 | Pending |
-| RESOLVE-08 | Phase 8 | Pending |
-| PROGRESS-01 | Phase 9 | Pending |
-| PROGRESS-02 | Phase 9 | Pending |
-| PROGRESS-03 | Phase 9 | Pending |
-| PROGRESS-04 | Phase 9 | Pending |
-| PROGRESS-05 | Phase 9 | Pending |
-| PROGRESS-06 | Phase 9 | Pending |
-| PROGRESS-07 | Phase 9 | Pending |
-| CHAT-01 | Phase 10 | Pending |
-| CHAT-02 | Phase 10 | Pending |
-| CHAT-03 | Phase 10 | Pending |
-| CHAT-04 | Phase 10 | Pending |
-| CHAT-05 | Phase 10 | Pending |
-| CHAT-06 | Phase 10 | Pending |
-| CHAT-07 | Phase 10 | Pending |
-| CHAT-08 | Phase 10 | Pending |
+| RESOLVE-01 | Phase 8 | Complete |
+| RESOLVE-02 | Phase 8 | Complete |
+| RESOLVE-03 | Phase 8 | Complete |
+| RESOLVE-04 | Phase 8 | Complete |
+| RESOLVE-05 | Phase 8 | Complete |
+| RESOLVE-06 | Phase 8 | Complete |
+| RESOLVE-07 | Phase 8 | Complete |
+| RESOLVE-08 | Phase 8 | Complete |
+| PROGRESS-01 | Phase 9 | Complete |
+| PROGRESS-02 | Phase 9 | Complete |
+| PROGRESS-03 | Phase 9 | Complete |
+| PROGRESS-04 | Phase 9 | Complete |
+| PROGRESS-05 | Phase 9 | Complete |
+| PROGRESS-06 | Phase 9 | Complete |
+| PROGRESS-07 | Phase 9 | Complete |
+| CHAT-01 | Phase 10 | Complete |
+| CHAT-02 | Phase 10 | Complete |
+| CHAT-03 | Phase 10 | Complete |
+| CHAT-04 | Phase 10 | Complete |
+| CHAT-05 | Phase 10 | Complete |
+| CHAT-06 | Phase 10 | Complete |
+| CHAT-07 | Phase 10 | Complete |
+| CHAT-08 | Phase 10 | Complete |
 | SEARCH-01 | Phase 11 | Pending |
 | SEARCH-02 | Phase 11 | Pending |
 | SEARCH-03 | Phase 11 | Pending |
@@ -307,6 +307,19 @@
 - Mapped to phases: 82 (100% coverage)
 - Unmapped: 0
 
+## Recent Verification Updates (2026-02-15)
+
+- Phase 7 verified complete: `FRONTEND-01` through `FRONTEND-08` closed and validated in UAT.
+- Phase 8 verified complete: `RESOLVE-01` through `RESOLVE-08` closed and validated in UAT + verification artifacts.
+- Phase 9 verified complete: `PROGRESS-01` through `PROGRESS-07` closed with backend/frontend targeted verification and typecheck evidence.
+- Canonical evidence:
+  - `.planning/phases/07-frontend-framework-setup/07-UAT.md`
+  - `.planning/phases/08-product-resolution-engine/08-UAT.md`
+  - `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md`
+  - `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`
+
 ---
 *Requirements defined: 2026-02-03 after comprehensive questioning and research*
-*Last updated: 2026-02-09 after Phase 5 verification completion*
+*Last updated: 2026-02-15 after Phase 9 verification evidence sync*
+
+

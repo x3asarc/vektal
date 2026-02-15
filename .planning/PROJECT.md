@@ -11,6 +11,8 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 ## Current Milestone: v1.0 Production-Ready Architecture
 
 **Goal:** Transform organic codebase into maintainable, containerized architecture ready for SaaS scaling.
+**Status:** Active
+**Current checkpoint:** Phase 10 verified complete, Phase 11 context discussion kickoff
 
 **Target outcomes:**
 - Clean, organized codebase (30+ scripts archived, duplicates consolidated)
@@ -19,10 +21,19 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 - Agent-driven cleanup and migration (autonomous refactoring where possible)
 - Production deployment-ready containers with clear boundaries
 
-## Execution Snapshot (2026-02-11)
+## Milestone Status
 
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6
-- Current phase: 7 (Frontend Framework Setup - Next.js, context/research wave)
+| Milestone | Scope | Status | Evidence |
+|---|---|---|---|
+| Milestone A: Foundation Buildout | Phases 1-6 | Complete | `.planning/ROADMAP.md`, `.planning/STATE.md` |
+| Milestone B: Frontend + Resolution | Phases 7-8 | Complete | `.planning/phases/07-frontend-framework-setup/07-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md` |
+| Milestone C: Real-Time + Conversational Ops | Phases 9-10 | Complete | `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md` |
+| Milestone D: Scale + Optimization | Phases 11-14 | In Progress | Phase 11 context/research kickoff |
+
+## Execution Snapshot (2026-02-15)
+
+- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10
+- Current phase: 11 (Product Search & Discovery - context discussion)
 - Phase 5 outcomes:
   - OpenAPI/Swagger docs at `/api/docs`
   - Versioned v1 API domains: products, jobs, vendors, user versioning
@@ -32,6 +43,21 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 - Phase 5 artifacts:
   - `.planning/phases/05-backend-api-design/05-05-SUMMARY.md`
   - `.planning/phases/05-backend-api-design/05-SUMMARY.md`
+- Phase 8 outcomes:
+  - Resolution source-priority + dry-run compiler APIs with structural conflict handling
+  - Collaborative review UX (lock-aware) + strategy quiz + rule suggestion inbox
+  - Guarded apply engine (preflight, recovery logs, adaptive throttling, image sovereignty)
+  - Verification artifacts: `.planning/phases/08-product-resolution-engine/08-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md`
+- Phase 9 outcomes:
+  - Canonical backend progress contract parity across SSE/polling/list/detail + guarded retry semantics (`09-01`)
+  - Frontend live progress UX across jobs detail, onboarding, and terminal notifications with actionable links (`09-02`)
+  - Verification artifacts: `.planning/phases/09-real-time-progress-tracking/09-01-SUMMARY.md`, `.planning/phases/09-real-time-progress-tracking/09-02-SUMMARY.md`, `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`
+- Phase 10 outcomes:
+  - Chat API/session/action contract foundation with typed block responses and SSE stream semantics (`10-01`)
+  - Single-SKU conversational dry-run/approval/apply workflow with recovery-link conflict holds (`10-02`)
+  - Bulk conversational orchestration for up to 1000 SKUs with adaptive chunk concurrency and queue-backed execution (`10-03`)
+  - Full `/chat` operator workspace with structured rendering, bounded stream subscription, and in-chat approval controls (`10-04`)
+  - Verification artifacts: `.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md`
 
 ## Requirements
 
@@ -139,7 +165,7 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 ### Technical Environment
 
 - **Current:** Python 3.12+, Flask, PostgreSQL, Redis, Selenium/Playwright, OpenAI/Gemini APIs
-- **Target:** Containerized microservices with completed backend API foundation and upcoming Celery job orchestration + Next.js UI phases
+- **Target:** Containerized microservices with completed backend API, frontend foundation, and product resolution engine; next milestone is real-time progress UX.
 - **External:** Shopify GraphQL API, 8 vendor websites, AI APIs (OpenAI, Gemini)
 
 ## Constraints
@@ -164,4 +190,4 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 ---
 *Created: 2026-02-03 after repository evaluation*
-*Last updated: 2026-02-11 after Phase 7 context/research kickoff and codexclaude integration*
+*Last updated: 2026-02-15 after Phase 10 execution + verification closure*
