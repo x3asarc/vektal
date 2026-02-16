@@ -28,3 +28,19 @@ try:
     __all__.extend(['run_capability_audit', 'compile_write_plan'])
 except ImportError:
     pass
+
+try:
+    from .profiles import get_profile, EnrichmentProfile
+    from .eligibility import build_eligibility_matrix, classify_product_class
+    from .retrieval_payload import build_retrieval_payload
+    from .pipeline import GovernedEnrichmentPipeline
+    __all__.extend([
+        'get_profile',
+        'EnrichmentProfile',
+        'build_eligibility_matrix',
+        'classify_product_class',
+        'build_retrieval_payload',
+        'GovernedEnrichmentPipeline',
+    ])
+except ImportError:
+    pass

@@ -2,19 +2,44 @@
 
 import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional
 from datetime import datetime
 
 from .extractors.attributes import AttributeExtractor
-from .generators.descriptions import AIDescriptionGenerator
-from .generators.seo import SEOGenerator
+try:
+    from .generators.descriptions import AIDescriptionGenerator
+except Exception:  # pragma: no cover - fallback for optional runtime dependency
+    class AIDescriptionGenerator:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError("AIDescriptionGenerator dependencies are not installed.")
+
+try:
+    from .generators.seo import SEOGenerator
+except Exception:  # pragma: no cover - fallback for optional runtime dependency
+    class SEOGenerator:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError("SEOGenerator dependencies are not installed.")
 from .families.grouper import ProductFamilyGrouper
 from .quality.scorer import QualityScorer, QualityGate
-from .embeddings.generator import EmbeddingGenerator
+try:
+    from .embeddings.generator import EmbeddingGenerator
+except Exception:  # pragma: no cover - fallback for optional runtime dependency
+    class EmbeddingGenerator:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError("EmbeddingGenerator dependencies are not installed.")
 from .templating.engine import TemplateEngine
 from .config import QUALITY_THRESHOLDS, COLOR_MAP
 from .vendor_integration import VendorEnrichmentConfig, detect_vendor_from_product, load_vendor_enrichment_config
 from .color_learning import load_store_colors
+from .eligibility import build_eligibility_matrix
+from .idempotency import EnrichmentIdempotencyCache, compute_enrichment_hash
+from .oracle_contract import OracleDecision
+from .oracles.content_oracle import evaluate_content_oracle
+from .oracles.policy_oracle import evaluate_policy_oracle
+from .oracles.visual_oracle import evaluate_visual_oracle
+from .profiles import get_profile
+from .retrieval_payload import build_retrieval_payload
+from .retries import RetryPolicy, execute_with_retry
 
 
 class EnrichmentPipeline:
@@ -364,3 +389,185 @@ class EnrichmentPipeline:
         print(f"  Product families: {families}")
         print(f"  Average quality: {avg_score:.1f}/100")
         print("="*60)
+
+
+class GovernedEnrichmentPipeline:
+    """
+    Retrieval-first enrichment engine with profile gears and Oracle arbitration.
+    """
+
+    def __init__(self, *, cache_ttl_seconds: int = 3600):
+        self.cache = EnrichmentIdempotencyCache(ttl_seconds=cache_ttl_seconds)
+
+    @staticmethod
+    def _classify_retry_error(exc: Exception) -> str:
+        if isinstance(exc, TimeoutError):
+            return "timeout"
+        if isinstance(exc, ConnectionError):
+            return "connectivity"
+        if isinstance(exc, PermissionError):
+            return "policy_error"
+        if isinstance(exc, ValueError):
+            return "validation_error"
+        return "server_error"
+
+    @staticmethod
+    def _fold_oracle_decisions(decisions: list[OracleDecision]) -> OracleDecision:
+        severity = {"accept": 0, "suggest": 1, "hold": 2, "reject": 3}
+        if not decisions:
+            return OracleDecision(
+                decision="accept",
+                confidence=1.0,
+                reason_codes=("no_oracle_constraints",),
+                evidence_refs=(),
+                requires_user_action=False,
+            )
+        final = max(decisions, key=lambda item: severity[item.decision])
+        reason_codes: list[str] = []
+        evidence_refs: list[str] = []
+        for decision in decisions:
+            reason_codes.extend(decision.reason_codes)
+            evidence_refs.extend(decision.evidence_refs)
+        return OracleDecision(
+            decision=final.decision,
+            confidence=min(decision.confidence for decision in decisions),
+            reason_codes=tuple(sorted(set(reason_codes))),
+            evidence_refs=tuple(sorted(set(evidence_refs))),
+            requires_user_action=any(item.requires_user_action for item in decisions),
+        )
+
+    def resolve_field_update(
+        self,
+        *,
+        field_name: str,
+        merchant_value: Any,
+        candidate_value: Any,
+        confidence: float,
+        structural_conflict: bool = False,
+        visual_hex: str | None = None,
+        immutable_fields: list[str] | None = None,
+        hitl_thresholds: dict | None = None,
+    ) -> dict[str, Any]:
+        """Resolve one field update with merchant-first and policy-aware arbitration."""
+        decisions: list[OracleDecision] = [
+            evaluate_content_oracle(
+                merchant_value=merchant_value,
+                candidate_value=candidate_value,
+                confidence=confidence,
+                structural_conflict=structural_conflict,
+                evidence_refs=[f"field:{field_name}"],
+            ),
+            evaluate_policy_oracle(
+                field_name=field_name,
+                before_value=merchant_value,
+                after_value=candidate_value,
+                immutable_fields=immutable_fields or [],
+                hitl_thresholds=hitl_thresholds or {},
+            ),
+        ]
+        if visual_hex is not None and field_name == "color":
+            decisions.append(
+                evaluate_visual_oracle(
+                    text_color=str(candidate_value) if candidate_value is not None else None,
+                    visual_hex=visual_hex,
+                    confidence=confidence,
+                    evidence_refs=["visual_hex"],
+                )
+            )
+        final = self._fold_oracle_decisions(decisions)
+        return {
+            "field_name": field_name,
+            "merchant_value": merchant_value,
+            "candidate_value": candidate_value,
+            "final_decision": final.to_dict(),
+            "oracle_decisions": [decision.to_dict() for decision in decisions],
+        }
+
+    def enrich_products(
+        self,
+        *,
+        products: list[dict],
+        profile_name: str,
+        target_language: str,
+        policy_version: int,
+    ) -> list[dict]:
+        """Build retrieval payloads with profile-dependent Oracle arbitration and idempotent reuse."""
+        profile = get_profile(profile_name)
+        retry_policy = RetryPolicy(max_attempts=profile.max_retry_attempts)
+        enriched: list[dict] = []
+
+        for product in products:
+            key = compute_enrichment_hash(
+                product_payload=product,
+                policy_version=policy_version,
+                profile_name=profile.name,
+            )
+
+            def _compute():
+                eligibility = build_eligibility_matrix(product)
+                payload = build_retrieval_payload(
+                    product=product,
+                    target_language=target_language,
+                    profile_name=profile.name,
+                    confidence_by_field={
+                        "color": float(product.get("color_confidence", 0.8)),
+                        "material": float(product.get("material_confidence", 0.8)),
+                        "finish_effect": float(product.get("finish_confidence", 0.75)),
+                    },
+                    source_by_field={
+                        "color": "vision_verified" if profile.include_visual_oracle else "ai_inferred",
+                        "material": "ai_inferred",
+                        "finish_effect": "ai_inferred",
+                    },
+                    eligibility_matrix=eligibility,
+                )
+                title_update = self.resolve_field_update(
+                    field_name="title",
+                    merchant_value=product.get("merchant_title", product.get("title")),
+                    candidate_value=payload.get("identity", {}).get("title"),
+                    confidence=float(product.get("title_confidence", 0.9)),
+                    structural_conflict=bool(product.get("title_structural_conflict", False)),
+                    immutable_fields=product.get("immutable_fields", []),
+                    hitl_thresholds=product.get("hitl_thresholds", {}),
+                )
+                decisions = [title_update]
+                if profile.include_visual_oracle and payload.get("physical", {}).get("color"):
+                    decisions.append(
+                        self.resolve_field_update(
+                            field_name="color",
+                            merchant_value=product.get("merchant_color"),
+                            candidate_value=payload.get("physical", {}).get("color"),
+                            confidence=float(product.get("color_confidence", 0.8)),
+                            structural_conflict=False,
+                            visual_hex=product.get("visual_hex"),
+                            immutable_fields=product.get("immutable_fields", []),
+                            hitl_thresholds=product.get("hitl_thresholds", {}),
+                        )
+                    )
+
+                return {
+                    "idempotency_key": key,
+                    "cache_reused": False,
+                    "profile": profile.name,
+                    "tier": profile.tier,
+                    "retrieval_payload": payload,
+                    "oracle_resolution": decisions,
+                }
+
+            retry_result = execute_with_retry(
+                operation=_compute,
+                classify_error=self._classify_retry_error,
+                policy=retry_policy,
+            )
+            payload, cache_reused = self.cache.get_or_set(key, lambda: retry_result.result)
+            result = dict(payload)
+            result["cache_reused"] = cache_reused
+            result["retry_attempts"] = retry_result.attempts
+            result["profile_contract"] = {
+                "include_visual_oracle": profile.include_visual_oracle,
+                "include_second_opinion": profile.include_second_opinion,
+                "include_multilingual_norm": profile.include_multilingual_norm,
+            }
+            enriched.append(result)
+
+        return enriched
