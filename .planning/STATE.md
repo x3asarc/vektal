@@ -2,36 +2,36 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-15)
+See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 11 - Product Search & Discovery
+**Current focus:** Phase 13.1 - Product Data Enrichment Protocol v2 Integration
 
 ## Current Position
 
-Phase: 11 of 15 (Product Search & Discovery)
-Plan: Phase 11 context + research + planning complete (`11-CONTEXT.md`, `11-RESEARCH.md`, `11-01..11-03 PLAN`)
-Status: Precision workspace architecture is locked and ready for execute-phase wave delivery
-Last activity: 2026-02-15 - Expanded Phase 11 context from multi-model research, completed Context7-backed deep research, and generated 3 execution plans
+Phase: 13.1 of 15 (Product Data Enrichment Protocol v2 Integration)
+Plan: Phase 13.1 context + research + planning complete; execution queued in wave order.
+Status: Phase `13` closed `GREEN`; Phase `13.1` now `Planned`.
+Last activity: 2026-02-16 - Generated `13.1-01..04` plans, planning coverage, and requirement mappings.
 
-Progress: 88% (66/75 plans in roadmap complete)
+Progress: 91% (75/82 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-11-execution-kickoff`
-Last completed gate: `Phase 11 planning closure (GREEN)`
+Current atomic task: `phase-13.1-execution-wave-1`
+Last completed gate: `Phase 13 verify-work closure (GREEN)`
 Current blocker: `N/A`
-Next action: `Run /prompts:gsd-execute-phase 11 (wave order: 11-01 -> 11-02 -> 11-03).`
+Next action: `Run /prompts:gsd-execute-phase 13.1`
 
 Gate board:
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Build + Self-Check | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/self-check.md` |
-| Code Review | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/review.md` |
-| Structure Audit | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/structure-audit.md` |
-| Integrity Audit | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/integrity-audit.md` |
-| Context Sync | `GREEN` | `docs/MASTER_MAP.md` |
+| Build + Self-Check | `GREEN` | `reports/13/13-04/self-check.md` |
+| Code Review | `GREEN` | `reports/13/13-04/review.md` |
+| Structure Audit | `GREEN` | `reports/13/13-04/structure-audit.md` |
+| Integrity Audit | `GREEN` | `reports/13/13-04/integrity-audit.md` |
+| Context Sync | `GREEN` | `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`, `docs/MASTER_MAP.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md` |
 
 ## StructureGuardian Audit Trail
 
@@ -41,7 +41,222 @@ Gate board:
 
 1. `N/A` (no bypass invoked).
 
+## Recent Session Summary (2026-02-16)
+
+**Phase 13.1 planning completed (wave-ordered):**
+- Added executable plans:
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-PLAN.md`
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-PLAN.md`
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-PLAN.md`
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-PLAN.md`
+- Added planning traceability matrix:
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PLANNING-COVERAGE.md`
+- Synced canonical trackers:
+  - `.planning/ROADMAP.md` (13.1 requirements + plan list no longer TBD)
+  - `.planning/REQUIREMENTS.md` (added `ENRICHV2-01..10` and traceability rows)
+
+**Phase 13 verify-work closure completed (phase-level):**
+- Added `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md` with requirement mapping for `INTEGRATE-01..08` and `DEPLOY-01..08`.
+- Re-ran mandatory Phase 13 contract suite:
+  - `tests/api/test_reliability_policy_contract.py`
+  - `tests/api/test_idempotency_terminal_states_contract.py`
+  - `tests/jobs/test_tier3_queue_ttl_deadletter_contract.py`
+  - `tests/api/test_verification_oracle_contract.py`
+  - `tests/jobs/test_deferred_verification_flow.py`
+  - `tests/api/test_kill_switch_contract.py`
+  - `tests/api/test_field_policy_threshold_contract.py`
+  - `tests/api/test_provider_fallback_contract.py`
+  - `tests/api/test_observability_correlation_contract.py`
+  - `tests/jobs/test_canary_rollback_contract.py`
+  - `tests/api/test_redaction_retention_contract.py`
+  - `tests/api/test_preference_signal_contract.py`
+  - `tests/api/test_oracle_signal_join_contract.py`
+  - `tests/api/test_instrumentation_export_contract.py`
+  - Aggregate: `35 passed`, `0 failed`
+- Governance validator passed for `13-01`, `13-02`, `13-03`, and `13-04`.
+- Fixed legacy test fixture drift after Tier semantic-firewall changes:
+  - `tests/api/test_chat_single_sku_workflow.py` now runs mutation-path assertions under Tier 2 (Tier 1 write-block behavior remains covered in `tests/api/test_chat_tier_runtime_contract.py`).
+  - Verification result: `9 passed`, `0 failed` for combined runtime suites.
+
+**Phase 13-04 executed + verified - Instrumentation Foundation (Data-capture only):**
+- Added durable instrumentation schemas:
+  - `assistant_preference_signals` for user feedback/edit signals.
+  - `assistant_verification_signals` for binary oracle outcomes linked to execution lineage.
+- Added instrumentation services under `src/assistant/instrumentation/`:
+  - runtime context extraction (`tier`, `correlation_id`, `reasoning_trace_tokens`, `cost_usd`),
+  - Tier 2/3 mandatory correlation-link enforcement,
+  - scoped export pipeline with join-integrity reporting.
+- Integrated signal emission into chat flows:
+  - approval paths emit preference signals,
+  - apply paths emit verification signals (including oracle event linkage),
+  - bulk action payloads now carry runtime correlation/tier metadata for compliant telemetry.
+- Added instrumentation export endpoint:
+  - `POST /api/v1/ops/instrumentation/export`
+  - supports store scope + tier/correlation/action/time filters.
+- Added phase-13-04 evidence artifacts:
+  - `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`
+  - `reports/13/13-04/self-check.md`
+  - `reports/13/13-04/review.md`
+  - `reports/13/13-04/structure-audit.md`
+  - `reports/13/13-04/integrity-audit.md`
+- Contract verification result:
+  - `tests/api/test_preference_signal_contract.py`
+  - `tests/api/test_oracle_signal_join_contract.py`
+  - `tests/api/test_instrumentation_export_contract.py`
+  - Aggregate: `6 passed`, `0 failed`
+
+**Phase 13-03 executed + verified - Deployment, Observability, and Security Hardening:**
+- Delivered deployment persistence and telemetry contracts:
+  - `assistant_deployment_policies` (versioned provider-ladder policy object).
+  - `assistant_provider_route_events` (correlation-linked provider routing lineage).
+- Added deployment hardening services under `src/assistant/deployment/`:
+  - deterministic provider route resolver (primary/fallback/budget-guard),
+  - availability SLI and 30-day error-budget math helpers,
+  - canary rollback evaluator (`scope_match`, sample-floor, threshold-drop),
+  - structured + regex redaction and retention/deletion SLA helpers.
+- Added ops endpoints:
+  - `POST /api/v1/ops/observability/sli`
+  - `POST /api/v1/ops/canary/evaluate`
+  - `POST /api/v1/ops/redaction/preview`
+  - `GET /api/v1/ops/retention/policy`
+- Added deployment guard workflow:
+  - `.github/workflows/phase13-deploy-guard.yml`
+  - includes canary gate checks, backup/restore hook checks, non-root and env-separation checks, and lightweight secrets lint.
+- Added phase-13-03 evidence artifacts:
+  - `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`
+  - `reports/13/13-03/self-check.md`
+  - `reports/13/13-03/review.md`
+  - `reports/13/13-03/structure-audit.md`
+  - `reports/13/13-03/integrity-audit.md`
+- Contract verification result:
+  - `tests/api/test_provider_fallback_contract.py`
+  - `tests/api/test_observability_correlation_contract.py`
+  - `tests/api/test_redaction_retention_contract.py`
+  - `tests/jobs/test_canary_rollback_contract.py`
+  - Aggregate: `12 passed`, `0 failed`
+
+**Phase 13-02 executed + verified - Governance & Recovery Controls:**
+- Delivered governance durability contracts:
+  - `assistant_verification_events` lineage model (`verified`, `deferred`, `failed`)
+  - `assistant_kill_switches` model (global + tenant fail-closed gating)
+  - `assistant_field_policies` model (immutable fields + tenant HITL thresholds + DR objectives)
+- Added governance services under `src/assistant/governance/`:
+  - verification oracle with mandatory `5s/10s/15s` schedule and explicit deferred state
+  - deferred verification background processor
+  - kill-switch decision resolver + mutation enforcement helper
+  - field policy evaluator for immutable-field blocking and threshold breach detection
+- Integrated enforcement into chat approval/apply/message flows:
+  - server-side kill-switch checks on approve/apply
+  - safe degraded mutation behavior in chat message flow with explicit `execution_paused` block
+  - policy metadata now persisted for immutable-field blocks and threshold HITL hits
+- Added governance artifacts:
+  - `.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md`
+  - `reports/13/13-02/self-check.md`
+  - `reports/13/13-02/review.md`
+  - `reports/13/13-02/structure-audit.md`
+  - `reports/13/13-02/integrity-audit.md`
+- Contract verification result:
+  - `tests/api/test_verification_oracle_contract.py`
+  - `tests/api/test_kill_switch_contract.py`
+  - `tests/api/test_field_policy_threshold_contract.py`
+  - `tests/jobs/test_deferred_verification_flow.py`
+  - Aggregate: `8 passed`, `0 failed`
+
+**Phase 13-01 executed + verified - Execution Shield:**
+- Delivered runtime reliability contracts:
+  - policy store + version lineage (`policy_version`, `effective_at`, `changed_by_id`)
+  - class-based retry matrix (`429`, `5xx`, `timeout`, `connectivity`, `schema/validation`)
+  - breaker gate + deterministic failure transitions
+- Delivered terminal idempotency contract:
+  - `PROCESSING`, `SUCCESS`, `FAILED`, `EXPIRED` semantics
+  - single retry reset path after failure
+- Delivered Tier 3 queue backlog protection:
+  - TTL default `900`, cap `3600`
+  - expired payloads routed to dead-letter metadata with `expired_not_run`
+- Added Phase 13-01 governance artifacts:
+  - `.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md`
+  - `reports/13/13-01/self-check.md`
+  - `reports/13/13-01/review.md`
+  - `reports/13/13-01/structure-audit.md`
+  - `reports/13/13-01/integrity-audit.md`
+- Contract verification result:
+  - `tests/api/test_reliability_policy_contract.py`: `3 passed`
+  - `tests/api/test_idempotency_terminal_states_contract.py`: `3 passed`
+  - `tests/jobs/test_tier3_queue_ttl_deadletter_contract.py`: `3 passed`
+
+**Phase 13 planning artifacts completed and synchronized:**
+- Added missing execution plans:
+  - `.planning/phases/13-integration-hardening-deployment/13-03-PLAN.md`
+  - `.planning/phases/13-integration-hardening-deployment/13-04-PLAN.md`
+- Added consolidated planning traceability:
+  - `.planning/phases/13-integration-hardening-deployment/13-PLANNING-COVERAGE.md`
+- Confirmed synthesized research structure is in place:
+  - `13-RESEARCH-core.md`
+  - `13-RESEARCH-deep.md`
+  - `13-RESEARCH.md` (canonical)
+- Synced state from planning kickoff to execution-ready (`phase-13-execution-wave-1`).
+- GSD workflow enhancements remain active for both Codex and Claude paths:
+  - parallel baseline + deep research pass
+  - synthesis to canonical RESEARCH
+  - Context7 gate in research workflow
+
 ## Recent Session Summary (2026-02-15)
+
+**Phase 12 complete + verified - Tier system architecture (`12-01` to `12-03`):**
+- Added backend-authoritative tier routing + policy-filtered tool projection + scoped memory retrieval contracts.
+- Added assistant governance persistence: tool registry, tenant policy overlays, profiles, memory facts/embeddings, route/delegation events.
+- Enforced semantic firewall:
+  - read actions blocked from mutation apply flow with machine-readable errors,
+  - write actions remain dry-run-first and product-scope approval gated.
+- Implemented Tier-3 delegation guardrails and tier-aware queue dispatch (`assistant.t1/t2/t3`) with QoS metadata.
+- Added chat UI fallback/escalation notice and delegation trace panel.
+- Verification run:
+  - backend+jobs: `31 passed`, `0 failed` across Phase 12 contract suites,
+  - frontend: `6 passed`, `0 failed` targeted chat component tests,
+  - frontend typecheck: pass.
+- Phase artifacts added:
+  - `.planning/phases/12-tier-system-architecture/12-01-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-02-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-03-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-VERIFICATION.md`
+  - `reports/12/12-01/*`, `reports/12/12-02/*`, `reports/12/12-03/*`
+
+**Phase 11 complete - Snapshot lifecycle + reliability closure (`11-03`):**
+- Added snapshot lifecycle services:
+  - baseline + manifest + pre-change chain traversal
+  - checksum dedupe with canonical pointer reuse
+  - dry-run TTL helpers and freshness enforcement
+- Added reliability/export/progress services:
+  - bounded transient retry/defer metadata in apply path
+  - audit export (`json` + `csv`) payload contracts
+  - apply progress + terminal summary contract
+- Added new resolution API contracts:
+  - `GET /api/v1/resolution/dry-runs/{batch_id}/snapshot-chain`
+  - `GET /api/v1/resolution/dry-runs/{batch_id}/audit-export`
+  - `GET /api/v1/resolution/dry-runs/{batch_id}/apply/progress`
+  - `GET /api/v1/resolution/recovery-logs/{log_id}/chain`
+- Verification run:
+  - `21 passed`, `0 failed` across new wave-3 tests plus impacted preflight/apply/recovery suites
+- Phase artifacts added:
+  - `.planning/phases/11-product-search-discovery/11-03-SUMMARY.md`
+  - `.planning/phases/11-product-search-discovery/11-VERIFICATION.md`
+
+**Phase 11 advanced - Lineage + semantic staging complete (`11-02`):**
+- Added product precision detail/history/diff contracts:
+  - `GET /api/v1/products/{id}`
+  - `GET /api/v1/products/{id}/history`
+  - `GET /api/v1/products/{id}/diff`
+- Added semantic staging endpoint:
+  - `POST /api/v1/products/bulk/stage` with action-block grammar, frozen selection, and admission controller outputs.
+- Added vendor field-mapping governance:
+  - `GET /api/v1/vendors/{vendor_id}/mappings`
+  - `POST /api/v1/vendors/{vendor_id}/mappings/versions`
+- Added frontend wave-2 precision workspace surfaces:
+  - `ProductDetailPanel`, `ProductDiffPanel`, `BulkActionBuilder`, `ApprovalBlockCard`, `useBulkStaging`.
+- Verification run:
+  - Backend: `13 passed`, `0 failed`
+  - Frontend tests: `6 passed`, `0 failed`
+  - Frontend typecheck: pass
 
 **Phase 10 verification + planning-state sync closed:**
 - Added `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md` with CHAT-01..08 requirement mapping.
@@ -255,8 +470,8 @@ Gate board:
 - All 10 success criteria verified
 
 **Phase 2.1 Discussion Completed:**
-- Discovery strategy: Hybrid (local patterns → known vendors → web search → AI)
-- Chat routing: Pattern matcher → LLM classifier (Gemini Flash) → handlers
+- Discovery strategy: Hybrid (local patterns â†’ known vendors â†’ web search â†’ AI)
+- Chat routing: Pattern matcher â†’ LLM classifier (Gemini Flash) â†’ handlers
 - AI integration: Local-first, aggressive caching, API fallback
 - YAML generation: Auto-generate with LLM verification + user review
 - Created comprehensive vendor template: `config/vendors/_template.yaml` (700+ lines)
@@ -314,7 +529,7 @@ Recent decisions affecting current work:
 - Typer CLI framework (01-02): Chose Typer over Click for type hints and automatic validation
 - Test organization (01-02): Organized by type (unit/integration/cli) for clarity
 - Python primary scraper (01-03): Python for static HTML, JavaScript for SPAs/dynamic sites
-- Architecture documentation pattern (01-03): matklad pattern (bird's eye view → code map → invariants → ADRs)
+- Architecture documentation pattern (01-03): matklad pattern (bird's eye view â†’ code map â†’ invariants â†’ ADRs)
 - Architectural invariants (01-03): 8 rules codified (src/core/ protection, approval gates, Vision AI caching, German SEO, YAML config)
 - Three-tier documentation structure (01.1-01): docs/ organized into guides/ (users), reference/ (technical), legacy/ (historical)
 - Input/output separation (01.1-01): data/ for inputs, results/ for outputs - clearer intent
@@ -342,7 +557,7 @@ Recent decisions affecting current work:
 - Early regex validation (02.1-01): SKU patterns validated at schema level to catch configuration errors immediately
 - URL placeholder validation (02.1-01): Product URL templates must contain {sku} placeholder to prevent misconfiguration
 - Local-first AI (02.1-05): sentence-transformers for free local classification before paid API calls
-- Multi-stage discovery (02.1-05): Pattern → Web → Local LLM → API LLM with early exit on high confidence
+- Multi-stage discovery (02.1-05): Pattern â†’ Web â†’ Local LLM â†’ API LLM with early exit on high confidence
 - Aggressive caching (02.1-05): LRU caches (1000 local, 500 API) prevent repeated queries
 - Confidence thresholds (02.1-05): Pattern >=0.90, Search >=0.80, Local LLM >=0.85 for early exit
 - Config auto-generation with confidence scoring (02.1-07): VendorConfigGenerator creates YAML from site recon, flags <0.80 for review
@@ -353,7 +568,7 @@ Recent decisions affecting current work:
 - Lazy Playwright import (02.1-06): Avoid requiring installation if unused, graceful degradation
 - Fallback selectors (02.1-06): Robustness against page structure changes via primary + fallback CSS selectors
 - Priority-based pattern matching (02.1-08): Check specific commands before generic SKU pattern to prevent "help" matching as SKU
-- 3-tier chat classification (02.1-08): Pattern (80%, free) → Local LLM (15%, free) → API LLM (5%, paid)
+- 3-tier chat classification (02.1-08): Pattern (80%, free) â†’ Local LLM (15%, free) â†’ API LLM (5%, paid)
 - Structured responses without LLM (02.1-08): Handlers generate JSON-ready responses from data, no LLM overhead for formatting
 - Backend-only chat infrastructure (02.1-08): Phase 5 exposes via REST API, Phase 10 builds ChatGPT-style UI
 - Lazy playwright import (02.1-09): Avoid requiring installation if unused, graceful degradation
@@ -363,16 +578,16 @@ Recent decisions affecting current work:
 - SKU pattern inference from samples (02.1-09): Extract and validate against 5 pre-defined patterns
 - Session-based metrics (02.1-11): In-memory tracking for dynamic improvement, clears on restart
 - Six categorized failure types (02.1-11): RATE_LIMIT, TIMEOUT, SELECTOR_FAILED, NETWORK_ERROR, VALIDATION_FAILED, UNKNOWN
-- Pragmatic adaptive rules (02.1-11): Rate limits → +50% delay, Timeouts → +25% timeout, Selector failures → fallback selectors
+- Pragmatic adaptive rules (02.1-11): Rate limits â†’ +50% delay, Timeouts â†’ +25% timeout, Selector failures â†’ fallback selectors
 - Rediscovery thresholds (02.1-11): >5 selector failures in 10 attempts OR <50% success rate triggers config refresh
-- Exponential backoff with jitter (02.1-11): delay × (2^attempt) ± 20% jitter, max 30s for human-like behavior
+- Exponential backoff with jitter (02.1-11): delay Ã— (2^attempt) Â± 20% jitter, max 30s for human-like behavior
 - OpenRouter for AI descriptions (02.2-02): Gemini Flash 1.5 default, 75-95% cost savings vs direct APIs ($0.03/1K products)
 - TTLCache for AI responses (02.2-02): 30-day TTL prevents duplicate API calls, saves costs on re-runs (95%+ cache hit rate)
 - No embedding model in AIDescriptionGenerator (02.2-02): Receives pre-computed embeddings from EmbeddingGenerator (Plan 04), prevents duplicate 400MB model loading
-- German stop word transliteration (02.2-02): Stop words use transliterated forms ("fuer" not "für") because removal happens after umlaut conversion
+- German stop word transliteration (02.2-02): Stop words use transliterated forms ("fuer" not "fÃ¼r") because removal happens after umlaut conversion
 - Meta description padding before CTA (02.2-02): Ensures 120-char minimum before adding optional CTA, Google SEO compliance
-- German-first color map (02.2-01): All colors normalized to German (Rot, Grün, etc.) for German market SEO
-- Pattern priority ordering (02.2-01): Size patterns ordered specific → general to avoid partial matches (14x14cm before 20ml)
+- German-first color map (02.2-01): All colors normalized to German (Rot, GrÃ¼n, etc.) for German market SEO
+- Pattern priority ordering (02.2-01): Size patterns ordered specific â†’ general to avoid partial matches (14x14cm before 20ml)
 - Compound word materials (02.2-01): Partial word boundaries for German compound words like Epoxidharz
 - Quality score formula (02.2-01): 40/30/20/10 weighting (description > structured data > categorization > tags)
 - Lazy component loading (02.2-05): AI generator and embedding generator loaded on first use, saves 2-3s startup for partial re-runs
@@ -380,12 +595,12 @@ Recent decisions affecting current work:
 - Step skip flags (02.2-05): Individual flags (skip_extraction, skip_ai, etc.) for fine-grained pipeline control
 - StrictUndefined templates (02.2-05): Jinja2 fails on missing variables to catch vendor YAML config errors early
 - Vendor auto-detection (02.2-06): Detect vendor from product['vendor'] field, normalize to slug for YAML lookup
-- Conditional OR support (02.2-06): Support OR logic in tagging rules to reduce YAML duplication (vintage OR retro → style:vintage)
+- Conditional OR support (02.2-06): Support OR logic in tagging rules to reduce YAML duplication (vintage OR retro â†’ style:vintage)
 - Vendor rules after extraction (02.2-06): Apply vendor enrichment as Step 1.5 so rules can reference extracted attributes
 - Dynamic color learning (02.2 enhancement): ColorLearner extracts colors from Shopify catalog during Phase 2.1 store analysis, merges with base COLOR_MAP for automatic recognition
-- Store-specific color vocabulary (02.2 enhancement): AttributeExtractor accepts custom_color_map, EnrichmentPipeline auto-loads from data/store_profile.json (typical 38 base → 85-150 total colors)
+- Store-specific color vocabulary (02.2 enhancement): AttributeExtractor accepts custom_color_map, EnrichmentPipeline auto-loads from data/store_profile.json (typical 38 base â†’ 85-150 total colors)
 - Color filtering heuristics (02.2 enhancement): Min 2 occurrences to filter typos, false positive removal (format, papier, vintage), 3-char minimum length
-- Color auto-normalization (02.2 enhancement): mintgrün → Mint Grün, sky-blue → Sky Blue for consistent data quality
+- Color auto-normalization (02.2 enhancement): mintgrÃ¼n â†’ Mint GrÃ¼n, sky-blue â†’ Sky Blue for consistent data quality
 - psycopg3 over psycopg2 (03-01): 4-5x more memory efficient, async support, better connection handling for production scaling
 - Development-friendly connection pool (03-01): pool_size=5, max_overflow=2 = 7 connections max per service (14 total with backend + celery_worker, well under PostgreSQL max_connections=100)
 - PostgreSQL 16 (03-01): Latest stable version with performance improvements per RESEARCH.md recommendations
@@ -421,8 +636,8 @@ Recent decisions affecting current work:
 - User ownership filtering (05-04): All user-scoped endpoints filter by current_user.id to enforce multi-tenant isolation at query level
 - Cursor pagination for products (05-04): Products use cursor pagination instead of offset to prevent page drift under concurrent modifications
 - Job state validation (05-04): Cancel endpoint validates job is pending/running before cancellation, returns 409 for invalid state transitions
-- Per-user API versioning (05-04-01): Version state stored in users table enables gradual v1→v2 migration without forcing all users to upgrade
-- 24-hour rollback window (05-04-01): Users can revert v2→v1 within 24h of migration for safety, prevents indefinite version downgrade
+- Per-user API versioning (05-04-01): Version state stored in users table enables gradual v1â†’v2 migration without forcing all users to upgrade
+- 24-hour rollback window (05-04-01): Users can revert v2â†’v1 within 24h of migration for safety, prevents indefinite version downgrade
 - RFC 7807 409 for version mismatch (05-04-01): Machine-readable error with suggested_path metadata guides clients to correct endpoint
 - Migration contract pattern (05-04-01): run_user_migration() interface established in Phase 5, implementation deferred until v2 requirements known
 
@@ -430,6 +645,7 @@ Recent decisions affecting current work:
 
 - Phase 1.1 inserted after Phase 1: Root Documentation Organization (URGENT) - Phase 1 archived scripts but left 20+ documentation/data files unorganized
 - Phase 2.1 inserted after Phase 2: Universal Vendor Scraping Engine (URGENT) - Current image_scraper.py lacks strict SKU matching; /quickcleanup proved better patterns (SKU validation, Firecrawl discovery, batch processing, retry logic). Must become vendor-agnostic system before Phase 3 database schema design.
+- Phase 13.1 inserted after Phase 13: Product Data Enrichment Protocol v2 Integration (URGENT) - Reconcile completed 2.2 baseline with side-project drift/performance learnings into one integrated, user-selectable platform module with API/jobs/DB/governance alignment.
 - Phase 14 added as final phase: Continuous Optimization & Learning - Self-improving system with ML-driven optimization, autonomous agents, and intelligent performance enhancement. Must be last to have full context of all previous phases.
 
 ### Pending Todos
@@ -511,3 +727,5 @@ Config (if exists):
   "commit_docs": true,
   "autonomous_cleanup_enabled": true
 }
+
+

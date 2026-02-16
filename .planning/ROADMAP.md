@@ -26,7 +26,7 @@ Canonical governance spec: `solutionsos/compound-engineering-os-policy.md`
 ## Phases
 
 **Phase Numbering:**
-- Integer phases (1-13): Planned milestone work
+- Integer phases (1-15): Planned milestone work
 - Decimal phases (e.g., 2.1): Urgent insertions (marked with INSERTED)
 
 Decimal phases appear between their surrounding integers in numeric order.
@@ -44,10 +44,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Product Resolution Engine** - Intelligent product lookup and enrichment
 - [x] **Phase 9: Real-Time Progress Tracking** - Live job monitoring with WebSocket/SSE
 - [x] **Phase 10: Conversational AI Interface** - ChatGPT-style intelligent interface
-- [ ] **Phase 11: Product Search & Discovery** - Advanced search and version tracking
-- [ ] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
-- [ ] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
+- [x] **Phase 11: Product Search & Discovery** - Advanced search and version tracking
+- [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
+- [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
+- [ ] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
+- [ ] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
 - [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
+- [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
 
 ## Phase Details
 
@@ -83,9 +86,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [x] 01.1-01-PLAN.md — Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
-- [x] 01.1-02-PLAN.md — Investigate and organize 13 questionable directories (Wave 2)
-- [x] 01.1-03-PLAN.md — Create documentation index and verify complete cleanup (Wave 3)
+- [x] 01.1-01-PLAN.md â€” Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
+- [x] 01.1-02-PLAN.md â€” Investigate and organize 13 questionable directories (Wave 2)
+- [x] 01.1-03-PLAN.md â€” Create documentation index and verify complete cleanup (Wave 3)
 
 **Insertion Reason**: Phase 1 archived scripts but left 42 loose files and 13 questionable directories unorganized in root. User feedback: "Only addressed 20 files but there are 70 ITEMS in root." Must handle ALL items before Docker phase.
 
@@ -102,17 +105,17 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [x] 02-01-PLAN.md — Foundation files: .gitattributes, Dockerfile.backend, gunicorn config, .env.example (Wave 1)
-- [x] 02-02-PLAN.md — Docker Compose with 6 services and Nginx reverse proxy (Wave 1)
-- [x] 02-03-PLAN.md — Documentation, frontend placeholder, and stack verification (Wave 2)
-- [x] 02-04-PLAN.md — Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
+- [x] 02-01-PLAN.md â€” Foundation files: .gitattributes, Dockerfile.backend, gunicorn config, .env.example (Wave 1)
+- [x] 02-02-PLAN.md â€” Docker Compose with 6 services and Nginx reverse proxy (Wave 1)
+- [x] 02-03-PLAN.md â€” Documentation, frontend placeholder, and stack verification (Wave 2)
+- [x] 02-04-PLAN.md â€” Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
 
 ### Phase 2.1: Universal Vendor Scraping Engine (INSERTED)
 **Goal**: Self-learning AI-powered vendor discovery with zero-configuration setup and niche-aware safety
 **Depends on**: Phase 2
 **Requirements**: TBD (will be defined during discussion phase)
 **Success Criteria** (what must be TRUE):
-  1. User provides ONLY SKU/barcode → System auto-discovers vendor (confidence >70%)
+  1. User provides ONLY SKU/barcode â†’ System auto-discovers vendor (confidence >70%)
   2. System learns vendor site structure and auto-generates YAML config
   3. Onboarding questionnaire builds store profile (niche, keywords, vendor scope)
   4. Niche mismatch detection prevents wrong vendors (car parts in arts store)
@@ -125,21 +128,21 @@ Plans:
 **Plans**: 11 plans in 5 waves
 
 Plans:
-- [x] 02.1-01-PLAN.md — Core Pydantic schemas and YAML loader (Wave 1)
-- [x] 02.1-02-PLAN.md — Store profile analyzer with TF-IDF extraction (Wave 1)
-- [x] 02.1-03-PLAN.md — Local pattern matching and SKU validation (Wave 1)
-- [x] 02.1-04-PLAN.md — Web search and niche validation (Wave 2)
-- [x] 02.1-05-PLAN.md — AI inference and vendor discovery pipeline (Wave 2)
-- [x] 02.1-06-PLAN.md — Multi-strategy scraping engine (Wave 3)
-- [x] 02.1-07-PLAN.md — YAML auto-generation and verification (Wave 3)
-- [x] 02.1-08-PLAN.md — Chat interface routing (Wave 4)
-- [x] 02.1-09-PLAN.md — Site reconnaissance and selector discovery (Wave 5, Gap Closure)
-- [x] 02.1-10-PLAN.md — Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
-- [x] 02.1-11-PLAN.md — Metrics tracking and adaptive learning (Wave 5, Gap Closure)
+- [x] 02.1-01-PLAN.md â€” Core Pydantic schemas and YAML loader (Wave 1)
+- [x] 02.1-02-PLAN.md â€” Store profile analyzer with TF-IDF extraction (Wave 1)
+- [x] 02.1-03-PLAN.md â€” Local pattern matching and SKU validation (Wave 1)
+- [x] 02.1-04-PLAN.md â€” Web search and niche validation (Wave 2)
+- [x] 02.1-05-PLAN.md â€” AI inference and vendor discovery pipeline (Wave 2)
+- [x] 02.1-06-PLAN.md â€” Multi-strategy scraping engine (Wave 3)
+- [x] 02.1-07-PLAN.md â€” YAML auto-generation and verification (Wave 3)
+- [x] 02.1-08-PLAN.md â€” Chat interface routing (Wave 4)
+- [x] 02.1-09-PLAN.md â€” Site reconnaissance and selector discovery (Wave 5, Gap Closure)
+- [x] 02.1-10-PLAN.md â€” Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
+- [x] 02.1-11-PLAN.md â€” Metrics tracking and adaptive learning (Wave 5, Gap Closure)
 
 **Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
 
-**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog ≥50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
+**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog â‰¥50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
 
 **Context Document**: See `.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md` for detailed vision, architectural decisions, and open questions captured from user discussion.
 
@@ -166,12 +169,12 @@ Plans:
 **Plans**: 6 plans in 2 waves
 
 Plans:
-- [x] 02.2-01-PLAN.md — Attribute extraction and quality scoring foundation (Wave 1)
-- [x] 02.2-02-PLAN.md — AI description generation and SEO content (Wave 1)
-- [x] 02.2-03-PLAN.md — Product family grouping and quality gate (Wave 1)
-- [x] 02.2-04-PLAN.md — Vector embedding generation (Wave 1)
-- [x] 02.2-05-PLAN.md — EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
-- [x] 02.2-06-PLAN.md — Vendor YAML enrichment integration (Wave 2)
+- [x] 02.2-01-PLAN.md â€” Attribute extraction and quality scoring foundation (Wave 1)
+- [x] 02.2-02-PLAN.md â€” AI description generation and SEO content (Wave 1)
+- [x] 02.2-03-PLAN.md â€” Product family grouping and quality gate (Wave 1)
+- [x] 02.2-04-PLAN.md â€” Vector embedding generation (Wave 1)
+- [x] 02.2-05-PLAN.md â€” EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
+- [x] 02.2-06-PLAN.md â€” Vendor YAML enrichment integration (Wave 2)
 
 **Insertion Reason**: Product enrichment is critical before database design (Phase 3). The `/side-project` folder contains a mature 7-step enrichment pipeline that should be integrated. Vendor YAML now includes enrichment config (sections 12-22). Embeddings needed for semantic search in Phase 11. Keeps Phase 2.1 focused on discovery/scraping.
 
@@ -197,11 +200,11 @@ Plans:
 **Plans**: 5 plans in 1 wave
 
 Plans:
-- [x] 03-01-PLAN.md — Flask-SQLAlchemy + psycopg3 foundation (Wave 1)
-- [x] 03-02-PLAN.md — SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 1)
-- [x] 03-03-PLAN.md — Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
-- [x] 03-04-PLAN.md — Pentart import script & auto-migrations (Wave 1)
-- [x] 03-05-PLAN.md — app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
+- [x] 03-01-PLAN.md â€” Flask-SQLAlchemy + psycopg3 foundation (Wave 1)
+- [x] 03-02-PLAN.md â€” SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 1)
+- [x] 03-03-PLAN.md â€” Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
+- [x] 03-04-PLAN.md â€” Pentart import script & auto-migrations (Wave 1)
+- [x] 03-05-PLAN.md â€” app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
 
 **Context Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md` for implementation decisions and deferred items.
 
@@ -220,12 +223,12 @@ Plans:
 **Plans**: 6 plans in 4 waves
 
 Plans:
-- [x] 04-01-PLAN.md — Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
-- [x] 04-02-PLAN.md — Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
-- [x] 04-03-PLAN.md — Login/logout, email verification endpoints (Wave 2)
-- [x] 04-04-PLAN.md — Stripe checkout session creation (Wave 2)
-- [x] 04-05-PLAN.md — Stripe webhooks, subscription management (Wave 3)
-- [x] 04-06-PLAN.md — Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
+- [x] 04-01-PLAN.md â€” Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
+- [x] 04-02-PLAN.md â€” Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
+- [x] 04-03-PLAN.md â€” Login/logout, email verification endpoints (Wave 2)
+- [x] 04-04-PLAN.md â€” Stripe checkout session creation (Wave 2)
+- [x] 04-05-PLAN.md â€” Stripe webhooks, subscription management (Wave 3)
+- [x] 04-06-PLAN.md â€” Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
 
 **Context Document**: See `.planning/phases/04-authentication-user-management/04-CONTEXT.md` for standalone SaaS architecture decisions, registration flow, and tier system design.
 
@@ -359,80 +362,120 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 11-01: Multi-field search and advanced filtering
-- [ ] 11-02: Version history, diff visualization, and bulk selection
-- [ ] 11-03: Snapshot lifecycle optimization (baseline + delta + dedupe + retention/recovery index)
+- [x] 11-01: Multi-field search and advanced filtering
+- [x] 11-02: Version history, diff visualization, and bulk selection
+- [x] 11-03: Snapshot lifecycle optimization (baseline + delta + dedupe + retention/recovery index)
 
 ### Phase 12: Tier System Architecture
-**Goal**: Implement multi-tier capability routing from basic LLM calls to full Claude Code agents
+**Goal**: Implement routing-first multi-tier capability control so each user request is handled by the correct runtime path
 **Depends on**: Phase 10
 **Requirements**: TIER-01, TIER-02, TIER-03, TIER-04, TIER-05, TIER-06, TIER-07, TIER-08
 **Success Criteria** (what must be TRUE):
-  1. Tier 1 user queries route to OpenRouter LLM API (no agent capabilities)
-  2. Tier 2 user can trigger agentic workflows that execute in background
-  3. Tier 3 user has access to full Claude Code agents with GSD skills
-  4. UI shows/hides features based on user tier (Tier 1 sees simplified interface)
-  5. Tier 3 agent can call Tier 2 workflows during complex operations
-**Plans**: TBD
+  1. Every user request resolves to an explainable route decision for Tier 1, Tier 2, or Tier 3.
+  2. Tier 1 handles low-risk LLM interactions without privileged execution paths.
+  3. Tier 2 executes governed skill/workflow actions with approval-aware behavior.
+  4. Tier 3 can orchestrate advanced agents and safely delegate to lower-tier capabilities.
+  5. Product UI/API enforce tier-based feature visibility and action boundaries consistently.
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 12-01: Tier detection and routing logic
-- [ ] 12-02: Tier 1 (LLM) and Tier 2 (Agentic) implementation
-- [ ] 12-03: Tier 3 (Full Agents) and cross-tier interaction
+- [x] 12-01: Tier detection and routing logic
+- [x] 12-02: Tier 1 (LLM) and Tier 2 (Agentic) implementation
+- [x] 12-03: Tier 3 (Full Agents) and cross-tier interaction
 
 ### Phase 13: Integration Hardening & Deployment
-**Goal**: Harden external API integrations and prepare production deployment infrastructure
+**Goal**: Harden production agent execution and external integrations, then prepare deployment infrastructure
 **Depends on**: Phase 11, Phase 12
 **Requirements**: INTEGRATE-01, INTEGRATE-02, INTEGRATE-03, INTEGRATE-04, INTEGRATE-05, INTEGRATE-06, INTEGRATE-07, INTEGRATE-08, DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05, DEPLOY-06, DEPLOY-07, DEPLOY-08
 **Success Criteria** (what must be TRUE):
-  1. Shopify API rate limiting respects X-Shopify-Shop-Api-Call-Limit header automatically
-  2. OpenAI/Gemini API costs stop at configured budget cap per day/month
-  3. External service failures trigger circuit breaker after 3 consecutive errors
-  4. Production deployment includes automated database backups every 6 hours
-  5. Health monitoring alerts developer when any service is down for 2+ minutes
-**Plans**: TBD
+  1. Agent/tool boundaries, auth, and policy enforcement are production-hardened with auditability.
+  2. Provider reliability is resilient (fallback, retries, and optional provider routing such as Replicate behind abstraction).
+  3. End-to-end observability and evaluation gates catch regressions and unsafe behavior before broad rollout.
+  4. Production deployment includes automated backups and operational alerting.
+  5. Health monitoring and failure isolation prevent cascading outages across core services.
+**Plans**: 4 plans in 4 waves
 
 Plans:
-- [ ] 13-01: API rate limiting and circuit breakers
-- [ ] 13-02: Cost monitoring and fallback strategies
-- [ ] 13-03: Production deployment and monitoring infrastructure
+- [x] 13-01: API rate limiting and circuit breakers
+- [x] 13-02: Governance and recovery controls (verification oracle, kill-switch, field policy)
+- [x] 13-03: Production deployment and monitoring infrastructure
+- [x] 13-04: Preference and verification instrumentation foundation
+
+### Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)
+
+**Goal:** Integrate a comprehensive enrichment protocol v2 as a first-class platform capability, combining best parts of Phase 2.2 and side-project behavior into one canonical, governed runtime path
+**Depends on:** Phase 13
+**Requirements:** ENRICHV2-01, ENRICHV2-02, ENRICHV2-03, ENRICHV2-04, ENRICHV2-05, ENRICHV2-06, ENRICHV2-07, ENRICHV2-08, ENRICHV2-09, ENRICHV2-10
+**Success Criteria** (what must be TRUE):
+  1. Enrichment is exposed as a selectable product capability within platform surfaces, not as an isolated script flow.
+  2. One canonical enrichment protocol replaces duplicated parallel paths across legacy 2.2 and side-project variants.
+  3. Enrichment contracts are wired to API/jobs/PostgreSQL and tracked through governance artifacts.
+  4. Throughput and quality are measurable and improved over latest historical run artifacts.
+  5. Default dependency/runtime path avoids repeated heavyweight ML runtime downloads unless explicitly enabled.
+**Plans:** 4 plans in 4 waves
+
+Plans:
+- [ ] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation (Wave 1)
+- [ ] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration, and idempotent retries (Wave 2)
+- [ ] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX (Wave 3)
+- [ ] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure (Wave 4)
+
+### Phase 13.2: Oracle Framework Reuse (INSERTED)
+
+**Goal:** Establish one reusable Oracle framework for content, visual, execution, and policy verification that can be consumed by multiple phases and runtime surfaces.
+**Depends on:** Phase 13, Phase 13.1
+**Requirements:** TBD (define during phase planning)
+**Success Criteria** (what must be TRUE):
+  1. A single Oracle contract is defined and reused across adapters (`decision`, `confidence`, `reason_codes`, `evidence_refs`, `requires_user_action`).
+  2. Oracle adapters are split by purpose (execution/content/visual/policy) without duplicated orchestration logic.
+  3. Existing and upcoming phases can call the Oracle framework through stable interfaces instead of bespoke verifier implementations.
+  4. Telemetry, idempotency, and retry behavior are unified for Oracle-triggered paths.
+  5. Phase 13.1 and later phases have explicit integration guidance to adopt Oracle reuse.
+**Plans:** TBD
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 13.2 to break down)
 
 ### Phase 14: Continuous Optimization & Learning
-**Goal**: Build self-improving system with ML-driven optimization, autonomous agents, and intelligent performance enhancement
+**Goal**: Build governed continuous optimization and learning loops for personalization, efficiency, and long-term quality
 **Depends on**: All previous phases (1-13) - Must have full context
 **Requirements**: TBD (will be defined during discussion phase)
 **Success Criteria** (what must be TRUE):
-  1. System identifies performance bottlenecks automatically and suggests optimizations
-  2. Machine learning models learn from user behavior patterns and optimize hot paths
-  3. Autonomous agents execute frequently-repeated tasks without manual intervention
-  4. Predictive prefetching reduces perceived latency for common workflows
-  5. System cost-per-operation decreases over time through intelligent optimization
-  6. A/B testing framework validates optimization effectiveness automatically
-  7. Self-healing mechanisms detect and fix common issues without human intervention
-  8. Telemetry shows measurable improvement week-over-week in key metrics
+  1. The platform learns from approved user behavior and proposes reusable improvements.
+  2. Personalization evolves safely (for example, skill suggestions and policy refinements) with governance controls.
+  3. Optimization loops measurably improve latency, cost, and success rates over time.
+  4. Drift and quality regressions are monitored and corrected through governed feedback loops.
+  5. Telemetry demonstrates consistent week-over-week improvement in key product metrics.
 **Plans**: TBD
 
 Plans:
 - [ ] 14-01: Performance profiling, telemetry, and bottleneck identification
 - [ ] 14-02: Machine learning from user behavior and usage patterns
-- [ ] 14-03: Autonomous optimization agents and self-healing systems
+- [ ] 14-03: Autonomous optimization agents (governed, non-remediation)
 - [ ] 14-04: Predictive intelligence and cost optimization
 
-**Phase Purpose**: This phase reviews ALL previous work (Phases 1-13) and implements continuous improvement mechanisms. The system should get faster, smarter, and more efficient over time by:
-- Learning what users do most frequently and optimizing those paths
-- Identifying slow operations and automatically improving them
-- Caching intelligently based on access patterns
-- Predicting user needs before they ask
-- Reducing API costs through smart batching and caching
-- Self-diagnosing and fixing common issues
-- Running optimization experiments automatically (A/B tests)
 
-This is the "system that learns" - it should improve itself continuously without manual intervention, becoming more valuable the longer it runs.
+### Phase 15: Self-Healing & Dynamic Scripting
+**Goal**: Implement guarded autonomous remediation workflows (research-plan-execute-verify) for unresolved integration/tool failures
+**Depends on**: Phase 13, Phase 14
+**Requirements**: TBD (will be defined during discussion phase)
+**Success Criteria** (what must be TRUE):
+  1. Self-healing execution only runs in sandboxed environments with strict policy controls.
+  2. Generated remediation actions are verified against explicit pass/fail contracts before promotion.
+  3. Every autonomous remediation has full audit lineage (trigger, plan, execution, verification, outcome).
+  4. Unsafe or low-confidence remediations fail closed and escalate to human review.
+  5. Reusable approved remediations are cataloged with versioning and rollback support.
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: Emergency specialist trigger and constrained research loop
+- [ ] 15-02: Dynamic remediation generation with policy validation
+- [ ] 15-03: Sandbox execution, verifier loop, and promotion gate
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 14
+Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 15
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -449,9 +492,13 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 8. Product Resolution Engine | 4/4 | Complete | 2026-02-13 |
 | 9. Real-Time Progress Tracking | 2/2 | Complete | 2026-02-15 |
 | 10. Conversational AI Interface | 4/4 | Complete | 2026-02-15 |
-| 11. Product Search & Discovery | 0/3 | Not started | - |
-| 12. Tier System Architecture | 0/3 | Not started | - |
-| 13. Integration Hardening & Deployment | 0/3 | Not started | - |
+| 11. Product Search & Discovery | 3/3 | Complete | 2026-02-15 |
+| 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
+| 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
+| 13.1. Product Data Enrichment Protocol v2 Integration | 0/4 | Planned | - |
+| 13.2. Oracle Framework Reuse | 0/0 | Not started | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |
+| 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |
+
 
 

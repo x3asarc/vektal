@@ -66,42 +66,55 @@
 
 ### Product Search & Discovery (SEARCH)
 
-- [ ] **SEARCH-01**: Multi-field search (HS code, SKU, EAN, name, country, stock, price)
-- [ ] **SEARCH-02**: Advanced filtering (by vendor, collection, tags, price range, stock level)
-- [ ] **SEARCH-03**: Search results with product cards (image, name, SKU, price, stock)
-- [ ] **SEARCH-04**: Product detail view with all fields
-- [ ] **SEARCH-05**: Version history ("what used to exist" vs "what now exists")
-- [ ] **SEARCH-06**: Diff visualization for product changes
-- [ ] **SEARCH-07**: Bulk selection for batch operations (checkboxes)
+- [x] **SEARCH-01**: Multi-field search (HS code, SKU, EAN, name, country, stock, price)
+- [x] **SEARCH-02**: Advanced filtering (by vendor, collection, tags, price range, stock level)
+- [x] **SEARCH-03**: Search results with product cards (image, name, SKU, price, stock)
+- [x] **SEARCH-04**: Product detail view with all fields
+- [x] **SEARCH-05**: Version history ("what used to exist" vs "what now exists")
+- [x] **SEARCH-06**: Diff visualization for product changes
+- [x] **SEARCH-07**: Bulk selection for batch operations (checkboxes)
 
 ### Snapshot Lifecycle & Recovery Efficiency (SNAP)
 
-- [ ] **SNAP-01**: Periodic full-store baseline snapshots (not per apply)
-- [ ] **SNAP-02**: Mandatory per-batch manifest + touched-product pre-change snapshots
-- [ ] **SNAP-03**: Hash-based snapshot dedupe with pointer reuse (no duplicate blobs)
-- [ ] **SNAP-04**: Re-baseline triggers + retention policy + Recovery Log restore chain (`batch -> pre-image -> baseline`)
+- [x] **SNAP-01**: Periodic full-store baseline snapshots (not per apply)
+- [x] **SNAP-02**: Mandatory per-batch manifest + touched-product pre-change snapshots
+- [x] **SNAP-03**: Hash-based snapshot dedupe with pointer reuse (no duplicate blobs)
+- [x] **SNAP-04**: Re-baseline triggers + retention policy + Recovery Log restore chain (`batch -> pre-image -> baseline`)
 
 ### Tier System Architecture (TIER)
 
-- [ ] **TIER-01**: Define tier capabilities (Tier 1: LLM orchestrator, Tier 2: Agentic workflows, Tier 3: Full Claude Code agents)
-- [ ] **TIER-02**: Implement tier detection and routing logic
-- [ ] **TIER-03**: Tier 1: OpenRouter LLM integration (API calls only)
-- [ ] **TIER-04**: Tier 2: Agentic workflow spawning (background task execution)
-- [ ] **TIER-05**: Tier 3: Full Claude Code agent execution with GSD skills
-- [ ] **TIER-06**: Tier-based feature gating (UI shows/hides based on user tier)
-- [ ] **TIER-07**: Cross-tier interaction (Tier 3 agents can call Tier 2 workflows)
-- [ ] **TIER-08**: Tier upgrade prompts (show value of higher tiers contextually)
+- [x] **TIER-01**: Define tier capability matrix and routing contract (Tier 1/2/3 boundaries)
+- [x] **TIER-02**: Implement explainable tier detection and request routing logic
+- [x] **TIER-03**: Tier 1 runtime: low-risk LLM interaction path without privileged execution
+- [x] **TIER-04**: Tier 2 runtime: governed skills/workflows with approval-aware execution
+- [x] **TIER-05**: Tier 3 runtime: advanced agent orchestration with safe delegation
+- [x] **TIER-06**: Tier-based feature gating and capability disclosure in UI/API
+- [x] **TIER-07**: User/team agent profiles with managed enabled-skill sets
+- [x] **TIER-08**: Tier transition UX (upgrade prompts, fallback behavior, and continuity)
 
 ### External API Integration Hardening (INTEGRATE)
 
-- [ ] **INTEGRATE-01**: Shopify API rate limiting (leaky bucket algorithm, respect headers)
-- [ ] **INTEGRATE-02**: OpenAI/Gemini cost monitoring and budget enforcement
-- [ ] **INTEGRATE-03**: Circuit breakers for external services (Shopify, AI APIs, vendor sites)
-- [ ] **INTEGRATE-04**: Retry logic with exponential backoff
-- [ ] **INTEGRATE-05**: Vision AI response caching verification (already built, needs audit)
-- [ ] **INTEGRATE-06**: Vendor scraping politeness delays (robots.txt respect)
-- [ ] **INTEGRATE-07**: Error logging and alerting for API failures
-- [ ] **INTEGRATE-08**: Fallback strategies when services unavailable
+- [x] **INTEGRATE-01**: Agent boundary + threat model for tools, data paths, and permissions
+- [x] **INTEGRATE-02**: Strict tool contracts (typed schemas, server-side validation, idempotency)
+- [x] **INTEGRATE-03**: Secure execution model (RBAC, sandboxing, and approval checkpoints)
+- [x] **INTEGRATE-04**: Reliability controls (retry/backoff, circuit breakers, graceful degradation)
+- [x] **INTEGRATE-05**: Provider abstraction + fallback strategy (including optional Replicate path)
+- [x] **INTEGRATE-06**: End-to-end observability (traces, metrics, logs, cost telemetry)
+- [x] **INTEGRATE-07**: Evaluation gates (regression, drift, safety checks) for production rollout
+- [x] **INTEGRATE-08**: Audit/compliance retention and export controls for agent actions
+
+### Product Enrichment Protocol v2 Integration (ENRICHV2)
+
+- [ ] **ENRICHV2-01**: Canonical enrichment v2 path replaces duplicate 2.2 + side-project execution paths
+- [ ] **ENRICHV2-02**: Mandatory Shopify capability/schema/scope audit before enrichment write planning
+- [ ] **ENRICHV2-03**: Merchant-first conflict arbitration with deterministic Oracle decision contract
+- [ ] **ENRICHV2-04**: Profile gears (`Quick`, `Standard`, `Deep`) with tier-aware execution controls
+- [ ] **ENRICHV2-05**: Broad retrieval-ready payload with product-class eligibility matrix
+- [ ] **ENRICHV2-06**: Reusable Oracle adapters for content/visual/policy arbitration (with Phase 13 execution oracle continuity)
+- [ ] **ENRICHV2-07**: Hash/idempotent rerun behavior and bounded transient retry controls
+- [ ] **ENRICHV2-08**: User-selectable multilingual output and field-level provenance/confidence lineage
+- [ ] **ENRICHV2-09**: Dry-run-first lifecycle with TTL/revalidation and governed approval semantics
+- [ ] **ENRICHV2-10**: Governance overlays for vendor field mapping, protected columns, alt-text preservation, and audit export/retention
 
 ### User Management & Authentication (AUTH)
 
@@ -147,14 +160,14 @@
 
 ### Deployment & DevOps (DEPLOY)
 
-- [ ] **DEPLOY-01**: Production Docker Compose configuration
-- [ ] **DEPLOY-02**: Environment variable management (dev, staging, production)
-- [ ] **DEPLOY-03**: Database backup and restore scripts
-- [ ] **DEPLOY-04**: CI/CD pipeline setup (GitHub Actions or similar)
-- [ ] **DEPLOY-05**: Health monitoring and alerting
-- [ ] **DEPLOY-06**: Log aggregation and analysis
-- [ ] **DEPLOY-07**: Performance monitoring (APM)
-- [ ] **DEPLOY-08**: Security hardening (non-root containers, secrets scanning)
+- [x] **DEPLOY-01**: Production Docker Compose configuration
+- [x] **DEPLOY-02**: Environment variable management (dev, staging, production)
+- [x] **DEPLOY-03**: Database backup and restore scripts
+- [x] **DEPLOY-04**: CI/CD pipeline setup (GitHub Actions or similar)
+- [x] **DEPLOY-05**: Health monitoring and alerting
+- [x] **DEPLOY-06**: Log aggregation and analysis
+- [x] **DEPLOY-07**: Performance monitoring (APM)
+- [x] **DEPLOY-08**: Security hardening (non-root containers, secrets scanning)
 
 ## v2 Requirements
 
@@ -277,60 +290,81 @@
 | CHAT-06 | Phase 10 | Complete |
 | CHAT-07 | Phase 10 | Complete |
 | CHAT-08 | Phase 10 | Complete |
-| SEARCH-01 | Phase 11 | Pending |
-| SEARCH-02 | Phase 11 | Pending |
-| SEARCH-03 | Phase 11 | Pending |
-| SEARCH-04 | Phase 11 | Pending |
-| SEARCH-05 | Phase 11 | Pending |
-| SEARCH-06 | Phase 11 | Pending |
-| SEARCH-07 | Phase 11 | Pending |
-| SNAP-01 | Phase 11 | Pending |
-| SNAP-02 | Phase 11 | Pending |
-| SNAP-03 | Phase 11 | Pending |
-| SNAP-04 | Phase 11 | Pending |
-| TIER-01 | Phase 12 | Pending |
-| TIER-02 | Phase 12 | Pending |
-| TIER-03 | Phase 12 | Pending |
-| TIER-04 | Phase 12 | Pending |
-| TIER-05 | Phase 12 | Pending |
-| TIER-06 | Phase 12 | Pending |
-| TIER-07 | Phase 12 | Pending |
-| TIER-08 | Phase 12 | Pending |
-| INTEGRATE-01 | Phase 13 | Pending |
-| INTEGRATE-02 | Phase 13 | Pending |
-| INTEGRATE-03 | Phase 13 | Pending |
-| INTEGRATE-04 | Phase 13 | Pending |
-| INTEGRATE-05 | Phase 13 | Pending |
-| INTEGRATE-06 | Phase 13 | Pending |
-| INTEGRATE-07 | Phase 13 | Pending |
-| INTEGRATE-08 | Phase 13 | Pending |
-| DEPLOY-01 | Phase 13 | Pending |
-| DEPLOY-02 | Phase 13 | Pending |
-| DEPLOY-03 | Phase 13 | Pending |
-| DEPLOY-04 | Phase 13 | Pending |
-| DEPLOY-05 | Phase 13 | Pending |
-| DEPLOY-06 | Phase 13 | Pending |
-| DEPLOY-07 | Phase 13 | Pending |
-| DEPLOY-08 | Phase 13 | Pending |
+| SEARCH-01 | Phase 11 | Complete |
+| SEARCH-02 | Phase 11 | Complete |
+| SEARCH-03 | Phase 11 | Complete |
+| SEARCH-04 | Phase 11 | Complete |
+| SEARCH-05 | Phase 11 | Complete |
+| SEARCH-06 | Phase 11 | Complete |
+| SEARCH-07 | Phase 11 | Complete |
+| SNAP-01 | Phase 11 | Complete |
+| SNAP-02 | Phase 11 | Complete |
+| SNAP-03 | Phase 11 | Complete |
+| SNAP-04 | Phase 11 | Complete |
+| TIER-01 | Phase 12 | Complete |
+| TIER-02 | Phase 12 | Complete |
+| TIER-03 | Phase 12 | Complete |
+| TIER-04 | Phase 12 | Complete |
+| TIER-05 | Phase 12 | Complete |
+| TIER-06 | Phase 12 | Complete |
+| TIER-07 | Phase 12 | Complete |
+| TIER-08 | Phase 12 | Complete |
+| INTEGRATE-01 | Phase 13 | Complete |
+| INTEGRATE-02 | Phase 13 | Complete |
+| INTEGRATE-03 | Phase 13 | Complete |
+| INTEGRATE-04 | Phase 13 | Complete |
+| INTEGRATE-05 | Phase 13 | Complete |
+| INTEGRATE-06 | Phase 13 | Complete |
+| INTEGRATE-07 | Phase 13 | Complete |
+| INTEGRATE-08 | Phase 13 | Complete |
+| DEPLOY-01 | Phase 13 | Complete |
+| DEPLOY-02 | Phase 13 | Complete |
+| DEPLOY-03 | Phase 13 | Complete |
+| DEPLOY-04 | Phase 13 | Complete |
+| DEPLOY-05 | Phase 13 | Complete |
+| DEPLOY-06 | Phase 13 | Complete |
+| DEPLOY-07 | Phase 13 | Complete |
+| DEPLOY-08 | Phase 13 | Complete |
+| ENRICHV2-01 | Phase 13.1 | Planned |
+| ENRICHV2-02 | Phase 13.1 | Planned |
+| ENRICHV2-03 | Phase 13.1 | Planned |
+| ENRICHV2-04 | Phase 13.1 | Planned |
+| ENRICHV2-05 | Phase 13.1 | Planned |
+| ENRICHV2-06 | Phase 13.1 | Planned |
+| ENRICHV2-07 | Phase 13.1 | Planned |
+| ENRICHV2-08 | Phase 13.1 | Planned |
+| ENRICHV2-09 | Phase 13.1 | Planned |
+| ENRICHV2-10 | Phase 13.1 | Planned |
 
 **Coverage:**
-- v1.0 requirements: 86 total
-- Mapped to phases: 86 (100% coverage)
+- v1.0 requirements: 96 total
+- Mapped to phases: 96 (100% coverage)
 - Unmapped: 0
 
-## Recent Verification Updates (2026-02-15)
+## Recent Verification Updates (2026-02-16)
 
 - Phase 7 verified complete: `FRONTEND-01` through `FRONTEND-08` closed and validated in UAT.
 - Phase 8 verified complete: `RESOLVE-01` through `RESOLVE-08` closed and validated in UAT + verification artifacts.
 - Phase 9 verified complete: `PROGRESS-01` through `PROGRESS-07` closed with backend/frontend targeted verification and typecheck evidence.
+- Phase 11 verified complete: `SEARCH-01` through `SEARCH-07` and `SNAP-01` through `SNAP-04` closed with backend/frontend contract and typecheck evidence.
+- Phase 12 verified complete: `TIER-01` through `TIER-08` closed with backend/frontend contract suites and queue/QoS delegation checks.
+- Phase 13 verified complete: `13-01` through `13-04` closed `GREEN`, phase-level verification closed, and `INTEGRATE-*` + `DEPLOY-*` requirements marked complete with canonical evidence in `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`.
 - Canonical evidence:
   - `.planning/phases/07-frontend-framework-setup/07-UAT.md`
   - `.planning/phases/08-product-resolution-engine/08-UAT.md`
   - `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md`
   - `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`
+  - `.planning/phases/11-product-search-discovery/11-01-SUMMARY.md`
+  - `.planning/phases/11-product-search-discovery/11-02-SUMMARY.md`
+  - `.planning/phases/11-product-search-discovery/11-03-SUMMARY.md`
+  - `.planning/phases/11-product-search-discovery/11-VERIFICATION.md`
+  - `.planning/phases/12-tier-system-architecture/12-01-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-02-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-03-SUMMARY.md`
+  - `.planning/phases/12-tier-system-architecture/12-VERIFICATION.md`
 
 ---
 *Requirements defined: 2026-02-03 after comprehensive questioning and research*
-*Last updated: 2026-02-15 after Phase 10 closure + Phase 11 snapshot lifecycle insertion*
+*Last updated: 2026-02-16 after Phase 13 verify-work closure*
 
 
