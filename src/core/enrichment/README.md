@@ -657,6 +657,59 @@ VendorEnrichmentConfig(vendor_slug: str = None, config_path: str = None)
 }
 ```
 
+## Phase 13.1 Benchmark & Gate Contracts
+
+Phase 13.1 introduces objective quality gates for enrichment v2 cutover readiness.
+
+### Benchmark Surfaces
+
+- `src/core/enrichment/benchmarks.py`
+  - `evaluate_retrieval_readiness(rows)`:
+    - coverage for retrieval-ready payloads (overall + per profile)
+    - critical missing field aggregation
+  - `evaluate_color_finish_accuracy(samples)`:
+    - audited color and finish accuracy
+    - delta-to-perfect metric used in governance gate
+  - `evaluate_semantic_uplift_smoke(queries, k)`:
+    - `Recall@K` and `nDCG@K` baseline vs enriched uplift
+    - profile-segmented quality rollups
+
+- `src/core/enrichment/evaluation.py`
+  - `evaluate_phase13_1_gate(...)`:
+    - deterministic go/no-go threshold evaluation
+    - fail reason codes for governance automation
+
+### Governance Gate Script
+
+`scripts/governance/phase13_1_enrichment_gate.py`
+
+Examples:
+
+```bash
+python scripts/governance/phase13_1_enrichment_gate.py --dry-run
+python scripts/governance/phase13_1_enrichment_gate.py --metrics-json data/enrichment_gate_metrics.json
+```
+
+Default threshold policy:
+- retrieval readiness coverage >= 0.85
+- color/finish delta <= 0.10
+- semantic uplift: recall >= 0 and ndcg >= 0
+
+## Canonical Cutover Notes (2.2/Side-Project -> 13.1)
+
+1. Run in shadow mode first:
+   - execute legacy 2.2/side-project and canonical 13.1 pipeline in parallel on same sample set.
+   - compare retrieval-readiness, color/finish delta, and semantic uplift reports.
+2. Keep writes dry-run-first:
+   - only apply from 13.1 lifecycle endpoints after approval and TTL-valid review.
+3. Rollback path:
+   - if phase gate fails, stop new applies and route traffic back to prior stable enrichment path.
+   - preserve run/item lineage for post-mortem and replay.
+4. Guardrails:
+   - merchant-first arbitration must remain enabled.
+   - blocked/protected field decisions must remain visible in audit export.
+   - queue isolation must prevent enrichment workloads from starving interactive runtime queues.
+
 ## Troubleshooting
 
 ### Common Issues

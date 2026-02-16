@@ -12,7 +12,7 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 **Goal:** Transform organic codebase into maintainable, containerized architecture ready for SaaS scaling.
 **Status:** Active
-**Current checkpoint:** Phase 13.1 execution is in progress (plans `13.1-01`..`13.1-03` complete); next is `13.1-04`.
+**Current checkpoint:** Phase 13.1 is closed `GREEN` (plans `13.1-01`..`13.1-04` complete and verified); next is Phase 13.2 planning/execution.
 
 **Target outcomes:**
 - Clean, organized codebase (30+ scripts archived, duplicates consolidated)
@@ -32,8 +32,8 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 ## Execution Snapshot (2026-02-16)
 
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
-- Current phase: 13.1 (Product Data Enrichment Protocol v2 Integration - execution wave 4 pending)
+- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13.1
+- Current phase: 13.2 (Oracle Framework Reuse - pre-context/discuss next)
 - Phase 5 outcomes:
   - OpenAPI/Swagger docs at `/api/docs`
   - Versioned v1 API domains: products, jobs, vendors, user versioning
@@ -69,11 +69,12 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
   - `13-03` deployment/observability/security hardening completed (provider route lineage, ops gates, redaction/retention, deploy guard workflow)
   - `13-04` instrumentation foundation completed (preference/oracle signal capture, export contracts, no-autonomy guardrail)
   - Verification artifacts: `.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`, `reports/13/13-01/*`, `reports/13/13-02/*`, `reports/13/13-03/*`, `reports/13/13-04/*`
-- Phase 13.1 progress:
+- Phase 13.1 progress (verified complete):
   - `13.1-01` completed (capability audit + dry-run policy contracts)
   - `13.1-02` completed (profiles/eligibility/oracle/idempotency foundations)
   - `13.1-03` completed (lifecycle API + queue-backed execution + `/enrichment` workspace)
-  - Evidence artifacts: `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `reports/13.1/13.1-01/*`, `reports/13.1/13.1-02/*`, `reports/13.1/13.1-03/*`
+  - `13.1-04` completed (benchmark/evaluation gates + lineage audit export + deterministic governance gate)
+  - Evidence artifacts: `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`, `reports/13.1/13.1-01/*`, `reports/13.1/13.1-02/*`, `reports/13.1/13.1-03/*`, `reports/13.1/13.1-04/*`
 
 ## Requirements
 

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 13.1 - Product Data Enrichment Protocol v2 Integration
+**Current focus:** Phase 13.2 - Oracle Framework Reuse
 
 ## Current Position
 
-Phase: 13.1 of 15 (Product Data Enrichment Protocol v2 Integration)
-Plan: `13.1-01`, `13.1-02`, and `13.1-03` executed and verified; `13.1-04` pending.
-Status: Phase `13` closed `GREEN`; Phase `13.1` now `In Progress` (`3/4` plans complete).
-Last activity: 2026-02-16 - Executed `13.1-03` (lifecycle API + queue-backed apply + `/enrichment` workspace) and closed governance evidence.
+Phase: 13.2 of 15 (Oracle Framework Reuse)
+Plan: Phase 13.1 closed `GREEN` (`13.1-01`..`13.1-04` complete and verified); Phase 13.2 pending planning/execution.
+Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` is next.
+Last activity: 2026-02-16 - Executed `13.1-04`, published phase verification artifact, and closed Phase 13.1 `GREEN`.
 
-Progress: 95% (78/82 plans in roadmap complete)
+Progress: 96% (79/82 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-13.1-execution-wave-4` (`13.1-04`)
-Last completed gate: `13.1-03 execution + governance evidence (GREEN)`
+Current atomic task: `phase-13.2-pre-context-scope-gate`
+Last completed gate: `13.1-04 execution + phase verification closure (GREEN)`
 Current blocker: `N/A`
-Next action: `Execute /prompts:gsd-execute-plan 13.1-04 and then run phase-level verify closure.`
+Next action: `Run /prompts:gsd-discuss-phase 13.2 (pre-context scope gate + context questions) then /prompts:gsd-plan-phase 13.2.`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -40,11 +40,11 @@ Gate board:
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Build + Self-Check | `GREEN` | `reports/13.1/13.1-03/self-check.md` |
-| Code Review | `GREEN` | `reports/13.1/13.1-03/review.md` |
-| Structure Audit | `GREEN` | `reports/13.1/13.1-03/structure-audit.md` |
-| Integrity Audit | `GREEN` | `reports/13.1/13.1-03/integrity-audit.md` |
-| Context Sync | `GREEN` | `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, `.planning/MILESTONES.md` |
+| Build + Self-Check | `GREEN` | `reports/13.1/13.1-04/self-check.md` |
+| Code Review | `GREEN` | `reports/13.1/13.1-04/review.md` |
+| Structure Audit | `GREEN` | `reports/13.1/13.1-04/structure-audit.md` |
+| Integrity Audit | `GREEN` | `reports/13.1/13.1-04/integrity-audit.md` |
+| Context Sync | `GREEN` | `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, `.planning/MILESTONES.md`, `docs/MASTER_MAP.md` |
 
 ## StructureGuardian Audit Trail
 
@@ -56,6 +56,30 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-16)
+
+**Phase 13.1-04 executed + verified - quality gates, lineage export, and phase closure:**
+- Added objective benchmark/evaluation contracts:
+  - retrieval-readiness coverage (overall + profile segmented)
+  - color/finish structured accuracy delta
+  - semantic uplift smoke metrics (`Recall@K`, `nDCG@K`)
+- Added enrichment lineage audit export contract:
+  - `POST /api/v1/ops/enrichment/audit-export`
+  - retention metadata + field-level decision lineage + blocked/protected trace export
+- Added deterministic governance gate:
+  - `scripts/governance/phase13_1_enrichment_gate.py`
+- Added phase closure artifacts:
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`
+  - `reports/13.1/13.1-04/self-check.md`
+  - `reports/13.1/13.1-04/review.md`
+  - `reports/13.1/13.1-04/structure-audit.md`
+  - `reports/13.1/13.1-04/integrity-audit.md`
+- Verification result:
+  - `python -m pytest -q tests/integration/test_enrichment_retrieval_readiness.py` -> `1 passed`
+  - `python -m pytest -q tests/integration/test_enrichment_color_finish_accuracy.py` -> `1 passed`
+  - `python -m pytest -q tests/integration/test_enrichment_semantic_uplift_smoke.py` -> `2 passed`
+  - `python -m pytest -q tests/api/test_enrichment_audit_export_contract.py` -> `2 passed`
+  - `python scripts/governance/phase13_1_enrichment_gate.py --dry-run` -> `pass`
 
 **Phase 13.1-03 executed + verified - lifecycle integration and enrichment workspace:**
 - Added lifecycle API endpoints:

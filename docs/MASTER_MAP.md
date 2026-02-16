@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-15
+Last batch update: 2026-02-16
 Owner: ContextCurator
 
 ## TOC
@@ -31,7 +31,8 @@ Owner: ContextCurator
 |   `-- archive/
 |-- reports/
 |   |-- 07/
-|   |   `-- 07.1-governance-baseline-dry-run/
+|   |   |-- 07.1-governance-baseline-dry-run/
+|   |   `-- 07.2-governance-operational-defaults/
 |   |-- meta/
 |   `-- templates/
 |-- ops/
@@ -85,15 +86,59 @@ Owner: ContextCurator
 7. ContextCurator updates this map at daily batch and phase close.
 
 ## Active Plans
-1. Phase 11 planning artifacts:
-   - `.planning/phases/11-product-search-discovery/11-CONTEXT.md`
-   - `.planning/phases/11-product-search-discovery/11-RESEARCH.md`
-   - `.planning/phases/11-product-search-discovery/11-01-PLAN.md`
-   - `.planning/phases/11-product-search-discovery/11-02-PLAN.md`
-   - `.planning/phases/11-product-search-discovery/11-03-PLAN.md`
-   - `.planning/phases/11-product-search-discovery/11-PLANNING-COVERAGE.md`
-2. Next planned execution:
-   - `.planning/phases/11-product-search-discovery/` (execute wave order next)
+1. Phase 13 canonical artifacts:
+   - `.planning/phases/13-integration-hardening-deployment/13-PRE-CONTEXT-SCOPE.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-CONTEXT.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-RESEARCH.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-PLANNING-COVERAGE.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-01-PLAN.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-02-PLAN.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-03-PLAN.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-04-PLAN.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`
+   - `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`
+2. Phase 13 governance evidence:
+   - `reports/13/13-01/self-check.md`
+   - `reports/13/13-01/review.md`
+   - `reports/13/13-01/structure-audit.md`
+   - `reports/13/13-01/integrity-audit.md`
+   - `reports/13/13-02/self-check.md`
+   - `reports/13/13-02/review.md`
+   - `reports/13/13-02/structure-audit.md`
+   - `reports/13/13-02/integrity-audit.md`
+   - `reports/13/13-03/self-check.md`
+   - `reports/13/13-03/review.md`
+   - `reports/13/13-03/structure-audit.md`
+   - `reports/13/13-03/integrity-audit.md`
+   - `reports/13/13-04/self-check.md`
+   - `reports/13/13-04/review.md`
+   - `reports/13/13-04/structure-audit.md`
+   - `reports/13/13-04/integrity-audit.md`
+3. Phase 13.1 closure artifacts:
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PRE-CONTEXT-SCOPE.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-CONTEXT.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-RESEARCH.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PLANNING-COVERAGE.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-PLAN.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-PLAN.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-PLAN.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-PLAN.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`
+   - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`
+4. Canonical trackers:
+   - `.planning/ROADMAP.md` (Phase 13.1 marked complete `4/4`)
+   - `.planning/STATE.md` (current atomic task: `phase-13.2-pre-context-scope-gate`)
+5. Governance closure evidence:
+   - `reports/07/07.2-governance-operational-defaults/self-check.md`
+   - `reports/07/07.2-governance-operational-defaults/review.md`
+   - `reports/07/07.2-governance-operational-defaults/structure-audit.md`
+   - `reports/07/07.2-governance-operational-defaults/integrity-audit.md`
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`

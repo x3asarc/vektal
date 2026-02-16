@@ -34,6 +34,12 @@ try:
     from .eligibility import build_eligibility_matrix, classify_product_class
     from .retrieval_payload import build_retrieval_payload
     from .pipeline import GovernedEnrichmentPipeline
+    from .benchmarks import (
+        evaluate_retrieval_readiness,
+        evaluate_color_finish_accuracy,
+        evaluate_semantic_uplift_smoke,
+    )
+    from .evaluation import evaluate_phase13_1_gate, EnrichmentGateVerdict
     __all__.extend([
         'get_profile',
         'EnrichmentProfile',
@@ -41,6 +47,11 @@ try:
         'classify_product_class',
         'build_retrieval_payload',
         'GovernedEnrichmentPipeline',
+        'evaluate_retrieval_readiness',
+        'evaluate_color_finish_accuracy',
+        'evaluate_semantic_uplift_smoke',
+        'evaluate_phase13_1_gate',
+        'EnrichmentGateVerdict',
     ])
 except ImportError:
     pass
