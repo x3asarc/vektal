@@ -7,7 +7,7 @@ import {
   resolveSafeRedirect,
 } from "@/lib/auth/guards";
 import { apiRequest } from "@/lib/api/client";
-import { setGuardFlags } from "@/lib/auth/session-flags";
+import { readGuardFlags, setGuardFlags } from "@/lib/auth/session-flags";
 import { GuardState } from "@/shared/contracts";
 import { GlobalJobTracker } from "@/features";
 import { Sidebar } from "@/shell/components/Sidebar";
@@ -19,24 +19,9 @@ type AppShellProps = {
   children: ReactNode;
 };
 
-function readFlag(name: string, fallback: boolean): boolean {
-  if (typeof document === "undefined") return fallback;
-  const match = document.cookie
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${name}=`));
-  if (!match) return fallback;
-  return match.split("=")[1] === "1";
-}
-
-function readGuardStateFromCookies(): GuardState {
-  // Defaults start unauthenticated until backend session is confirmed.
-  return {
-    A: readFlag("phase7_A", false),
-    V: readFlag("phase7_V", false),
-    S: readFlag("phase7_S", false),
-  };
-}
+const DEV_AUTH_BYPASS =
+  process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "1" ||
+  process.env.NODE_ENV !== "production";
 
 type AuthMeResponse = {
   user: {
@@ -82,9 +67,7 @@ export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
   const [width, setWidth] = useState(1280);
   const [guardHydrated, setGuardHydrated] = useState(false);
-  const [guardState, setGuardState] = useState<GuardState>(() =>
-    readGuardStateFromCookies(),
-  );
+  const [guardState, setGuardState] = useState<GuardState>(() => readGuardFlags());
 
   useEffect(() => {
     const updateWidth = () => setWidth(window.innerWidth);
@@ -97,6 +80,15 @@ export function AppShell({ children }: AppShellProps) {
     let cancelled = false;
 
     async function refreshGuardState() {
+      if (DEV_AUTH_BYPASS) {
+        const localState = readGuardFlags();
+        if (cancelled) return;
+        setGuardFlags(localState);
+        setGuardState(localState);
+        setGuardHydrated(true);
+        return;
+      }
+
       const backendState = await fetchGuardStateFromBackend();
       if (cancelled) return;
       setGuardFlags(backendState);
