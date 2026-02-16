@@ -21,3 +21,10 @@ try:
     __all__.extend(['AIDescriptionGenerator', 'SEOGenerator'])
 except ImportError:
     pass
+
+try:
+    from .capability_audit import run_capability_audit
+    from .write_plan import compile_write_plan
+    __all__.extend(['run_capability_audit', 'compile_write_plan'])
+except ImportError:
+    pass

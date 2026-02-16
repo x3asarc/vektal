@@ -86,8 +86,34 @@ class Product(db.Model, TimestampMixin):
         order_by='ProductImage.position'
     )
 
+    enrichment_items = relationship(
+        'ProductEnrichmentItem',
+        back_populates='product',
+        cascade='save-update, merge',
+        lazy='dynamic',
+    )
+
     def __repr__(self):
         return f'<Product {self.sku} store_id={self.store_id}>'
+
+    @property
+    def status(self) -> str:
+        """Derived catalog status used by API search contracts."""
+        if not self.is_active:
+            return "inactive"
+        if self.is_published:
+            return "active"
+        return "draft"
+
+    @property
+    def inventory_total(self):
+        """
+        Placeholder for inventory aggregate.
+
+        Inventory is variant-scoped and not yet modeled in this phase, so search
+        APIs surface this as null until variant inventory is introduced.
+        """
+        return None
 
 
 class ProductEnrichment(db.Model, TimestampMixin):
