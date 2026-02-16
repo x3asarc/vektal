@@ -118,6 +118,49 @@ class EnrichmentDryRunPlanResponse(BaseModel):
     write_plan: dict
 
 
+class EnrichmentRunStartRequest(EnrichmentDryRunPlanRequest):
+    """Lifecycle start payload (alias to dry-run plan request contract)."""
+
+
+class EnrichmentRunLifecycleResponse(BaseModel):
+    """Run lifecycle payload shared by review/approve/apply surfaces."""
+
+    run_id: int
+    status: str
+    run_profile: str
+    target_language: str
+    policy_version: int
+    mapping_version: int | None = None
+    alt_text_policy: str
+    protected_columns: list[str] = Field(default_factory=list)
+    dry_run_expires_at: str | None = None
+    is_stale: bool = False
+    oracle_decision: str = "pending"
+    capability_audit: EnrichmentCapabilityAuditResponse | None = None
+    write_plan: dict
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class EnrichmentRunApprovalRequest(BaseModel):
+    """Batch-level approval semantics for enrichment dry-runs."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    approve_all: bool = True
+    approved_item_ids: list[int] = Field(default_factory=list)
+    rejected_item_ids: list[int] = Field(default_factory=list)
+    reviewer_note: str | None = Field(default=None, max_length=1000)
+
+
+class EnrichmentRunApplyRequest(BaseModel):
+    """Apply request for approved enrichment dry-runs."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    apply_mode: Literal["immediate", "scheduled"] = "immediate"
+    confirm_apply: bool = False
+
+
 class ProductQuery(CursorPaginationParams):
     """Query parameters for product list."""
 

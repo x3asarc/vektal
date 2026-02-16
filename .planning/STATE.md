@@ -10,38 +10,76 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 13.1 of 15 (Product Data Enrichment Protocol v2 Integration)
-Plan: Phase 13.1 context + research + planning complete; execution queued in wave order.
-Status: Phase `13` closed `GREEN`; Phase `13.1` now `Planned`.
-Last activity: 2026-02-16 - Generated `13.1-01..04` plans, planning coverage, and requirement mappings.
+Plan: `13.1-01`, `13.1-02`, and `13.1-03` executed and verified; `13.1-04` pending.
+Status: Phase `13` closed `GREEN`; Phase `13.1` now `In Progress` (`3/4` plans complete).
+Last activity: 2026-02-16 - Executed `13.1-03` (lifecycle API + queue-backed apply + `/enrichment` workspace) and closed governance evidence.
 
-Progress: 91% (75/82 plans in roadmap complete)
+Progress: 95% (78/82 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-13.1-execution-wave-1`
-Last completed gate: `Phase 13 verify-work closure (GREEN)`
+Current atomic task: `phase-13.1-execution-wave-4` (`13.1-04`)
+Last completed gate: `13.1-03 execution + governance evidence (GREEN)`
 Current blocker: `N/A`
-Next action: `Run /prompts:gsd-execute-phase 13.1`
+Next action: `Execute /prompts:gsd-execute-plan 13.1-04 and then run phase-level verify closure.`
+
+Governance defaults locked (2026-02-16):
+1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
+2. Pinning scope is canonical: Python exact pins in `requirements.txt`; Node lock state in `package-lock.json`.
+3. License policy blocks strong-copyleft direct dependencies; transitive strong-copyleft requires expiration-dated suppression plus replacement plan owner/date.
+4. Dev auth bypass is local-pilot only, default `OFF`, development-only, and must be visibly indicated when active.
+
+Governance task `07.2-governance-operational-defaults` evidence:
+1. `reports/07/07.2-governance-operational-defaults/self-check.md`
+2. `reports/07/07.2-governance-operational-defaults/review.md`
+3. `reports/07/07.2-governance-operational-defaults/structure-audit.md`
+4. `reports/07/07.2-governance-operational-defaults/integrity-audit.md`
+5. `docs/MASTER_MAP.md`
 
 Gate board:
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Build + Self-Check | `GREEN` | `reports/13/13-04/self-check.md` |
-| Code Review | `GREEN` | `reports/13/13-04/review.md` |
-| Structure Audit | `GREEN` | `reports/13/13-04/structure-audit.md` |
-| Integrity Audit | `GREEN` | `reports/13/13-04/integrity-audit.md` |
-| Context Sync | `GREEN` | `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`, `docs/MASTER_MAP.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md` |
+| Build + Self-Check | `GREEN` | `reports/13.1/13.1-03/self-check.md` |
+| Code Review | `GREEN` | `reports/13.1/13.1-03/review.md` |
+| Structure Audit | `GREEN` | `reports/13.1/13.1-03/structure-audit.md` |
+| Integrity Audit | `GREEN` | `reports/13.1/13.1-03/integrity-audit.md` |
+| Context Sync | `GREEN` | `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, `.planning/MILESTONES.md` |
 
 ## StructureGuardian Audit Trail
 
 1. 2026-02-12: No file moves required for governance baseline scaffold (`N/A`).
+2. 2026-02-16: No file moves required for governance operational defaults (`N/A`).
 
 ## Bypass Log
 
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-16)
+
+**Phase 13.1-03 executed + verified - lifecycle integration and enrichment workspace:**
+- Added lifecycle API endpoints:
+  - `POST /api/v1/products/enrichment/runs/start`
+  - `GET /api/v1/products/enrichment/runs/{run_id}/review`
+  - `POST /api/v1/products/enrichment/runs/{run_id}/approve`
+  - `POST /api/v1/products/enrichment/runs/{run_id}/apply`
+- Added stale dry-run TTL enforcement and apply confirmation semantics.
+- Added queue-backed worker `src.tasks.enrichment.run_enrichment_batch` with progress emission and bounded routing.
+- Added dedicated frontend route and feature module:
+  - `frontend/src/app/(app)/enrichment/page.tsx`
+  - `frontend/src/features/enrichment/*`
+  - `frontend/src/shell/components/Sidebar.tsx` navigation update.
+- Added required governance artifacts:
+  - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`
+  - `reports/13.1/13.1-03/self-check.md`
+  - `reports/13.1/13.1-03/review.md`
+  - `reports/13.1/13.1-03/structure-audit.md`
+  - `reports/13.1/13.1-03/integrity-audit.md`
+- Verification result:
+  - `python -m pytest -q tests/api/test_enrichment_dry_run_contract.py` -> `2 passed`
+  - `python -m pytest -q tests/jobs/test_enrichment_batch_queue_contract.py` -> `3 passed`
+  - `npm --prefix frontend run test -- EnrichmentWorkspace EnrichmentReviewTable` -> `3 passed`
+  - `npm --prefix frontend run typecheck` -> `0 errors`
 
 **Phase 13.1 planning completed (wave-ordered):**
 - Added executable plans:

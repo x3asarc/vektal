@@ -16,12 +16,18 @@ Canonical governance spec: `solutionsos/compound-engineering-os-policy.md`
 6. Reviewer uses two-pass protocol (`Blind Audit` then `Context Fit`) with timestamp evidence.
 7. `MASTER_MAP.md` must be updated at daily batch and phase-close.
 8. Protected paths (`.planning`, `.rules`, `AGENTS.md`) cannot be auto-moved.
+9. Review timing is tracked as SLO, not a hard merge gate (`4h` initial, `2h` re-review; escalate at `24h`).
+10. Pinning policy is canonical: Python exact pins in `requirements.txt`; Node changes require committed `package-lock.json`.
+11. License policy blocks strong copyleft direct dependencies; transitive strong copyleft requires expiration-dated suppression plus replacement plan or blocks.
+12. Dev auth bypass is local-pilot only and must be default OFF, dev-only, and explicitly visible when active.
+13. Governance sequence is enforced: `07.1` validated before `07.2` execution.
 
 ### Phase 7 Governance Task Board
 
 | Task | Purpose | Gate Status | Evidence |
 |---|---|---|---|
 | 07.1-governance-baseline-dry-run | Stand up governance artifacts and evidence flow | `GREEN` | `reports/07/07.1-governance-baseline-dry-run/` |
+| 07.2-governance-operational-defaults | Lock v1.1 defaults (SLO, pinning, license scope, dev-bypass guard) | `GREEN` | `reports/07/07.2-governance-operational-defaults/` |
 
 ## Phases
 
@@ -415,9 +421,9 @@ Plans:
 **Plans:** 4 plans in 4 waves
 
 Plans:
-- [ ] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation (Wave 1)
-- [ ] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration, and idempotent retries (Wave 2)
-- [ ] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX (Wave 3)
+- [x] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation (Wave 1)
+- [x] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration, and idempotent retries (Wave 2)
+- [x] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX (Wave 3)
 - [ ] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure (Wave 4)
 
 ### Phase 13.2: Oracle Framework Reuse (INSERTED)
@@ -495,7 +501,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 11. Product Search & Discovery | 3/3 | Complete | 2026-02-15 |
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
-| 13.1. Product Data Enrichment Protocol v2 Integration | 0/4 | Planned | - |
+| 13.1. Product Data Enrichment Protocol v2 Integration | 3/4 | In Progress | - |
 | 13.2. Oracle Framework Reuse | 0/0 | Not started | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |
 | 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |

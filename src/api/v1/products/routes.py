@@ -19,6 +19,10 @@ from src.api.v1.products.schemas import (
     EnrichmentCapabilityAuditResponse,
     EnrichmentDryRunPlanRequest,
     EnrichmentDryRunPlanResponse,
+    EnrichmentRunApplyRequest,
+    EnrichmentRunApprovalRequest,
+    EnrichmentRunLifecycleResponse,
+    EnrichmentRunStartRequest,
     ProductDetailResponse,
     ProductDiffQuery,
     ProductDiffResponse,
@@ -35,8 +39,12 @@ from src.api.v1.products.schemas import (
 )
 from src.core.enrichment.capability_audit import run_capability_audit
 from src.core.enrichment.contracts import RequestedMutation
+from src.core.enrichment.profiles import get_profile
 from src.core.enrichment.write_plan import compile_write_plan
 from src.api.v1.products.staging import stage_bulk_actions
+from src.celery_app import app as celery_app
+from src.jobs.progress import announce_job_progress
+from src.jobs.queueing import queue_for_tier
 from src.api.v1.products.search_query import (
     apply_keyset_cursor,
     apply_sort,
@@ -44,7 +52,17 @@ from src.api.v1.products.search_query import (
     encode_search_cursor,
     extract_sort_value,
 )
-from src.models import Product, ProductChangeEvent, ProductEnrichmentItem, ProductEnrichmentRun, ShopifyStore, db
+from src.models import (
+    Job,
+    JobStatus,
+    JobType,
+    Product,
+    ProductChangeEvent,
+    ProductEnrichmentItem,
+    ProductEnrichmentRun,
+    ShopifyStore,
+    db,
+)
 
 PROTECTED_COLUMNS = (
     "id",
@@ -189,6 +207,114 @@ def _coerce_float(value):
     except (TypeError, ValueError):
         return None
 
+
+def _connected_store_for_user():
+    store = ShopifyStore.query.filter_by(user_id=current_user.id, is_active=True).first()
+    if store is None:
+        return None, ProblemDetails.business_error(
+            "store-not-connected",
+            "Store Not Connected",
+            "Connect a Shopify store before running enrichment actions.",
+            409,
+        )
+    return store, None
+
+
+def _is_run_stale(run: ProductEnrichmentRun, *, now_utc: datetime | None = None) -> bool:
+    if run.dry_run_expires_at is None:
+        return False
+    now_utc = now_utc or datetime.now(timezone.utc)
+    expires_at = run.dry_run_expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    return now_utc > expires_at
+
+
+def _serialize_enrichment_item(row: ProductEnrichmentItem) -> dict:
+    return {
+        "item_id": row.id,
+        "product_id": row.product_id,
+        "field_name": row.field_name,
+        "field_group": row.field_group,
+        "before_value": row.before_value,
+        "after_value": row.after_value,
+        "policy_version": row.policy_version,
+        "mapping_version": row.mapping_version,
+        "reason_codes": list(row.reason_codes or []),
+        "requires_user_action": bool(row.requires_user_action),
+        "is_blocked": row.decision_state == "blocked",
+        "is_protected_column": bool(row.is_protected_column),
+        "alt_text_preserved": bool(row.alt_text_preserved),
+        "confidence": _coerce_float(row.confidence),
+        "provenance": row.provenance,
+        "decision_state": row.decision_state,
+    }
+
+
+def _load_run_items(run_id: int) -> list[ProductEnrichmentItem]:
+    return (
+        ProductEnrichmentItem.query.filter_by(run_id=run_id)
+        .order_by(ProductEnrichmentItem.id.asc())
+        .all()
+    )
+
+
+def _build_run_write_plan(items: list[ProductEnrichmentItem]) -> dict:
+    allowed_rows = [item for item in items if item.decision_state != "blocked"]
+    blocked_rows = [item for item in items if item.decision_state == "blocked"]
+    approved_rows = [item for item in allowed_rows if item.decision_state in {"approved", "applied"}]
+    return {
+        "allowed": [_serialize_enrichment_item(row) for row in allowed_rows],
+        "blocked": [_serialize_enrichment_item(row) for row in blocked_rows],
+        "counts": {
+            "allowed": len(allowed_rows),
+            "blocked": len(blocked_rows),
+            "approved": len(approved_rows),
+            "total": len(items),
+        },
+    }
+
+
+def _lifecycle_response_for_run(run: ProductEnrichmentRun, *, items: list[ProductEnrichmentItem]) -> EnrichmentRunLifecycleResponse:
+    write_plan = _build_run_write_plan(items)
+    capability_raw = run.capability_audit_json if isinstance(run.capability_audit_json, dict) else None
+    capability = EnrichmentCapabilityAuditResponse(**capability_raw) if capability_raw else None
+    metadata = dict(run.metadata_json or {})
+    metadata.setdefault("mapping_version", run.mapping_version)
+    metadata.setdefault("policy_version", run.policy_version)
+    metadata.setdefault("oracle_decision", metadata.get("oracle_decision") or "pending")
+    is_stale = _is_run_stale(run)
+    return EnrichmentRunLifecycleResponse(
+        run_id=run.id,
+        status=run.status,
+        run_profile=run.run_profile,
+        target_language=run.target_language,
+        policy_version=run.policy_version,
+        mapping_version=run.mapping_version,
+        alt_text_policy=run.alt_text_policy,
+        protected_columns=list(run.protected_columns_json or []),
+        dry_run_expires_at=_iso(run.dry_run_expires_at),
+        is_stale=is_stale,
+        oracle_decision=str(metadata.get("oracle_decision") or "pending"),
+        capability_audit=capability,
+        write_plan=write_plan,
+        metadata=metadata,
+    )
+
+
+def _get_run_or_error(run_id: int, *, store_id: int):
+    run = ProductEnrichmentRun.query.filter_by(id=run_id, store_id=store_id).first()
+    if run is None:
+        return None, ProblemDetails.not_found("enrichment-run", run_id)
+    if _is_run_stale(run) and run.status in {"draft", "dry_run_ready", "approved"}:
+        run.status = "expired"
+        metadata = dict(run.metadata_json or {})
+        metadata["expired_at"] = datetime.now(timezone.utc).isoformat()
+        metadata["expiry_reason"] = "dry_run_ttl_elapsed"
+        run.metadata_json = metadata
+        db.session.commit()
+    return run, None
+
 @products_bp.route('', methods=['GET'])
 @login_required
 def list_products():
@@ -268,14 +394,9 @@ def get_product(product_id: int):
 @login_required
 def enrichment_capability_audit():
     """Return deterministic allowed/blocked write plan for enrichment preflight."""
-    store = ShopifyStore.query.filter_by(user_id=current_user.id, is_active=True).first()
-    if store is None:
-        return ProblemDetails.business_error(
-            "store-not-connected",
-            "Store Not Connected",
-            "Connect a Shopify store before running enrichment capability audit.",
-            409,
-        )
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
 
     try:
         payload = EnrichmentCapabilityAuditRequest(**(request.get_json(silent=True) or {}))
@@ -299,14 +420,9 @@ def enrichment_capability_audit():
 @login_required
 def enrichment_dry_run_plan():
     """Compile and persist an enrichment dry-run write plan with policy lineage."""
-    store = ShopifyStore.query.filter_by(user_id=current_user.id, is_active=True).first()
-    if store is None:
-        return ProblemDetails.business_error(
-            "store-not-connected",
-            "Store Not Connected",
-            "Connect a Shopify store before staging enrichment dry-runs.",
-            409,
-        )
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
 
     try:
         payload = EnrichmentDryRunPlanRequest(**(request.get_json(silent=True) or {}))
@@ -468,6 +584,251 @@ def enrichment_dry_run_plan():
         write_plan=write_plan.to_dict(),
     )
     return response.model_dump(), 201
+
+
+@products_bp.route('/enrichment/runs/start', methods=['POST'])
+@login_required
+def enrichment_run_start():
+    """
+    Start enrichment lifecycle by creating dry-run write plan.
+
+    This endpoint aliases the canonical dry-run compiler and returns lifecycle
+    metadata used by the dedicated enrichment workspace.
+    """
+    try:
+        EnrichmentRunStartRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc, status=422)
+
+    raw = enrichment_dry_run_plan()
+    if isinstance(raw, tuple):
+        payload, status_code = raw[0], raw[1]
+    else:
+        payload, status_code = raw, 200
+    if status_code >= 400:
+        return raw
+
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
+    run_id = int(payload.get("run_id"))
+    run, run_error = _get_run_or_error(run_id, store_id=store.id)
+    if run_error:
+        return run_error
+    items = _load_run_items(run.id)
+    lifecycle = _lifecycle_response_for_run(run, items=items)
+    return lifecycle.model_dump(), status_code
+
+
+@products_bp.route('/enrichment/runs/<int:run_id>/review', methods=['GET'])
+@login_required
+def enrichment_run_review(run_id: int):
+    """Return persisted enrichment run review payload with stale-state metadata."""
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
+    run, run_error = _get_run_or_error(run_id, store_id=store.id)
+    if run_error:
+        return run_error
+    items = _load_run_items(run.id)
+    lifecycle = _lifecycle_response_for_run(run, items=items)
+    return lifecycle.model_dump(), 200
+
+
+@products_bp.route('/enrichment/runs/<int:run_id>/approve', methods=['POST'])
+@login_required
+def enrichment_run_approve(run_id: int):
+    """Apply batch-level approval semantics over dry-run enrichment items."""
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
+    run, run_error = _get_run_or_error(run_id, store_id=store.id)
+    if run_error:
+        return run_error
+    if run.status == "expired":
+        return ProblemDetails.business_error(
+            "stale-dry-run",
+            "Dry-Run Expired",
+            "This dry-run exceeded TTL and must be regenerated before approval.",
+            409,
+        )
+    if run.status not in {"dry_run_ready", "approved"}:
+        return ProblemDetails.business_error(
+            "invalid-run-status",
+            "Run Not Reviewable",
+            f"Run status is `{run.status}` and cannot be approved.",
+            409,
+        )
+
+    try:
+        payload = EnrichmentRunApprovalRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc, status=422)
+
+    items = _load_run_items(run.id)
+    item_by_id = {item.id: item for item in items}
+    non_blocked_items = [item for item in items if item.decision_state != "blocked"]
+    blocked_item_ids = {item.id for item in items if item.decision_state == "blocked"}
+
+    approved_ids = set(payload.approved_item_ids)
+    rejected_ids = set(payload.rejected_item_ids)
+    if approved_ids.intersection(blocked_item_ids):
+        return ProblemDetails.business_error(
+            "blocked-approval",
+            "Blocked Field Approval Rejected",
+            "Blocked fields cannot be approved. Review policy guidance first.",
+            422,
+        )
+    if rejected_ids.intersection(blocked_item_ids):
+        return ProblemDetails.business_error(
+            "blocked-reject",
+            "Blocked Field Review Invalid",
+            "Blocked fields are already excluded and do not accept reviewer decisions.",
+            422,
+        )
+    if not payload.approve_all and not approved_ids and not rejected_ids:
+        return ProblemDetails.business_error(
+            "approval-empty",
+            "Approval Selection Required",
+            "Provide approved_item_ids/rejected_item_ids or set approve_all=true.",
+            422,
+        )
+
+    if payload.approve_all:
+        approved_ids.update(item.id for item in non_blocked_items)
+    approved_ids = {item_id for item_id in approved_ids if item_id in item_by_id}
+    rejected_ids = {item_id for item_id in rejected_ids if item_id in item_by_id}
+
+    for item in non_blocked_items:
+        if item.id in approved_ids:
+            item.decision_state = "approved"
+        elif item.id in rejected_ids:
+            item.decision_state = "rejected"
+
+    run.status = "approved"
+    metadata = dict(run.metadata_json or {})
+    metadata["approval"] = {
+        "approved_item_ids": sorted(approved_ids),
+        "rejected_item_ids": sorted(rejected_ids),
+        "approved_at": datetime.now(timezone.utc).isoformat(),
+        "reviewer_note": payload.reviewer_note or "",
+    }
+    metadata["oracle_decision"] = "approved_ready_for_apply"
+    run.metadata_json = metadata
+    db.session.commit()
+
+    refreshed_items = _load_run_items(run.id)
+    lifecycle = _lifecycle_response_for_run(run, items=refreshed_items)
+    return lifecycle.model_dump(), 200
+
+
+@products_bp.route('/enrichment/runs/<int:run_id>/apply', methods=['POST'])
+@login_required
+def enrichment_run_apply(run_id: int):
+    """Dispatch approved enrichment run to queue-backed execution."""
+    store, store_error = _connected_store_for_user()
+    if store_error:
+        return store_error
+    run, run_error = _get_run_or_error(run_id, store_id=store.id)
+    if run_error:
+        return run_error
+    if run.status == "expired":
+        return ProblemDetails.business_error(
+            "stale-dry-run",
+            "Dry-Run Expired",
+            "This dry-run exceeded TTL and must be regenerated before apply.",
+            409,
+        )
+    if run.status not in {"approved", "dry_run_ready"}:
+        return ProblemDetails.business_error(
+            "invalid-run-status",
+            "Run Not Applyable",
+            f"Run status is `{run.status}` and cannot be queued for apply.",
+            409,
+        )
+
+    try:
+        payload = EnrichmentRunApplyRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc, status=422)
+    if not payload.confirm_apply:
+        return ProblemDetails.business_error(
+            "apply-confirmation-required",
+            "Apply Confirmation Required",
+            "Set confirm_apply=true to queue enrichment apply.",
+            422,
+        )
+
+    items = _load_run_items(run.id)
+    approved_items = [item for item in items if item.decision_state == "approved"]
+    if not approved_items:
+        return ProblemDetails.business_error(
+            "no-approved-items",
+            "No Approved Changes",
+            "Approve at least one non-blocked item before apply.",
+            409,
+        )
+
+    profile = get_profile(run.run_profile)
+    queue_name = queue_for_tier(profile.tier, kind="batch")
+    job = Job(
+        user_id=current_user.id,
+        store_id=store.id,
+        job_type=JobType.PRODUCT_ENRICH,
+        job_name=f"Enrichment apply run #{run.id}",
+        status=JobStatus.PENDING,
+        total_products=len(approved_items),
+        processed_count=0,
+        total_items=len(approved_items),
+        processed_items=0,
+        parameters={
+            "run_id": run.id,
+            "run_profile": run.run_profile,
+            "target_language": run.target_language,
+            "policy_version": run.policy_version,
+            "mapping_version": run.mapping_version,
+            "apply_mode": payload.apply_mode,
+            "current_step": "queued",
+        },
+    )
+    db.session.add(job)
+    db.session.flush()
+
+    task = celery_app.send_task(
+        "src.tasks.enrichment.run_enrichment_batch",
+        kwargs={
+            "run_id": run.id,
+            "job_id": job.id,
+            "actor_user_id": current_user.id,
+        },
+        queue=queue_name,
+    )
+    job.celery_task_id = task.id
+
+    run.status = "applied"
+    metadata = dict(run.metadata_json or {})
+    metadata["apply"] = {
+        "job_id": job.id,
+        "task_id": task.id,
+        "queued_at": datetime.now(timezone.utc).isoformat(),
+        "queue_name": queue_name,
+        "apply_mode": payload.apply_mode,
+    }
+    metadata["oracle_decision"] = "execution_queued"
+    run.metadata_json = metadata
+    db.session.commit()
+    announce_job_progress(job.id, job=job)
+
+    return {
+        "run_id": run.id,
+        "status": run.status,
+        "job_id": job.id,
+        "task_id": task.id,
+        "queue": queue_name,
+        "stream_url": f"/api/v1/jobs/{job.id}/stream",
+        "results_url": f"/jobs/{job.id}?tab=results",
+        "target_language": run.target_language,
+    }, 202
 
 
 def _event_to_response(event: ProductChangeEvent) -> ProductChangeEventResponse:

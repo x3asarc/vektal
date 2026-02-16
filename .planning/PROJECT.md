@@ -12,7 +12,7 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 **Goal:** Transform organic codebase into maintainable, containerized architecture ready for SaaS scaling.
 **Status:** Active
-**Current checkpoint:** Phase 11 context/research/planning complete, execution waves ready
+**Current checkpoint:** Phase 13.1 execution is in progress (plans `13.1-01`..`13.1-03` complete); next is `13.1-04`.
 
 **Target outcomes:**
 - Clean, organized codebase (30+ scripts archived, duplicates consolidated)
@@ -28,12 +28,12 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 | Milestone A: Foundation Buildout | Phases 1-6 | Complete | `.planning/ROADMAP.md`, `.planning/STATE.md` |
 | Milestone B: Frontend + Resolution | Phases 7-8 | Complete | `.planning/phases/07-frontend-framework-setup/07-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md` |
 | Milestone C: Real-Time + Conversational Ops | Phases 9-10 | Complete | `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md` |
-| Milestone D: Scale + Optimization | Phases 11-14 | In Progress | Phase 11 planning complete (`11-CONTEXT`, `11-RESEARCH`, `11-01..11-03 PLAN`) |
+| Milestone D: Scale + Optimization | Phases 11-14 | In Progress | Phases 11-13 complete (`13-01`..`13-04` and phase-level verification closed `GREEN`) |
 
-## Execution Snapshot (2026-02-15)
+## Execution Snapshot (2026-02-16)
 
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10
-- Current phase: 11 (Product Search & Discovery - execution ready)
+- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+- Current phase: 13.1 (Product Data Enrichment Protocol v2 Integration - execution wave 4 pending)
 - Phase 5 outcomes:
   - OpenAPI/Swagger docs at `/api/docs`
   - Versioned v1 API domains: products, jobs, vendors, user versioning
@@ -58,6 +58,22 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
   - Bulk conversational orchestration for up to 1000 SKUs with adaptive chunk concurrency and queue-backed execution (`10-03`)
   - Full `/chat` operator workspace with structured rendering, bounded stream subscription, and in-chat approval controls (`10-04`)
   - Verification artifacts: `.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md`
+- Phase 12 outcomes:
+  - Backend-authoritative tier routing, capability projection, and scoped memory retrieval contracts (`12-01`)
+  - Tier1/Tier2 runtime semantics with semantic-firewall enforcement and fallback-stage telemetry (`12-02`)
+  - Tier3 delegation guardrails with tier-aware queue routing and delegation trace UX (`12-03`)
+  - Verification artifacts: `.planning/phases/12-tier-system-architecture/12-01-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-02-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-03-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-VERIFICATION.md`
+- Phase 13 outcomes (verified complete):
+  - `13-01` execution shield completed (runtime policy, retry/breaker matrix, idempotency, Tier3 TTL/dead-letter)
+  - `13-02` governance/recovery completed (verification oracle, kill-switch enforcement, tenant field policy thresholds)
+  - `13-03` deployment/observability/security hardening completed (provider route lineage, ops gates, redaction/retention, deploy guard workflow)
+  - `13-04` instrumentation foundation completed (preference/oracle signal capture, export contracts, no-autonomy guardrail)
+  - Verification artifacts: `.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`, `reports/13/13-01/*`, `reports/13/13-02/*`, `reports/13/13-03/*`, `reports/13/13-04/*`
+- Phase 13.1 progress:
+  - `13.1-01` completed (capability audit + dry-run policy contracts)
+  - `13.1-02` completed (profiles/eligibility/oracle/idempotency foundations)
+  - `13.1-03` completed (lifecycle API + queue-backed execution + `/enrichment` workspace)
+  - Evidence artifacts: `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `reports/13.1/13.1-01/*`, `reports/13.1/13.1-02/*`, `reports/13.1/13.1-03/*`
 
 ## Requirements
 
@@ -190,4 +206,4 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 ---
 *Created: 2026-02-03 after repository evaluation*
-*Last updated: 2026-02-15 after Phase 10 execution + verification closure*
+*Last updated: 2026-02-16 after Phase 13 phase-level verify-work closure*
