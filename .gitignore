@@ -107,6 +107,14 @@ universal_vendor_scraper/
 .minimax/
 .agents/
 
+# --- Personal notes / scratch docs (not platform code) ---
+precisionworkspace.md
+productionagents.md
+skillbuilding.md
+solutionsarchitect.md
+codex.md
+screenshots/
+
 # --- One-off setup scripts (not platform code) ---
 install-scoop.ps1
 INSTALL_SCOOP.md
