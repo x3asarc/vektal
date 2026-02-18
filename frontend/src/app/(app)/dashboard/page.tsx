@@ -232,7 +232,7 @@ export default function DashboardPage() {
 
         {/* Welcome heading */}
         <section className="dashboard-welcome">
-          <h2 className="dashboard-title">Welcome to Synthex!</h2>
+          <h2 className="dashboard-title">Welcome to Vektal!</h2>
           <p className="dashboard-subtitle">
             <span>Friendly Owner</span>
             <span className="wave-emoji" aria-hidden>

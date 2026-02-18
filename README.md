@@ -1,4 +1,4 @@
-# Synthex
+# Vektal
 
 **AI-powered product intelligence platform** — conversational interface for managing Shopify product catalogs at scale.
 
@@ -36,7 +36,7 @@ Built for store operators who need to resolve, enrich, and bulk-manage product d
 ## Project Structure
 
 ```
-synthex/
+vektal/
 ├── frontend/               # Next.js app
 │   └── src/
 │       ├── app/            # Route pages (App Router)

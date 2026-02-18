@@ -20,6 +20,7 @@ URL Structure:
 
 Legacy routes will be deprecated after frontend migration to /api/v1/ routes.
 """
+import os
 
 
 def register_v1_blueprints(app):
@@ -44,13 +45,23 @@ def register_v1_blueprints(app):
     """
     from flask_cors import CORS
 
+    configured_origins = os.getenv("CORS_ORIGINS", "")
+    cors_origins = [
+        origin.strip()
+        for origin in configured_origins.split(",")
+        if origin.strip()
+    ]
+    if not cors_origins:
+        cors_origins = [
+            "http://localhost:3000",      # Next.js dev server
+            "http://localhost:5000",      # Flask dev server
+            "https://app.vektal.systems",  # Production app domain
+        ]
+
     # Initialize CORS for API routes
     CORS(app, resources={
         r"/api/*": {
-            "origins": [
-                "http://localhost:3000",  # Next.js dev server
-                "http://localhost:5000",  # Flask dev server
-            ],
+            "origins": cors_origins,
             "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True

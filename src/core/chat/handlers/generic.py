@@ -141,15 +141,21 @@ class GenericHandler:
             intent: Intent
 
         Returns:
-            Structured error response with suggestions
+            Structured response with guidance on supported commands
         """
         return {
             "status": "unknown",
-            "message": f"I didn't understand: '{intent.raw_message}'",
+            "message": (
+                "I can help you manage your Shopify products. "
+                "Try typing a SKU (e.g. R0530) to add or look up a product, "
+                "or type 'help' to see all available commands."
+            ),
             "suggestions": [
-                "Try typing a SKU like R0530",
-                "Type 'help' to see available commands",
-                "Use natural language: 'find vendor for R0530'"
+                "Type a SKU directly (e.g. R0530) to add it quickly",
+                "Type 'help' to see all available commands",
+                "Use natural language: 'find vendor for R0530'",
+                "Type 'list vendors' to see configured suppliers",
+                "Type 'status' to check system health"
             ],
             "actions": [
                 {
