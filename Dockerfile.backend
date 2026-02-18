@@ -30,6 +30,8 @@ COPY gunicorn_config.py .
 COPY src/ ./src/
 COPY utils/ ./utils/
 COPY config/ ./config/
+COPY migrations/ ./migrations/
+COPY web/ ./web/
 
 # Create data directories with proper ownership
 RUN mkdir -p /app/data/input /app/data/output /app/uploads && \

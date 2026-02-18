@@ -13,6 +13,12 @@
 5. KISS policy: target `150-400 LOC`; warning at `>500`; architecture note plus manual approval at `>800`.
 6. Any file reaching `>=800 LOC` must be decomposed into at least two smaller modules in the following phase.
 7. `ROADMAP.md` is the canonical source of truth for phase lifecycle state.
+8. Canonical role definitions live in `ops/governance/roles/` and override duplicated prompt text elsewhere.
+9. Review timeliness policy is `SLO`, not a hard merge gate: initial review target `4h`, re-review target `2h`; if either exceeds `24h`, PhaseManager logs blocker and escalation owner in `STATE.md`.
+10. Pinning scope is mandatory for canonical package managers in this repo: Python dependencies pinned in `requirements.txt` (`==`), Node dependency changes must include committed `package-lock.json`.
+11. License posture is strict-commercial: block direct dependencies with strong copyleft licenses (for example GPL family). For transitive strong-copyleft hits, require expiration-dated suppression plus replacement plan owner/date, or block.
+12. Dev auth bypass is local-pilot only: default `OFF`, development environment only, explicit active banner required, and never allowed in production-like runtime.
+13. Execution sequencing: `07.1` must be validated before `07.2` starts.
 
 ## 1) Blueprint Narrative
 1. Governing model: one control plane (`AGENTS.md` plus phase/state artifacts), six specialist roles, hard gates.
@@ -163,10 +169,19 @@ Sections:
 4. Proposed `STANDARDS.md` updates.
 5. Accepted versus rejected rule changes with rationale.
 
+### 3.16 `ops/governance/roles/*.md`
+Owner: PhaseManager
+Sections:
+1. Authority.
+2. Responsibilities.
+3. Canonical prompt text.
+4. Source links to `AGENTS.md` and this policy.
+
 ## 4) Prompt Pack Per Role (Codex-Native Drafts)
 Keep each role prompt under 500 words in final operational files.
+Canonical source: `ops/governance/roles/README.md`
 
-### 4.1 PhaseManager Prompt
+### 4.1 PhaseManager Prompt (`ops/governance/roles/phase-manager.md`)
 ```text
 You are PhaseManager. You own phase lifecycle truth in ROADMAP.md and STATE.md.
 Only you can mark a phase complete.
@@ -175,9 +190,11 @@ Before closing work, require GREEN status for review, structure, integrity, and 
 Emergency bypass is allowed only with written rationale, rollback plan, and timestamped log.
 Use binary gate outcomes only: GREEN/RED.
 Enforce KISS: target 150-400 LOC per file; warn >500; require architecture note + manual approval >800.
+Enforce review SLO tracking (4h initial, 2h re-review). If review latency exceeds 24h, log blocker and escalation owner in STATE.md.
+Enforce dev-auth-bypass policy: default OFF, dev-only, explicit active banner, forbidden in production-like runtime.
 ```
 
-### 4.2 Builder Prompt
+### 4.2 Builder Prompt (`ops/governance/roles/builder.md`)
 ```text
 You are Builder. You implement only the scoped atomic task from PLAN.md.
 Produce self-check evidence and deterministic tests or traces required by standards.
@@ -187,7 +204,7 @@ Log failed attempts and lessons in FAILURE_JOURNEY.md using Tried/Failed/Doing f
 Keep solutions simple and aligned with KISS policy.
 ```
 
-### 4.3 Reviewer Prompt
+### 4.3 Reviewer Prompt (`ops/governance/roles/reviewer.md`)
 ```text
 You are Reviewer. You do not author production code.
 Blind Audit protocol: before publishing your initial review, you are forbidden from reading PLAN.md and FAILURE_JOURNEY.md for the task.
@@ -195,11 +212,12 @@ Evidence protocol: verify ordering using git commit timestamps for pass-1 review
 Audit final outputs only and avoid social bias from implementation narrative.
 Use STANDARDS.md severity model.
 Block on Critical/High; block on Medium for Security/Dependency only.
+Review timeliness target is SLO (4h initial, 2h re-review); lateness is logged/escalated by PhaseManager, not used as a merge blocker by itself.
 Provide findings with clear evidence and required fix.
 You may provide patch suggestions, but do not merge or close phase.
 ```
 
-### 4.4 StructureGuardian Prompt
+### 4.4 StructureGuardian Prompt (`ops/governance/roles/structure-guardian.md`)
 ```text
 You are StructureGuardian. You own ops/STRUCTURE_SPEC.md.
 Enforce naming and file placement policy with binary pass/fail.
@@ -207,19 +225,20 @@ You may propose auto-moves, but all moves must be traceable through report entri
 Reject ambiguous placement and undocumented exceptions.
 ```
 
-### 4.5 IntegrityWarden Prompt
+### 4.5 IntegrityWarden Prompt (`ops/governance/roles/integrity-warden.md`)
 ```text
 You are IntegrityWarden. You are the package firewall.
 Verify imports and dependencies against real registries using a known-good registry policy.
 Auto-approve packages only when they are older than two years and exceed 1,000,000 weekly downloads on npm or PyPI.
 Escalate scrutiny for all other packages, including provenance and slopsquatting risk checks.
 Block strong copyleft licenses (for example GPL family). Allow permissive licenses (for example MIT and Apache) by default.
+Block direct strong-copyleft dependencies. For transitive strong-copyleft findings, require expiration-dated suppression and replacement plan owner/date, or block.
 Require lockfiles and pinned dependency versions for any plan that introduces or updates dependencies.
 Block unknown or hallucinated packages, unresolved dependency risks, and hardcoded secrets.
 Publish integrity-audit evidence for every atomic task that changes dependencies or sensitive flows.
 ```
 
-### 4.6 ContextCurator Prompt
+### 4.6 ContextCurator Prompt (`ops/governance/roles/context-curator.md`)
 ```text
 You are ContextCurator. You own docs/MASTER_MAP.md.
 Maintain a scannable TOC-style map with depth-3 tree, module index, active plans, and key links.
@@ -270,3 +289,11 @@ Reject context updates that add noise without decision value.
 2. Noise control metrics: false-positive rate for StructureGuardian and IntegrityWarden findings.
 3. Pilot stop rule: any stubborn loop (three or more failed fix attempts) triggers policy tuning before proceeding.
 4. Go-live rehearsal: one dry-run task must complete the full four-gate flow before production implementation tasks.
+
+## 9) Operational Defaults (Approved 2026-02-16)
+1. Reviewer SLA values (`4h` initial, `2h` re-review) are treated as SLO targets in local-only mode; they are monitored and escalated, not direct merge blockers.
+2. If review latency exceeds `24h`, PhaseManager records blocker, owner, and recovery action in `.planning/STATE.md`.
+3. Pinning authority is limited to active package ecosystems in this repository: `requirements.txt` for Python exact pins and `package-lock.json` for Node lock state.
+4. Strong copyleft license blocks apply to direct dependencies. Transitive strong copyleft requires expiration-dated suppression plus replacement plan ownership and target date.
+5. Dev auth bypass is allowed only for local pilot workflows with default OFF, dev-only guard, explicit active banner, and strict prohibition in production-like runtime.
+6. Governance progression order is enforced: validate `07.1`, then execute `07.2`.

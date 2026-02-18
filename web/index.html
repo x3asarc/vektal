@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Supplier Scraper</title>
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge-utils.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f6f6f7;
+            color: #202223;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #6d7175;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #c9cccf;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-area:hover {
+            border-color: #008060;
+            background: #f0f9f7;
+        }
+        
+        .upload-area.dragover {
+            border-color: #008060;
+            background: #f0f9f7;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            background: #008060;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #006e52;
+        }
+        
+        .btn:disabled {
+            background: #c9cccf;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6d7175;
+        }
+        
+        .btn-secondary:hover {
+            background: #5c5f62;
+        }
+        
+        .jobs-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .job-item {
+            border: 1px solid #e1e3e5;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .job-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .job-info p {
+            font-size: 14px;
+            color: #6d7175;
+        }
+        
+        .job-status {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff4e6;
+            color: #b8650b;
+        }
+        
+        .status-processing {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .status-completed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-failed {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e3e5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #008060;
+            transition: width 0.3s;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #008060;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Multi-Supplier Scraper</h1>
+            <p>Upload a CSV file to automatically sync product images, prices, and details from suppliers to Shopify</p>
+        </div>
+        
+        <div class="card">
+            <h2>Upload CSV File</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p style="margin-bottom: 8px; font-weight: 500;">Drag and drop your CSV file here</p>
+                <p style="color: #6d7175; font-size: 14px; margin-bottom: 16px;">or click to browse</p>
+                <input type="file" id="fileInput" class="file-input" accept=".csv">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">Select File</button>
+            </div>
+            <div id="fileInfo" style="margin-top: 16px; display: none;">
+                <p><strong>Selected:</strong> <span id="fileName"></span></p>
+                <button class="btn" id="uploadBtn" onclick="uploadFile()">Start Scraping</button>
+            </div>
+            <div id="message"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Recent Jobs</h2>
+            <div id="jobsList" class="jobs-list">
+                <p style="color: #6d7175; text-align: center; padding: 40px;">No jobs yet. Upload a CSV to get started.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Shopify App Bridge
+        const app = window.appBridge || {};
+        
+        let selectedFile = null;
+        
+        // File input handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                fileName.textContent = selectedFile.name;
+                fileInfo.style.display = 'block';
+            }
+        });
+        
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.name.endsWith('.csv')) {
+                    selectedFile = file;
+                    fileName.textContent = selectedFile.name;
+                    fileInfo.style.display = 'block';
+                } else {
+                    showMessage('Please select a CSV file', 'error');
+                }
+            }
+        });
+        
+        async function uploadFile() {
+            if (!selectedFile) {
+                showMessage('Please select a file first', 'error');
+                return;
+            }
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = 'Uploading... <span class="loading"></span>';
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`Job created successfully! Job ID: ${data.job_id}`, 'success');
+                    fileInfo.style.display = 'none';
+                    selectedFile = null;
+                    fileInput.value = '';
+                    loadJobs();
+                } else {
+                    showMessage(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Error uploading file: ' + error.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = 'Start Scraping';
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function loadJobs() {
+            try {
+                const response = await fetch('/api/jobs');
+                const data = await response.json();
+                
+                if (response.ok && data.jobs && data.jobs.length > 0) {
+                    renderJobs(data.jobs);
+                } else {
+                    document.getElementById('jobsList').innerHTML = 
+                        '<p style="color: #6d7175; text-align: center; padding: 40px;">No jobs yet. Upload a CSV to get started.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+            }
+        }
+        
+        function renderJobs(jobs) {
+            const jobsList = document.getElementById('jobsList');
+            jobsList.innerHTML = jobs.map(job => {
+                const progress = job.total_products > 0 
+                    ? Math.round((job.processed / job.total_products) * 100) 
+                    : 0;
+                
+                return `
+                    <div class="job-item">
+                        <div class="job-info">
+                            <h3>Job #${job.id}</h3>
+                            <p>${job.total_products} products • ${job.processed} processed • ${job.successful} successful</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="job-status status-${job.status}">${job.status}</span>
+                            <button class="btn btn-secondary" style="margin-left: 8px; padding: 6px 12px; font-size: 12px;" 
+                                    onclick="viewJob(${job.id})">View</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function viewJob(jobId) {
+            window.location.href = `/job/${jobId}`;
+        }
+        
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                // Load jobs if authenticated
+                loadJobs();
+                setInterval(loadJobs, 5000);
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        
+        // Check auth and load jobs
+        checkAuth();
+    </script>
+</body>
+</html>

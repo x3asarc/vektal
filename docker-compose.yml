@@ -8,6 +8,13 @@
 #   docker compose logs -f   # View logs (all services)
 #   docker compose logs -f backend  # View specific service logs
 
+x-common-logging: &common-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+    mode: non-blocking
+
 services:
   # ===========================================
   # Nginx Reverse Proxy
@@ -49,6 +56,8 @@ services:
       - backend_data:/app/data
     environment:
       - FLASK_ENV=${FLASK_ENV:-development}
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - FLASK_DEBUG=${FLASK_DEBUG:-1}
       - FLASK_APP=src/app.py
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
@@ -65,9 +74,17 @@ services:
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
       - API_VERSION=${API_VERSION:-2024-01}
+      - APP_URL=${APP_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     # Install missing Phase 4 auth dependencies before starting
     command: >
-      sh -c "pip install --no-cache-dir flask-login flask-session[redis] flask-bcrypt redis itsdangerous flask-mail stripe tenacity &&
+      sh -c "pip install --no-cache-dir flask-login flask-session[redis] flask-bcrypt redis itsdangerous flask-mail stripe tenacity flask-openapi3 flask-limiter flask-compress &&
              python -m flask db upgrade &&
              gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - src.app:app"
     depends_on:
@@ -78,6 +95,7 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    logging: *common-logging
 
   # ===========================================
   # Celery Worker (Background Jobs)
@@ -95,6 +113,8 @@ services:
       - backend_uploads:/app/uploads
       - backend_data:/app/data
     environment:
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -108,7 +128,12 @@ services:
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
       - API_VERSION=${API_VERSION:-2024-01}
-    command: celery -A src.celery_app worker --loglevel=info --concurrency=2
+    command: >
+      celery -A src.celery_app worker
+      --loglevel=info
+      --concurrency=${CELERY_INTERACTIVE_CONCURRENCY:-2}
+      --hostname=interactive@%h
+      -Q control,interactive.t1,interactive.t2,interactive.t3
     depends_on:
       db:
         condition: service_healthy
@@ -117,6 +142,85 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    logging: *common-logging
+
+  # ===========================================
+  # Dedicated Scraper Worker (batch queues)
+  # Isolates high-volume scraping from interactive/control tasks
+  # ===========================================
+  celery_scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    volumes:
+      - ./src:/app/src
+      - ./utils:/app/utils
+      - ./config:/app/config
+      - ./migrations:/app/migrations
+      - backend_uploads:/app/uploads
+      - backend_data:/app/data
+    environment:
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
+      - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
+      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
+    command: >
+      celery -A src.celery_app worker
+      --loglevel=info
+      --concurrency=${CELERY_BATCH_CONCURRENCY:-3}
+      --hostname=batch@%h
+      -Q batch.t1,batch.t2,batch.t3
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    logging: *common-logging
+
+  # ===========================================
+  # Flower monitoring dashboard for Celery workers
+  # ===========================================
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "${FLOWER_PORT:-5555}:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH:-admin:admin}
+    command: >
+      celery -A src.celery_app flower
+      --port=5555
+      --persistent=True
+      --db=/data/flower.db
+      --basic_auth=${FLOWER_BASIC_AUTH:-admin:admin}
+    volumes:
+      - flower_data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+      celery_scraper:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - app-network
+    logging: *common-logging
 
   # ===========================================
   # Next.js Frontend
@@ -136,7 +240,8 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
-      - NEXT_PUBLIC_API_URL=http://localhost/api
+      - NEXT_PRIVATE_API_PROXY_ORIGIN=http://backend:5000
+      - NEXT_PUBLIC_API_BASE_URL=${APP_URL}
     # Install dependencies on first start, then run dev server
     command: sh -c "npm install && npm run dev"
     restart: unless-stopped
@@ -203,6 +308,8 @@ volumes:
     name: shopify_backend_uploads
   backend_data:
     name: shopify_backend_data
+  flower_data:
+    name: shopify_flower_data
 
 # ===========================================
 # Networks

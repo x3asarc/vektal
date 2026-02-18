@@ -9,11 +9,17 @@
 
 ## Role authority boundaries
 1. `PhaseManager`: owns phase state, gate decisions, and closure in `.planning/ROADMAP.md` and `.planning/STATE.md`.
+   - Canonical definition: `ops/governance/roles/phase-manager.md`
 2. `Builder`: implements scoped task from plan and publishes `self-check.md`.
+   - Canonical definition: `ops/governance/roles/builder.md`
 3. `Reviewer`: performs two-pass review and publishes findings; cannot merge or close phase.
+   - Canonical definition: `ops/governance/roles/reviewer.md`
 4. `StructureGuardian`: audits placement/naming/spec, proposes moves through traceable reports.
+   - Canonical definition: `ops/governance/roles/structure-guardian.md`
 5. `IntegrityWarden`: verifies dependencies/imports/licenses/secrets and blocks unsafe package changes.
+   - Canonical definition: `ops/governance/roles/integrity-warden.md`
 6. `ContextCurator`: owns `docs/MASTER_MAP.md` and three-phase journey synthesis.
+   - Canonical definition: `ops/governance/roles/context-curator.md`
 
 ## Gate policy and blocking rules
 1. Block on `Critical` and `High`.
@@ -54,4 +60,4 @@
 8. Task reports: `reports/<phase>/<task>/`.
 9. Three-phase synthesis: `reports/meta/journey-synthesis-<phase-range>.md`.
 10. Governance blueprint reference: `solutionsos/compound-engineering-os-policy.md`.
-
+11. Canonical role definitions: `ops/governance/roles/README.md`.
