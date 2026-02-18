@@ -1,0 +1,113 @@
+name: risk-policy-gate
+
+# Preflight: classify changed files by risk tier and emit required-checks JSON.
+# All other CI jobs declare `needs: [risk-policy-gate]` so this always runs first.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: ["main"]
+
+jobs:
+  classify:
+    name: Classify risk tier
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tier: ${{ steps.classify.outputs.tier }}
+      required_checks: ${{ steps.classify.outputs.required_checks }}
+      block_merge: ${{ steps.classify.outputs.block_merge }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # need HEAD~1 for diff
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Classify changed files
+        id: classify
+        run: |
+          OUTPUT=$(python scripts/governance/risk_tier_gate.py --from-git-diff)
+          echo "$OUTPUT"
+          TIER=$(echo "$OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(d['tier'])")
+          REQUIRED=$(echo "$OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(json.dumps(d['required_checks']))")
+          BLOCK=$(echo "$OUTPUT" | python -c "import sys,json; d=json.load(sys.stdin); print(str(d['block_merge_on_failure']).lower())")
+          echo "tier=$TIER" >> "$GITHUB_OUTPUT"
+          echo "required_checks=$REQUIRED" >> "$GITHUB_OUTPUT"
+          echo "block_merge=$BLOCK" >> "$GITHUB_OUTPUT"
+          echo "### Risk Tier: \`$TIER\`" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo "$OUTPUT" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  governance-validate:
+    name: Governance validate
+    needs: [classify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run governance validator
+        run: python scripts/governance/validate_governance.py
+
+  secret-lint:
+    name: Secret lint
+    needs: [classify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Scan for hardcoded secrets
+        run: |
+          python - <<'PY'
+          import pathlib, re, sys, json
+
+          policy = json.loads(pathlib.Path("risk-policy.json").read_text())
+          patterns = [re.compile(p) for p in policy.get("secret_lint_patterns", [])]
+
+          extensions = {".py", ".yml", ".yaml", ".json", ".sh", ".env.example", ".ts", ".tsx"}
+          skip_dirs = {".git", "node_modules", "__pycache__", ".venv", "venv", ".tox"}
+
+          violations = []
+          root = pathlib.Path(".")
+          for path in root.rglob("*"):
+              if any(part in skip_dirs for part in path.parts):
+                  continue
+              if path.suffix not in extensions:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8", errors="ignore")
+              except OSError:
+                  continue
+              for i, line in enumerate(text.splitlines(), start=1):
+                  for pat in patterns:
+                      if pat.search(line):
+                          violations.append(f"{path}:{i}: {line.strip()[:120]}")
+                          break
+
+          if violations:
+              print("Potential hardcoded secrets detected:")
+              print("\n".join(violations))
+              sys.exit(1)
+          print(f"Secret scan clean — scanned {sum(1 for _ in root.rglob('*'))} paths.")
+          PY

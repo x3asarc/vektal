@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python *.py:*)",
+      "Bash(python -m:*)",
+      "Bash(./venv/Scripts/python.exe:*)",
+      "Bash(pip install:*)",
+      "Bash(pip list:*)",
+      "Bash(pip show:*)",
+      "Bash(pip freeze:*)",
+      "Bash(pip uninstall:*)",
+      "Bash(ls:*)",
+      "Bash(ls -la:*)",
+      "Bash(ls -l:*)",
+      "Bash(dir:*)",
+      "Bash(dir /B:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(grep:*)",
+      "Bash(pwd:*)",
+      "Bash(echo:*)",
+      "Bash(which:*)",
+      "Bash(type:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(git commit:*)",
+      "WebSearch",
+      "WebFetch(domain:shopify.dev)",
+      "mcp__context7__query-docs",
+      "mcp__firecrawl-mcp__firecrawl_search",
+      "mcp__firecrawl-mcp__firecrawl_scrape",
+      "Bash(python:*)",
+      "Bash(timeout /t 15 /nobreak)",
+      "Bash(ping:*)"
+    ]
+  }
+}

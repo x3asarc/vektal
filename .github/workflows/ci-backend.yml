@@ -1,0 +1,198 @@
+name: ci-backend
+
+# Backend CI — runs after risk-policy-gate classifies the change.
+# Standard/Low tiers skip integration tests. Critical/High always run all.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: ["main"]
+
+jobs:
+  risk-policy-gate:
+    name: Risk gate (reuse)
+    uses: ./.github/workflows/risk-policy-gate.yml
+
+  unit-tests:
+    name: Unit tests
+    needs: [risk-policy-gate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379/0
+      FLASK_ENV: testing
+      SECRET_KEY: ci-test-secret-key-not-for-production
+      APP_ENVIRONMENT: test
+      APP_DEPLOY_STAGE: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -x --tb=short -q \
+            --ignore=tests/e2e \
+            --ignore=tests/integration \
+            -m "not integration" \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-fail-under=60
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: .coverage
+          retention-days: 7
+
+  integration-tests:
+    name: Integration tests
+    needs: [risk-policy-gate, unit-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Only run integration tests for critical/high tier changes
+    if: |
+      needs.risk-policy-gate.outputs.tier == 'critical' ||
+      needs.risk-policy-gate.outputs.tier == 'high'
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://test_user:test_pass@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379/0
+      FLASK_ENV: testing
+      SECRET_KEY: ci-test-secret-key-not-for-production
+      APP_ENVIRONMENT: test
+      APP_DEPLOY_STAGE: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run integration tests
+        run: |
+          python -m pytest tests/integration/ tests/api/ -x --tb=short -q \
+            --cov=src \
+            --cov-report=term-missing
+
+  canary-gate:
+    name: Canary rollback gate
+    needs: [risk-policy-gate, unit-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Only for critical-tier changes that touch deployment
+    if: needs.risk-policy-gate.outputs.tier == 'critical'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install pytest
+
+      - name: Validate canary gate CLI
+        run: |
+          python scripts/governance/phase13_canary_gate.py \
+            --baseline 0.99 --canary 0.97 --sample-size 500 --scope-match true
+          if python scripts/governance/phase13_canary_gate.py \
+            --baseline 0.99 --canary 0.90 --sample-size 500 --scope-match true; then
+            echo "ERROR: expected rollback exit code for failing canary gate"
+            exit 1
+          fi
+
+      - name: Run rollback contract tests
+        run: pytest -q tests/jobs/test_canary_rollback_contract.py
+
+  ci-summary:
+    name: CI summary
+    needs: [risk-policy-gate, unit-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Emit summary
+        run: |
+          echo "## CI Backend Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Job | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| risk-policy-gate | ${{ needs.risk-policy-gate.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| unit-tests | ${{ needs.unit-tests.result }} |" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,125 @@
+name: resolve-bot-threads
+
+# Auto-resolve review threads that were opened by a bot and have been addressed.
+# A thread is considered resolved when:
+#   1. It was opened by a bot (contains BOT_MARKER)
+#   2. The SHA in the comment does not match HEAD (stale — the fix was already merged)
+#   3. OR the thread has a reply from a human saying "done", "fixed", "resolved"
+#
+# This prevents bot-only threads from piling up and blocking merges on noise.
+
+on:
+  pull_request:
+    types: [synchronize, closed]
+  schedule:
+    # Sweep stale bot threads nightly
+    - cron: "0 2 * * *"
+
+jobs:
+  resolve-stale-threads:
+    name: Resolve stale bot threads
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Find and resolve stale bot threads
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, sys
+
+          REPO = os.environ.get("GITHUB_REPOSITORY", "")
+          if not REPO:
+              print("Not in GitHub Actions context — skipping")
+              sys.exit(0)
+
+          EVENT_NAME = os.environ.get("GITHUB_EVENT_NAME", "")
+
+          def gh_api(path, method="GET", data=None):
+              cmd = ["gh", "api", path, "--method", method]
+              if data:
+                  cmd += ["--input", "-"]
+              result = subprocess.run(
+                  cmd,
+                  input=json.dumps(data).encode() if data else None,
+                  capture_output=True,
+                  check=False,
+              )
+              if result.returncode != 0:
+                  print(f"API error: {result.stderr.decode()[:200]}", file=sys.stderr)
+                  return None
+              try:
+                  return json.loads(result.stdout)
+              except json.JSONDecodeError:
+                  return result.stdout.decode()
+
+          BOT_MARKER = "<!-- sha-gate-bot -->"
+          RESOLVE_KEYWORDS = {"done", "fixed", "resolved", "addressed", "merged"}
+
+          # Get open PRs
+          if EVENT_NAME == "pull_request":
+              pr_number = os.environ.get("GITHUB_REF", "").split("/")[-2]
+              prs = [{"number": int(pr_number)}] if pr_number.isdigit() else []
+          else:
+              prs_raw = gh_api(f"repos/{REPO}/pulls?state=open&per_page=20") or []
+              prs = prs_raw if isinstance(prs_raw, list) else []
+
+          resolved_count = 0
+
+          for pr in prs:
+              pr_num = pr.get("number")
+              if not pr_num:
+                  continue
+
+              # Get HEAD SHA
+              pr_detail = gh_api(f"repos/{REPO}/pulls/{pr_num}")
+              if not pr_detail:
+                  continue
+              head_sha = pr_detail.get("head", {}).get("sha", "")
+
+              # Get review comments
+              comments = gh_api(f"repos/{REPO}/pulls/{pr_num}/comments?per_page=100") or []
+
+              for comment in (comments if isinstance(comments, list) else []):
+                  body = comment.get("body", "")
+                  comment_id = comment.get("id")
+
+                  if BOT_MARKER not in body:
+                      continue
+
+                  # Extract SHA from bot comment
+                  sha_start = body.find("<!-- sha:")
+                  sha_end = body.find(" -->", sha_start + 9) if sha_start >= 0 else -1
+                  comment_sha = body[sha_start + 9:sha_end] if sha_start >= 0 and sha_end >= 0 else ""
+
+                  # Stale if SHA doesn't match current HEAD
+                  is_stale = comment_sha and comment_sha != head_sha
+
+                  if is_stale:
+                      print(f"PR #{pr_num}: Resolving stale bot comment {comment_id} "
+                            f"(SHA {comment_sha[:8]} → HEAD {head_sha[:8]})")
+                      # Note: resolving individual review comments requires GraphQL
+                      # For now, add a "resolved" reply to mark it done
+                      gh_api(
+                          f"repos/{REPO}/pulls/{pr_num}/comments/{comment_id}/replies",
+                          method="POST",
+                          data={"body": f"<!-- sha-gate-bot --> <!-- sha:{head_sha} -->\n"
+                                        f"_Auto-resolved: this comment was for `{comment_sha[:8]}`, "
+                                        f"HEAD is now `{head_sha[:8]}`._"},
+                      )
+                      resolved_count += 1
+
+          print(f"Resolved {resolved_count} stale bot thread(s).")
+          PY

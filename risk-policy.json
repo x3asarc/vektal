@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_comment": "Machine-readable risk contract. Read by risk_tier_gate.py and ci-backend.yml. Tiers: critical > high > standard > low.",
+  "version": "1.0.0",
+  "tiers": {
+    "critical": {
+      "description": "Production safety, authentication, data destruction, billing",
+      "required_checks": [
+        "risk-policy-gate",
+        "backend-unit-tests",
+        "backend-integration-tests",
+        "governance-validate",
+        "secret-lint",
+        "canary-gate"
+      ],
+      "block_merge_on_failure": true,
+      "min_reviewers": 2,
+      "paths": [
+        "src/assistant/governance/**",
+        "src/assistant/runtime_tier*.py",
+        "src/assistant/delegation.py",
+        "src/core/kill_switch.py",
+        "src/core/field_policy.py",
+        "src/api/v1/auth/**",
+        "src/models/**",
+        "scripts/backup_db.sh",
+        "scripts/restore_db.sh",
+        "docker-compose.yml",
+        "Dockerfile.backend"
+      ]
+    },
+    "high": {
+      "description": "API contracts, task routing, deployment config",
+      "required_checks": [
+        "risk-policy-gate",
+        "backend-unit-tests",
+        "governance-validate",
+        "secret-lint"
+      ],
+      "block_merge_on_failure": true,
+      "min_reviewers": 1,
+      "paths": [
+        "src/api/v1/**",
+        "src/tasks/**",
+        "src/jobs/**",
+        "src/assistant/deployment/**",
+        "src/api/v1/ops/**",
+        ".github/workflows/**",
+        "requirements.txt",
+        "pyproject.toml"
+      ]
+    },
+    "standard": {
+      "description": "Business logic, resolution, enrichment, adapters",
+      "required_checks": [
+        "risk-policy-gate",
+        "backend-unit-tests",
+        "secret-lint"
+      ],
+      "block_merge_on_failure": true,
+      "min_reviewers": 1,
+      "paths": [
+        "src/resolution/**",
+        "src/enrichment/**",
+        "src/vendors/**",
+        "src/scrapers/**",
+        "src/core/**",
+        "frontend/src/**"
+      ]
+    },
+    "low": {
+      "description": "Docs, scripts, tests, config files",
+      "required_checks": [
+        "secret-lint"
+      ],
+      "block_merge_on_failure": false,
+      "min_reviewers": 0,
+      "paths": [
+        "docs/**",
+        "tests/**",
+        "scripts/**",
+        ".planning/**",
+        "reports/**",
+        "*.md",
+        "*.json",
+        "*.yml"
+      ]
+    }
+  },
+  "override_to_critical": [
+    "src/assistant/governance/kill_switch.py",
+    "src/assistant/governance/field_policy.py",
+    "src/assistant/governance/verification_oracle.py"
+  ],
+  "secret_lint_patterns": [
+    "(?i)(api[_-]?key|secret|token|password)\\s*[:=]\\s*['\"](?!\\$\\{)(?!test[-_]?key)(?!super[-_]?secret)(?!tok[-_]?\\d)(?!fake)(?!dummy)(?!example)[^'\"]{12,}['\"]"
+  ],
+  "secret_lint_skip_paths": [
+    "tests/",
+    "frontend/src/**/*.test.*",
+    "frontend/src/**/*.spec.*"
+  ],
+  "tier_resolution": "highest_match_wins"
+}

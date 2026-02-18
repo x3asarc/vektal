@@ -1,0 +1,126 @@
+name: review-agent-rerun
+
+# Single rerun-comment writer with SHA dedupe.
+# Triggered by review comments containing `/rerun <check>`.
+# Emits ONE idempotent SHA-pinned comment per (commit, check) pair.
+# Stale comments (wrong SHA) are detected by sha_gate.py and ignored.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  handle-rerun:
+    name: Handle /rerun command
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Only act on /rerun commands in PR comments
+    if: |
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/rerun')
+
+    permissions:
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Parse rerun command
+        id: parse
+        run: |
+          BODY="${{ github.event.comment.body }}"
+          CHECK=$(echo "$BODY" | awk '{print $2}')
+          if [ -z "$CHECK" ]; then
+            CHECK="ci-backend"
+          fi
+          echo "check=$CHECK" >> "$GITHUB_OUTPUT"
+
+      - name: Get PR HEAD SHA
+        id: pr-sha
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          SHA=$(gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing rerun comment (SHA dedup)
+        id: dedup
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          HEAD_SHA="${{ steps.pr-sha.outputs.sha }}"
+          CHECK="${{ steps.parse.outputs.check }}"
+
+          # Fetch existing bot comments
+          gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq '[.[] | select(.body | contains("<!-- sha-gate-bot -->"))]' \
+            > /tmp/bot_comments.json
+
+          # Check for stale + dedup
+          python scripts/governance/sha_gate.py \
+            --head-sha "$HEAD_SHA" \
+            --comments-file /tmp/bot_comments.json > /tmp/sha_check.json || true
+
+          STALE_COUNT=$(python -c "import json; d=json.load(open('/tmp/sha_check.json')); print(d.get('stale_count',0))")
+          echo "stale_count=$STALE_COUNT" >> "$GITHUB_OUTPUT"
+
+          # Check if identical (sha+check) comment already exists
+          DEDUP_KEY=$(python -c "
+          import hashlib, sys
+          key = hashlib.sha256(b'$HEAD_SHA:$CHECK').hexdigest()[:12]
+          import json
+          comments = json.load(open('/tmp/bot_comments.json'))
+          found = any(f'<!-- dedup:{key} -->' in c.get('body','') for c in comments)
+          print('true' if found else 'false')
+          ")
+          echo "already_posted=$DEDUP_KEY" >> "$GITHUB_OUTPUT"
+
+      - name: Post rerun comment
+        if: steps.dedup.outputs.already_posted == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          HEAD_SHA="${{ steps.pr-sha.outputs.sha }}"
+          CHECK="${{ steps.parse.outputs.check }}"
+          PR_NUMBER="${{ github.event.issue.number }}"
+          REQUESTER="${{ github.event.comment.user.login }}"
+
+          BODY=$(python scripts/governance/sha_gate.py \
+            --emit-rerun \
+            --head-sha "$HEAD_SHA" \
+            --check "$CHECK" \
+            --context "Requested by @${REQUESTER}")
+
+          gh pr comment "$PR_NUMBER" --body "$BODY"
+          echo "Rerun comment posted for check=$CHECK sha=${HEAD_SHA:0:8}"
+
+      - name: Skip (already posted)
+        if: steps.dedup.outputs.already_posted == 'true'
+        run: |
+          echo "Rerun comment for ${{ steps.parse.outputs.check }} @ ${{ steps.pr-sha.outputs.sha }} already exists — skipping duplicate."
+
+      - name: Trigger workflow rerun
+        if: steps.dedup.outputs.already_posted == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CHECK="${{ steps.parse.outputs.check }}"
+          PR_NUMBER="${{ github.event.issue.number }}"
+          HEAD_SHA="${{ steps.pr-sha.outputs.sha }}"
+
+          echo "Would trigger rerun of '$CHECK' for SHA ${HEAD_SHA:0:8} on PR #$PR_NUMBER"
+          # In a real setup with workflow_dispatch or re-run API:
+          # gh workflow run "$CHECK.yml" --ref "$HEAD_SHA"
+          # For now: emit the comment as the signal; human or bot picks it up.

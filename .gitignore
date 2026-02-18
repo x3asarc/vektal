@@ -1,57 +1,125 @@
-# Python
+# =============================================================================
+# Shopify Multi-Supplier Platform — .gitignore
+# =============================================================================
+
+# --- Secrets & environment (NEVER commit) ---
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# --- Python ---
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.tox/
+.venv/
 venv/
 env/
-ENV/
-.venv
+.Python
+pip-log.txt
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
 
-# Flask
-instance/
-.webassets-cache
+# --- Node / Next.js ---
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/tsconfig.tsbuildinfo
+.npm
 
-# Database
-*.db
+# --- Playwright / test artifacts ---
+test-results/
+playwright-report/
+*.trace.zip
+
+# --- Logs ---
+logs/
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+
+# --- Docker ---
+docker-compose.override.yml
+
+# --- Database / data (potentially large or sensitive) ---
 *.sqlite
 *.sqlite3
-backups/
+*.db
+data/
+results/
 
-# Environment variables
-.env
-.env.local
-
-# Uploads
-uploads/
-*.csv
-
-# IDE
-.vscode/
+# --- IDE ---
 .idea/
+.vscode/
 *.swp
 *.swo
-
-# OS
+*~
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-live_run.log
+# --- Windows artifacts ---
+desktop.ini
+nul
 
-# Archive
-csv_archive/
-not_found.csv
-push_proof.csv
-preview_results.csv
-batch_*_preview.csv
+# --- Broken pip fragments found in root ---
+=3.1.0
+=4.0.0
+=42.0.0
 
-# Temporary and debug directories
+# --- Screenshots / binary media (use test-results/ for evidence) ---
+"Screenshot *.png"
+reports/meta/*.png
+reports/meta/*.json
+
+# --- Playwright evidence (committed only when promoting to CI artifacts) ---
+test-results/
+
+# --- Project-specific large/external dirs not part of the platform ---
+awesome-claude-code/
+codexclaude/
+quickcleanup/
+side-project/
+universal_vendor_scraper/
+.minimax/
+.agents/
+
+# --- One-off setup scripts (not platform code) ---
+install-scoop.ps1
+INSTALL_SCOOP.md
+stripe-webhook-local.bat
+test-stripe-webhooks.bat
+setup-stripe-webhooks.bat
+STRIPE_WEBHOOK_SETUP.md
+
+# --- Temp dirs ---
 temp/
-screenshots/
 
-# Docker secrets (never commit actual secrets)
-secrets/*
-!secrets/.gitkeep
+# --- Screenshots in root ---
+*.png
+
+# --- Archive backups ---
+archive/image_scraper_backup_*.py

@@ -1,0 +1,102 @@
+name: phase13-deploy-guard
+
+on:
+  pull_request:
+    paths:
+      - "docker-compose.yml"
+      - "Dockerfile.backend"
+      - "scripts/backup_db.sh"
+      - "scripts/restore_db.sh"
+      - "scripts/governance/phase13_canary_gate.py"
+      - "src/assistant/deployment/**"
+      - "src/api/v1/ops/**"
+      - "tests/api/test_redaction_retention_contract.py"
+      - "tests/jobs/test_canary_rollback_contract.py"
+      - ".github/workflows/phase13-deploy-guard.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "docker-compose.yml"
+      - "Dockerfile.backend"
+      - "scripts/backup_db.sh"
+      - "scripts/restore_db.sh"
+      - "scripts/governance/phase13_canary_gate.py"
+      - "src/assistant/deployment/**"
+      - "src/api/v1/ops/**"
+      - "tests/api/test_redaction_retention_contract.py"
+      - "tests/jobs/test_canary_rollback_contract.py"
+      - ".github/workflows/phase13-deploy-guard.yml"
+
+jobs:
+  deploy-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install minimal test deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+
+      - name: Validate canary rollback guard CLI
+        run: |
+          python scripts/governance/phase13_canary_gate.py --baseline 0.99 --canary 0.97 --sample-size 500 --scope-match true
+          if python scripts/governance/phase13_canary_gate.py --baseline 0.99 --canary 0.90 --sample-size 500 --scope-match true; then
+            echo "expected rollback exit code for failing canary gate"
+            exit 1
+          fi
+
+      - name: Verify backup and restore hooks are wired
+        run: |
+          test -f scripts/backup_db.sh
+          test -f scripts/restore_db.sh
+          grep -q "pg_dump" scripts/backup_db.sh
+          grep -q "pg_restore" scripts/restore_db.sh
+
+      - name: Enforce non-root and environment separation
+        run: |
+          grep -Eq "^USER\\s+appuser$" Dockerfile.backend
+          grep -q "APP_ENVIRONMENT" docker-compose.yml
+          grep -q "APP_DEPLOY_STAGE" docker-compose.yml
+
+      - name: Lightweight secret lint on deploy-critical files
+        run: |
+          python - <<'PY'
+          import pathlib
+          import re
+          import sys
+
+          targets = [
+              "docker-compose.yml",
+              "Dockerfile.backend",
+              "src/api/v1/ops/routes.py",
+              "src/assistant/deployment/provider_router.py",
+              "src/assistant/deployment/redaction.py",
+              "scripts/backup_db.sh",
+              "scripts/restore_db.sh",
+          ]
+          pattern = re.compile(r"(?i)(api[_-]?key|secret|token|password)\\s*[:=]\\s*['\\\"](?!\\$\\{)[^'\\\"]{8,}['\\\"]")
+          violations = []
+          for rel in targets:
+              path = pathlib.Path(rel)
+              text = path.read_text(encoding="utf-8")
+              for i, line in enumerate(text.splitlines(), start=1):
+                  if pattern.search(line):
+                      violations.append(f"{rel}:{i}:{line.strip()}")
+          if violations:
+              print("Potential hardcoded secrets detected:")
+              print("\\n".join(violations))
+              sys.exit(1)
+          print("No hardcoded secrets detected in deploy-critical files.")
+          PY
+
+      - name: Run rollback contract tests
+        run: |
+          pytest -q tests/jobs/test_canary_rollback_contract.py
