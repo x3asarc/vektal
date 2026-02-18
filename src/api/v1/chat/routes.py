@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import queue
 import threading
 import uuid
 from datetime import datetime, timezone
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from flask import Response, request, stream_with_context
 from flask_login import current_user, login_required
@@ -252,7 +255,85 @@ def _resolve_store_id_or_error(requested_store_id: int | None):
     return user_store.id, None
 
 
-def _build_assistant_blocks(route_result, *, extra_blocks: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
+def _generate_ai_reply(user_message: str, intent_type: str, handler_message: str) -> str | None:
+    """
+    Call OpenRouter to generate a conversational AI reply.
+
+    Used when intent is UNKNOWN or the handler returns a generic fallback,
+    so the user gets a natural language response instead of static boilerplate.
+
+    Returns None on any failure ? callers fall back to handler_message.
+    """
+    import os
+    import json as _json
+    import requests as _requests
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        return None
+
+    system_prompt = (
+        "You are a helpful assistant for a Shopify product management platform. "
+        "The platform helps store owners manage products across multiple craft/hobby "
+        "suppliers (8+ vendors, 4000+ SKUs). "
+        "You can help users add products by SKU, update product data, search for vendors, "
+        "discover new vendor sites, list vendors, and check system status. "
+        "Keep replies concise and friendly. If the user asks something you can act on, "
+        "tell them the exact command to use. If it's a greeting or small talk, respond naturally "
+        "and invite them to try a command."
+    )
+
+    context = (
+        f"The user said: \"{user_message}\"\n"
+        f"Classified intent: {intent_type}\n"
+        f"Default handler response: {handler_message}\n\n"
+        "Generate a friendly, helpful reply (1-3 sentences). "
+        "If the intent is 'unknown', guide the user toward useful commands."
+    )
+
+    primary_model = os.getenv("OPENROUTER_TEXT_MODEL", "google/gemini-2.0-flash-001")
+    fallback_model = os.getenv("OPENROUTER_TEXT_FALLBACK_MODEL", "openai/gpt-4o-mini")
+    candidate_models = list(dict.fromkeys(model for model in [primary_model, fallback_model] if model))
+
+    try:
+        for model in candidate_models:
+            resp = _requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://vektal.systems",
+                    "X-Title": "Vektal Platform",
+                },
+                json={
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": context},
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 200,
+                },
+                timeout=8,
+            )
+            if resp.status_code == 404:
+                logger.warning("AI reply model unavailable on OpenRouter: %s", model)
+                continue
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"].strip()
+        logger.warning("AI reply generation skipped: no available OpenRouter models from %s", candidate_models)
+        return None
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("AI reply generation failed: %s", exc)
+        return None
+
+
+def _build_assistant_blocks(
+    route_result,
+    *,
+    extra_blocks: list[dict[str, Any]] | None = None,
+    raw_user_message: str = "",
+) -> list[dict[str, Any]]:
     response_payload = route_result.response or {}
     blocks: list[ChatBlock] = []
 
@@ -260,8 +341,25 @@ def _build_assistant_blocks(route_result, *, extra_blocks: list[dict[str, Any]] 
         blocks.append(ChatBlock(type="alert", text=route_result.error))
 
     primary_text = response_payload.get("message")
+    intent_type = route_result.intent.type.value
+
+    # When intent is UNKNOWN or no handler message was set, generate a
+    # conversational AI reply instead of showing static boilerplate.
+    _needs_ai_reply = (
+        intent_type == IntentType.UNKNOWN.value
+        or not primary_text
+    )
+    if _needs_ai_reply and raw_user_message:
+        ai_reply = _generate_ai_reply(
+            user_message=raw_user_message,
+            intent_type=intent_type,
+            handler_message=primary_text or "",
+        )
+        if ai_reply:
+            primary_text = ai_reply
+
     if not primary_text:
-        primary_text = f"Intent classified as `{route_result.intent.type.value}`."
+        primary_text = f"Intent classified as `{intent_type}`."
     blocks.append(ChatBlock(type="text", text=primary_text))
 
     if isinstance(response_payload.get("commands"), list):
@@ -733,7 +831,11 @@ def create_message(session_id: int):
     extra_blocks = list(prepared_action.assistant_blocks) if prepared_action else []
     if semantic_block:
         extra_blocks.append(semantic_block)
-    assistant_blocks = _build_assistant_blocks(route_result, extra_blocks=extra_blocks or None)
+    assistant_blocks = _build_assistant_blocks(
+        route_result,
+        extra_blocks=extra_blocks or None,
+        raw_user_message=payload.content,
+    )
     assistant_content = next(
         (block.get("text") for block in assistant_blocks if block.get("type") == "text" and block.get("text")),
         "Acknowledged.",
@@ -1504,3 +1606,4 @@ def stream_session(session_id: int):
             "X-Accel-Buffering": "no",
         },
     )
+

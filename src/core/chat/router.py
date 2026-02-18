@@ -14,6 +14,7 @@ INTEGRATION NOTES:
 
 import re
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Optional, Callable, Any
 from enum import Enum
@@ -256,9 +257,10 @@ class APILLMClassifier:
     Handles ~5% of ambiguous queries.
     """
 
-    def __init__(self, api_key: str = None):
-        import os
+    def __init__(self, api_key: str = None, model: str = None, fallback_model: str = None):
         self.api_key = api_key or os.getenv('OPENROUTER_API_KEY')
+        self.model = model or os.getenv("OPENROUTER_TEXT_MODEL", "google/gemini-2.0-flash-001")
+        self.fallback_model = fallback_model or os.getenv("OPENROUTER_TEXT_FALLBACK_MODEL", "openai/gpt-4o-mini")
 
     def classify(self, message: str) -> Optional[Intent]:
         """
@@ -300,21 +302,43 @@ Return JSON:
 {{"intent": "intent_name", "confidence": 0-100, "sku": "extracted_sku_or_null"}}"""
 
         try:
-            response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "google/gemini-flash-1.5",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.1,
-                    "max_tokens": 100
-                },
-                timeout=10
-            )
-            response.raise_for_status()
+            candidate_models = [self.model, self.fallback_model]
+            # Preserve order while removing duplicates.
+            candidate_models = list(dict.fromkeys(model for model in candidate_models if model))
+
+            response = None
+            selected_model = None
+            for candidate in candidate_models:
+                resp = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": candidate,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": 0.1,
+                        "max_tokens": 100
+                    },
+                    timeout=10
+                )
+                if resp.status_code == 404:
+                    logger.warning("API classification model unavailable on OpenRouter: %s", candidate)
+                    continue
+                resp.raise_for_status()
+                response = resp
+                selected_model = candidate
+                break
+
+            if response is None:
+                logger.error("API classification failed: no available OpenRouter models from %s", candidate_models)
+                return Intent(
+                    type=IntentType.UNKNOWN,
+                    confidence=0.0,
+                    raw_message=message,
+                    method="api_llm"
+                )
 
             content = response.json()['choices'][0]['message']['content']
             content = content.strip()
@@ -341,7 +365,7 @@ Return JSON:
                 confidence=round(confidence, 2),
                 entities=entities,
                 raw_message=message,
-                method="api_llm"
+                method=f"api_llm:{selected_model}"
             )
 
         except Exception as e:
@@ -458,3 +482,4 @@ class ChatRouter:
                 handler_name=intent.type.value,
                 error=str(e)
             )
+

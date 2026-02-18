@@ -24,8 +24,10 @@ services:
     image: nginx:1.25
     ports:
       - "${NGINX_PORT:-80}:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       backend:
         condition: service_started
@@ -190,6 +192,49 @@ services:
     logging: *common-logging
 
   # ===========================================
+  # Assistant runtime worker - handles assistant.t1/t2/t3 queues
+  # Previously missing: tasks sent to these queues queued indefinitely
+  # ===========================================
+  celery_assistant:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    volumes:
+      - ./src:/app/src
+      - ./utils:/app/utils
+      - ./config:/app/config
+      - ./migrations:/app/migrations
+      - backend_uploads:/app/uploads
+      - backend_data:/app/data
+    environment:
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
+      - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
+    command: >
+      celery -A src.celery_app worker
+      --loglevel=info
+      --concurrency=${CELERY_ASSISTANT_CONCURRENCY:-2}
+      --hostname=assistant@%h
+      -Q assistant.t1,assistant.t2,assistant.t3,assistant.t3.dlq
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+    logging: *common-logging
+
+  # ===========================================
   # Flower monitoring dashboard for Celery workers
   # ===========================================
   flower:
@@ -317,3 +362,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+
