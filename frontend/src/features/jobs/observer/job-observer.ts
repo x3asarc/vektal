@@ -5,6 +5,7 @@ export type BackendJobStatus =
   | "cancel_requested"
   | "completed"
   | "failed"
+  | "failed_terminal"
   | "cancelled";
 
 export type ObservedLifecycle =
@@ -28,6 +29,7 @@ export function mapBackendStatusToLifecycle(status: string): ObservedLifecycle {
     case "completed":
       return "success";
     case "failed":
+    case "failed_terminal":
       return "error";
     case "cancelled":
       return "cancelled";

@@ -45,6 +45,7 @@ class ChatSessionListResponse(BaseModel):
 class ChatMessageCreateRequest(BaseModel):
     content: str = Field(min_length=1, max_length=4000)
     idempotency_key: Optional[str] = Field(default=None, max_length=128)
+    correlation_id: Optional[str] = Field(default=None, max_length=96)
     action_hints: Optional[dict[str, Any]] = None
 
 
@@ -99,6 +100,96 @@ class ChatStreamEnvelope(BaseModel):
     event: str
     emitted_at: datetime
     payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class ChatRouteRequest(BaseModel):
+    content: str = Field(min_length=1, max_length=4000)
+    store_id: Optional[int] = None
+    session_id: Optional[int] = None
+    correlation_id: Optional[str] = Field(default=None, max_length=96)
+    provider_failure_stage: Optional[str] = Field(default=None, max_length=64)
+    provider_budget_percent: Optional[float] = Field(default=None, ge=0, le=100)
+    rbac_role: str = Field(default="member", max_length=64)
+    active_integrations: Optional[dict[str, bool]] = None
+
+
+class EffectiveTool(BaseModel):
+    tool_id: str
+    risk_class: str
+    mutates_data: bool
+    requires_integration: Optional[str] = None
+    required_role: Optional[str] = None
+
+
+class ChatRouteResponse(BaseModel):
+    route_decision: Literal["tier_1", "tier_2", "tier_3", "blocked"]
+    correlation_id: Optional[str] = None
+    confidence: float
+    intent_type: str
+    classifier_method: str
+    approval_mode: str
+    fallback_stage: Optional[str] = None
+    suggested_escalation: Optional[str] = None
+    reasons: list[str] = Field(default_factory=list)
+    effective_toolset: list[EffectiveTool] = Field(default_factory=list)
+    explainability_payload: dict[str, Any] = Field(default_factory=dict)
+    runtime_payload: dict[str, Any] = Field(default_factory=dict)
+    provider_route: dict[str, Any] = Field(default_factory=dict)
+    route_event_id: Optional[int] = None
+    policy_snapshot_hash: Optional[str] = None
+    effective_toolset_hash: Optional[str] = None
+
+
+class ChatToolsResolveRequest(BaseModel):
+    store_id: Optional[int] = None
+    rbac_role: str = Field(default="member", max_length=64)
+    active_integrations: Optional[dict[str, bool]] = None
+
+
+class ChatToolsResolveResponse(BaseModel):
+    effective_toolset: list[EffectiveTool] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class ChatMemoryRetrieveRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=2000)
+    top_k: int = Field(default=5, ge=1, le=20)
+    scope: Literal["team", "user"] = "team"
+    store_id: Optional[int] = None
+
+
+class ChatMemoryFactResponse(BaseModel):
+    fact_id: int
+    fact_key: str
+    fact_value_text: str
+    source: str
+    trust_score: float
+    relevance_score: float
+    provenance: dict[str, Any] = Field(default_factory=dict)
+    expires_at: Optional[str] = None
+
+
+class ChatMemoryRetrieveResponse(BaseModel):
+    items: list[ChatMemoryFactResponse] = Field(default_factory=list)
+    total: int
+
+
+class ChatDelegateRequest(BaseModel):
+    parent_request_id: Optional[str] = Field(default=None, max_length=64)
+    requested_tools: list[str] = Field(default_factory=list)
+    depth: int = Field(default=1, ge=1, le=10)
+    fan_out: int = Field(default=1, ge=1, le=20)
+    budget: Optional[dict[str, Any]] = None
+
+
+class ChatDelegateResponse(BaseModel):
+    delegation_event_id: int
+    status: str
+    worker_tool_scope: list[str] = Field(default_factory=list)
+    blocked_tools: list[str] = Field(default_factory=list)
+    task_id: Optional[str] = None
+    queue: Optional[str] = None
+    reason: Optional[str] = None
 
 
 class ProductActionFieldOverride(BaseModel):

@@ -10,6 +10,7 @@ from sqlalchemy import and_
 
 from src.celery_app import app as celery_app
 from src.jobs.checkpoints import crossed_checkpoints, upsert_checkpoint_intents
+from src.jobs.progress import announce_job_progress
 from src.jobs.queueing import normalize_tier, queue_for_tier
 from src.models import (
     IngestChunk,
@@ -88,6 +89,7 @@ def start_ingest(job_id: int, store_id: int, user_id: int, chunk_size: int = DEF
         job.completed_at = _now()
         job.terminal_reason = "cancel_requested_before_queue"
         db.session.commit()
+        announce_job_progress(job_id=job.id, job=job)
         return {
             "job_id": job.id,
             "store_id": store_id,
@@ -115,6 +117,9 @@ def start_ingest(job_id: int, store_id: int, user_id: int, chunk_size: int = DEF
     job.failed_items = 0
     job.status = JobStatus.QUEUED
     job.started_at = _now()
+    params = dict(job.parameters or {})
+    params["current_step"] = "searching_shopify"
+    job.parameters = params
 
     chunks: list[IngestChunk] = []
     for idx, product_ids in enumerate(_split_chunks(ordered_ids, chunk_size)):
@@ -146,6 +151,7 @@ def start_ingest(job_id: int, store_id: int, user_id: int, chunk_size: int = DEF
         )
         chunk.task_id = async_result.id
     db.session.commit()
+    announce_job_progress(job_id=job.id, job=job)
 
     return {
         "job_id": job.id,
@@ -262,7 +268,18 @@ def ingest_chunk(job_id: int, store_id: int, chunk_idx: int) -> dict:
         total_products=job.total_products,
     )
     upsert_checkpoint_intents(db.session, job=job, checkpoints=checkpoints)
+    params = dict(job.parameters or {})
+    if new_count <= max(int(job.total_products or 0), 1) * 0.35:
+        params["current_step"] = "searching_supplier_data"
+    elif new_count <= max(int(job.total_products or 0), 1) * 0.7:
+        params["current_step"] = "scraping_web"
+    elif new_count < int(job.total_products or 0):
+        params["current_step"] = "analyzing_images"
+    else:
+        params["current_step"] = "applying_updates"
+    job.parameters = params
     db.session.commit()
+    announce_job_progress(job_id=job.id, job=job)
 
     return {
         "processed_actual": processed_actual,
@@ -270,3 +287,18 @@ def ingest_chunk(job_id: int, store_id: int, chunk_idx: int) -> dict:
         "processed_count": new_count,
         "checkpoints_created": checkpoints,
     }
+
+
+def enqueue_resolution_apply(*, batch_id: int, tier: str | None = None, actor_user_id: int | None = None, mode: str | None = None) -> dict:
+    """Queue Phase 8 resolution apply task using tier-routed batch queues."""
+    target_queue = queue_for_tier(tier, kind="batch")
+    task = celery_app.send_task(
+        "src.tasks.resolution_apply.apply_resolution_batch",
+        kwargs={
+            "batch_id": batch_id,
+            "actor_user_id": actor_user_id,
+            "mode": mode,
+        },
+        queue=target_queue,
+    )
+    return {"task_id": task.id, "queue": target_queue}

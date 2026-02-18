@@ -115,3 +115,31 @@ export async function applyChatAction(
     },
   );
 }
+
+export async function delegateChatAction(
+  sessionId: number,
+  actionId: number,
+  input: {
+    parent_request_id?: string;
+    requested_tools?: string[];
+    depth?: number;
+    fan_out?: number;
+    budget?: Record<string, unknown>;
+  } = {},
+) {
+  return apiRequest<{
+    delegation_event_id: number;
+    status: string;
+    worker_tool_scope: string[];
+    blocked_tools: string[];
+    task_id?: string | null;
+    queue?: string | null;
+    reason?: string | null;
+  }, typeof input>(
+    `/api/v1/chat/sessions/${sessionId}/actions/${actionId}/delegate`,
+    {
+      method: "POST",
+      body: input,
+    },
+  );
+}

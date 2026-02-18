@@ -7,6 +7,9 @@ export type JobTerminalEvent = {
   jobId: number;
   status: TerminalStatus;
   message: string;
+  detail?: string;
+  jobUrl?: string;
+  resultsUrl?: string;
   occurredAt: number;
 };
 
@@ -82,6 +85,20 @@ export function JobTerminalNotifications({
           <li key={event.key}>
             <strong>{event.status}</strong>
             : {event.message}
+            {event.detail && (
+              <>
+                {" "}
+                <span className="muted">{event.detail}</span>
+              </>
+            )}
+            {(event.jobUrl || event.resultsUrl) && (
+              <span>
+                {" "}
+                {event.jobUrl && <a href={event.jobUrl}>Open job</a>}
+                {event.jobUrl && event.resultsUrl && " | "}
+                {event.resultsUrl && <a href={event.resultsUrl}>View results</a>}
+              </span>
+            )}
           </li>
         ))}
       </ul>

@@ -24,9 +24,7 @@ const SESSION_STREAMS = new Map<number, SessionStreamEntry>();
 
 function resolveApiBase(): string {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-    return "http://localhost:5000";
-  }
+  // Default to same-origin so /api/* requests use Next.js rewrite proxy in dev.
   return "";
 }
 

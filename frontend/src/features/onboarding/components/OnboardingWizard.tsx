@@ -15,7 +15,8 @@ import {
   useStartImportMutation,
 } from "@/features/onboarding/api/onboarding-mutations";
 import { setGuardFlags } from "@/lib/auth/session-flags";
-import { ApiClientError } from "@/lib/api/client";
+import { apiRequest, ApiClientError } from "@/lib/api/client";
+import { useJobDetailObserver } from "@/features/jobs/hooks/useJobDetailObserver";
 
 function nextState(
   state: OnboardingState,
@@ -43,10 +44,26 @@ export function OnboardingWizard() {
   const [state, setState] = useState(INITIAL_ONBOARDING_STATE);
   const [shopDomain, setShopDomain] = useState("example.myshopify.com");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const [retrying, setRetrying] = useState(false);
   const [authUrl, setAuthUrl] = useState<string | null>(null);
+  const [activeJobId, setActiveJobId] = useState<number | string | null>(null);
   const [isRedirectingToShopify, setIsRedirectingToShopify] = useState(false);
   const connectMutation = useConnectShopifyMutation();
   const startMutation = useStartImportMutation();
+  const observed = useJobDetailObserver(activeJobId);
+
+  function redirectToTopWindow(url: string) {
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch {
+      // Ignore cross-origin access errors and fallback to same-window redirect.
+    }
+    window.location.assign(url);
+  }
 
   function setUiError(error: unknown) {
     if (error instanceof ApiClientError) {
@@ -108,7 +125,7 @@ export function OnboardingWizard() {
                   }
                   setAuthUrl(result.auth_url);
                   setIsRedirectingToShopify(true);
-                  window.location.assign(result.auth_url);
+                  redirectToTopWindow(result.auth_url);
                 })
                 .catch((error: unknown) => {
                   setIsRedirectingToShopify(false);
@@ -179,7 +196,8 @@ export function OnboardingWizard() {
                   ingestPath: state.ingestPath ?? "sync_store",
                   includeAll: true,
                 })
-                .then(() => {
+                .then((result) => {
+                  setActiveJobId(result.job_id);
                   setState((prev) => nextState(prev, "start"));
                 })
                 .catch(setUiError);
@@ -193,6 +211,78 @@ export function OnboardingWizard() {
       {state.step === "import_progress" && (
         <div style={{ display: "grid", gap: 8 }}>
           <p>Import in progress. You can navigate away without blocking.</p>
+          {observed.job ? (
+            <>
+              <div className="progress-shell" aria-label="onboarding-progress">
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${Math.max(0, Math.min(100, observed.job.percent_complete ?? 0))}%`,
+                  }}
+                />
+              </div>
+              <p className="muted">
+                {Number(observed.job.percent_complete ?? 0).toFixed(1)}% complete
+              </p>
+              <p className="muted">
+                Step: <strong>{observed.job.current_step_label ?? observed.job.current_step ?? "Queued"}</strong>
+              </p>
+              <p className="muted">
+                ETA: <strong>{typeof observed.job.eta_seconds === "number" ? `${observed.job.eta_seconds}s` : "Calculating ETA..."}</strong>
+              </p>
+              <p className="muted">
+                Processed: <strong>{observed.job.processed_items ?? 0}</strong> / <strong>{observed.job.total_items ?? 0}</strong>
+              </p>
+              {observed.job.error_message && (
+                <p className="muted" style={{ color: "var(--error)" }}>
+                  {observed.job.error_message}
+                </p>
+              )}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {observed.job.results_url && (
+                  <a href={observed.job.results_url}>View results</a>
+                )}
+                {activeJobId && (
+                  <a href={`/jobs/${activeJobId}`}>Open job detail</a>
+                )}
+                {observed.job.can_retry && activeJobId && (
+                  <button
+                    type="button"
+                    disabled={retrying}
+                    onClick={() => {
+                      setRetryError(null);
+                      setRetrying(true);
+                      void apiRequest<{ job_id: number }>(`/api/v1/jobs/${activeJobId}/retry`, { method: "POST" })
+                        .then((result) => {
+                          setActiveJobId(result.job_id);
+                        })
+                        .catch((reason: unknown) => {
+                          if (reason instanceof ApiClientError) {
+                            setRetryError(`${reason.normalized.detail} (HTTP ${reason.normalized.status})`);
+                          } else if (reason instanceof Error) {
+                            setRetryError(reason.message);
+                          } else {
+                            setRetryError("Retry request failed.");
+                          }
+                        })
+                        .finally(() => {
+                          setRetrying(false);
+                        });
+                    }}
+                  >
+                    {retrying ? "Retrying..." : "Retry import"}
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="muted">Waiting for live job status...</p>
+          )}
+          {retryError && (
+            <p className="muted" style={{ color: "var(--error)" }}>
+              {retryError}
+            </p>
+          )}
           <button
             type="button"
             onClick={() => {

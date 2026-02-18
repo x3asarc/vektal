@@ -38,7 +38,7 @@ app = create_openapi_app()
 # Shopify App Configuration
 SHOPIFY_API_KEY = get_secret('SHOPIFY_API_KEY') or os.getenv('SHOPIFY_CLIENT_ID')
 SHOPIFY_API_SECRET = get_secret('SHOPIFY_API_SECRET') or os.getenv('SHOPIFY_CLIENT_SECRET')
-SHOPIFY_API_SCOPES = 'read_products,write_products,read_inventory,write_inventory,write_files'
+SHOPIFY_API_SCOPES = 'read_products,write_products,read_inventory,write_inventory,read_locations,write_files'
 SHOPIFY_API_VERSION = os.getenv('API_VERSION', '2024-01')
 APP_URL = os.getenv('APP_URL', 'http://localhost:5000')
 
@@ -100,15 +100,7 @@ def index():
         return render_template('auth_required.html')
     return render_template('index.html')
 
-@app.route('/health')
-def health():
-    """Health check endpoint with database connectivity check."""
-    try:
-        # Test database connection
-        db.session.execute(db.text('SELECT 1'))
-        return jsonify({'status': 'ok', 'database': 'connected'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'database': 'disconnected', 'error': str(e)}), 500
+# /health endpoint moved to src/api/app.py (OpenAPI)
 
 @app.route('/auth/shopify')
 def legacy_shopify_auth():

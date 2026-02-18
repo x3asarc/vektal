@@ -105,16 +105,16 @@
 
 ### Product Enrichment Protocol v2 Integration (ENRICHV2)
 
-- [ ] **ENRICHV2-01**: Canonical enrichment v2 path replaces duplicate 2.2 + side-project execution paths
-- [ ] **ENRICHV2-02**: Mandatory Shopify capability/schema/scope audit before enrichment write planning
-- [ ] **ENRICHV2-03**: Merchant-first conflict arbitration with deterministic Oracle decision contract
-- [ ] **ENRICHV2-04**: Profile gears (`Quick`, `Standard`, `Deep`) with tier-aware execution controls
-- [ ] **ENRICHV2-05**: Broad retrieval-ready payload with product-class eligibility matrix
-- [ ] **ENRICHV2-06**: Reusable Oracle adapters for content/visual/policy arbitration (with Phase 13 execution oracle continuity)
-- [ ] **ENRICHV2-07**: Hash/idempotent rerun behavior and bounded transient retry controls
-- [ ] **ENRICHV2-08**: User-selectable multilingual output and field-level provenance/confidence lineage
-- [ ] **ENRICHV2-09**: Dry-run-first lifecycle with TTL/revalidation and governed approval semantics
-- [ ] **ENRICHV2-10**: Governance overlays for vendor field mapping, protected columns, alt-text preservation, and audit export/retention
+- [x] **ENRICHV2-01**: Canonical enrichment v2 path replaces duplicate 2.2 + side-project execution paths
+- [x] **ENRICHV2-02**: Mandatory Shopify capability/schema/scope audit before enrichment write planning
+- [x] **ENRICHV2-03**: Merchant-first conflict arbitration with deterministic Oracle decision contract
+- [x] **ENRICHV2-04**: Profile gears (`Quick`, `Standard`, `Deep`) with tier-aware execution controls
+- [x] **ENRICHV2-05**: Broad retrieval-ready payload with product-class eligibility matrix
+- [x] **ENRICHV2-06**: Reusable Oracle adapters for content/visual/policy arbitration (with Phase 13 execution oracle continuity)
+- [x] **ENRICHV2-07**: Hash/idempotent rerun behavior and bounded transient retry controls
+- [x] **ENRICHV2-08**: User-selectable multilingual output and field-level provenance/confidence lineage
+- [x] **ENRICHV2-09**: Dry-run-first lifecycle with TTL/revalidation and governed approval semantics
+- [x] **ENRICHV2-10**: Governance overlays for vendor field mapping, protected columns, alt-text preservation, and audit export/retention
 
 ### User Management & Authentication (AUTH)
 
@@ -325,16 +325,16 @@
 | DEPLOY-06 | Phase 13 | Complete |
 | DEPLOY-07 | Phase 13 | Complete |
 | DEPLOY-08 | Phase 13 | Complete |
-| ENRICHV2-01 | Phase 13.1 | Planned |
-| ENRICHV2-02 | Phase 13.1 | Planned |
-| ENRICHV2-03 | Phase 13.1 | Planned |
-| ENRICHV2-04 | Phase 13.1 | Planned |
-| ENRICHV2-05 | Phase 13.1 | Planned |
-| ENRICHV2-06 | Phase 13.1 | Planned |
-| ENRICHV2-07 | Phase 13.1 | Planned |
-| ENRICHV2-08 | Phase 13.1 | Planned |
-| ENRICHV2-09 | Phase 13.1 | Planned |
-| ENRICHV2-10 | Phase 13.1 | Planned |
+| ENRICHV2-01 | Phase 13.1 | Complete |
+| ENRICHV2-02 | Phase 13.1 | Complete |
+| ENRICHV2-03 | Phase 13.1 | Complete |
+| ENRICHV2-04 | Phase 13.1 | Complete |
+| ENRICHV2-05 | Phase 13.1 | Complete |
+| ENRICHV2-06 | Phase 13.1 | Complete |
+| ENRICHV2-07 | Phase 13.1 | Complete |
+| ENRICHV2-08 | Phase 13.1 | Complete |
+| ENRICHV2-09 | Phase 13.1 | Complete |
+| ENRICHV2-10 | Phase 13.1 | Complete |
 
 **Coverage:**
 - v1.0 requirements: 96 total

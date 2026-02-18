@@ -1,0 +1,257 @@
+# Vendor Configuration File
+# Defines vendor-specific settings for image naming, alt text, and scraping
+
+# Default configuration (used when vendor is unknown or not specified)
+default:
+  country_of_origin: "SI"
+  default_weight: 0.05  # 50g average for unknown products
+  filename_pattern: "{product_name}_{sku}"
+  alt_text_template: "{product_name}"
+  hs_code_default: "9999.00"
+
+  # Vision AI settings (applies to all vendors unless overridden)
+  vision_ai:
+    enabled: true  # Enable vision AI globally
+    fallback_template: "{product_name} von {vendor}"  # Generic fallback (uses runtime vendor)
+    max_retries: 3
+    timeout_seconds: 10
+
+  keyword_categories:
+    default: []
+
+# Pentart (Hungary) - Art supplies, paints, mediums
+pentart:
+  country_of_origin: "HU"
+  default_weight: 0.15  # 150g average for paints/mediums
+  filename_pattern: "{category}_{product_name}_{sku}"
+  alt_text_template: "{product_name} - {category}"
+  hs_code_default: "3210.00"
+  hs_code_map:
+    paint: "3210.00"
+    medium: "3214.10"
+    varnish: "3208.10"
+    paste: "3214.90"
+  keyword_categories:
+    paint: ["acrylic paint", "craft paint", "art paint"]
+    medium: ["art medium", "painting medium"]
+    varnish: ["art varnish", "protective coating"]
+    paste: ["texture paste", "modeling paste"]
+  scraper:
+    enabled: true
+    base_url: "https://www.pentacolor.eu"
+    search_url: "https://www.pentacolor.eu/kereses?description=0&keyword={sku}"
+    fallback_to_database: true
+
+# Aistcraft (Slovenia) - Decoupage papers, craft supplies
+aistcraft:
+  country_of_origin: "SI"
+  default_weight: 0.03  # 30g average for papers
+  filename_pattern: "{product_name}_{sku}_aistcraft"
+  alt_text_template: "{product_name} - Aistcraft"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    "rice paper": "4823.90"
+    napkin: "4823.20"
+    paper: "4823.90"
+    canvas: "5210.11"
+  keyword_categories:
+    "rice paper": ["rice paper", "decoupage paper", "craft paper"]
+    napkin: ["decorative napkin", "decoupage napkin", "paper napkin"]
+    paper: ["craft paper", "scrapbook paper"]
+    canvas: ["stretched canvas", "painting canvas"]
+  scraper:
+    enabled: true
+    base_url: "https://aistcraft.com"
+    search_url: "https://aistcraft.com/search?controller=search&orderby=position&orderway=desc&search_query={sku}&submit_search="
+
+# Ciao Bella (Italy) - Scrapbooking, decorative papers
+ciao_bella:
+  country_of_origin: "IT"
+  default_weight: 0.03  # 30g average for decorative papers
+  filename_pattern: "{product_name}_{sku}_ciaobella"
+  alt_text_template: "{product_name} by Ciao Bella"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    paper: "4823.90"
+    "rice paper": "4823.90"
+    cardstock: "4802.56"
+    sticker: "4821.10"
+  keyword_categories:
+    paper: ["scrapbook paper", "decorative paper", "craft paper"]
+    "rice paper": ["rice paper", "decoupage paper"]
+    cardstock: ["cardstock", "heavy paper", "card making"]
+    sticker: ["decorative sticker", "craft sticker"]
+  scraper:
+    enabled: false  # To be implemented
+    base_url: "https://www.ciaobellaitaly.com"
+
+# ITD Collection (Poland) - Decoupage papers, rice papers
+itd:
+  country_of_origin: "PL"
+  default_weight: 0.03  # 30g average for rice papers
+  filename_pattern: "{product_name}_{sku}_itd"
+  alt_text_template: "{product_name} - ITD Collection"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    "rice paper": "4823.90"
+    paper: "4823.90"
+    napkin: "4823.20"
+  keyword_categories:
+    "rice paper": ["rice paper", "decoupage paper", "ITD paper"]
+    paper: ["decorative paper", "craft paper", "scrapbook paper"]
+    napkin: ["decorative napkin", "paper napkin"]
+  scraper:
+    enabled: false  # To be implemented
+    base_url: "https://www.itdcollection.com"
+    search_url: "https://www.itdcollection.com/q/?keywords={sku}"
+
+# Stamperia (Italy) - Scrapbooking, mixed media
+stamperia:
+  country_of_origin: "IT"
+  default_weight: 0.04  # 40g average for scrapbook materials
+  filename_pattern: "{product_name}_{sku}_stamperia"
+  alt_text_template: "{product_name} by Stamperia"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    paper: "4823.90"
+    "rice paper": "4823.90"
+    stencil: "3926.90"
+    chipboard: "4823.90"
+    paint: "3210.00"
+  keyword_categories:
+    paper: ["scrapbook paper", "decorative paper", "Stamperia paper"]
+    "rice paper": ["rice paper", "decoupage paper"]
+    stencil: ["craft stencil", "mixed media stencil"]
+    chipboard: ["chipboard embellishment", "decorative chipboard"]
+    paint: ["acrylic paint", "craft paint"]
+  scraper:
+    enabled: false  # To be implemented
+    base_url: "https://www.stamperia.com"
+
+# Prima Marketing (USA) - Mixed media, embellishments
+prima:
+  country_of_origin: "US"
+  default_weight: 0.06  # 60g average for mixed media supplies
+  filename_pattern: "{product_name}_{sku}_prima"
+  alt_text_template: "{product_name} - Prima Marketing"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    paper: "4823.90"
+    flowers: "6702.90"
+    embellishment: "8306.29"
+    paint: "3210.00"
+    paste: "3214.90"
+  keyword_categories:
+    paper: ["scrapbook paper", "decorative paper", "Prima paper"]
+    flowers: ["paper flowers", "decorative flowers", "embellishment"]
+    embellishment: ["craft embellishment", "mixed media"]
+    paint: ["art paint", "mixed media paint"]
+    paste: ["texture paste", "art paste"]
+  scraper:
+    enabled: false  # To be implemented
+    base_url: "https://www.prima.com"
+
+# Bastelschachtel (Austria/Germany) - Craft supplies, papers
+bastelschachtel:
+  country_of_origin: "AT"  # Austria
+  default_weight: 0.04  # 40g average for craft supplies
+  filename_pattern: "{product_name}_{sku}_bastelschachtel"
+  alt_text_template: "{product_name} - Bastelschachtel"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    "rice paper": "4823.90"
+    paper: "4823.90"
+    napkin: "4823.20"
+    paint: "3210.00"
+    glue: "3506.10"
+  keyword_categories:
+    "rice paper": ["reispapier", "decoupage paper", "craft paper"]
+    paper: ["bastelpapier", "craft paper", "scrapbook paper"]
+    napkin: ["serviette", "decorative napkin"]
+    paint: ["farbe", "craft paint", "acrylic paint"]
+    glue: ["kleber", "craft glue", "decoupage glue"]
+  scraper:
+    enabled: false  # To be implemented
+    base_url: "https://www.bastelschachtel.at"
+
+# Paperdesigns (Italy) - Rice papers, decorative papers
+paperdesigns:
+  country_of_origin: "IT"
+  default_weight: 0.03  # 30g average for rice papers
+  filename_pattern: "{product_name}_{sku}_paperdesigns"
+  alt_text_template: "{product_name} - Paperdesigns"
+  hs_code_default: "4823.90"
+  hs_code_map:
+    "rice paper": "4823.90"
+    paper: "4823.90"
+    napkin: "4823.20"
+  keyword_categories:
+    "rice paper": ["reispapier", "decoupage paper", "craft paper"]
+    paper: ["bastelpapier", "craft paper", "scrapbook paper"]
+    napkin: ["serviette", "decorative napkin"]
+  scraper:
+    enabled: true
+    base_url: "https://paperdesigns.it"
+    search_url: "https://paperdesigns.it/en/search?controller=search&s={sku}"
+
+# Category Detection Keywords
+# Used to auto-detect product category from title/description
+category_keywords:
+  paint:
+    - "paint"
+    - "acrylic"
+    - "tempera"
+    - "gouache"
+    - "farbe"  # German
+    - "festék"  # Hungarian
+
+  "rice paper":
+    - "rice paper"
+    - "reispapier"  # German
+    - "rizspapír"  # Hungarian
+    - "carta di riso"  # Italian
+
+  napkin:
+    - "napkin"
+    - "serviette"
+    - "szalvéta"  # Hungarian
+    - "tovagliolo"  # Italian
+
+  canvas:
+    - "canvas"
+    - "leinwand"  # German
+    - "vászon"  # Hungarian
+    - "tela"  # Italian
+
+  brush:
+    - "brush"
+    - "pinsel"  # German
+    - "ecset"  # Hungarian
+    - "pennello"  # Italian
+
+  medium:
+    - "medium"
+    - "gel"
+    - "paste"
+    - "texture"
+
+  varnish:
+    - "varnish"
+    - "lacquer"
+    - "lakk"  # Hungarian
+    - "vernice"  # Italian
+
+# Template Variable Definitions
+# Available variables for filename_pattern and alt_text_template:
+# {product_name}  - Cleaned product name (no UUIDs, HS codes, etc.)
+# {sku}           - Product SKU (lowercase, sanitized)
+# {category}      - Auto-detected category (paint, paper, etc.)
+# {vendor}        - Vendor name (lowercase)
+# {country}       - Country of origin (2-letter code)
+
+# Configuration Notes:
+# - All patterns are processed through get_valid_filename() for sanitization
+# - Alt text is processed through validate_alt_text() for length/quality
+# - Extension is preserved from original image (.jpg, .png, etc.)
+# - Vendor names are matched case-insensitively
+# - Unknown vendors fall back to 'default' configuration

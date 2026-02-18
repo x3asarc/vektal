@@ -43,6 +43,7 @@ describe("ChatWorkspace", () => {
     createBulkAction: vi.fn().mockResolvedValue(undefined),
     approveAction: vi.fn().mockResolvedValue(undefined),
     applyAction: vi.fn().mockResolvedValue(undefined),
+    delegateAction: vi.fn().mockResolvedValue(undefined),
     refresh: vi.fn().mockResolvedValue(undefined),
   };
 
@@ -83,5 +84,31 @@ describe("ChatWorkspace", () => {
     await waitFor(() => {
       expect(sendMessage).toHaveBeenCalledWith("update SKU-100");
     });
+  });
+
+  it("renders fallback notice when route telemetry indicates safe fallback", () => {
+    useChatSessionMock.mockReturnValue({
+      ...baseState,
+      messages: [
+        {
+          id: 201,
+          session_id: 5,
+          user_id: 1,
+          role: "assistant",
+          content: "Need clarification",
+          blocks: [{ type: "text", text: "Need clarification" }],
+          source_metadata: {
+            route_summary: {
+              fallback_stage: "safe_tier_fallback",
+              suggested_escalation: "tier_2",
+            },
+          },
+        },
+      ],
+    });
+
+    render(<ChatWorkspace />);
+    expect(screen.getByTestId("safe-tier-fallback")).toHaveTextContent("safe_tier_fallback");
+    expect(screen.getByTestId("safe-tier-fallback")).toHaveTextContent("tier_2");
   });
 });

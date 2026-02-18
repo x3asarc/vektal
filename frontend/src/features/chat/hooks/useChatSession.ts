@@ -6,6 +6,7 @@ import {
   approveChatAction,
   createChatBulkAction,
   createChatSession,
+  delegateChatAction,
   getChatAction,
   listChatMessages,
   listChatSessions,
@@ -38,6 +39,11 @@ type UseChatSessionResult = {
   }) => Promise<void>;
   approveAction: (actionId: number, comment?: string) => Promise<void>;
   applyAction: (actionId: number, mode?: "immediate" | "scheduled") => Promise<void>;
+  delegateAction: (actionId: number, input?: {
+    requestedTools?: string[];
+    depth?: number;
+    fanOut?: number;
+  }) => Promise<void>;
   refresh: () => Promise<void>;
 };
 
@@ -334,6 +340,46 @@ export function useChatSession(): UseChatSessionResult {
     [sessionId, setAction],
   );
 
+  const delegate = useCallback(
+    async (
+      actionId: number,
+      input: {
+        requestedTools?: string[];
+        depth?: number;
+        fanOut?: number;
+      } = {},
+    ) => {
+      if (!sessionId) return;
+      setSubmitting(true);
+      try {
+        const delegated = await delegateChatAction(sessionId, actionId, {
+          requested_tools: input.requestedTools ?? [],
+          depth: input.depth ?? 1,
+          fan_out: input.fanOut ?? 1,
+        });
+        setActionsById((previous) => {
+          const current = previous.get(actionId);
+          if (!current) return previous;
+          const result = {
+            ...(current.result ?? {}),
+            delegation: delegated,
+          };
+          const payload = {
+            ...(current.payload ?? {}),
+            delegation_trace: delegated,
+          };
+          return upsertActionMap(previous, { ...current, result, payload });
+        });
+        setError(null);
+      } catch (reason: unknown) {
+        setError(formatApiError(reason));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [sessionId],
+  );
+
   useEffect(() => {
     if (!sessionId) return;
     const activeSessionId = sessionId;
@@ -380,6 +426,7 @@ export function useChatSession(): UseChatSessionResult {
     createBulkAction: createBulkActionWrapper,
     approveAction: approve,
     applyAction: apply,
+    delegateAction: delegate,
     refresh,
   };
 }

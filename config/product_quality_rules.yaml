@@ -1,0 +1,152 @@
+# Product Quality Rules
+# Defines what makes a "complete" product in your store
+
+# Required fields - product is incomplete without these
+required_fields:
+  # Core identification
+  sku:
+    required: true
+    description: "Product SKU"
+    repair_script: null  # Can't auto-fix, needs manual intervention
+
+  barcode:
+    required: true
+    description: "Product barcode/EAN"
+    repair_script: "search_barcode.py"
+    repair_args: "--sku {sku}"
+
+  # Logistics/shipping
+  country_of_origin:
+    required: true
+    description: "Country of origin (metafield)"
+    metafield:
+      namespace: "custom"
+      key: "country_of_origin"
+    repair_script: "utils/enrich_product_logistics.py"
+    repair_args: "--sku {sku}"
+
+  hs_code:
+    required: true
+    description: "Harmonized System code (metafield)"
+    metafield:
+      namespace: "custom"
+      key: "hs_code"
+    repair_script: "utils/enrich_product_logistics.py"
+    repair_args: "--sku {sku}"
+
+  weight:
+    required: false  # Optional - API limitation prevents auto-update
+    description: "Product weight (nice to have, but not required)"
+    min_value: 0.01
+    repair_script: "utils/enrich_product_logistics.py"
+    repair_args: "--sku {sku}"
+
+  # Basic product info
+  vendor:
+    required: true
+    description: "Vendor/brand name"
+    repair_script: null  # Should exist on creation
+
+  product_type:
+    required: true
+    description: "Product type/category"
+    repair_script: "utils/categorize_product.py"
+    repair_args: "--sku {sku}"
+
+  # Content
+  title:
+    required: true
+    description: "Product title"
+    min_length: 10
+    max_length: 255
+    repair_script: null  # Should exist on creation
+
+  description_html:
+    required: true
+    description: "Product description (HTML)"
+    min_length: 200
+    repair_script: "seo/generate_seo_quick.py"
+    repair_args: "--sku {sku} --output data/auto_repair_{sku}.csv"
+
+  # Images
+  images:
+    required: false  # Optional - requires manual search if not found
+    description: "Product images (nice to have)"
+    min_count: 1
+    ideal_count: 3
+    repair_script: "utils/find_product_image.py"
+    repair_args: "--sku {sku}"  # Flags missing images, provides search links
+
+  # SEO
+  seo_title:
+    required: true
+    description: "SEO meta title"
+    field: "seo.title"  # Native Shopify SEO field
+    min_length: 30
+    max_length: 60
+    repair_script: "seo/generate_seo_quick.py"
+    repair_args: "--sku {sku} --output data/auto_repair_{sku}.csv"
+
+  seo_description:
+    required: true
+    description: "SEO meta description"
+    field: "seo.description"  # Native Shopify SEO field
+    min_length: 120
+    max_length: 160
+    repair_script: "seo/generate_seo_quick.py"
+    repair_args: "--sku {sku} --output data/auto_repair_{sku}.csv"
+
+  # Organization
+  tags:
+    required: true
+    description: "Product tags"
+    min_count: 3
+    repair_script: "utils/generate_product_tags.py"
+    repair_args: "--sku {sku}"
+
+  collections:
+    required: true
+    description: "Product collections"
+    min_count: 1
+    repair_script: "utils/assign_collections.py"
+    repair_args: "--sku {sku}"
+
+  # URL
+  # DISABLED: Handle checking disabled until redirect system is implemented
+  # Changing handles without redirects breaks SEO and existing links
+  # handle:
+  #   required: true
+  #   description: "URL handle (should match title)"
+  #   validate_against: "title"
+  #   repair_script: "utils/fix_product_handles.py"
+  #   repair_args: "--sku {sku}"
+
+# Optional but recommended fields
+recommended_fields:
+  variant_options:
+    description: "Product variants (color, size, etc.)"
+    repair_script: null
+
+  compare_at_price:
+    description: "Compare at price (for discounts)"
+    repair_script: null
+
+# Scoring weights (total = 100)
+scoring:
+  required_fields: 80  # 80 points divided among required fields
+  recommended_fields: 20  # 20 points for recommended
+
+# Vendor-specific overrides
+vendor_rules:
+  Pentart:
+    images:
+      min_count: 3
+      ideal_count: 5
+    tags:
+      min_count: 5
+
+  Bastelschachtel:
+    images:
+      min_count: 2
+    tags:
+      min_count: 4

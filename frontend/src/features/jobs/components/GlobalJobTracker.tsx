@@ -17,7 +17,7 @@ function toTerminalStatus(status: string): JobTerminalEvent["status"] | null {
 }
 
 export function GlobalJobTracker() {
-  const { jobs, activeJobs, error, isRehydrating, rehydrate } = useJobRehydrate();
+  const { jobs, activeJobs: _activeJobs, error: _error, isRehydrating: _isRehydrating, rehydrate: _rehydrate } = useJobRehydrate();
   const [terminalEvents, setTerminalEvents] = useState<JobTerminalEvent[]>([]);
   const seenEvents = useRef<Set<string>>(new Set());
 
@@ -37,8 +37,14 @@ export function GlobalJobTracker() {
           terminal === "success"
             ? `Job ${job.id} completed`
             : terminal === "cancelled"
-              ? `Job ${job.id} cancelled`
-              : `Job ${job.id} failed`,
+            ? `Job ${job.id} cancelled`
+            : `Job ${job.id} failed`,
+        detail:
+          terminal === "success"
+            ? `${job.successful_items ?? 0} succeeded, ${job.failed_items ?? 0} failed.`
+            : job.error_message ?? undefined,
+        jobUrl: `/jobs/${job.id}`,
+        resultsUrl: job.results_url ?? undefined,
         occurredAt: Date.now(),
       });
     }
@@ -47,21 +53,8 @@ export function GlobalJobTracker() {
     }
   }, [jobs]);
 
-  return (
-    <section className="panel" data-job-tracker>
-      <h2>Global Job Tracker</h2>
-      <p className="muted">
-        Tracks active jobs and rehydrate cycles from backend source-of-truth.
-      </p>
-      <p className="muted">
-        Active jobs: <strong>{activeJobs.length}</strong>
-      </p>
-      {isRehydrating && <p className="muted">Rehydrating jobs...</p>}
-      {error && <p className="muted">Transport degraded: {error}</p>}
-      <button type="button" onClick={() => void rehydrate()}>
-        rehydrate now
-      </button>
-      <JobTerminalNotifications events={terminalEvents} />
-    </section>
-  );
+  // Only render when there are terminal notifications to surface
+  if (terminalEvents.length === 0) return null;
+
+  return <JobTerminalNotifications events={terminalEvents} />;
 }

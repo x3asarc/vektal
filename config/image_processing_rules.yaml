@@ -1,0 +1,377 @@
+# IMAGE PROCESSING MASTER FRAMEWORK
+version: "1.0"
+updated: "2026-02-02"
+
+# GLOBAL DEFAULTS
+defaults:
+  image_format: "png"               # png | jpg | webp
+  transparency: true                # Always preserve/create transparency
+  square_conversion: true           # Convert to 1:1 aspect ratio
+  square_method: "center_crop"      # center_crop | contain | cover
+  target_size: 900                  # Square dimension (900x900)
+  alt_text_language: "de"           # de | en (German default)
+  min_images_per_product: 1
+  ideal_images_per_product: 8       # 1 primary + 7 shared
+
+# VISION AI RULES
+vision_ai:
+  enabled: true
+  provider: "openrouter"            # openrouter | gemini
+  model: "google/gemini-2.0-flash-001"
+  use_for:
+    - image_type_identification     # Always use AI to determine type
+    - alt_text_generation           # Generate German alt text
+    - filename_suggestions          # Suggest SEO filenames
+  fallback:
+    when_budget_exceeded: "template"
+    when_api_fails: "template"
+    template: "{product_name} von {vendor}"
+  cache:
+    enabled: true
+    ttl_days: 30
+
+# HYBRID NAMING RULES
+naming:
+  strategy: "hybrid"                # hybrid | seo_only | ai_only
+
+  # Primary Images (product-specific)
+  primary:
+    pattern: "{vendor}-{product_line}-{variant_name}.{ext}"
+    examples:
+      - "pentart-galaxy-flakes-15g-jupiter-white.png"
+      - "pentart-galaxy-flakes-15g-saturn-green.png"
+    rules:
+      - Include vendor name (lowercase)
+      - Include product line (slug format)
+      - Include FULL variant name (not just color)
+      - Use proper extension based on format
+
+  # Shared Images (across multiple products)
+  shared:
+    pattern: "{vendor}-{product_line}-{image_type}.{ext}"
+    examples:
+      - "pentart-galaxy-flakes-15g-packshot.jpg"
+      - "pentart-galaxy-flakes-15g-groupshot.jpg"
+      - "pentart-galaxy-flakes-15g-detail.jpg"
+      - "pentart-galaxy-flakes-15g-lifestyle.jpg"
+    rules:
+      - Use AI-determined image type
+      - Same type = same filename across products
+      - No variant-specific identifiers
+
+  # Image Types (from Vision AI)
+  image_types:
+    packshot:
+      description: "Single product container/jar on plain background"
+      german: "Produktfoto"
+      priority: high
+    groupshot:
+      description: "Multiple products/variants shown together"
+      german: "Gruppenbild"
+      priority: high
+    detail:
+      description: "Close-up of texture, flakes, or product effect"
+      german: "Detailansicht"
+      priority: medium
+    lifestyle:
+      description: "Product in use or styled scene"
+      german: "Anwendung"
+      priority: medium
+
+  # Filename Sanitization
+  sanitization:
+    lowercase: true
+    replace_spaces: "-"
+    remove_special_chars: true
+    max_length: 100
+    allowed_chars: "a-z0-9-_."
+
+# ALT TEXT RULES
+alt_text:
+  language: "de"                    # Default to German
+  max_length: 125                   # Shopify limit
+
+  # Primary Images
+  primary_template: "{product_name} - {variant_name} - {image_type_german} - {vendor}"
+  primary_example: "Galaxy Flakes 15g - Jupiter white - Produktfoto - Pentart"
+
+  # Shared Images
+  shared_template: "{product_line} von {vendor} - {image_type_german}"
+  shared_example: "Galaxy Flakes von Pentart - Gruppenbild"
+
+  # Include in alt text:
+  include:
+    - product_name                  # Always
+    - vendor_name                   # Always
+    - image_type                    # Always (German translation)
+    - key_features                  # From AI description
+    - size_if_relevant              # "15g", "100ml"
+
+  # Never include:
+  exclude:
+    - SKUs or barcodes
+    - HS codes
+    - UUIDs
+    - Generic phrases like "product image"
+    - English words (unless brand name)
+
+# UPLOAD STRATEGY RULES
+upload:
+  # When to use staged uploads (for filename control)
+  staged_uploads:
+    use_when:
+      - need_exact_filename: true   # Always use for new images
+      - replacing_primary: true     # Always when replacing featured
+    method: "stagedUploadsCreate"
+
+  # When simple URL upload is acceptable
+  simple_upload:
+    use_when:
+      - source_url_provided: true
+      - filename_not_critical: true
+    method: "productCreateMedia"
+
+  # File preparation
+  preparation:
+    download_locally: true          # Always download before upload
+    convert_format: true            # Apply format conversions
+    validate_size: true             # Check file size limits
+    max_file_size_mb: 20
+
+# IMAGE POSITIONING RULES
+positioning:
+  # Primary Images
+  primary:
+    position: 0                     # Always featured (first)
+    action: "replace_and_reorder"   # Replace old primary, reorder
+    delete_old_primary: false       # NEVER delete without confirmation
+
+  # Shared Images
+  shared:
+    position: "append"              # Add after primary
+    action: "append_only"           # Never delete existing
+    preserve_order: true
+
+  # Reordering Strategy
+  reorder:
+    mutation: "productReorderMedia"
+    new_primary_first: true
+    preserve_other_positions: true
+
+# IMAGE TRANSFORMATION RULES
+transformation:
+  # Always apply these transformations
+  always:
+    - convert_to_square:
+        method: "center_crop"       # Default method
+        target_ratio: "1:1"
+        target_size: 900
+    - ensure_transparency:
+        convert_to_rgba: true
+        preserve_alpha: true
+    - optimize_size:
+        quality: 95                 # For JPG
+        compression: 6              # For PNG (0-9)
+
+  # Format-specific rules
+  formats:
+    png:
+      use_for: ["primary", "packshot", "detail"]
+      transparency: required
+      compression: 6
+    jpg:
+      use_for: ["shared", "groupshot", "lifestyle"]
+      transparency: not_required
+      quality: 95
+    webp:
+      use_for: []                   # Not used currently
+
+  # Dimension rules
+  dimensions:
+    aspect_ratio: "1:1"             # Always square
+    min_size: 500
+    max_size: 2048
+    target_size: 900
+    method: "center_crop"
+
+# DELETION SAFEGUARDS
+deletion:
+  # CRITICAL: Default to NEVER delete
+  default_policy: "preserve"
+
+  # Only delete when:
+  allow_deletion_when:
+    - explicit_user_confirmation: true
+    - backup_created: true
+    - old_image_has_random_filename: false  # Changed to false for safety
+
+  # Before any deletion:
+  pre_deletion_checks:
+    - download_to_backup: true
+    - create_deletion_manifest: true
+    - log_all_deletions: true
+    - require_user_approval: true
+
+  # NEVER delete:
+  never_delete:
+    - shared_images                 # Images used by multiple products
+    - images_without_backup
+    - primary_without_replacement
+
+# IMAGE ORGANIZATION RULES
+organization:
+  # Image Categories
+  categories:
+    primary:
+      description: "Main product image (variant-specific)"
+      count: 1
+      required: true
+      position: 0
+
+    shared:
+      description: "Images shared across product variants"
+      types: ["packshot", "groupshot", "detail", "lifestyle"]
+      count: 1-7
+      required: false
+      position: 1+
+
+    variant_specific:
+      description: "Additional variant-specific images"
+      count: 0-5
+      required: false
+      position: "after shared"
+
+  # Distribution Rules
+  distribution:
+    shared_images:
+      apply_to: "all_variants"      # Upload shared to all variants
+      filename_consistency: true    # Same type = same filename
+
+    primary_images:
+      apply_to: "specific_variant"
+      filename_uniqueness: true     # Each variant has unique name
+
+# DATA PLAN INTERPRETATION
+data_plans:
+  # CSV-based SEO plans (like seo_plan_per_product.csv)
+  seo_plan:
+    enabled: true
+    columns_required:
+      - product_id
+      - is_primary
+      - proposed_filename
+      - proposed_alt
+      - cluster_id
+
+    rules:
+      - is_primary == True: Process as primary image
+      - is_primary == False: Process as shared image
+      - cluster_id groups shared images
+
+  # Vision analysis results
+  vision_analysis:
+    enabled: true
+    columns_required:
+      - image_num
+      - ai_type
+      - ai_filename
+      - ai_alt
+      - ai_description
+
+    rules:
+      - Use ai_type for hybrid filename
+      - Prefer ai_alt over template
+      - Group by ai_type for shared images
+
+# VENDOR OVERRIDES
+vendor_overrides:
+  # Vendors can override specific rules
+  pentart:
+    min_images: 3                   # Pentart products need more images
+    image_format: "png"             # Always PNG for Pentart
+    alt_text_language: "de"
+
+  default:
+    min_images: 1
+    image_format: "png"
+
+# WORKFLOW DECISION TREE
+workflow:
+  # Step 1: Image Type Identification
+  step_1_identify:
+    method: "vision_ai"             # Always use vision AI
+    fallback: "detail"              # Default to detail if AI fails
+
+  # Step 2: Filename Generation
+  step_2_filename:
+    if_primary: "use primary pattern with variant name"
+    if_shared: "use shared pattern with AI type"
+    method: "hybrid_naming"
+
+  # Step 3: Alt Text Generation
+  step_3_alt_text:
+    method: "vision_ai"
+    enhance_with: "seo_keywords"
+    language: "de"
+
+  # Step 4: Transformation
+  step_4_transform:
+    apply: ["square", "transparency", "optimize"]
+
+  # Step 5: Upload
+  step_5_upload:
+    method: "staged_upload"
+    verify_filename: true
+
+  # Step 6: Positioning
+  step_6_position:
+    if_primary: "reorder to position 0"
+    if_shared: "append after primary"
+
+  # Step 7: Cleanup (OPTIONAL)
+  step_7_cleanup:
+    delete_old: false               # NEVER without confirmation
+    verify_result: true
+
+# ERROR HANDLING
+error_handling:
+  vision_api_failure:
+    action: "use_fallback_template"
+    log: true
+    notify: false
+
+  upload_failure:
+    action: "retry"
+    max_retries: 3
+    log: true
+    notify: true
+
+  filename_collision:
+    action: "append_uuid"
+    format: "{filename}_{uuid}"
+    log: true
+
+  budget_exceeded:
+    action: "use_cache_or_fallback"
+    log: true
+    notify: true
+
+# LOGGING & MONITORING
+logging:
+  level: "info"
+  log_file: "logs/image_processing.log"
+
+  log_events:
+    - vision_ai_calls
+    - filename_generation
+    - transformations_applied
+    - uploads_completed
+    - deletions_attempted
+    - errors_encountered
+
+  metrics:
+    track:
+      - images_processed_count
+      - vision_api_cost
+      - upload_success_rate
+      - average_processing_time

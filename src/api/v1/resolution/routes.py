@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 
 from flask import request
 from flask_login import current_user, login_required
@@ -29,10 +30,13 @@ from src.models.resolution_rule import ResolutionRule
 from src.models.resolution_snapshot import ResolutionSnapshot
 from src.models.shopify import ShopifyStore
 from src.resolution.apply_engine import apply_batch
+from src.resolution.audit_export import render_audit_export
 from src.resolution.dry_run_compiler import compile_dry_run
 from src.resolution.locks import acquire_batch_lock, heartbeat_batch_lock, release_batch_lock
 from src.resolution.lineage import build_batch_lineage
 from src.resolution.preflight import run_preflight
+from src.resolution.progress_contract import build_apply_progress_payload
+from src.resolution.snapshot_lifecycle import resolve_snapshot_chain
 
 
 def _iso(dt):
@@ -107,6 +111,22 @@ def _lock_conflict_response(batch: ResolutionBatch):
         lock_owner=batch.lock_owner_user_id,
         lock_expires_at=_iso(batch.lock_expires_at),
     )
+
+
+def _serialize_recovery_log(row: RecoveryLog) -> dict:
+    return {
+        "id": row.id,
+        "batch_id": row.batch_id,
+        "item_id": row.item_id,
+        "reason_code": row.reason_code,
+        "reason_detail": row.reason_detail,
+        "payload": row.payload,
+        "replay_metadata": row.replay_metadata,
+        "deferred_until": _iso(row.deferred_until),
+        "snapshot_id": row.snapshot_id,
+        "created_by_user_id": row.created_by_user_id,
+        "created_at": _iso(row.created_at),
+    }
 
 
 @resolution_bp.route("/rules", methods=["GET"])
@@ -525,11 +545,57 @@ def apply_dry_run(batch_id: int):
         "applied_item_ids": result.applied_item_ids,
         "conflicted_item_ids": result.conflicted_item_ids,
         "failed_item_ids": result.failed_item_ids,
+        "deferred_item_ids": result.deferred_item_ids,
+        "retryable_item_ids": result.retryable_item_ids,
         "paused": result.paused,
         "critical_errors": result.critical_errors,
         "backoff_events": result.backoff_events,
         "rerun_conflicted_item_ids": result.rerun_conflicted_item_ids,
+        "terminal_summary": result.terminal_summary,
     }, 200
+
+
+@resolution_bp.route("/dry-runs/<int:batch_id>/apply/progress", methods=["GET"])
+@login_required
+def get_apply_progress(batch_id: int):
+    batch, error = _get_batch_or_error(batch_id)
+    if error:
+        return error
+    return build_apply_progress_payload(batch), 200
+
+
+@resolution_bp.route("/dry-runs/<int:batch_id>/snapshot-chain", methods=["GET"])
+@login_required
+def get_snapshot_chain(batch_id: int):
+    batch, error = _get_batch_or_error(batch_id)
+    if error:
+        return error
+    item_id = request.args.get("item_id", type=int)
+    chain = resolve_snapshot_chain(batch_id=batch.id, item_id=item_id)
+    return chain, 200
+
+
+@resolution_bp.route("/dry-runs/<int:batch_id>/audit-export", methods=["GET"])
+@login_required
+def export_dry_run_audit(batch_id: int):
+    batch, error = _get_batch_or_error(batch_id)
+    if error:
+        return error
+
+    fmt = (request.args.get("format") or "json").strip().lower()
+    try:
+        rendered, content_type = render_audit_export(batch, fmt=fmt)
+    except ValueError:
+        return ProblemDetails.business_error(
+            "unsupported-export-format",
+            "Unsupported Export Format",
+            "Use format=json or format=csv.",
+            status=422,
+        )
+
+    if fmt == "json":
+        return json.loads(rendered), 200
+    return rendered, 200, {"Content-Type": content_type}
 
 
 @resolution_bp.route("/recovery-logs", methods=["GET"])
@@ -545,20 +611,7 @@ def list_recovery_logs():
         query = query.filter(RecoveryLog.batch_id == batch_id)
 
     rows = query.limit(200).all()
-    logs = [
-        {
-            "id": row.id,
-            "batch_id": row.batch_id,
-            "item_id": row.item_id,
-            "reason_code": row.reason_code,
-            "reason_detail": row.reason_detail,
-            "payload": row.payload,
-            "snapshot_id": row.snapshot_id,
-            "created_by_user_id": row.created_by_user_id,
-            "created_at": _iso(row.created_at),
-        }
-        for row in rows
-    ]
+    logs = [_serialize_recovery_log(row) for row in rows]
     return {"logs": logs, "total": len(logs)}, 200
 
 
@@ -572,14 +625,18 @@ def get_recovery_log(log_id: int):
     )
     if row is None:
         return ProblemDetails.not_found("recovery-log", log_id)
-    return {
-        "id": row.id,
-        "batch_id": row.batch_id,
-        "item_id": row.item_id,
-        "reason_code": row.reason_code,
-        "reason_detail": row.reason_detail,
-        "payload": row.payload,
-        "snapshot_id": row.snapshot_id,
-        "created_by_user_id": row.created_by_user_id,
-        "created_at": _iso(row.created_at),
-    }, 200
+    return _serialize_recovery_log(row), 200
+
+
+@resolution_bp.route("/recovery-logs/<int:log_id>/chain", methods=["GET"])
+@login_required
+def get_recovery_log_chain(log_id: int):
+    row = (
+        RecoveryLog.query.join(ResolutionBatch, RecoveryLog.batch_id == ResolutionBatch.id)
+        .filter(RecoveryLog.id == log_id, ResolutionBatch.user_id == current_user.id)
+        .first()
+    )
+    if row is None:
+        return ProblemDetails.not_found("recovery-log", log_id)
+    chain = resolve_snapshot_chain(batch_id=row.batch_id, item_id=row.item_id)
+    return {"log": _serialize_recovery_log(row), "chain": chain}, 200

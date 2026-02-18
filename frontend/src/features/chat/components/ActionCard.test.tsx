@@ -3,6 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import { ActionCard } from "@/features/chat/components/ActionCard";
 import { ChatAction } from "@/shared/contracts/chat";
 
+vi.mock("@/features/resolution/components/DryRunReview", () => ({
+  DryRunReview: ({ batchId }: { batchId?: number }) => (
+    <div data-testid="dry-run-review">dry-run-review-{batchId ?? "none"}</div>
+  ),
+}));
+
 function buildAction(overrides: Partial<ChatAction> = {}): ChatAction {
   return {
     id: 11,
@@ -19,6 +25,7 @@ describe("ActionCard", () => {
   it("calls approve and apply handlers", async () => {
     const onApprove = vi.fn().mockResolvedValue(undefined);
     const onApply = vi.fn().mockResolvedValue(undefined);
+    const onDelegate = vi.fn().mockResolvedValue(undefined);
     const action = buildAction();
 
     render(
@@ -26,6 +33,7 @@ describe("ActionCard", () => {
         action={action}
         onApprove={onApprove}
         onApply={onApply}
+        onDelegate={onDelegate}
       />,
     );
 
@@ -34,10 +42,12 @@ describe("ActionCard", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Approve" }));
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delegate" }));
 
     await waitFor(() => {
       expect(onApprove).toHaveBeenCalledWith(11, "looks good");
       expect(onApply).toHaveBeenCalledWith(11);
+      expect(onDelegate).toHaveBeenCalledWith(11);
     });
   });
 
@@ -61,5 +71,49 @@ describe("ActionCard", () => {
     );
 
     expect(screen.getByTestId("action-warning")).toHaveTextContent("Structural conflicts detected");
+  });
+
+  it("renders delegation trace panel when trace exists", () => {
+    const action = buildAction({
+      payload: {
+        preview: {},
+        delegation_trace: {
+          delegation_event_id: 9,
+          status: "running",
+          worker_tool_scope: ["chat.respond"],
+          blocked_tools: [],
+        },
+      },
+    });
+    render(
+      <ActionCard
+        action={action}
+        onApprove={() => Promise.resolve()}
+        onApply={() => Promise.resolve()}
+      />,
+    );
+    expect(screen.getByTestId("delegation-trace")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /View Trace/i }));
+    expect(screen.getByText(/delegation_event_id/i)).toBeInTheDocument();
+  });
+
+  it("renders dry-run review when dry_run_id is present", () => {
+    const action = buildAction({
+      payload: {
+        dry_run_id: 42,
+        preview: {},
+      },
+    });
+
+    render(
+      <ActionCard
+        action={action}
+        onApprove={() => Promise.resolve()}
+        onApply={() => Promise.resolve()}
+      />,
+    );
+
+    expect(screen.getByText(/Open dry-run review/i)).toBeInTheDocument();
+    expect(screen.getByTestId("dry-run-review")).toHaveTextContent("dry-run-review-42");
   });
 });

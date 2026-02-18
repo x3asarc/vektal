@@ -5,14 +5,14 @@ Provides:
 - SSE endpoint for real-time job progress updates
 - Polling fallback endpoint for environments blocking SSE
 """
-import json
-from flask import Response, request
+from flask import Response
 from flask_login import login_required, current_user
 
 from src.api.jobs import jobs_bp
 from src.api.core.sse import job_announcer, format_sse
 from src.api.jobs.schemas import JobProgressEvent, JobStatusResponse
-from src.models import Job, db
+from src.jobs.progress import announce_job_progress, build_progress_payload
+from src.models import Job
 
 
 @jobs_bp.route('/<int:job_id>/stream')
@@ -85,22 +85,28 @@ def get_job_status(job_id: int):
     if not job:
         return {"error": "Job not found"}, 404
 
-    percent = 0.0
-    if job.total_items and job.total_items > 0:
-        percent = (job.processed_items / job.total_items) * 100
+    progress_payload = build_progress_payload(job)
 
     response = JobStatusResponse(
         job_id=job.id,
         status=job.status.value if hasattr(job.status, 'value') else str(job.status),
-        processed_items=job.processed_items or 0,
-        total_items=job.total_items or 0,
-        successful_items=job.successful_items or 0,
-        failed_items=job.failed_items or 0,
-        percent_complete=round(percent, 1),
+        processed_items=progress_payload["processed_items"],
+        total_items=progress_payload["total_items"],
+        successful_items=progress_payload["successful_items"],
+        failed_items=progress_payload["failed_items"],
+        percent_complete=progress_payload["percent_complete"],
         created_at=job.created_at.isoformat() if job.created_at else None,
         started_at=job.started_at.isoformat() if job.started_at else None,
         completed_at=job.completed_at.isoformat() if job.completed_at else None,
-        error_message=job.error_message
+        error_message=job.error_message,
+        current_step=progress_payload["current_step"],
+        current_step_label=progress_payload["current_step_label"],
+        step_index=progress_payload["step_index"],
+        step_total=progress_payload["step_total"],
+        eta_seconds=progress_payload["eta_seconds"],
+        can_retry=progress_payload["can_retry"],
+        retry_url=progress_payload["retry_url"],
+        results_url=progress_payload["results_url"],
     )
 
     return response.model_dump(), 200
@@ -120,8 +126,7 @@ def broadcast_job_progress(job_id: int, job=None):
         job = Job.query.get(job_id)
 
     if job:
-        event = JobProgressEvent.from_job(job)
-        job_announcer.announce(job_id, event.model_dump_json())
+        announce_job_progress(job_id=job_id, job=job)
 
 
 __all__ = ['stream_job_progress', 'get_job_status', 'broadcast_job_progress']

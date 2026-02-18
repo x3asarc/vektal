@@ -112,8 +112,13 @@ class User(db.Model, UserMixin, TimestampMixin):
 
     @property
     def is_active(self):
-        """Flask-Login checks this to allow/deny login."""
-        return self.account_status == AccountStatus.ACTIVE
+        """
+        Flask-Login checks this to allow/deny login.
+
+        Users must be able to log in before OAuth completion (PENDING_OAUTH),
+        so only suspended accounts are denied at session level.
+        """
+        return self.account_status != AccountStatus.SUSPENDED
 
     def set_password(self, plaintext_password: str) -> None:
         """Hash password with bcrypt before storing."""

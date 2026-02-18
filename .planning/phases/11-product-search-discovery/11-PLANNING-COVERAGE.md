@@ -2,7 +2,7 @@
 
 **Phase:** 11-product-search-discovery  
 **Generated:** 2026-02-15  
-**Source inputs:** `11-CONTEXT.md`, `11-RESEARCH.md`, `precisionworkspace.md`
+**Source inputs:** `11-CONTEXT.md`, `11-RESEARCH.md`, `precisionworkspace.md`, `GOV_REL_GLOSSARY.md`
 
 ## Requirement Trace
 
@@ -19,12 +19,24 @@
 | SNAP-02 (manifest + touched pre-change snapshots) | `11-03` Task 1+2 | Mandatory safety capture at apply path |
 | SNAP-03 (hash dedupe + pointer reuse) | `11-03` Task 1 | Checksum dedupe and chain pointer reuse |
 | SNAP-04 (re-baseline/retention/export/recovery chain) | `11-03` Task 2+3 | TTL+preflight gating + audit export + chain traversal |
+| GOV-01 (vendor mapping versioning) | `11-02` Task 2 | Store+supplier+field-group versioned mapping and required-field gate |
+| GOV-02 (protected column enforcement) | `11-01` Task 2+3, `11-02` Task 2+3 | Protected metadata in search UI and staging contract enforcement |
+| GOV-03 (alt-text governance) | `11-02` Task 3 | Preserve-by-default and explicit overwrite approval pathway |
+| REL-01 (admission controller) | `11-02` Task 2 | Schema/policy/conflict/apply-eligibility gate output |
+| REL-02 (transient retry policy) | `11-03` Task 2 | Bounded retry + jitter + deterministic recovery defer on exhaustion |
+| REL-03 (progress/terminal contract) | `11-03` Task 3 | Processed/ETA/current/terminal summary contract and tests |
+
+## Canonical Definitions
+
+- GOV/REL contract definitions are canonical in:
+  - `.planning/phases/11-product-search-discovery/GOV_REL_GLOSSARY.md`
 
 ## Plan Waves
 
 1. **Wave 1 (`11-01`)**: Search/filter API foundation and `/search` precision workspace.
 2. **Wave 2 (`11-02`)**: Product detail history/diff and semantic bulk staging with action-block approval model.
 3. **Wave 3 (`11-03`)**: Snapshot lifecycle optimization, dedupe, TTL/revalidation, retention/export, and recovery-chain hardening.
+4. **Cross-cutting governance/reliability**: `GOV-*` and `REL-*` contracts are embedded in Wave 2/3 implementation and verification.
 
 ## Verification Contract (Mandatory)
 
@@ -35,6 +47,7 @@
   - `tests/resolution/test_snapshot_lifecycle.py`
   - `tests/api/test_snapshot_chain_contract.py`
   - `tests/api/test_audit_export_contract.py`
+  - `tests/api/test_apply_progress_contract.py`
 - Frontend:
   - `frontend/src/app/(app)/search/page.test.tsx`
   - `frontend/src/features/search/components/BulkActionBuilder.test.tsx`
@@ -54,4 +67,3 @@
   - range selection, fill-handle axis control, clipboard and keyboard-edit patterns.
 - SQLAlchemy 2.x (`/websites/sqlalchemy_en_21`):
   - large result streaming and query performance practices.
-

@@ -15,7 +15,7 @@ Error handling:
 - state_mismatch: Security error, require fresh OAuth start
 """
 from flask import Blueprint, request, jsonify, session, redirect, url_for, current_app
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import os
@@ -33,7 +33,7 @@ oauth_bp = Blueprint('oauth', __name__)
 # Shopify OAuth configuration
 SHOPIFY_API_KEY = get_secret('SHOPIFY_API_KEY') or os.getenv('SHOPIFY_CLIENT_ID')
 SHOPIFY_API_SECRET = get_secret('SHOPIFY_API_SECRET') or os.getenv('SHOPIFY_CLIENT_SECRET')
-SHOPIFY_API_SCOPES = 'read_products,write_products,read_inventory,write_inventory,write_files'
+SHOPIFY_API_SCOPES = 'read_products,write_products,read_inventory,write_inventory,read_locations,write_files'
 APP_URL = os.getenv('APP_URL', 'http://localhost:5000')
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
@@ -41,6 +41,31 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 def generate_state_token() -> str:
     """Generate cryptographically secure state token for CSRF protection."""
     return os.urandom(16).hex()
+
+
+def _resolve_pending_oauth_attempt(state_token: str | None, shop: str | None) -> OAuthAttempt | None:
+    """
+    Resolve a pending, non-expired OAuth attempt for state-recovery scenarios.
+
+    This is used only when callback session state is missing/mismatched.
+    """
+    if not state_token:
+        return None
+
+    attempt = OAuthAttempt.query.filter_by(state_token=state_token).first()
+    if not attempt:
+        return None
+
+    if attempt.result != 'pending':
+        return None
+
+    if attempt.expires_at and attempt.expires_at < datetime.utcnow():
+        return None
+
+    if shop and attempt.shop_domain.lower() != shop.lower():
+        return None
+
+    return attempt
 
 
 @oauth_bp.route('/shopify', methods=['GET'])
@@ -184,14 +209,26 @@ def shopify_callback():
     state = request.args.get('state')
     shop = request.args.get('shop')
 
-    # Verify state parameter (CSRF protection)
+    # Verify state parameter (CSRF protection) with recovery fallback.
     stored_state = session.get('oauth_state')
+    attempt = None
     if not state or state != stored_state:
-        _log_oauth_result(state, 'state_mismatch', 'State token mismatch or missing')
-        return _render_oauth_error(
-            'Security validation failed',
-            'Please try connecting your store again.',
-            shop
+        attempt = _resolve_pending_oauth_attempt(state, shop)
+        if not attempt:
+            _log_oauth_result(state, 'state_mismatch', 'State token mismatch or missing')
+            return _render_oauth_error(
+                'Security validation failed',
+                'Please try connecting your store again.',
+                shop
+            )
+
+        # Recover transiently lost session state (common across embedded/tunnel redirects).
+        session['oauth_state'] = state
+        session['oauth_shop'] = attempt.shop_domain
+        current_app.logger.warning(
+            'Recovered OAuth callback state via OAuthAttempt (user_id=%s shop=%s)',
+            attempt.user_id,
+            attempt.shop_domain,
         )
 
     # Clear state from session (single-use)
@@ -225,8 +262,11 @@ def shopify_callback():
             shop
         )
 
-    # Get user from session or state
-    # Note: User must be logged in for OAuth to work
+    # Get user from session or recovered OAuth attempt.
+    if not current_user.is_authenticated:
+        if attempt and attempt.user:
+            login_user(attempt.user, remember=False)
+
     if not current_user.is_authenticated:
         _log_oauth_result(state, 'not_authenticated', 'User not logged in during callback')
         return _render_oauth_error(
@@ -234,6 +274,14 @@ def shopify_callback():
             'Your session has expired. Please log in and try connecting your store again.',
             shop,
             login_required=True
+        )
+
+    if attempt and current_user.id != attempt.user_id:
+        _log_oauth_result(state, 'state_mismatch', 'Authenticated user does not match OAuth attempt owner')
+        return _render_oauth_error(
+            'Security validation failed',
+            'Please restart Shopify connection from onboarding.',
+            shop,
         )
 
     try:
@@ -354,6 +402,7 @@ def _render_oauth_error(title: str, message: str, shop: str = None,
             {'scope': 'write_products', 'reason': 'Update product images, descriptions, and details'},
             {'scope': 'read_inventory', 'reason': 'Check stock levels'},
             {'scope': 'write_inventory', 'reason': 'Sync inventory with suppliers'},
+            {'scope': 'read_locations', 'reason': 'Resolve active inventory locations for stock updates'},
             {'scope': 'write_files', 'reason': 'Upload product images'}
         ]
 

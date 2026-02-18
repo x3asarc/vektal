@@ -9,6 +9,13 @@ export type JobListItem = {
   status: string;
   job_name?: string;
   error_message?: string | null;
+  processed_items?: number;
+  total_items?: number;
+  successful_items?: number;
+  failed_items?: number;
+  percent_complete?: number;
+  can_retry?: boolean;
+  results_url?: string | null;
 };
 
 type JobsResponse = {

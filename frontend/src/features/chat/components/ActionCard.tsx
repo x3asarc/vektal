@@ -3,12 +3,15 @@
 import { useMemo, useState } from "react";
 import { ChatAction } from "@/shared/contracts/chat";
 import { BulkRunPanel } from "@/features/chat/components/BulkRunPanel";
+import { DelegationTracePanel } from "@/features/chat/components/DelegationTracePanel";
+import { DryRunReview } from "@/features/resolution/components/DryRunReview";
 
 type ActionCardProps = {
   action: ChatAction;
   submitting?: boolean;
   onApprove: (actionId: number, comment?: string) => Promise<void> | void;
   onApply: (actionId: number, mode?: "immediate" | "scheduled") => Promise<void> | void;
+  onDelegate?: (actionId: number) => Promise<void> | void;
 };
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -21,16 +24,31 @@ function asNumberArray(value: unknown): number[] {
   return value.filter((item): item is number => typeof item === "number" && Number.isFinite(item));
 }
 
-export function ActionCard({ action, submitting = false, onApprove, onApply }: ActionCardProps) {
+function asPositiveInt(value: unknown): number | undefined {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const normalized = Math.trunc(value);
+  return normalized > 0 ? normalized : undefined;
+}
+
+export function ActionCard({
+  action,
+  submitting = false,
+  onApprove,
+  onApply,
+  onDelegate,
+}: ActionCardProps) {
   const [comment, setComment] = useState("");
   const payload = asRecord(action.payload);
   const isBulk = payload.bulk === true;
   const preview = asRecord(payload.preview);
+  const dryRunId = asPositiveInt(payload.dry_run_id) ?? asPositiveInt(preview.batch_id);
   const conflictItemIds = asNumberArray(preview.conflict_item_ids);
   const lowConfidenceChangeIds = asNumberArray(preview.low_confidence_change_ids);
   const requiresDecision = payload.requires_user_decision === true || conflictItemIds.length > 0 || lowConfidenceChangeIds.length > 0;
   const canApprove = action.status === "dry_run_ready" || action.status === "awaiting_approval" || action.status === "approved";
   const canApply = action.status === "approved";
+  const delegationTrace = asRecord(payload.delegation_trace);
+  const hasDelegationTrace = Object.keys(delegationTrace).length > 0;
 
   const warningText = useMemo(() => {
     if (!requiresDecision) return null;
@@ -80,11 +98,27 @@ export function ActionCard({ action, submitting = false, onApprove, onApply }: A
         >
           {submitting ? "Applying..." : "Apply"}
         </button>
+        {onDelegate && (
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => void onDelegate(action.id)}
+          >
+            {submitting ? "Delegating..." : "Delegate"}
+          </button>
+        )}
       </div>
       {isBulk && <BulkRunPanel action={action} />}
+      {!isBulk && dryRunId && (
+        <details className="chat-action-dry-run">
+          <summary>Open dry-run review</summary>
+          <DryRunReview batchId={dryRunId} />
+        </details>
+      )}
       {!isBulk && action.result && (
         <pre className="chat-action-result">{JSON.stringify(action.result, null, 2)}</pre>
       )}
+      {hasDelegationTrace && <DelegationTracePanel trace={delegationTrace} />}
     </section>
   );
 }

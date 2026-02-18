@@ -52,6 +52,7 @@ products_tag = Tag(name="Products", description="Product catalog operations (CRU
 vendors_tag = Tag(name="Vendors", description="Vendor configuration and catalog management")
 oauth_tag = Tag(name="OAuth", description="Shopify OAuth integration and store connection")
 chat_tag = Tag(name="Chat", description="Conversational control plane and action orchestration")
+ops_tag = Tag(name="Ops", description="Operational guardrails and observability endpoints")
 
 _PATH_PARAM_RE = re.compile(r"<(?:[^:<>]+:)?([^<>]+)>")
 
@@ -231,5 +232,5 @@ def create_openapi_app(config_object=None):
 __all__ = [
     'create_openapi_app',
     'auth_tag', 'billing_tag', 'jobs_tag',
-    'products_tag', 'vendors_tag', 'oauth_tag', 'chat_tag'
+    'products_tag', 'vendors_tag', 'oauth_tag', 'chat_tag', 'ops_tag'
 ]

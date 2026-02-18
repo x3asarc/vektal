@@ -124,6 +124,78 @@ This phase defines the non-chat operational control surface and safe mutation pr
   - retryable subset,
   - exported recovery payload.
 
+### Precision Runtime Contracts (Expanded)
+- Admission controller is mandatory between staging edits and apply:
+  - schema validation,
+  - policy validation,
+  - conflict classification,
+  - commit eligibility gate.
+- Mutation execution mode switches by scope and complexity:
+  - smaller sets may run synchronous mutation path,
+  - large sets use staged uploads + background bulk mutation workflow,
+  - selection scope and complexity drive mode choice.
+- Throughput control follows adaptive AIMD behavior:
+  - additive increase while healthy,
+  - multiplicative decrease on throttle (429),
+  - bounded worker and chunk guardrails to avoid API lockout.
+- Progress contract is explicit and operator-visible:
+  - processed/total,
+  - ETA,
+  - current item/chunk,
+  - live log stream,
+  - cancel remaining action.
+- Conflict resolution contract includes four explicit user actions:
+  - skip,
+  - force apply,
+  - merge non-conflicting fields,
+  - review in side-by-side diff.
+- Recovery contract is actionable, not archival-only:
+  - deferred/failed rows become a replayable work queue,
+  - retry-eligible rows support one-click re-apply after fix,
+  - non-retryable rows require targeted remediation with reason codes.
+
+### Deep Architecture Recommendations (Locked)
+- Vendor field mapping architecture:
+  - versioned per `store + supplier + field_group`,
+  - deterministic transform pipeline from supplier raw -> canonical -> Shopify payload,
+  - required-field mapping gaps block dry-run completion.
+- Dry-run TTL architecture:
+  - default TTL is 60 minutes,
+  - stale previews require revalidation before apply,
+  - stale state must be surfaced with explicit UI badge and blocked blind apply.
+- Retry logic architecture (transient only):
+  - retry classes: 429, timeout, 5xx,
+  - exponential backoff + jitter,
+  - bounded attempts and deferred handoff to Recovery Logs.
+- Audit retention/export architecture:
+  - immutable 24-month retention,
+  - export formats CSV + JSON,
+  - payload includes actor, reason, rule version, per-product diff, timestamps.
+- Protected column architecture:
+  - enforced at UI, API, and persistence layers,
+  - protected/system columns cannot be filled, bulk-overwritten, or formula-propagated.
+- Alt-text preservation architecture:
+  - existing Shopify alt text preserved by default,
+  - generated/source candidates tracked with provenance,
+  - overwrite requires explicit rule or action-level approval.
+
+### Error Taxonomy Contract (Planning Seed)
+- Validation class:
+  - invalid domains (negative price, type mismatch, required missing),
+  - blocks preview completion until fixed or excluded.
+- Conflict class:
+  - stale snapshot/concurrent mutation/structural mismatch,
+  - routes to merge/force/skip/review actions.
+- Platform/transient class:
+  - throttle/timeouts/service failures,
+  - auto-retry under bounded policy.
+- Deferred dependency class:
+  - image ingest failure, mapping dependency, variant dependency constraints,
+  - moved to Recovery Logs with replay metadata.
+- Unexpected/system class:
+  - operation paused safely,
+  - failure reason preserved and operator notified with next action.
+
 </decisions>
 
 <specifics>
@@ -186,6 +258,44 @@ This phase defines the non-chat operational control surface and safe mutation pr
    - retryable failures get one-click replay path,
    - non-retryable failures route to fix queue.
 
+### Precision Interaction Blueprint (Expanded)
+- Workspace layout baseline:
+  - search bar + filter builder,
+  - scope-aware selection toolbar,
+  - editable grid with locked/protected columns,
+  - bulk action panel,
+  - dry-run preview modal/page,
+  - apply monitor and results/recovery view.
+- Selection semantics:
+  - explicit scopes: page, filtered result set, explicit checked rows,
+  - persistent selection under filter changes,
+  - immutable selection snapshot when dry-run is generated.
+- Bulk operations grammar:
+  - set,
+  - add,
+  - remove,
+  - replace,
+  - clear,
+  - increase/decrease (percent/fixed),
+  - conditional set (if blank),
+  - find/replace,
+  - map-from-column.
+- Grid ergonomics (desktop-first precision mode):
+  - keyboard-first navigation,
+  - fill handle (vertical default, horizontal optional),
+  - pattern-aware fill with confirmation on ambiguous patterns,
+  - protected fields visually distinct and non-fillable.
+- Dry-run preview ergonomics:
+  - side-by-side before/after,
+  - risk/conflict badges,
+  - per-product include/exclude,
+  - export preview for offline review.
+- Apply monitor ergonomics:
+  - live progress and ETA,
+  - active chunk/item indicator,
+  - background continuation option,
+  - deterministic terminal summary and recovery handoff.
+
 ### Error and Conflict Taxonomy (Planning Input)
 - Validation errors:
   - type mismatch, required field missing, invalid value domain.
@@ -210,6 +320,32 @@ This phase defines the non-chat operational control surface and safe mutation pr
   - support both synchronous and background apply modes,
   - provide chunk-progress stream and final aggregate summary,
   - return conflict-classified responses for dry-run and preflight.
+
+### Minimal Entity Contract (Expanded for Planning)
+- `bulk_operation`:
+  - operation state machine (drafting -> previewing -> preview_ready -> applying -> completed/deferred/failed/cancelled),
+  - selection scope snapshot,
+  - operation config and risk metadata.
+- `product_snapshot`:
+  - product pre-image at scope freeze,
+  - snapshot timestamp and lineage reference.
+- `preview_result`:
+  - per-product before/after,
+  - conflict and warning classification,
+  - preview generation timestamp and TTL marker.
+- `apply_result`:
+  - chunk-level outcomes,
+  - processed/success/deferred/failed counters,
+  - started/completed timestamps.
+- `recovery_log`:
+  - deferred/failed action record,
+  - retry eligibility,
+  - reason code/message,
+  - replay payload pointer.
+- `stored_image_asset`:
+  - source URL provenance,
+  - content hash and dedupe key,
+  - internal storage reference and media metadata.
 
 ### Success Metrics to Carry into Plan/Verification
 - Adoption:
@@ -252,7 +388,9 @@ This phase defines the non-chat operational control surface and safe mutation pr
 - user_answers_captured: yes
 - external_research_inputs:
   - precisionworkspace.md (Kimi agent mode, Gemini deep research, Grok instant, ChatGPT instant)
-  - synthesis_method: consensus lock + outlier adjudication by user decisions
+  - synthesis_method: consensus lock + outlier adjudication by user decisions + architecture uplift from multi-model overlap
+- canonical_contract_definitions:
+  - `.planning/phases/11-product-search-discovery/GOV_REL_GLOSSARY.md`
 
 </discussion_evidence>
 

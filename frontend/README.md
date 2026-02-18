@@ -215,3 +215,254 @@ backend session checks on every route.
 3. Add shared cross-feature types to `src/shared/contracts`.
 4. Add tests alongside implementation (`*.test.ts` / `*.test.tsx`) or in `tests/frontend` for cross-cutting contract tests.
 5. Respect import-boundary rules; do not bypass by deep-linking across layers.
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Premium Glassmorphic AI Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#FFFFFF", 
+                        "background-dark": "#0a0a0f", 
+                        "surface-dark": "#121212",
+                        "card-dark": "#1c1c24",
+                        "border-dark": "#27272a",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",'xl': '0.75rem','2xl': '1rem',
+                        'card': '0.5rem', 
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px -5px rgba(255, 255, 255, 0.05)',
+                        'input-glow': '0 0 15px -3px rgba(255,255,255,0.1), inset 0 0 20px -10px rgba(255,255,255,0.05)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-rounded {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 300,
+          'GRAD' 0,
+          'opsz' 24
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-input {
+            background: rgba(28, 28, 36, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px -3px rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-gray-100 h-screen flex overflow-hidden selection:bg-white selection:text-black dark relative">
+<div class="absolute inset-0 z-0 bg-noise pointer-events-none opacity-40 mix-blend-overlay"></div>
+<div class="absolute inset-0 z-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d0d12] to-[#0a0a0f] pointer-events-none"></div>
+<aside class="w-16 flex flex-col items-center py-4 glass-panel flex-shrink-0 z-20 relative">
+<div class="mb-6">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-colors border border-white/5">
+<span class="material-symbols-rounded text-gray-300">asterisk</span>
+</button>
+</div>
+<nav class="flex-1 flex flex-col gap-4 w-full px-2">
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Layout">
+<span class="material-symbols-rounded">space_dashboard</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="New">
+<span class="material-symbols-rounded">add_box</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Search">
+<span class="material-symbols-rounded">search</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-xl bg-gray-700/50 text-white transition-colors shadow-glow border border-white/10" title="AI Tools">
+<span class="material-symbols-rounded filled-icon">auto_awesome</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Images">
+<span class="material-symbols-rounded">image</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Grid">
+<span class="material-symbols-rounded">grid_view</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Code">
+<span class="material-symbols-rounded">code</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Folder">
+<span class="material-symbols-rounded">folder_open</span>
+</button>
+</nav>
+<div class="flex flex-col gap-4 w-full px-2 mt-auto">
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
+<span class="material-symbols-rounded">info</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
+<span class="material-symbols-rounded">headphones</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
+<span class="material-symbols-rounded">settings</span>
+</button>
+<button class="w-10 h-10 mx-auto flex items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
+<span class="material-symbols-rounded">flare</span>
+</button>
+<button class="w-10 h-10 mx-auto mt-2 rounded-full overflow-hidden border border-white/10">
+<img alt="User profile" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD9h_iXky16WcCbArhY7GW1tU5aWbMqUW1LWBKI-GXj-871fsiM8lRlX3nf8VIoXPdmfk6HSyDvqG_Y9ktmeuJbXlO5kW5dAzPAnp62B6uuISnlt9P30uGjTYsAXdoxOTKBcFef4odmiuJ-u7gVAoAomT-QjS6rCZbt2Ar2lRp_heqrauRz-7Joj9vs5MMhb56irRGO3pnZXQSjBy8kPdNe5oLEcnyPql-e-xcS3xGbRp18psQthkmCXmnZn8nPHLLLBO-QwLnkQ"/>
+</button>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full relative overflow-hidden z-10">
+<header class="h-16 flex items-center px-6 border-b border-white/5 bg-transparent backdrop-blur-sm z-10 sticky top-0">
+<div class="flex items-center gap-2 cursor-pointer group">
+<h1 class="font-medium text-sm text-gray-200 tracking-wide">Proxyum 5.0</h1>
+<span class="material-symbols-rounded text-base text-gray-500 group-hover:text-gray-300 transition-colors">arrow_drop_down</span>
+</div>
+<div class="ml-auto flex items-center gap-4">
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-rounded text-xl">more_horiz</span>
+</button>
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-rounded text-xl">ios_share</span>
+</button>
+<button class="text-gray-500 hover:text-white transition-colors">
+<span class="material-symbols-rounded text-xl">help</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto w-full relative custom-scrollbar">
+<div class="absolute top-[-10%] left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-gradient-to-b from-white/5 to-transparent blur-[120px] pointer-events-none rounded-full"></div>
+<div class="max-w-4xl mx-auto px-6 py-20 flex flex-col items-center relative z-10">
+<div class="text-center mb-16 animate-fade-in-up">
+<h2 class="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight drop-shadow-lg">Welcome to Proxyum!</h2>
+<div class="flex items-center justify-center gap-2 text-xl md:text-2xl text-gray-400 font-normal">
+<span>Friendly Vanuel</span>
+<span class="text-2xl animate-pulse">👋</span>
+</div>
+</div>
+<div class="w-full mb-12">
+<h3 class="text-xs uppercase tracking-wider font-semibold text-gray-500 mb-4 ml-1">Starters</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-[#1c1c24] border border-white/10 hover:border-white/20 p-6 rounded-xl flex items-center justify-between group transition-all duration-300 cursor-pointer shadow-lg hover:shadow-glow hover:-translate-y-0.5">
+<div class="flex flex-col gap-1 pr-4">
+<span class="font-bold text-gray-100 text-lg">Smart Response Assistant</span>
+<span class="text-xs text-gray-500 font-medium">Create instant, accurate AI replies.</span>
+</div>
+<button class="bg-transparent border border-white/20 hover:bg-white/5 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-gray-300 hover:text-white whitespace-nowrap">
+<span class="material-symbols-rounded text-sm">auto_awesome</span>
+                            Generate
+                        </button>
+</div>
+<div class="bg-[#1c1c24] border border-white/10 hover:border-white/20 p-6 rounded-xl flex items-center justify-between group transition-all duration-300 cursor-pointer shadow-lg hover:shadow-glow hover:-translate-y-0.5">
+<div class="flex flex-col gap-1 pr-4">
+<span class="font-bold text-gray-100 text-lg">Chatbot Flow Generator</span>
+<span class="text-xs text-gray-500 font-medium">Design smart reply flows in seconds.</span>
+</div>
+<button class="bg-transparent border border-white/20 hover:bg-white/5 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-gray-300 hover:text-white whitespace-nowrap">
+<span class="material-symbols-rounded text-sm">auto_awesome</span>
+                            Generate
+                        </button>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-3 w-full mb-10">
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-[#1c1c24] hover:bg-white/5 hover:border-white/20 transition-all text-xs font-medium text-gray-400 hover:text-white shadow-sm">
+<span class="material-symbols-rounded text-sm">bar_chart</span>
+                    Market Trend Research
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-[#1c1c24] hover:bg-white/5 hover:border-white/20 transition-all text-xs font-medium text-gray-400 hover:text-white shadow-sm">
+<span class="material-symbols-rounded text-sm">assignment</span>
+                    Generate Reports
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-[#1c1c24] hover:bg-white/5 hover:border-white/20 transition-all text-xs font-medium text-gray-400 hover:text-white shadow-sm">
+<span class="material-symbols-rounded text-sm">database</span>
+                    Create Data Visual
+                </button>
+</div>
+<div class="w-full relative group">
+<div class="absolute -inset-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-xl blur-md group-focus-within:via-white/20 transition-all duration-500 opacity-60"></div>
+<div class="relative glass-input rounded-xl p-5 shadow-input-glow transition-all">
+<textarea class="w-full bg-transparent border-none focus:ring-0 resize-none text-gray-100 placeholder-gray-500 text-base min-h-[60px]" placeholder="Ask anything..." rows="2"></textarea>
+<div class="flex items-center justify-between mt-3 pt-2 border-t border-white/5">
+<div class="flex items-center gap-2">
+<button class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/5 bg-white/5 backdrop-blur-sm">
+<span class="material-symbols-rounded text-xl">add</span>
+</button>
+<button class="h-9 px-3 flex items-center gap-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors text-xs font-medium border border-white/5 bg-white/5 backdrop-blur-sm">
+<span class="material-symbols-rounded text-sm">attachment</span>
+                                Attach
+                            </button>
+<button class="h-9 px-3 flex items-center gap-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors text-xs font-medium border border-white/5 bg-white/5 backdrop-blur-sm">
+<span class="material-symbols-rounded text-sm">language</span>
+                                Deep Search
+                            </button>
+<button class="h-9 px-3 flex items-center gap-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors text-xs font-medium border border-white/5 bg-white/5 backdrop-blur-sm">
+<span class="material-symbols-rounded text-sm">image</span>
+                                Generate Image
+                            </button>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-rounded">graphic_eq</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-lg bg-white text-black hover:bg-gray-200 transition-colors shadow-glow">
+<span class="material-symbols-rounded text-xl filled-icon">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex items-center gap-2 text-[10px] sm:text-xs text-gray-600 font-light">
+<span class="material-symbols-rounded text-sm">info</span>
+<p>Don't enter sensitive info. AI may generate inaccurate or incomplete responses.</p>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

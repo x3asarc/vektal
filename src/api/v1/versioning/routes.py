@@ -22,6 +22,15 @@ from src.api.core.versioning import run_user_migration
 from src.models import db
 
 
+def _as_utc(dt):
+    """Normalize datetime to timezone-aware UTC."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
 @versioning_bp.route('/version', methods=['GET'])
 @login_required
 def get_version_status():
@@ -47,9 +56,10 @@ def get_version_status():
 
     if current_user.api_version == 'v2' and current_user.api_version_locked_until:
         now = datetime.now(timezone.utc)
-        if current_user.api_version_locked_until > now:
+        lock_until_dt = _as_utc(current_user.api_version_locked_until)
+        if lock_until_dt > now:
             rollback_available = True
-            lock_until = current_user.api_version_locked_until
+            lock_until = lock_until_dt
 
     response = ApiVersionStatusResponse(
         current_version=current_user.api_version,
@@ -96,8 +106,9 @@ def migrate_to_v2():
         rollback_until = None
         if current_user.api_version_locked_until:
             now = datetime.now(timezone.utc)
-            if current_user.api_version_locked_until > now:
-                rollback_until = current_user.api_version_locked_until
+            lock_until_dt = _as_utc(current_user.api_version_locked_until)
+            if lock_until_dt > now:
+                rollback_until = lock_until_dt
 
         response = MigrateToV2Response(
             previous_version='v2',
@@ -118,7 +129,7 @@ def migrate_to_v2():
             status=422,
             detail=migration_result['error'],
             instance=request.path
-        ).to_response()
+        )
 
     # Update user version and set rollback lock window
     current_user.api_version = 'v2'
@@ -135,7 +146,7 @@ def migrate_to_v2():
             status=500,
             detail=f'Database commit failed: {str(e)}',
             instance=request.path
-        ).to_response()
+        )
 
     response = MigrateToV2Response(
         previous_version=previous_version,
@@ -180,11 +191,9 @@ def rollback_to_v1():
             status=409,
             detail=f'Rollback to v1 is only available for v2 users. You are currently on {current_user.api_version}.',
             instance=request.path,
-            extensions={
-                'current_version': current_user.api_version,
-                'reason': 'not-on-v2'
-            }
-        ).to_response()
+            current_version=current_user.api_version,
+            reason='not-on-v2'
+        )
 
     # Validate rollback window is still active
     if not current_user.api_version_locked_until:
@@ -194,26 +203,23 @@ def rollback_to_v1():
             status=409,
             detail='Rollback window has expired. You cannot rollback to v1 after 24 hours.',
             instance=request.path,
-            extensions={
-                'current_version': current_user.api_version,
-                'reason': 'no-lock-window'
-            }
-        ).to_response()
+            current_version=current_user.api_version,
+            reason='no-lock-window'
+        )
 
     now = datetime.now(timezone.utc)
-    if current_user.api_version_locked_until <= now:
+    lock_until_dt = _as_utc(current_user.api_version_locked_until)
+    if lock_until_dt <= now:
         return ProblemDetails.business_error(
             error_type='rollback-not-allowed',
             title='Rollback Window Expired',
             status=409,
-            detail=f'Rollback window expired at {current_user.api_version_locked_until.isoformat()}. You cannot rollback to v1 after 24 hours.',
+            detail=f'Rollback window expired at {lock_until_dt.isoformat()}. You cannot rollback to v1 after 24 hours.',
             instance=request.path,
-            extensions={
-                'current_version': current_user.api_version,
-                'lock_expired_at': current_user.api_version_locked_until.isoformat(),
-                'reason': 'window-expired'
-            }
-        ).to_response()
+            current_version=current_user.api_version,
+            lock_expired_at=lock_until_dt.isoformat(),
+            reason='window-expired'
+        )
 
     # Perform rollback
     current_user.api_version = 'v1'
@@ -229,7 +235,7 @@ def rollback_to_v1():
             status=500,
             detail=f'Database commit failed: {str(e)}',
             instance=request.path
-        ).to_response()
+        )
 
     response = RollbackToV1Response(
         previous_version=previous_version,

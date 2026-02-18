@@ -32,7 +32,7 @@ def authenticated_client(client):
     with client.application.app_context():
         user = User(
             email="chat-single-sku@example.com",
-            tier=UserTier.TIER_1,
+            tier=UserTier.TIER_2,
             account_status=AccountStatus.ACTIVE,
             email_verified=True,
             api_version="v1",

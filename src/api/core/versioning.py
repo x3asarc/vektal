@@ -118,6 +118,12 @@ def register_versioning_hooks(app):
         if requested_version is None:
             return None
 
+        # Always allow user version-management control plane.
+        # These endpoints are intentionally hosted under /api/v1/user/*
+        # for migration/rollback regardless of current user version.
+        if request.path.startswith('/api/v1/user/'):
+            return None
+
         # Check for version mismatch
         user_version = current_user.api_version
         if requested_version != user_version:
@@ -131,12 +137,10 @@ def register_versioning_hooks(app):
                 status=409,
                 detail=f'You are using API {user_version} but requested {requested_version}. Please use the correct version endpoint.',
                 instance=request.path,
-                extensions={
-                    'user_version': user_version,
-                    'requested_version': requested_version,
-                    'suggested_path': suggested_path
-                }
-            ).to_response()
+                user_version=user_version,
+                requested_version=requested_version,
+                suggested_path=suggested_path
+            )
 
         return None
 
@@ -162,7 +166,10 @@ def register_versioning_hooks(app):
         # Add lock-until header if rollback window is active
         if current_user.api_version_locked_until:
             # Format as ISO 8601 with timezone
-            lock_until_iso = current_user.api_version_locked_until.isoformat()
+            lock_until = current_user.api_version_locked_until
+            if lock_until.tzinfo is None:
+                lock_until = lock_until.replace(tzinfo=timezone.utc)
+            lock_until_iso = lock_until.isoformat()
             response.headers['X-API-Version-Lock-Until'] = lock_until_iso
 
         return response

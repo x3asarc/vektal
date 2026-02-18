@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from src.models import IngestChunk, IngestChunkStatus, Job, JobStatus, db
+from src.jobs.progress import announce_job_progress
 
 
 def _now() -> datetime:
@@ -48,6 +49,7 @@ def request_cancellation(job_id: int, terminate: bool = False) -> dict:
     # Kick finalizer asynchronously so the state converges quickly.
     celery_app.send_task("src.tasks.control.finalize_job", kwargs={"job_id": job.id})
     db.session.commit()
+    announce_job_progress(job_id=job.id, job=job)
     return {
         "status": "cancel_requested",
         "job_status": job.status.value,

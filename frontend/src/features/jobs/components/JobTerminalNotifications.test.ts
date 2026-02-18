@@ -1,6 +1,9 @@
+import { render, screen } from "@testing-library/react";
+import { createElement } from "react";
 import { describe, expect, it } from "vitest";
 import {
   JobTerminalEvent,
+  JobTerminalNotifications,
   selectVisibleTerminalEvents,
 } from "@/features/jobs/components/JobTerminalNotifications";
 
@@ -42,5 +45,32 @@ describe("job terminal notification policy", () => {
     const result = selectVisibleTerminalEvents(events, now);
     expect(result.collapsed).toBe(true);
     expect(result.collapsedCount).toBe(3);
+  });
+
+  it("renders actionable detail and links for terminal events", () => {
+    const events: JobTerminalEvent[] = [
+      {
+        key: "error-1",
+        jobId: 99,
+        status: "error",
+        message: "Job 99 failed",
+        detail: "strict_failed_chunk",
+        jobUrl: "/jobs/99",
+        resultsUrl: "/jobs/99?tab=results",
+        occurredAt: 300_000,
+      },
+    ];
+
+    render(createElement(JobTerminalNotifications, { events, now: 300_500 }));
+
+    expect(screen.getByText("strict_failed_chunk")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Open job" })).toHaveAttribute(
+      "href",
+      "/jobs/99",
+    );
+    expect(screen.getByRole("link", { name: "View results" })).toHaveAttribute(
+      "href",
+      "/jobs/99?tab=results",
+    );
   });
 });

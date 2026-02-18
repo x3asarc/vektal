@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Any
 from datetime import datetime
 
+from src.jobs.progress import build_progress_payload
+
 
 class JobProgressEvent(BaseModel):
     """Real-time job progress update sent via SSE."""
@@ -20,23 +22,21 @@ class JobProgressEvent(BaseModel):
     current_item: Optional[str] = Field(default=None, description="SKU currently being processed")
     message: Optional[str] = Field(default=None, description="Status message")
     percent_complete: float = Field(default=0.0)
+    current_step: str = Field(default="queued")
+    current_step_label: str = Field(default="Queued")
+    step_index: int = Field(default=1)
+    step_total: int = Field(default=6)
+    eta_seconds: Optional[int] = Field(default=None)
+    can_retry: bool = Field(default=False)
+    retry_url: Optional[str] = Field(default=None)
+    results_url: Optional[str] = Field(default=None)
+    error_message: Optional[str] = Field(default=None)
 
     @classmethod
     def from_job(cls, job) -> "JobProgressEvent":
         """Create progress event from Job model."""
-        percent = 0.0
-        if job.total_items > 0:
-            percent = (job.processed_items / job.total_items) * 100
-
-        return cls(
-            job_id=job.id,
-            status=job.status.value if hasattr(job.status, 'value') else str(job.status),
-            processed_items=job.processed_items or 0,
-            total_items=job.total_items or 0,
-            successful_items=job.successful_items or 0,
-            failed_items=job.failed_items or 0,
-            percent_complete=round(percent, 1)
-        )
+        payload = build_progress_payload(job)
+        return cls(**payload)
 
 
 class JobStatusResponse(BaseModel):
@@ -52,6 +52,14 @@ class JobStatusResponse(BaseModel):
     started_at: Optional[str] = None
     completed_at: Optional[str] = None
     error_message: Optional[str] = None
+    current_step: str = "queued"
+    current_step_label: str = "Queued"
+    step_index: int = 1
+    step_total: int = 6
+    eta_seconds: Optional[int] = None
+    can_retry: bool = False
+    retry_url: Optional[str] = None
+    results_url: Optional[str] = None
 
 
 class JobStreamInfo(BaseModel):

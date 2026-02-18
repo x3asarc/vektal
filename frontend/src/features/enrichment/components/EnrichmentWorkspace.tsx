@@ -110,62 +110,75 @@ export function EnrichmentWorkspace() {
   }
 
   return (
-    <section className="panel" data-testid="enrichment-workspace">
-      <h1>enrichment</h1>
-      <p className="muted">
-        Governed product enrichment with dry-run TTL, policy lineage, and queue-backed apply.
-      </p>
-      <EnrichmentRunConfigurator onStart={handleStart} isSubmitting={isBusy} />
+    <div className="page-wrap" data-testid="enrichment-workspace">
+      {/* Page header */}
+      <div className="page-header">
+        <h1 className="page-title">
+          <span className="material-symbols-rounded" style={{ marginRight: 8 }}>inventory_2</span>
+          Product Enrichment
+        </h1>
+        <p className="page-subtitle">Governed enrichment with dry-run TTL, policy lineage, and queue-backed apply.</p>
+      </div>
 
-      {run ? (
-        <section className="panel" style={{ marginTop: 12 }} data-testid="enrichment-run-summary">
-          <h2>Run Summary</h2>
-          <p className="muted">
-            Run #{run.run_id} | Profile: <strong>{run.run_profile}</strong> | Language:{" "}
-            <strong>{run.target_language}</strong>
-          </p>
-          <p className="muted">
-            Status: <strong>{run.status}</strong> | Oracle: <strong>{run.oracle_decision}</strong> | TTL stale:{" "}
-            <strong>{run.is_stale ? "yes" : "no"}</strong>
-          </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={handleRefresh} disabled={isBusy}>
-              Refresh review
-            </button>
-            <button type="button" onClick={handleApprove} disabled={isBusy || run.is_stale}>
-              Approve selection
-            </button>
-            <button type="button" onClick={handleApply} disabled={isBusy || run.is_stale}>
-              Apply approved
-            </button>
+      {/* Scrollable body */}
+      <div className="page-body">
+        {error ? <p style={{ color: "var(--error)", margin: 0 }}>{error}</p> : null}
+
+        <EnrichmentRunConfigurator onStart={handleStart} isSubmitting={isBusy} />
+
+        {run ? (
+          <div className="enrichment-run-summary" data-testid="enrichment-run-summary">
+            <h2>Run Summary</h2>
+            <div className="enrichment-run-meta">
+              <span className="enrichment-badge">Run <strong>#{run.run_id}</strong></span>
+              <span className="enrichment-badge">Profile: <strong>{run.run_profile}</strong></span>
+              <span className="enrichment-badge">Lang: <strong>{run.target_language}</strong></span>
+              <span className="enrichment-badge">Status: <strong>{run.status}</strong></span>
+              <span className="enrichment-badge">Oracle: <strong>{run.oracle_decision}</strong></span>
+              {run.is_stale && <span className="enrichment-badge" style={{ color: "var(--warning)", borderColor: "rgba(251,191,36,0.3)" }}>TTL stale</span>}
+            </div>
+            <div className="enrichment-run-meta" style={{ gap: 6 }}>
+              <span className="enrichment-badge">Allowed: <strong>{run.write_plan.counts.allowed}</strong></span>
+              <span className="enrichment-badge">Blocked: <strong>{run.write_plan.counts.blocked}</strong></span>
+              <span className="enrichment-badge">Approved: <strong>{run.write_plan.counts.approved ?? 0}</strong></span>
+              <span className="enrichment-badge">Total: <strong>{run.write_plan.counts.total}</strong></span>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="btn-ghost" type="button" onClick={handleRefresh} disabled={isBusy} style={{ fontSize: "0.8rem" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>refresh</span>
+                Refresh
+              </button>
+              <button className="btn-ghost" type="button" onClick={handleApprove} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>check_circle</span>
+                Approve selection
+              </button>
+              <button className="btn-primary" type="button" onClick={handleApply} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>send</span>
+                Apply approved
+              </button>
+            </div>
           </div>
-          <p className="muted">
-            Counts: allowed {run.write_plan.counts.allowed}, blocked {run.write_plan.counts.blocked}, approved{" "}
-            {run.write_plan.counts.approved ?? 0}, total {run.write_plan.counts.total}
-          </p>
-        </section>
-      ) : null}
+        ) : null}
 
-      {run ? (
-        <>
-          <EnrichmentReviewTable rows={rows} selectedIds={selectedIds} onToggle={toggleSelected} />
-          <EnrichmentConflictPanel
-            blockedRows={run.write_plan.blocked}
-            protectedColumns={run.protected_columns}
-          />
-        </>
-      ) : null}
+        {applyResult ? (
+          <div className="panel" data-testid="enrichment-apply-result" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span className="material-symbols-rounded" style={{ color: "var(--ok)", fontSize: 20 }}>check_circle</span>
+            <p className="muted" style={{ margin: 0 }}>
+              Job <strong style={{ color: "var(--text)" }}>#{applyResult.job_id}</strong> queued on <strong style={{ color: "var(--text)" }}>{applyResult.queue}</strong>.
+            </p>
+          </div>
+        ) : null}
 
-      {applyResult ? (
-        <section className="panel" data-testid="enrichment-apply-result">
-          <h2>Apply queued</h2>
-          <p className="muted">
-            Job #{applyResult.job_id} queued on <strong>{applyResult.queue}</strong>.
-          </p>
-        </section>
-      ) : null}
-
-      {error ? <p style={{ color: "var(--error)" }}>{error}</p> : null}
-    </section>
+        {run ? (
+          <>
+            <EnrichmentReviewTable rows={rows} selectedIds={selectedIds} onToggle={toggleSelected} />
+            <EnrichmentConflictPanel
+              blockedRows={run.write_plan.blocked}
+              protectedColumns={run.protected_columns}
+            />
+          </>
+        ) : null}
+      </div>
+    </div>
   );
 }

@@ -53,7 +53,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Product Search & Discovery** - Advanced search and version tracking
 - [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
 - [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
-- [ ] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
+- [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
 - [ ] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
 - [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
 - [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
@@ -424,7 +424,7 @@ Plans:
 - [x] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation (Wave 1)
 - [x] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration, and idempotent retries (Wave 2)
 - [x] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX (Wave 3)
-- [ ] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure (Wave 4)
+- [x] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure (Wave 4)
 
 ### Phase 13.2: Oracle Framework Reuse (INSERTED)
 
@@ -501,7 +501,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 11. Product Search & Discovery | 3/3 | Complete | 2026-02-15 |
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
-| 13.1. Product Data Enrichment Protocol v2 Integration | 3/4 | In Progress | - |
+| 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
 | 13.2. Oracle Framework Reuse | 0/0 | Not started | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |
 | 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |

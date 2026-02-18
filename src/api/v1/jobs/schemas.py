@@ -38,6 +38,15 @@ class JobResponse(BaseModel):
     completed_at: Optional[str] = None
     error_message: Optional[str] = None
     stream_url: Optional[str] = None  # SSE endpoint
+    percent_complete: float = 0.0
+    current_step: str = "queued"
+    current_step_label: str = "Queued"
+    step_index: int = 1
+    step_total: int = 6
+    eta_seconds: Optional[int] = None
+    can_retry: bool = False
+    retry_url: Optional[str] = None
+    results_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -53,13 +62,23 @@ class JobListResponse(BaseModel):
     total: int
 
 class JobCreateRequest(BaseModel):
-    """Request to create a job (via CSV upload)."""
-    # Note: Actual job creation uses file upload, not JSON
-    # This schema is for documentation purposes
-    pass
+    """Request to create a background ingest job."""
+    store_id: Optional[int] = Field(default=None, description="Optional store id override")
+    job_name: Optional[str] = Field(default=None, max_length=255)
+    chunk_size: int = Field(default=100, ge=10, le=1000)
 
 class JobCancelResponse(BaseModel):
     """Response after cancelling a job."""
     message: str
     job_id: int
     new_status: str
+
+
+class JobRetryResponse(BaseModel):
+    """Response after creating a retry job."""
+    message: str
+    job_id: int
+    retry_of_job_id: int
+    status: str
+    task_id: Optional[str] = None
+    stream_url: Optional[str] = None

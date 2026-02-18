@@ -6,22 +6,17 @@ import {
   getRedirectForRoute,
   resolveSafeRedirect,
 } from "@/lib/auth/guards";
-import { apiRequest } from "@/lib/api/client";
+import { ApiClientError, apiRequest } from "@/lib/api/client";
 import { readGuardFlags, setGuardFlags } from "@/lib/auth/session-flags";
 import { GuardState } from "@/shared/contracts";
-import { GlobalJobTracker } from "@/features";
 import { Sidebar } from "@/shell/components/Sidebar";
-import { ChatSurface } from "@/shell/components/ChatSurface";
 import { GlobalPendingIndicator } from "@/shell/components/GlobalPendingIndicator";
-import { NotificationStack } from "@/shell/components/NotificationStack";
 
 type AppShellProps = {
   children: ReactNode;
 };
 
-const DEV_AUTH_BYPASS =
-  process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "1" ||
-  process.env.NODE_ENV !== "production";
+const DEV_AUTH_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "1";
 
 type AuthMeResponse = {
   user: {
@@ -53,12 +48,18 @@ async function fetchGuardStateFromBackend(): Promise<GuardState> {
       V: Boolean(me.user.email_verified),
       S: storeConnected,
     };
-  } catch {
-    return {
-      A: false,
-      V: false,
-      S: false,
-    };
+  } catch (error: unknown) {
+    // Only treat definitive auth failures as logged-out state.
+    if (error instanceof ApiClientError && (error.normalized.status === 401 || error.normalized.status === 403)) {
+      return {
+        A: false,
+        V: false,
+        S: false,
+      };
+    }
+
+    // Preserve local state on transient API failures (429/5xx/network).
+    return readGuardFlags();
   }
 }
 
@@ -119,13 +120,8 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <main>
       <GlobalPendingIndicator />
-      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "1fr" }}>
-        <Sidebar width={width} />
-        <NotificationStack />
-        <GlobalJobTracker />
-        {children}
-        <ChatSurface width={width} />
-      </div>
+      <Sidebar width={width} />
+      <div className="app-shell-content">{children}</div>
     </main>
   );
 }

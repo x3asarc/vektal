@@ -28,7 +28,7 @@ Usage:
 """
 import os
 from typing import Callable
-from flask import Flask
+from flask import Flask, request
 from flask_login import current_user
 from src.models import UserTier
 
@@ -40,8 +40,9 @@ TIER_LIMITS = {
     UserTier.TIER_3: "2000 per day",   # $299/mo Enterprise
 }
 
-# Default limits for unauthenticated and fallback scenarios
-DEFAULT_UNAUTHENTICATED_LIMIT = "10 per hour"
+# Default limits for unauthenticated and fallback scenarios.
+# Keep this high enough for normal browser auth/bootstrap traffic.
+DEFAULT_UNAUTHENTICATED_LIMIT = "200 per hour"
 DEFAULT_LIMITS = ["200 per day", "50 per hour"]
 
 
@@ -116,15 +117,25 @@ def create_limiter(app: Flask):
     # Get Redis URL from environment (Docker Compose uses redis:6379)
     redis_url = os.getenv("REDIS_URL", "redis://redis:6379/1")
 
+    rate_limit_enabled = app.config.get("RATELIMIT_ENABLED", True)
+    storage_uri = app.config.get("RATELIMIT_STORAGE_URI", redis_url)
+
+    def _exempt_non_api_v1() -> bool:
+        """Apply default limits only to versioned API routes."""
+        return not request.path.startswith("/api/v1/")
+
     limiter = Limiter(
         key_func=get_rate_limit_key,
         app=app,
-        storage_uri=redis_url,
+        storage_uri=storage_uri,
         storage_options={"socket_keepalive": True},
-        default_limits=DEFAULT_LIMITS,
+        # Enforce limits per request based on authenticated user's tier.
+        default_limits=[get_user_tier_limit],
+        default_limits_exempt_when=_exempt_non_api_v1,
         # Strategy: fixed-window (simple, predictable)
         # Alternative: moving-window (more accurate but higher Redis load)
-        strategy="fixed-window"
+        strategy="fixed-window",
+        enabled=rate_limit_enabled
     )
 
     return limiter

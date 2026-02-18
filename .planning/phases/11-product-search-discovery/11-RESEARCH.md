@@ -10,6 +10,7 @@
 - Shopify is source of truth.
 - Precision workspace is the non-chat operator surface.
 - Dry-run diff gate is mandatory for mutating operations.
+- Admission controller is mandatory between staging and apply.
 - Approval model is action-block with per-product include/exclude overrides.
 - Bulk cap is up to 1000 SKUs with adaptive chunking/concurrency.
 - Snapshot lifecycle is tiered:
@@ -19,6 +20,10 @@
   - hash dedupe and deterministic recovery chain.
 - Retry policy is bounded for transient failures only (429/5xx/timeouts).
 - Audit retention/export and protected-column/alt-text policies are mandatory.
+- Execution mode is adaptive:
+  - synchronous chunked path for smaller/safer sets,
+  - staged upload + background bulk mutation path for larger sets.
+- Recovery logs are actionable replay queues, not passive archives.
 </phase_context>
 
 ## Executive Summary
@@ -83,6 +88,11 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - Search API contracts should be keyset/cursor first with deterministic tie-breakers.
 - Phase 11 bulk discovery/staging should not bypass Phase 8 mutation safety engine.
 - Grid technology should support strong keyboard/selection/fill behavior from day one; AG Grid is a fit for the locked precision requirements.
+- Shopify bulk pipeline integration should model:
+  - staged uploads,
+  - bulk mutation submission,
+  - current operation polling/cancel semantics,
+  - explicit terminal summary and recovery routing.
 
 ## Recommended Architecture
 
@@ -117,6 +127,37 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - Enforce dry-run TTL (60 minutes) and mandatory preflight revalidation before apply.
 - Add audit retention/export services and endpoints (CSV + JSON).
 
+### 4) Admission, Throughput, and Recovery Runtime (`11-03` cross-cutting)
+
+- Admission controller stages:
+  - schema check,
+  - policy check,
+  - conflict check,
+  - commit eligibility decision.
+- Throughput governor:
+  - additive increase while healthy,
+  - multiplicative decrease on 429,
+  - bounded chunk/worker caps by operation complexity.
+- Recovery engine behavior:
+  - retry transient classes with bounded attempts and jitter,
+  - route exhaustion to Recovery Logs with replay metadata,
+  - keep non-retryable failures in fix queue with clear reason codes.
+
+### 5) Vendor Mapping and Field Governance (`11-02` + `11-03`)
+
+- Add versioned vendor mapping contract per `store + supplier + field_group`.
+- Transform chain must remain deterministic:
+  - supplier raw -> canonical model -> Shopify payload.
+- Unmapped required fields must block dry-run completion with guided remediation.
+- Protected-column enforcement is required in:
+  - grid interaction layer,
+  - API validation layer,
+  - persistence layer.
+- Alt-text governance:
+  - preserve Shopify alt by default,
+  - record source/generated candidates with provenance,
+  - overwrite only by explicit rule/action approval.
+
 ## Data Model Changes Required
 
 ### Minimum Additions
@@ -125,11 +166,18 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
    - product_id, actor, source, before/after payload, rule/action refs, timestamps.
 2. `search_saved_views`
    - user/store scoped saved filters/column presets/sort.
-3. Snapshot lifecycle enhancements
+3. `vendor_field_mappings` (versioned)
+   - store_id, supplier_id, field_group, mapping_version, mapping_rules, required_coverage_status.
+4. Snapshot lifecycle enhancements
    - baseline snapshot type support,
    - optional pointer/dedupe relations from repeated pre-images.
-4. Audit export job records
+5. Audit export job records
    - async export tracking and file references for CSV/JSON output.
+6. Precision operation entities
+   - `bulk_operation`: operation state machine + scope snapshot + config.
+   - `preview_result`: per-product before/after + risk class + ttl marker.
+   - `apply_result`: chunk outcomes + aggregate counters.
+   - `recovery_log`: retry eligibility + replay pointer + reason code.
 
 ### Existing Model Extensions
 
@@ -138,6 +186,8 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
   - strengthen checksum indexing for dedupe lookups.
 - `recovery_logs`
   - ensure payload captures enough metadata to replay from staged failures.
+- Product/media linkage
+  - internal image asset references and hash metadata for no-passthrough image policy.
 
 ## API Contract Targets
 
@@ -160,6 +210,8 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
   - semantic action blocks + scope snapshot.
 - `POST /api/v1/products/bulk/dry-run`
   - compile and return per-product diff/risk payload.
+- `POST /api/v1/products/bulk/admission-check`
+  - explicit schema/policy/conflict gate output prior to apply.
 - `POST /api/v1/products/bulk/approve`
   - action-block approval with per-product overrides.
 
@@ -169,6 +221,14 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - `GET /api/v1/resolution/snapshots/{batch_id}/chain`
 - `GET /api/v1/audit/exports/{export_id}`
 - `POST /api/v1/audit/exports`
+- `GET /api/v1/products/bulk/{operation_id}/progress`
+  - live progress stream contract (processed/total, ETA, active chunk, terminal status).
+
+### Vendor Mapping Governance
+
+- `GET /api/v1/vendors/{vendor_id}/mappings`
+- `POST /api/v1/vendors/{vendor_id}/mappings/versions`
+- `POST /api/v1/vendors/{vendor_id}/mappings/validate`
 
 ## Risk Areas and Mitigations
 
@@ -182,6 +242,12 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
    - Mitigation: baseline+delta architecture with checksum dedupe and pointer reuse.
 5. **Retry storms on transient API failures**
    - Mitigation: bounded retry + jitter + queue backpressure + deferred recovery routing.
+6. **Stale dry-run use after TTL expiry**
+   - Mitigation: explicit TTL marker + hard preflight gate + required recompile path.
+7. **Vendor mapping drift introducing bad payloads**
+   - Mitigation: mapping version pinning in preview/apply + required-field coverage check.
+8. **Protected-column accidental mutation by fill/operation**
+   - Mitigation: lock in grid + server-side contract rejection + audit event on attempts.
 
 ## Requirement Mapping
 
@@ -198,6 +264,12 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 | SNAP-02 | Mandatory batch manifest + touched-product pre-change capture contract. |
 | SNAP-03 | Checksum dedupe and pointer reuse strategy. |
 | SNAP-04 | Retention/export and deterministic recovery-chain retrieval contracts. |
+| GOV-01 | Vendor mapping versioning and required-field coverage gate. |
+| GOV-02 | Protected-column enforcement across UI/API/persistence. |
+| GOV-03 | Alt-text preservation with explicit overwrite approval path. |
+| REL-01 | Admission controller contract (schema/policy/conflict gates). |
+| REL-02 | Bounded transient retry with deferred recovery replay path. |
+| REL-03 | Progress/terminal summary contract with replayable recovery payload. |
 
 ## Verification Guidance for Planning
 
@@ -210,6 +282,10 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - Snapshot dedupe behavior and chain traversal integrity.
 - Retry backoff policy behavior for transient failure simulations.
 - Audit export schema integrity (CSV/JSON).
+- Vendor mapping version pinning and required-field coverage checks.
+- Protected-column hard lock tests (grid + API).
+- Alt-text preservation/overwrite approval tests.
+- Dry-run TTL expiry + forced recompile tests.
 
 ### Frontend Tests
 
@@ -217,13 +293,15 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - Selection persists during edits and freezes on dry-run.
 - Diff panel renders side-by-side and risk badges.
 - Action-block approval UI supports per-product overrides.
+- Progress monitor renders processed/total, ETA, and terminal summary.
+- Recovery queue UI supports retry-eligible vs non-retryable paths.
 
-## Open Questions to Resolve During Planning
+## Planning Defaults (from locked context + synthesis)
 
-1. Whether AG Grid Community capabilities are sufficient or Enterprise modules are required for v1 feature parity.
-2. Threshold policy for switching from synchronous chunked mutations to Shopify bulk operation mode.
-3. Exact retention tiering for snapshots vs audit exports (hot vs cold storage behavior).
-4. UI behavior for guarded-edit columns in mixed bulk operations (single additional confirmation vs per-action confirmation).
+1. AG Grid path: start with Community baseline; escalate to Enterprise only if required features fail parity tests.
+2. Execution mode switch: use synchronous chunk path for smaller low-complexity sets and bulk operation path for large/high-complexity sets.
+3. Retention baseline: immutable 24-month audit retention; snapshot hot/cold tier policy finalized in implementation detail docs.
+4. Guarded-edit behavior: one explicit elevated confirmation per action-block, not per cell.
 
 ## Sources
 
@@ -248,4 +326,3 @@ This should reuse existing Phase 8/10 infrastructure wherever possible:
 - Research method: internal code audit + external benchmark synthesis + Context7 primary-doc extraction.
 - Context7 applicability: applicable and used (3 libraries).
 - Planning recommendation: proceed with 3-wave Phase 11 execution aligned to roadmap (`11-01`, `11-02`, `11-03`).
-

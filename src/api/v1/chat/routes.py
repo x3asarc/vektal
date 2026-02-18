@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import queue
 import threading
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
@@ -20,18 +21,51 @@ from src.api.v1.chat.schemas import (
     ChatBulkActionRequest,
     ChatActionResponse,
     ChatBlock,
+    ChatDelegateRequest,
+    ChatDelegateResponse,
+    ChatMemoryFactResponse,
+    ChatMemoryRetrieveRequest,
+    ChatMemoryRetrieveResponse,
     ChatMessageCreateRequest,
     ChatMessageCreateResponse,
     ChatMessageListResponse,
     ChatMessageResponse,
+    ChatRouteRequest,
+    ChatRouteResponse,
     ChatSessionCreateRequest,
     ChatSessionListResponse,
     ChatSessionResponse,
     ChatStreamEnvelope,
+    ChatToolsResolveRequest,
+    ChatToolsResolveResponse,
+    EffectiveTool,
     ProductActionApprovalRequest,
     ProductActionApplyRequest,
 )
 from src.api.v1.chat.approvals import ApprovalError, apply_product_action, approve_product_action
+from src.assistant.governance import KillSwitchBlockedError, assert_mutation_allowed
+from src.assistant.instrumentation import (
+    InstrumentationLinkError,
+    capture_preference_signal,
+    capture_verification_signal,
+    extract_action_runtime_context,
+)
+from src.assistant.deployment import (
+    persist_provider_route_event,
+    resolve_correlation_id,
+    resolve_provider_route,
+)
+from src.assistant import (
+    project_effective_toolset,
+    resolve_route_decision,
+    retrieve_memory_facts,
+    select_worker_scope,
+    validate_delegation_request,
+)
+from src.assistant.reliability import get_runtime_policy_snapshot
+from src.assistant.runtime_tier1 import build_tier1_payload
+from src.assistant.runtime_tier2 import build_tier2_payload
+from src.assistant.runtime_tier3 import build_tier3_payload
 from src.api.v1.chat.orchestrator import (
     OrchestrationError,
     is_mutating_intent,
@@ -39,7 +73,16 @@ from src.api.v1.chat.orchestrator import (
 )
 from src.core.chat import ChatRouter, IntentType, ProductHandler, VendorHandler
 from src.core.chat.handlers.generic import GenericHandler
-from src.models import ChatAction, ChatMessage, ChatSession, db
+from src.jobs.queueing import queue_for_tier_runtime
+from src.models import (
+    AssistantDelegationEvent,
+    AssistantRouteEvent,
+    ChatAction,
+    ChatMessage,
+    ChatSession,
+    UserTier,
+    db,
+)
 
 
 class SessionEventAnnouncer:
@@ -104,6 +147,19 @@ def _iso(value):
     if value.tzinfo is None:
         value = value.replace(tzinfo=timezone.utc)
     return value.isoformat()
+
+
+def _user_tier_value() -> str:
+    tier = getattr(getattr(current_user, "tier", None), "value", "tier_1")
+    return str(tier).lower()
+
+
+def _preference_signal_from_approval_request(payload: ProductActionApprovalRequest) -> tuple[str, str]:
+    if payload.overrides:
+        return "edit", "edited"
+    if payload.selected_change_ids:
+        return "approval", "approved_selection"
+    return "approval", "approved_all"
 
 
 def _session_to_response(session: ChatSession) -> ChatSessionResponse:
@@ -180,6 +236,22 @@ def _get_session_or_error(session_id: int):
     return session, None
 
 
+def _resolve_store_id_or_error(requested_store_id: int | None):
+    user_store = getattr(current_user, "shopify_store", None)
+    if requested_store_id is not None:
+        if user_store is None or user_store.id != requested_store_id:
+            return None, ProblemDetails.forbidden("Requested store_id must belong to the authenticated user.")
+        return requested_store_id, None
+    if user_store is None:
+        return None, ProblemDetails.business_error(
+            "store-not-connected",
+            "Store Not Connected",
+            "Connect a Shopify store to use assistant routing endpoints.",
+            status=409,
+        )
+    return user_store.id, None
+
+
 def _build_assistant_blocks(route_result, *, extra_blocks: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
     response_payload = route_result.response or {}
     blocks: list[ChatBlock] = []
@@ -232,6 +304,204 @@ def _build_assistant_blocks(route_result, *, extra_blocks: list[dict[str, Any]] 
     if extra_blocks:
         output.extend(extra_blocks)
     return output
+
+
+def _runtime_payload_from_route(route_summary: dict[str, Any], *, mutating: bool) -> dict[str, Any]:
+    route_decision = route_summary.get("route_decision")
+    if route_decision == "tier_3":
+        return build_tier3_payload(route_summary=route_summary)
+    if route_decision == "tier_2":
+        return build_tier2_payload(route_summary=route_summary, mutating=mutating)
+    return build_tier1_payload(route_summary=route_summary)
+
+
+@chat_bp.route("/route", methods=["POST"])
+@login_required
+def resolve_route():
+    try:
+        payload = ChatRouteRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    store_id, store_error = _resolve_store_id_or_error(payload.store_id)
+    if store_error:
+        return store_error
+
+    default_integrations = {"shopify": bool(getattr(current_user, "shopify_store", None))}
+    active_integrations = dict(default_integrations)
+    if payload.active_integrations:
+        active_integrations.update(payload.active_integrations)
+
+    route_summary = resolve_route_decision(
+        user=current_user,
+        content=payload.content,
+        store_id=store_id,
+        session_id=payload.session_id,
+        rbac_role=payload.rbac_role,
+        active_integrations=active_integrations,
+    )
+    correlation_id = resolve_correlation_id(
+        provided=(payload.correlation_id or request.headers.get("X-Correlation-Id"))
+    )
+    provider_route = resolve_provider_route(
+        correlation_id=correlation_id,
+        store_id=store_id,
+        intent_type=route_summary["intent_type"],
+        tier=_user_tier_value(),
+        failure_stage=payload.provider_failure_stage,
+        budget_percent=payload.provider_budget_percent,
+    )
+    runtime_payload = _runtime_payload_from_route(
+        route_summary,
+        mutating=route_summary.get("intent_type") == "mutating_request",
+    )
+    runtime_payload["correlation_id"] = correlation_id
+    runtime_payload["provider_route"] = {
+        "provider": provider_route.selected_provider,
+        "model": provider_route.selected_model,
+        "route_stage": provider_route.route_stage,
+        "route_index": provider_route.route_index,
+        "fallback_reason_code": provider_route.fallback_reason_code,
+        "policy_snapshot_hash": provider_route.policy_snapshot_hash,
+    }
+
+    event = AssistantRouteEvent(
+        user_id=current_user.id,
+        store_id=store_id,
+        session_id=payload.session_id,
+        route_decision=route_summary["route_decision"],
+        intent_type=route_summary["intent_type"],
+        classifier_method=route_summary["classifier_method"],
+        confidence=route_summary["confidence"],
+        approval_mode=route_summary["approval_mode"],
+        fallback_stage=route_summary.get("fallback_stage"),
+        reasons_json=route_summary["reasons"],
+        effective_toolset_json=route_summary["effective_toolset"],
+        policy_snapshot_hash=route_summary["policy_snapshot_hash"],
+        effective_toolset_hash=route_summary["effective_toolset_hash"],
+        metadata_json={"rbac_role": payload.rbac_role, "correlation_id": correlation_id},
+    )
+    db.session.add(event)
+    provider_event = persist_provider_route_event(
+        decision=provider_route,
+        user_id=current_user.id,
+        store_id=store_id,
+        session_id=payload.session_id,
+        action_id=None,
+        route_event_id=None,
+        intent_type=route_summary["intent_type"],
+    )
+    db.session.flush()
+    provider_event.route_event_id = event.id
+    db.session.commit()
+
+    response = ChatRouteResponse(
+        route_decision=route_summary["route_decision"],
+        correlation_id=correlation_id,
+        confidence=route_summary["confidence"],
+        intent_type=route_summary["intent_type"],
+        classifier_method=route_summary["classifier_method"],
+        approval_mode=route_summary["approval_mode"],
+        fallback_stage=route_summary.get("fallback_stage"),
+        suggested_escalation=route_summary.get("suggested_escalation"),
+        reasons=route_summary["reasons"],
+        effective_toolset=[EffectiveTool(**item) for item in route_summary["effective_toolset"]],
+        explainability_payload=route_summary.get("explainability_payload", {}),
+        runtime_payload=runtime_payload,
+        provider_route={
+            "provider_route_event_id": provider_event.id,
+            "provider": provider_route.selected_provider,
+            "model": provider_route.selected_model,
+            "route_stage": provider_route.route_stage,
+            "route_index": provider_route.route_index,
+            "fallback_reason_code": provider_route.fallback_reason_code,
+            "policy_snapshot_hash": provider_route.policy_snapshot_hash,
+        },
+        route_event_id=event.id,
+        policy_snapshot_hash=route_summary.get("policy_snapshot_hash"),
+        effective_toolset_hash=route_summary.get("effective_toolset_hash"),
+    )
+    return response.model_dump(mode="json"), 200
+
+
+@chat_bp.route("/tools/resolve", methods=["POST"])
+@login_required
+def resolve_tools():
+    try:
+        payload = ChatToolsResolveRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    store_id, store_error = _resolve_store_id_or_error(payload.store_id)
+    if store_error:
+        return store_error
+
+    default_integrations = {"shopify": bool(getattr(current_user, "shopify_store", None))}
+    active_integrations = dict(default_integrations)
+    if payload.active_integrations:
+        active_integrations.update(payload.active_integrations)
+
+    effective_tools, notes = project_effective_toolset(
+        user=current_user,
+        store_id=store_id,
+        rbac_role=payload.rbac_role,
+        active_integrations=active_integrations,
+    )
+    response = ChatToolsResolveResponse(
+        effective_toolset=[EffectiveTool(**item) for item in effective_tools],
+        notes=notes,
+    )
+    return response.model_dump(mode="json"), 200
+
+
+@chat_bp.route("/runtime/policy", methods=["POST"])
+@login_required
+def resolve_runtime_policy():
+    """Return resolved runtime reliability policy snapshot for debug/audit surfaces."""
+    payload = request.get_json(silent=True) or {}
+    snapshot = get_runtime_policy_snapshot(
+        provider_name=payload.get("provider_name"),
+        skill_name=payload.get("skill_name"),
+    )
+    return {"policy": snapshot.to_dict()}, 200
+
+
+@chat_bp.route("/memory/retrieve", methods=["POST"])
+@login_required
+def retrieve_memory():
+    try:
+        payload = ChatMemoryRetrieveRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    store_id, store_error = _resolve_store_id_or_error(payload.store_id)
+    if store_error:
+        return store_error
+
+    rows = retrieve_memory_facts(
+        store_id=store_id,
+        user_id=current_user.id,
+        query=payload.query,
+        top_k=payload.top_k,
+        scope=payload.scope,
+    )
+    response = ChatMemoryRetrieveResponse(
+        items=[
+            ChatMemoryFactResponse(
+                fact_id=item["fact_id"],
+                fact_key=item["fact_key"],
+                fact_value_text=item["fact_value_text"],
+                source=item["source"],
+                trust_score=item["trust_score"],
+                relevance_score=item["relevance_score"],
+                provenance=item["provenance"],
+                expires_at=item["expires_at"],
+            )
+            for item in rows
+        ],
+        total=len(rows),
+    )
+    return response.model_dump(mode="json"), 200
 
 
 @chat_bp.route("/sessions", methods=["POST"])
@@ -336,10 +606,100 @@ def create_message(session_id: int):
             )
 
     now = datetime.now(timezone.utc)
+    correlation_id = resolve_correlation_id(
+        provided=(payload.correlation_id or request.headers.get("X-Correlation-Id"))
+    )
     route_result = _CHAT_ROUTER.route(payload.content)
+    rbac_role = "manager" if current_user.tier == UserTier.TIER_3 else "member"
+    active_integrations = {"shopify": bool(getattr(current_user, "shopify_store", None))}
+    route_summary = resolve_route_decision(
+        user=current_user,
+        content=payload.content,
+        store_id=session.store_id,
+        session_id=session.id,
+        rbac_role=rbac_role,
+        active_integrations=active_integrations,
+    )
+    mutating_request = is_mutating_intent(route_result.intent.type.value)
+    provider_failure_stage = None
+    provider_budget_percent = None
+    if isinstance(payload.action_hints, dict):
+        provider_failure_stage = payload.action_hints.get("provider_failure_stage")
+        provider_budget_percent = payload.action_hints.get("provider_budget_percent")
+    provider_route = resolve_provider_route(
+        correlation_id=correlation_id,
+        store_id=session.store_id,
+        intent_type=route_summary["intent_type"],
+        tier=_user_tier_value(),
+        failure_stage=provider_failure_stage,
+        budget_percent=provider_budget_percent,
+    )
+    runtime_payload = _runtime_payload_from_route(route_summary, mutating=mutating_request)
+    runtime_payload["correlation_id"] = correlation_id
+    runtime_payload["provider_route"] = {
+        "provider": provider_route.selected_provider,
+        "model": provider_route.selected_model,
+        "route_stage": provider_route.route_stage,
+        "route_index": provider_route.route_index,
+        "fallback_reason_code": provider_route.fallback_reason_code,
+        "policy_snapshot_hash": provider_route.policy_snapshot_hash,
+    }
+    route_event = AssistantRouteEvent(
+        user_id=current_user.id,
+        store_id=session.store_id,
+        session_id=session.id,
+        route_decision=route_summary["route_decision"],
+        intent_type=route_summary["intent_type"],
+        classifier_method=route_summary["classifier_method"],
+        confidence=route_summary["confidence"],
+        approval_mode=route_summary["approval_mode"],
+        fallback_stage=route_summary.get("fallback_stage"),
+        reasons_json=route_summary["reasons"],
+        effective_toolset_json=route_summary["effective_toolset"],
+        policy_snapshot_hash=route_summary["policy_snapshot_hash"],
+        effective_toolset_hash=route_summary["effective_toolset_hash"],
+        metadata_json={
+            "rbac_role": rbac_role,
+            "source": "session_message",
+            "correlation_id": correlation_id,
+        },
+    )
+    db.session.add(route_event)
+    db.session.flush()
 
     prepared_action = None
-    if is_mutating_intent(route_result.intent.type.value):
+    semantic_block = None
+    if mutating_request:
+        try:
+            assert_mutation_allowed(
+                store_id=session.store_id,
+                action_name="chat.message.mutation",
+            )
+        except KillSwitchBlockedError as exc:
+            semantic_block = {
+                "type": "action",
+                "title": "execution_paused",
+                "data": {
+                    "error_type": exc.error_type,
+                    "scope_kind": exc.decision.scope_kind,
+                    "mode": exc.decision.mode,
+                    "switch_id": exc.decision.switch_id,
+                    "reason": exc.decision.reason,
+                },
+            }
+
+    if semantic_block is None and mutating_request and route_summary.get("approval_mode") == "blocked_write":
+        semantic_block = {
+            "type": "action",
+            "title": "tier_upgrade_required",
+            "data": {
+                "route_decision": route_summary.get("route_decision"),
+                "fallback_stage": route_summary.get("fallback_stage"),
+                "suggested_escalation": route_summary.get("suggested_escalation"),
+                "reason": "Write actions require a higher capability tier.",
+            },
+        }
+    elif semantic_block is None and mutating_request:
         try:
             prepared_action = prepare_single_sku_action(
                 session=session,
@@ -370,10 +730,10 @@ def create_message(session_id: int):
     db.session.add(user_message)
     db.session.flush()
 
-    assistant_blocks = _build_assistant_blocks(
-        route_result,
-        extra_blocks=prepared_action.assistant_blocks if prepared_action else None,
-    )
+    extra_blocks = list(prepared_action.assistant_blocks) if prepared_action else []
+    if semantic_block:
+        extra_blocks.append(semantic_block)
+    assistant_blocks = _build_assistant_blocks(route_result, extra_blocks=extra_blocks or None)
     assistant_content = next(
         (block.get("text") for block in assistant_blocks if block.get("type") == "text" and block.get("text")),
         "Acknowledged.",
@@ -389,6 +749,9 @@ def create_message(session_id: int):
             "handler_name": route_result.handler_name,
             "router_error": route_result.error,
             "router_response": route_result.response,
+            "route_summary": route_summary,
+            "runtime_payload": runtime_payload,
+            "correlation_id": correlation_id,
         },
         intent_type=route_result.intent.type.value,
         classification_method=route_result.intent.method,
@@ -399,6 +762,16 @@ def create_message(session_id: int):
 
     action = None
     if prepared_action is not None:
+        payload_json = dict(prepared_action.payload_json)
+        payload_json["runtime"] = {
+            "route_decision": route_summary.get("route_decision"),
+            "runtime_mode": runtime_payload.get("mode"),
+            "action_kind": "write",
+            "approval_mode": route_summary.get("approval_mode"),
+            "fallback_stage": route_summary.get("fallback_stage"),
+            "correlation_id": correlation_id,
+            "provider_route": runtime_payload.get("provider_route"),
+        }
         action = ChatAction(
             session_id=session.id,
             user_id=current_user.id,
@@ -407,10 +780,20 @@ def create_message(session_id: int):
             action_type=prepared_action.action_type,
             status=prepared_action.status,
             idempotency_key=payload.idempotency_key,
-            payload_json=prepared_action.payload_json,
+            payload_json=payload_json,
         )
         db.session.add(action)
         session.state = "in_house"
+
+    persist_provider_route_event(
+        decision=provider_route,
+        user_id=current_user.id,
+        store_id=session.store_id,
+        session_id=session.id,
+        action_id=action.id if action is not None else None,
+        route_event_id=route_event.id,
+        intent_type=route_summary["intent_type"],
+    )
 
     session.last_message_at = now
     try:
@@ -517,6 +900,9 @@ def create_bulk_action(session_id: int):
         )
 
     now = datetime.now(timezone.utc)
+    correlation_id = resolve_correlation_id(
+        provided=request.headers.get("X-Correlation-Id")
+    )
     user_message = ChatMessage(
         session_id=session.id,
         user_id=current_user.id,
@@ -598,11 +984,19 @@ def create_bulk_action(session_id: int):
         payload_json={
             "bulk": True,
             "source": "chat_bulk",
+            "correlation_id": correlation_id,
+            "tier": _user_tier_value(),
             "operation": payload.operation,
             "mode": payload.mode or "immediate",
             "dry_run_required": True,
             "approval_scope": "product",
             "requires_product_approval": True,
+            "runtime": {
+                "route_decision": _user_tier_value(),
+                "runtime_mode": "governed_skill_runtime",
+                "action_kind": "write",
+                "correlation_id": correlation_id,
+            },
             "action_hints": payload.action_hints or {},
             "admin_concurrency_cap": payload.admin_concurrency_cap,
             "chunk_plan": chunk_plan.to_payload(),
@@ -703,6 +1097,19 @@ def approve_action(session_id: int, action_id: int):
         return ProblemDetails.not_found("chat-action", action_id)
     if action.user_id != current_user.id:
         return ProblemDetails.forbidden("You do not have access to this chat action.")
+    try:
+        assert_mutation_allowed(
+            store_id=action.store_id or session.store_id,
+            action_name=f"chat.approve_action:{action.action_type}",
+        )
+    except KillSwitchBlockedError as exc:
+        return ProblemDetails.business_error(
+            exc.error_type,
+            exc.title,
+            exc.detail,
+            status=exc.status,
+            **(exc.extensions or {}),
+        )
 
     try:
         payload = ProductActionApprovalRequest(**(request.get_json(silent=True) or {}))
@@ -728,6 +1135,34 @@ def approve_action(session_id: int, action_id: int):
         action.status = "approved"
         action.approved_at = datetime.now(timezone.utc)
         action.error_message = None
+        signal_kind, preference_signal = _preference_signal_from_approval_request(payload)
+        runtime_ctx = extract_action_runtime_context(action, fallback_tier=_user_tier_value())
+        try:
+            capture_preference_signal(
+                action=action,
+                user_id=current_user.id,
+                store_id=action.store_id or session.store_id,
+                session_id=session.id,
+                tier=runtime_ctx.tier,
+                correlation_id=runtime_ctx.correlation_id,
+                signal_kind=signal_kind,
+                preference_signal=preference_signal,
+                selected_change_count=len(payload.selected_change_ids),
+                override_count=len(payload.overrides),
+                comment=payload.comment,
+                reasoning_trace_tokens=runtime_ctx.reasoning_trace_tokens,
+                cost_usd=runtime_ctx.cost_usd,
+                metadata_json={"bulk": True, "approval_scope": "product"},
+                require_link=True,
+            )
+        except InstrumentationLinkError as exc:
+            db.session.rollback()
+            return ProblemDetails.business_error(
+                "instrumentation-correlation-required",
+                "Instrumentation Link Required",
+                str(exc),
+                status=409,
+            )
         db.session.commit()
         approved_action = action
     else:
@@ -778,6 +1213,19 @@ def apply_action(session_id: int, action_id: int):
         return ProblemDetails.not_found("chat-action", action_id)
     if action.user_id != current_user.id:
         return ProblemDetails.forbidden("You do not have access to this chat action.")
+    try:
+        assert_mutation_allowed(
+            store_id=action.store_id or session.store_id,
+            action_name=f"chat.apply_action:{action.action_type}",
+        )
+    except KillSwitchBlockedError as exc:
+        return ProblemDetails.business_error(
+            exc.error_type,
+            exc.title,
+            exc.detail,
+            status=exc.status,
+            **(exc.extensions or {}),
+        )
 
     try:
         payload = ProductActionApplyRequest(**(request.get_json(silent=True) or {}))
@@ -817,6 +1265,38 @@ def apply_action(session_id: int, action_id: int):
         execution["queued_at"] = datetime.now(timezone.utc).isoformat()
         payload_json["bulk_execution"] = execution
         action.payload_json = payload_json
+        runtime_ctx = extract_action_runtime_context(action, fallback_tier=_user_tier_value())
+        try:
+            capture_verification_signal(
+                action=action,
+                user_id=current_user.id,
+                store_id=action.store_id or session.store_id,
+                session_id=session.id,
+                verification_event_id=None,
+                verification_status="deferred",
+                oracle_signal=False,
+                attempt_count=1,
+                waited_seconds=0,
+                tier=runtime_ctx.tier,
+                correlation_id=runtime_ctx.correlation_id,
+                reasoning_trace_tokens=runtime_ctx.reasoning_trace_tokens,
+                cost_usd=runtime_ctx.cost_usd,
+                metadata_json={
+                    "bulk": True,
+                    "result_status": "queued",
+                    "task_id": task_result.id,
+                    "job_id": payload_json.get("job_id"),
+                },
+                require_link=True,
+            )
+        except InstrumentationLinkError as exc:
+            db.session.rollback()
+            return ProblemDetails.business_error(
+                "instrumentation-correlation-required",
+                "Instrumentation Link Required",
+                str(exc),
+                status=409,
+            )
         db.session.commit()
         applied_action = action
     else:
@@ -852,6 +1332,124 @@ def apply_action(session_id: int, action_id: int):
         event_type="action",
     )
     return _action_to_response(applied_action).model_dump(), 200
+
+
+@chat_bp.route("/sessions/<int:session_id>/actions/<int:action_id>/delegate", methods=["POST"])
+@login_required
+def delegate_action(session_id: int, action_id: int):
+    session, error = _get_session_or_error(session_id)
+    if error:
+        return error
+
+    action = ChatAction.query.filter_by(id=action_id, session_id=session.id).first()
+    if action is None:
+        return ProblemDetails.not_found("chat-action", action_id)
+    if action.user_id != current_user.id:
+        return ProblemDetails.forbidden("You do not have access to this chat action.")
+
+    if current_user.tier != UserTier.TIER_3:
+        return ProblemDetails.business_error(
+            "tier-insufficient",
+            "Tier Insufficient",
+            "Delegation is available only for Tier 3 users.",
+            status=403,
+        )
+
+    try:
+        payload = ChatDelegateRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    budget = payload.budget or {}
+    allowed, reason = validate_delegation_request(
+        depth=payload.depth,
+        fan_out=payload.fan_out,
+        budget=budget,
+    )
+
+    store_id = session.store_id or getattr(getattr(current_user, "shopify_store", None), "id", None)
+    effective_tools, _ = project_effective_toolset(
+        user=current_user,
+        store_id=store_id,
+        rbac_role="manager",
+        active_integrations={"shopify": bool(getattr(current_user, "shopify_store", None))},
+    )
+    effective_tool_ids = [item["tool_id"] for item in effective_tools]
+    worker_scope, blocked_tools = select_worker_scope(
+        effective_tool_ids=effective_tool_ids,
+        requested_tools=payload.requested_tools,
+    )
+
+    status = "spawned"
+    reason_text = reason
+    if not allowed:
+        status = "blocked"
+    elif not worker_scope:
+        status = "blocked"
+        reason_text = "No permitted worker tools remain after policy projection."
+
+    event = AssistantDelegationEvent(
+        session_id=session.id,
+        action_id=action.id,
+        user_id=current_user.id,
+        store_id=store_id,
+        parent_request_id=payload.parent_request_id,
+        request_id=f"deleg-{uuid.uuid4().hex[:24]}",
+        depth=payload.depth,
+        fan_out=payload.fan_out,
+        status=status,
+        worker_tool_scope_json=worker_scope,
+        budget_json=budget,
+        reason=reason_text,
+        fallback_stage="none" if status == "spawned" else "delegation_blocked",
+        metadata_json={"blocked_tools": blocked_tools},
+    )
+    db.session.add(event)
+    db.session.flush()
+    task_id = None
+    task_queue = None
+    if status == "spawned":
+        from src.celery_app import app as celery_app
+
+        task_queue = queue_for_tier_runtime("tier_3")
+        task_payload = {
+            "delegation_event_id": event.id,
+            "action_id": action.id,
+            "session_id": session.id,
+            "worker_tool_scope": worker_scope,
+            "depth": payload.depth,
+            "fan_out": payload.fan_out,
+            "fallback_stage": "delegation_spawned",
+        }
+        try:
+            result = celery_app.send_task(
+                "src.tasks.assistant_runtime.run_tier_runtime",
+                kwargs={"route_decision": "tier_3", "payload": task_payload},
+                queue=task_queue,
+            )
+            task_id = result.id
+        except Exception:
+            # Keep delegation auditable even when queue infra is unavailable.
+            task_id = f"local-{uuid.uuid4().hex[:20]}"
+        metadata_json = dict(event.metadata_json or {})
+        metadata_json["task_id"] = task_id
+        metadata_json["queue"] = task_queue
+        event.metadata_json = metadata_json
+        event.status = "running"
+        event.fallback_stage = "delegation_running"
+
+    db.session.commit()
+
+    response = ChatDelegateResponse(
+        delegation_event_id=event.id,
+        status=event.status,
+        worker_tool_scope=worker_scope,
+        blocked_tools=blocked_tools,
+        task_id=task_id,
+        queue=task_queue,
+        reason=reason_text,
+    )
+    return response.model_dump(mode="json"), 200
 
 
 @chat_bp.route("/sessions/<int:session_id>/stream", methods=["GET"])

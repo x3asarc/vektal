@@ -10,6 +10,7 @@
    - `AGENTS.md`
    - `STANDARDS.md`
    - `.rules`
+   - `ops/governance/roles/`
    - `solutionsos/`
 3. Execution evidence:
    - `reports/<phase>/<task>/`
@@ -35,6 +36,7 @@
 3. Meta synthesis reports belong under `reports/meta/`.
 4. Long-term context indexes belong under `docs/`.
 5. Governance policy source lives under `solutionsos/`.
+6. Canonical role definitions live under `ops/governance/roles/`.
 
 ## Protected paths
 1. `.planning/`
@@ -48,4 +50,3 @@ StructureGuardian must not auto-move files in protected paths.
 2. Every move requires a `Moved Files` entry in `structure-audit.md`.
 3. Every move requires a one-line rationale.
 4. Every move is mirrored into `.planning/STATE.md` under `StructureGuardian Audit Trail`.
-

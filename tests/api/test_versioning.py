@@ -17,22 +17,11 @@ Fixtures:
 """
 import pytest
 from datetime import datetime, timezone, timedelta
-from unittest.mock import patch
 
 from src.models import db
 from src.models.user import User, UserTier, AccountStatus
 from src.api.app import create_openapi_app
-
-
-class TestConfig:
-    """Test configuration for Flask app."""
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {}  # No pool settings for SQLite
-    SECRET_KEY = 'test-secret-key'
-    WTF_CSRF_ENABLED = False
-    ENABLE_API_VERSION_ENFORCEMENT = True
+from tests.api.conftest import TestConfig
 
 
 @pytest.fixture
@@ -178,7 +167,7 @@ def test_v1_user_accessing_v2_endpoint_gets_409(client, authenticated_user):
 
     assert response.status_code == 409
     data = response.get_json()
-    assert data['type'] == 'version-mismatch'
+    assert data['type'].endswith('/version-mismatch')
     assert data['user_version'] == 'v1'
     assert data['requested_version'] == 'v2'
     assert data['suggested_path'] == '/api/v1/products'
@@ -190,7 +179,7 @@ def test_v2_user_accessing_v1_endpoint_gets_409(client, v2_user_with_lock):
 
     assert response.status_code == 409
     data = response.get_json()
-    assert data['type'] == 'version-mismatch'
+    assert data['type'].endswith('/version-mismatch')
     assert data['user_version'] == 'v2'
     assert data['requested_version'] == 'v1'
     assert data['suggested_path'] == '/api/v2/products'
@@ -271,7 +260,7 @@ def test_rollback_after_expiry_rejected(client, v2_user_expired_lock):
 
     assert response.status_code == 409
     data = response.get_json()
-    assert data['type'] == 'rollback-not-allowed'
+    assert data['type'].endswith('/rollback-not-allowed')
     assert 'expired' in data['title'].lower()
 
 
@@ -281,7 +270,7 @@ def test_rollback_v1_user_rejected(client, authenticated_user):
 
     assert response.status_code == 409
     data = response.get_json()
-    assert data['type'] == 'rollback-not-allowed'
+    assert data['type'].endswith('/rollback-not-allowed')
     assert data['reason'] == 'not-on-v2'
 
 
