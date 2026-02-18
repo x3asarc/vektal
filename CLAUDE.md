@@ -140,6 +140,30 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 
 ---
 
+## Branch Workflow (always — no direct commits to master)
+
+```
+git checkout -b <type>/<short-description>   # start every piece of work on a branch
+# ... make changes, run tests ...
+git add <files>
+git commit -m "type: description"
+git push -u origin <branch-name>             # opens PR link on GitHub
+# CI runs automatically → merge when green → delete branch
+git checkout master && git pull              # sync master after merge
+git branch -d <branch-name>                 # clean up local branch
+```
+
+**Branch naming:**
+- `feat/` — new feature or phase work
+- `fix/` — bug fix
+- `phase/` — full GSD phase (e.g. `phase/13.2-oracle-framework`)
+- `chore/` — tooling, config, docs
+
+**Rule:** `master` = always deployable. Never commit half-finished work directly to master.
+**CI fires automatically** on every PR: `risk-policy-gate` → `ci-backend` → merge when green.
+
+---
+
 ## Anti-Patterns
 
 - No `cd` — use full paths from project root
@@ -148,6 +172,7 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 - No task closure without all four gate reports
 - No new top-level files/dirs without asking
 - No guessing at state — read `STATE.md` first
+- No direct commits to `master` — always use a branch + PR
 
 **Protected paths** (never auto-move): `.planning/` · `.rules` · `AGENTS.md`
 
