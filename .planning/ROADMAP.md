@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
 - [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
 - [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
-- [ ] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
+- [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
 - [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
 - [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
 
@@ -445,8 +445,8 @@ Plans:
 - [x] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
 - [x] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
 - [x] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
-- [ ] 13.2-06-PLAN.md - Unify Oracle Contract (Gap Closure) (Wave 5)
-- [ ] 13.2-07-PLAN.md - Create Governance Reports (Gap Closure) (Wave 5)
+- [x] 13.2-06-PLAN.md - Unify Oracle Contract (Gap Closure) (Wave 5)
+- [x] 13.2-07-PLAN.md - Create Governance Reports (Gap Closure) (Wave 5)
 
 **Gap Closure Plans (Wave 5)**: Two verification gaps addressed:
 - Plan 06: Unify OracleDecision and OracleSignal into single contract with harmonized decision types (Gap 1: Contract Unification)
