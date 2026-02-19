@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
 - [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
 - [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
-- [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
+- [ ] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
 - [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
 - [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
 
@@ -437,7 +437,7 @@ Plans:
   3. Existing and upcoming phases can call the Oracle framework through stable interfaces instead of bespoke verifier implementations.
   4. Telemetry, idempotency, and retry behavior are unified for Oracle-triggered paths.
   5. Phase 13.1 and later phases have explicit integration guidance to adopt Oracle reuse.
-**Plans:** 5 plans in 4 waves
+**Plans:** 7 plans in 5 waves
 
 Plans:
 - [x] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types (Wave 1)
@@ -445,6 +445,12 @@ Plans:
 - [x] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
 - [x] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
 - [x] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
+- [ ] 13.2-06-PLAN.md - Unify Oracle Contract (Gap Closure) (Wave 5)
+- [ ] 13.2-07-PLAN.md - Create Governance Reports (Gap Closure) (Wave 5)
+
+**Gap Closure Plans (Wave 5)**: Two verification gaps addressed:
+- Plan 06: Unify OracleDecision and OracleSignal into single contract with harmonized decision types (Gap 1: Contract Unification)
+- Plan 07: Create 20 governance reports retroactively for plans 01-05 (Gap 2: Governance Reports Missing)
 
 ### Phase 14: Continuous Optimization & Learning
 **Goal**: Build governed continuous optimization and learning loops for personalization, efficiency, and long-term quality
@@ -506,8 +512,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
-| 13.2. Oracle Framework Reuse | 0/5 | Not started | - |
+| 13.2. Oracle Framework Reuse | 5/7 | Gap Closure | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |
 | 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |
-
 
