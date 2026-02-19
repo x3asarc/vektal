@@ -12,10 +12,11 @@ from datetime import datetime
 
 from src.assistant.governance.graph_oracle_adapter import (
     GraphOracleAdapter,
-    OracleSignal,
+    OracleSignal,  # Deprecated alias for OracleDecision
     FAIL_OPEN_SIGNAL,
     query_graph_evidence
 )
+from src.core.enrichment.oracle_contract import OracleDecision
 
 
 # ===========================================
@@ -46,8 +47,8 @@ def test_query_evidence_returns_fail_open_when_graph_unavailable():
             assert signal == FAIL_OPEN_SIGNAL
             assert signal.decision == 'pass'
             assert signal.confidence == 0.5
-            assert signal.reason_codes == []
-            assert signal.evidence_refs == []
+            assert signal.reason_codes == ()
+            assert signal.evidence_refs == ()
             assert signal.source == 'graph_unavailable'
 
 
@@ -105,13 +106,13 @@ def test_query_evidence_returns_fail_open_on_error():
 
 def test_oracle_signal_has_required_fields():
     """
-    OracleSignal has all required contract fields.
+    OracleDecision has all required contract fields.
     """
-    signal = OracleSignal(
+    signal = OracleDecision(
         decision='pass',
         confidence=0.85,
-        reason_codes=['no_failures_found'],
-        evidence_refs=[],
+        reason_codes=('no_failures_found',),
+        evidence_refs=(),
         requires_user_action=False,
         source='graph'
     )
@@ -119,21 +120,22 @@ def test_oracle_signal_has_required_fields():
     # Verify required fields
     assert signal.decision == 'pass'
     assert signal.confidence == 0.85
-    assert signal.reason_codes == ['no_failures_found']
-    assert signal.evidence_refs == []
+    assert signal.reason_codes == ('no_failures_found',)
+    assert signal.evidence_refs == ()
     assert signal.requires_user_action is False
     assert signal.source == 'graph'
 
 
 def test_oracle_signal_is_immutable():
     """
-    OracleSignal is frozen (immutable dataclass).
+    OracleDecision is frozen (immutable dataclass).
     """
-    signal = OracleSignal(
+    signal = OracleDecision(
         decision='pass',
         confidence=0.85,
-        reason_codes=[],
-        evidence_refs=[]
+        reason_codes=(),
+        evidence_refs=(),
+        requires_user_action=False
     )
 
     # Should not be able to modify fields
@@ -147,8 +149,8 @@ def test_fail_open_signal_has_safe_defaults():
     """
     assert FAIL_OPEN_SIGNAL.decision == 'pass'
     assert FAIL_OPEN_SIGNAL.confidence == 0.5
-    assert FAIL_OPEN_SIGNAL.reason_codes == []
-    assert FAIL_OPEN_SIGNAL.evidence_refs == []
+    assert FAIL_OPEN_SIGNAL.reason_codes == ()
+    assert FAIL_OPEN_SIGNAL.evidence_refs == ()
     assert FAIL_OPEN_SIGNAL.requires_user_action is False
     assert FAIL_OPEN_SIGNAL.source == 'graph_unavailable'
 

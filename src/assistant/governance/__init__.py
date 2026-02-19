@@ -20,10 +20,12 @@ from .verification_oracle import (
 )
 from .graph_oracle_adapter import (
     GraphOracleAdapter,
-    OracleSignal,
+    OracleSignal,  # Deprecated alias, kept for backward compatibility
     query_graph_evidence,
     FAIL_OPEN_SIGNAL,
 )
+# Import unified contract from canonical location
+from src.core.enrichment.oracle_contract import OracleDecision
 
 __all__ = [
     "FieldPolicyDecision",
@@ -39,7 +41,8 @@ __all__ = [
     "process_deferred_verifications",
     "verify_execution_finality",
     "GraphOracleAdapter",
-    "OracleSignal",
+    "OracleDecision",  # Unified Oracle contract
+    "OracleSignal",  # Deprecated: Use OracleDecision instead
     "query_graph_evidence",
     "FAIL_OPEN_SIGNAL",
 ]

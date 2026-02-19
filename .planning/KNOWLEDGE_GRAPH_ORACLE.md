@@ -25,22 +25,23 @@ Phase 14 (Continuous Optimization) and Phase 15 (Self-Healing) MUST query graph 
 ### Graph Evidence Query
 
 ```python
-from src.assistant.governance import query_graph_evidence, OracleSignal
+from src.assistant.governance import query_graph_evidence, OracleDecision
 
-signal: OracleSignal = query_graph_evidence(
+# Returns unified OracleDecision contract (same as enrichment oracles)
+signal: OracleDecision = query_graph_evidence(
     action_type='enrichment',      # 'optimization', 'remediation', 'enrichment'
     target_module='src.tasks.enrichment',
     store_id='store_123',
     timeout=2.0  # seconds (default)
 )
 
-# OracleSignal contract:
-# - decision: 'pass', 'fail', 'review'
+# OracleDecision contract (unified across all adapters):
+# - decision: 'pass', 'fail', 'review', 'hold'
 # - confidence: float [0.0, 1.0]
-# - reason_codes: List[str]
-# - evidence_refs: List[str]
+# - reason_codes: tuple[str, ...]
+# - evidence_refs: tuple[str, ...]
 # - requires_user_action: bool
-# - source: 'graph' or 'graph_unavailable'
+# - source: str ('graph', 'enrichment', 'graph_unavailable')
 
 if signal.decision == 'fail':
     # Critical failures detected - escalate to user
@@ -52,6 +53,8 @@ else:
     # No failures found - proceed
     pass
 ```
+
+**Note:** `OracleSignal` is a deprecated alias for `OracleDecision`. Use `OracleDecision` for new code.
 
 ### Memory Retrieval with Graph Evidence
 
@@ -376,11 +379,11 @@ if recent_remediations:
 1. **2-second default timeout** - Queries complete within 2s or return fallback
 2. **FAIL_OPEN_SIGNAL returned on timeout/error:**
    ```python
-   OracleSignal(
+   OracleDecision(
        decision='pass',
        confidence=0.5,
-       reason_codes=[],
-       evidence_refs=[],
+       reason_codes=(),
+       evidence_refs=(),
        requires_user_action=False,
        source='graph_unavailable'
    )
@@ -505,11 +508,15 @@ GRAPH_ORACLE_ENABLED=true
 
 ```python
 try:
-    from src.assistant.governance import query_graph_evidence
+    from src.assistant.governance import query_graph_evidence, FAIL_OPEN_SIGNAL
 except ImportError:
     # Graph oracle not available - use fallback logic
     logger.warning("Graph oracle not available - using default decision")
-    signal = FAIL_OPEN_SIGNAL
+    from src.core.enrichment.oracle_contract import OracleDecision
+    FAIL_OPEN_SIGNAL = OracleDecision(
+        decision='pass', confidence=0.5, reason_codes=(), evidence_refs=(),
+        requires_user_action=False, source='graph_unavailable'
+    )
 ```
 
 ### Query Timeouts

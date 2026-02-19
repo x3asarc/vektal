@@ -2,7 +2,9 @@
 Graph-backed Oracle evidence adapter for governance decisions.
 
 Provides timeout-bounded graph evidence retrieval with fail-open behavior.
-Returns OracleSignal contract on success, falls back to safe default on timeout/error.
+Returns OracleDecision contract on success, falls back to safe default on timeout/error.
+
+Uses unified Oracle contract from src.core.enrichment.oracle_contract.
 
 Phase 13.2 - Oracle Framework Reuse
 """
@@ -10,9 +12,11 @@ Phase 13.2 - Oracle Framework Reuse
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import List
 from datetime import datetime, timedelta
+
+# Import unified Oracle contract
+from src.core.enrichment.oracle_contract import OracleDecision
 
 logger = logging.getLogger(__name__)
 
@@ -29,30 +33,18 @@ except ImportError:
 
 
 # ===========================================
-# OracleSignal Contract
+# Unified Oracle Contract
 # ===========================================
 
-@dataclass(frozen=True)
-class OracleSignal:
-    """
-    Oracle signal payload for graph-backed evidence decisions.
-
-    Compatible with verification_oracle.build_oracle_signal_payload contract.
-    """
-    decision: str  # 'pass', 'fail', 'review'
-    confidence: float  # 0.0 to 1.0
-    reason_codes: List[str]
-    evidence_refs: List[str]
-    requires_user_action: bool = False
-    source: str = 'graph'
-
+# Deprecated alias for backward compatibility
+OracleSignal = OracleDecision  # Deprecated: Use OracleDecision instead
 
 # Fail-open signal returned when graph unavailable or query times out
-FAIL_OPEN_SIGNAL = OracleSignal(
+FAIL_OPEN_SIGNAL = OracleDecision(
     decision='pass',
     confidence=0.5,
-    reason_codes=[],
-    evidence_refs=[],
+    reason_codes=(),
+    evidence_refs=(),
     requires_user_action=False,
     source='graph_unavailable'
 )
@@ -101,11 +93,11 @@ class GraphOracleAdapter:
         action_type: str,
         target_module: str,
         store_id: str
-    ) -> OracleSignal:
+    ) -> OracleDecision:
         """
         Query graph for evidence about proposed action.
 
-        Returns OracleSignal with decision based on historical evidence:
+        Returns OracleDecision with decision based on historical evidence:
         - No prior failures -> pass (confidence 0.8)
         - Prior failures exist -> review (confidence 0.6)
         - Critical warnings -> fail (confidence 0.9, requires user action)
@@ -116,7 +108,7 @@ class GraphOracleAdapter:
             store_id: Store ID for multi-tenant filtering
 
         Returns:
-            OracleSignal with decision and evidence references
+            OracleDecision with decision and evidence references
         """
         # Check graph availability
         if not self._ensure_client():
@@ -136,11 +128,11 @@ class GraphOracleAdapter:
 
             if not failures:
                 # No prior failures - safe to proceed
-                return OracleSignal(
+                return OracleDecision(
                     decision='pass',
                     confidence=0.8,
-                    reason_codes=['no_failures_found'],
-                    evidence_refs=[],
+                    reason_codes=('no_failures_found',),
+                    evidence_refs=(),
                     requires_user_action=False,
                     source='graph'
                 )
@@ -152,21 +144,21 @@ class GraphOracleAdapter:
             ]
 
             if critical_failures:
-                return OracleSignal(
+                return OracleDecision(
                     decision='fail',
                     confidence=0.9,
-                    reason_codes=['critical_failures_detected'],
-                    evidence_refs=[f"failure_{f.get('id')}" for f in critical_failures[:5]],
+                    reason_codes=('critical_failures_detected',),
+                    evidence_refs=tuple(f"failure_{f.get('id')}" for f in critical_failures[:5]),
                     requires_user_action=True,
                     source='graph'
                 )
 
             # Non-critical failures - suggest review
-            return OracleSignal(
+            return OracleDecision(
                 decision='review',
                 confidence=0.6,
-                reason_codes=['prior_failures_detected'],
-                evidence_refs=[f"failure_{f.get('id')}" for f in failures[:5]],
+                reason_codes=('prior_failures_detected',),
+                evidence_refs=tuple(f"failure_{f.get('id')}" for f in failures[:5]),
                 requires_user_action=False,
                 source='graph'
             )
@@ -233,7 +225,7 @@ def query_graph_evidence(
     target_module: str,
     store_id: str,
     timeout: float = 2.0
-) -> OracleSignal:
+) -> OracleDecision:
     """
     Convenience function for graph evidence queries.
 
@@ -246,7 +238,7 @@ def query_graph_evidence(
         timeout: Query timeout in seconds (default 2.0)
 
     Returns:
-        OracleSignal with decision and evidence
+        OracleDecision with decision and evidence
 
     Example:
         >>> signal = query_graph_evidence(
