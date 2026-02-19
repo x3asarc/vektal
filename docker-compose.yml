@@ -78,6 +78,11 @@ services:
       - API_VERSION=${API_VERSION:-2024-01}
       - APP_URL=${APP_URL}
       - FRONTEND_URL=${FRONTEND_URL}
+      # Neo4j graph database (Phase 13.2)
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5).read()"]
       interval: 10s
@@ -130,6 +135,11 @@ services:
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
       - API_VERSION=${API_VERSION:-2024-01}
+      # Neo4j graph database (Phase 13.2)
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
     command: >
       celery -A src.celery_app worker
       --loglevel=info
@@ -341,6 +351,33 @@ services:
     networks:
       - app-network
 
+  # ===========================================
+  # Neo4j Graph Database
+  # Direct access: http://localhost:7474 (browser), bolt://localhost:7687 (driver)
+  # Used for temporal knowledge storage (Phase 13.2+)
+  # ===========================================
+  neo4j:
+    image: neo4j:5.26
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
+      - NEO4J_server_memory_heap_max__size=1G
+      - NEO4J_server_memory_pagecache_size=512M
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:7474"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - app-network
+
 # ===========================================
 # Named Volumes (persistent data)
 # ===========================================
@@ -355,6 +392,10 @@ volumes:
     name: shopify_backend_data
   flower_data:
     name: shopify_flower_data
+  neo4j_data:
+    name: shopify_neo4j_data
+  neo4j_logs:
+    name: shopify_neo4j_logs
 
 # ===========================================
 # Networks

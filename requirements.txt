@@ -63,3 +63,7 @@ pytest==8.3.5
 pytest-cov==6.1.0
 pytest-asyncio==0.25.3
 requests-mock==1.12.1
+
+# Graph Database and Temporal Knowledge (Phase 13.2)
+graphiti-core==0.26.0
+neo4j==5.26.0
