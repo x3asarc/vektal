@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 13.2 of 15 (Oracle Framework Reuse)
-Plan: 13.2-01 complete (Neo4j runtime + graph entity contracts). Plans 13.2-02 through 13.2-05 pending.
-Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` execution started (`1/5` plans complete).
-Last activity: 2026-02-19 - Executed `13.2-01`, deployed Neo4j service, created Graphiti client singleton, defined entity/edge contracts.
+Plan: 13.2-02 complete (Episode ingestion pipeline with emission hooks). Plans 13.2-03 through 13.2-05 pending.
+Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` execution in progress (`2/5` plans complete).
+Last activity: 2026-02-19 - Executed `13.2-02`, created async episode emission tasks, added fail-open emission hooks to governance/apply paths.
 
-Progress: 96% (80/83 plans in roadmap complete)
+Progress: 97% (81/83 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `13.2-02-episode-ingestion-pipeline`
-Last completed gate: `13.2-01 execution (Neo4j + Graphiti client + entity contracts)`
+Current atomic task: `13.2-03-graph-oracle-adapter`
+Last completed gate: `13.2-02 execution (Episode ingestion pipeline with emission hooks)`
 Current blocker: `N/A`
-Next action: `Execute 13.2-02-PLAN.md (Episode ingestion pipeline with emission hooks)`
+Next action: `Execute 13.2-03-PLAN.md (Graph Oracle adapter + memory retrieval upgrade)`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -56,6 +56,29 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-19)
+
+**Phase 13.2-02 executed - Episode ingestion pipeline with emission hooks:**
+- Created Celery tasks for async graph episode emission:
+  - emit_episode task with fire-and-forget semantics (max 2 retries, 5s delay)
+  - sync_failure_journey task for FAILURE_JOURNEY.md parsing
+  - Episode ID generation from content hash for idempotency
+- Created GraphitiIngestor with retry and dedupe logic:
+  - LRU cache-based deduplication (10k entries)
+  - 5-second timeout protection per episode
+  - Async bridge compatible with Celery workers
+  - Batch ingestion with individual error handling
+- Added emission hooks to governance and apply paths:
+  - verification_oracle.py: oracle_decision episodes for verified/failed events
+  - approvals.py: user_approval and vendor_catalog_change episodes
+  - enrichment.py: enrichment_outcome episodes
+  - finalizer.py: vendor_catalog_change episodes on ingest completion
+- All hooks wrapped in try/except with pass (fail-open semantics)
+- Artifacts created:
+  - `.planning/phases/13.2-oracle-framework-reuse/13.2-02-SUMMARY.md`
+- Verification result:
+  - All files compile successfully
+  - Emission hooks verified present via grep
+  - All commits verified (eb61870, 9f4b740, 1d77727)
 
 **Phase 13.2-01 executed - Neo4j runtime + graph entity contracts:**
 - Added Neo4j 5.26 service to docker-compose.yml:
@@ -603,7 +626,7 @@ Gate board:
 
 *Updated after each plan completion*
 | Phase 13.2 P01 | 5 | 3 tasks | 7 files |
-| Phase 13.2 P03 | 5 | 3 tasks | 4 files |
+| Phase 13.2 P02 | 6 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -612,6 +635,12 @@ Gate board:
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Fire-and-forget emission hooks (13.2-02): All hooks wrapped in try/except with pass for fail-open semantics, do not block primary flows
+- Async dispatch via .delay() (13.2-02): All emissions use Celery .delay() to avoid blocking request path
+- Episode ID from content hash (13.2-02): Deterministic ID generation from episode_type + store_id + correlation_id + key fields for idempotency
+- LRU cache deduplication (13.2-02): 10k entry LRU cache prevents duplicate episode ingestion across worker restarts
+- 5-second ingestion timeout (13.2-02): Prevents worker hangs while allowing sufficient time for graph writes
+- Retry only on transient errors (13.2-02): Validation errors do not retry; connection/timeout errors retry max 2 times with 5s delay
 - Neo4j 5.26 for temporal knowledge storage (13.2-01): Provides native bitemporal semantics, contradiction handling, and entity deduplication vs custom implementation
 - Graphiti-core integration (13.2-01): Unified episode ingestion API faster than building custom pipeline
 - GRAPH_ORACLE_ENABLED defaults to false (13.2-01): Safe rollout pattern, prevents breaking existing flows if graph unavailable
@@ -815,7 +844,7 @@ Current blockers for Phase 6 closure: None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 13.2-01-PLAN.md (Neo4j runtime + graph entity contracts)
+Stopped at: Completed 13.2-02-PLAN.md (Episode ingestion pipeline with emission hooks)
 Resume file: None
 
 Config (if exists):
