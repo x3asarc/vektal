@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 13.2 of 15 (Oracle Framework Reuse)
-Plan: Phase 13.1 closed `GREEN` (`13.1-01`..`13.1-04` complete and verified); Phase 13.2 pending planning/execution.
-Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` is next.
-Last activity: 2026-02-16 - Executed `13.1-04`, published phase verification artifact, and closed Phase 13.1 `GREEN`.
+Plan: 13.2-01 complete (Neo4j runtime + graph entity contracts). Plans 13.2-02 through 13.2-05 pending.
+Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` execution started (`1/5` plans complete).
+Last activity: 2026-02-19 - Executed `13.2-01`, deployed Neo4j service, created Graphiti client singleton, defined entity/edge contracts.
 
-Progress: 96% (79/82 plans in roadmap complete)
+Progress: 96% (80/83 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `phase-13.2-pre-context-scope-gate`
-Last completed gate: `13.1-04 execution + phase verification closure (GREEN)`
+Current atomic task: `13.2-02-episode-ingestion-pipeline`
+Last completed gate: `13.2-01 execution (Neo4j + Graphiti client + entity contracts)`
 Current blocker: `N/A`
-Next action: `Run /prompts:gsd-discuss-phase 13.2 (pre-context scope gate + context questions) then /prompts:gsd-plan-phase 13.2.`
+Next action: `Execute 13.2-02-PLAN.md (Episode ingestion pipeline with emission hooks)`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -54,6 +54,33 @@ Gate board:
 ## Bypass Log
 
 1. `N/A` (no bypass invoked).
+
+## Recent Session Summary (2026-02-19)
+
+**Phase 13.2-01 executed - Neo4j runtime + graph entity contracts:**
+- Added Neo4j 5.26 service to docker-compose.yml:
+  - Health check with 60s start period
+  - Named volumes (neo4j_data, neo4j_logs)
+  - Environment wiring for backend and celery_worker services
+- Created Graphiti client singleton (`src/core/graphiti_client.py`):
+  - get_graphiti_client() with lazy initialization
+  - check_graph_availability() with 2s timeout
+  - query_with_fallback() helper for fail-open queries
+  - Returns None when GRAPH_ORACLE_ENABLED=false
+- Defined entity/edge contracts (`src/core/synthex_entities.py`):
+  - EpisodeType enum (oracle_decision, failure_pattern, enrichment_outcome, user_approval, vendor_catalog_change)
+  - 5 entity families (OracleDecisionEntity, FailurePatternEntity, ModuleEntity, EnrichmentOutcomeEntity, UserApprovalEntity)
+  - 4 edge families (WasVerifiedByEdge, HasFailureWarningEdge, YieldedOutcomeEdge, ApprovedByUserEdge)
+  - create_episode_payload() helper
+- Pinned dependencies:
+  - graphiti-core==0.26.0
+  - neo4j==5.26.0
+- Artifacts created:
+  - `.planning/phases/13.2-oracle-framework-reuse/13.2-01-SUMMARY.md`
+- Verification result:
+  - Docker Compose config valid
+  - Python imports work with fail-open behavior when graphiti-core not installed
+  - All commits verified (794108c, 59a7497, 5edec01)
 
 ## Recent Session Summary (2026-02-16)
 
@@ -575,6 +602,7 @@ Gate board:
 - Current transition: Phase 11 execution kickoff (plans ready)
 
 *Updated after each plan completion*
+| Phase 13.2 P01 | 5 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -583,6 +611,10 @@ Gate board:
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Neo4j 5.26 for temporal knowledge storage (13.2-01): Provides native bitemporal semantics, contradiction handling, and entity deduplication vs custom implementation
+- Graphiti-core integration (13.2-01): Unified episode ingestion API faster than building custom pipeline
+- GRAPH_ORACLE_ENABLED defaults to false (13.2-01): Safe rollout pattern, prevents breaking existing flows if graph unavailable
+- 2-second timeout for all graph queries (13.2-01): Prevents request-path latency regression, fail-open with fallback values
 - Cleanup before features: 30+ scripts make codebase unmaintainable; organize first, then build
 - Agent-driven refactoring: Leverage awesome-claude-code + GSD for autonomous cleanup
 - Docker-first architecture: Scalability requirement; separates concerns, enables multi-tenant future
@@ -778,8 +810,8 @@ Current blockers for Phase 6 closure: None.
 
 ## Session Continuity
 
-Last session: 2026-02-15
-Stopped at: Phase 11 planning closure; execute phase 11 in wave order next
+Last session: 2026-02-19
+Stopped at: Completed 13.2-01-PLAN.md (Neo4j runtime + graph entity contracts)
 Resume file: None
 
 Config (if exists):
