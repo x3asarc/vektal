@@ -603,6 +603,7 @@ Gate board:
 
 *Updated after each plan completion*
 | Phase 13.2 P01 | 5 | 3 tasks | 7 files |
+| Phase 13.2 P03 | 5 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -734,6 +735,9 @@ Recent decisions affecting current work:
 - 24-hour rollback window (05-04-01): Users can revert v2â†’v1 within 24h of migration for safety, prevents indefinite version downgrade
 - RFC 7807 409 for version mismatch (05-04-01): Machine-readable error with suggested_path metadata guides clients to correct endpoint
 - Migration contract pattern (05-04-01): run_user_migration() interface established in Phase 5, implementation deferred until v2 requirements known
+- [Phase 13.2-03]: OracleSignal dataclass provides unified contract across graph/content/visual/policy adapters
+- [Phase 13.2-03]: Blended scoring weights: 0.7 vector + 0.3 lexical based on retrieval research
+- [Phase 13.2-03]: Lexical fallback ensures retrieval works when embeddings unavailable
 
 ### Roadmap Evolution
 
