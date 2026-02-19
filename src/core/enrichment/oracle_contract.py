@@ -1,24 +1,37 @@
-"""Deterministic Oracle decision contract for enrichment arbitration."""
+"""
+Canonical Oracle decision contract for all adapters (enrichment + governance).
+
+This is the unified contract used by:
+- Enrichment oracles: content_oracle, visual_oracle, policy_oracle
+- Governance oracles: graph_oracle_adapter
+
+Decision type harmonization (Phase 13.2-06):
+- pass: Clear automatic approval (was 'accept')
+- review: Requires human review but not blocking (was 'suggest')
+- hold: Pending more information (unchanged)
+- fail: Clear rejection/blocking (was 'reject')
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Literal
 
 
-OracleDecisionType = Literal["accept", "suggest", "hold", "reject"]
+OracleDecisionType = Literal["pass", "review", "hold", "fail"]
 
 _GENERIC_MERCHANT_VALUES = {"", "n/a", "na", "none", "see title", "same as title"}
 
 
 @dataclass(frozen=True)
 class OracleDecision:
-    """Unified Oracle output payload across content/visual/policy adapters."""
+    """Unified Oracle output payload across content/visual/policy/graph adapters."""
 
     decision: OracleDecisionType
     confidence: float
     reason_codes: tuple[str, ...]
     evidence_refs: tuple[str, ...]
     requires_user_action: bool
+    source: str = 'enrichment'  # Track origin: 'enrichment' | 'graph' | etc
 
     def to_dict(self) -> dict:
         return {
@@ -27,6 +40,7 @@ class OracleDecision:
             "reason_codes": list(self.reason_codes),
             "evidence_refs": list(self.evidence_refs),
             "requires_user_action": self.requires_user_action,
+            "source": self.source,
         }
 
 
@@ -39,6 +53,26 @@ def merchant_value_is_meaningful(value) -> bool:
     return text not in _GENERIC_MERCHANT_VALUES
 
 
+def normalize_legacy_decision(decision: str) -> str:
+    """
+    Normalize legacy decision vocabulary to unified contract.
+
+    Backward-compatibility helper for external callers using old decision types.
+
+    Mapping:
+    - accept -> pass
+    - suggest -> review
+    - reject -> fail
+    - pass/review/hold/fail -> unchanged
+    """
+    legacy_map = {
+        "accept": "pass",
+        "suggest": "review",
+        "reject": "fail",
+    }
+    return legacy_map.get(decision, decision)
+
+
 def merchant_first_arbitration(
     *,
     merchant_value,
@@ -49,6 +83,8 @@ def merchant_first_arbitration(
 ) -> OracleDecision:
     """
     Apply merchant-first policy to enrichment candidate updates.
+
+    Uses unified decision vocabulary: pass | review | hold | fail
     """
     if candidate_value is None:
         return OracleDecision(
@@ -62,7 +98,7 @@ def merchant_first_arbitration(
     if not merchant_value_is_meaningful(merchant_value):
         if confidence >= 0.7 and not structural_conflict:
             return OracleDecision(
-                decision="accept",
+                decision="pass",
                 confidence=float(confidence),
                 reason_codes=(f"{reason_code_prefix}_merchant_missing",),
                 evidence_refs=(),
@@ -80,7 +116,7 @@ def merchant_first_arbitration(
     candidate_text = str(candidate_value).strip()
     if merchant_text == candidate_text and confidence >= 0.7:
         return OracleDecision(
-            decision="accept",
+            decision="pass",
             confidence=float(confidence),
             reason_codes=(f"{reason_code_prefix}_matches_merchant",),
             evidence_refs=(),
@@ -97,7 +133,7 @@ def merchant_first_arbitration(
         )
 
     return OracleDecision(
-        decision="suggest",
+        decision="review",
         confidence=float(confidence),
         reason_codes=(f"{reason_code_prefix}_merchant_conflict_suggest",),
         evidence_refs=(),
