@@ -1,550 +1,554 @@
-# Phase 14 Context: Continuous Optimization & Learning
+# Phase 14: Codebase Knowledge Graph & Continual Learning - Context
 
-**Status**: Future phase - placeholder for system-wide optimization
-**Created**: 2026-02-08
-**Source**: User vision for self-improving system
+**Gathered:** 2026-02-19
+**Status:** Ready for planning
+
+<domain>
+## Phase Boundary
+
+Build a self-learning codebase knowledge graph that makes all project context immediately visible to LLMs and developers, eliminating massive token consumption and enabling intelligent code optimization suggestions.
+
+**What this phase delivers:**
+- Every file, module, class, and function as a node in Neo4j graph
+- Dual indexing: explicit relationships (imports, calls) + semantic similarity (vectors)
+- Planning docs as central hubs (the "why" behind every piece of code)
+- Automatic graph updates via git hooks + daemon + manual triggers
+- Query interface for LLMs to find context without reading everything
+- Similarity detection for duplicate code and refactoring opportunities
+
+**What this phase does NOT include:**
+- Autonomous refactoring execution (Phase 15)
+- Runtime performance optimization (Phase 15)
+- Self-healing capabilities (Phase 15)
+
+</domain>
+
+<decisions>
+## Implementation Decisions
+
+### 1. Phase Scope Redefined
+
+**Decision:** Phase 14 = Codebase Knowledge Graph (foundational), Phase 15 = Self-Healing + Runtime Optimization (action)
+
+**Rationale:**
+- Knowledge graph must come first (foundation for all future work)
+- Phase 15 needs Phase 14's graph to make intelligent optimization decisions
+- Separation of concerns: Phase 14 = intelligence (what could be better?), Phase 15 = action (make it better)
+
+**Phase 15 context:** See `.planning/phases/15-self-healing-dynamic-scripting/15-CONTEXT.md` for integration details
 
 ---
 
-## The Vision: System That Gets Better Every Day
+### 2. Trigger Mechanism: Hybrid 4-Layer
 
-### Core Principle
-**Continuous learning and autonomous optimization** - The system should improve itself over time by learning from usage patterns, identifying bottlenecks, and automatically optimizing hot paths.
+**Decision:** Multiple triggers that cross-validate each other with clear precedence
 
-### Why This is Last
+**Layers:**
+1. **Git pre-commit hook** (PRIMARY)
+   - Runs on every commit
+   - Scans changed files, updates graph relationships
+   - Can block commit if graph sync fails (ensures accuracy)
+   - Catches 95% of changes reliably
 
-**Phase 14 MUST be last** because:
-1. Needs full context of ALL previous phases (1-13)
-2. Can reference entire system architecture
-3. Optimizes real usage patterns (not theoretical)
-4. Learns from production data
-5. Improves what's actually built
+2. **LLM instructions in .md files** (ENRICHMENT)
+   - Instructions in `claude.md`, `codex.md`, `gemini.md`
+   - LLM logs intent + context when generating code
+   - Enriches graph with semantic meaning ("why" not just "what")
+   - Only works for AI-generated code
 
----
+3. **Periodic scan daemon** (FALLBACK)
+   - Runs hourly or daily
+   - Full codebase scan
+   - Finds divergence between graph and reality
+   - Catches manual edits outside git, repairs inconsistencies
 
-## Key Optimization Areas
+4. **Manual trigger command** (DEBUG/OVERRIDE)
+   - `/sync-graph` or `gsd:sync-graph`
+   - Force full rescan on-demand
+   - For testing, debugging, recovery after issues
 
-### 1. Performance Profiling & Bottleneck Identification
-
-**Automatic Performance Monitoring**:
-- Track every operation's duration
-- Identify slowest endpoints/workflows
-- Detect N+1 queries automatically
-- Profile memory usage patterns
-- Monitor API call frequency
-
-**Bottleneck Detection**:
+**Cross-validation:**
 ```python
-# System automatically identifies slow operations
-bottlenecks = profiler.identify_slowest_operations(
-    threshold_ms=500,  # Operations taking >500ms
-    frequency="high"   # That happen frequently
+# Git hook checks graph freshness
+if graph.last_sync_time < (now - 1 hour):
+    warn("Graph may be stale - run daemon sync first")
+
+# Daemon detects divergence
+files_in_codebase = scan_src_directory()
+files_in_graph = query_graph("MATCH (f:File) RETURN f.path")
+missing = files_in_codebase - files_in_graph
+if missing:
+    log(f"Found {len(missing)} files not in graph - syncing")
+```
+
+**Implementation sequence (8 plans across 4 waves):**
+
+**Wave 1: Foundation**
+- Plan 14-01: Extend Neo4j schema for codebase entities
+- Plan 14-02: Vector embedding pipeline
+
+**Wave 2: Initial Population**
+- Plan 14-03: Full codebase scanner + manual sync command (Layer 4)
+- Plan 14-04: Planning docs as central nodes
+
+**Wave 3: Automatic Updates**
+- Plan 14-05: Git pre-commit hook integration (Layer 1)
+- Plan 14-06: Periodic consistency daemon (Layer 3)
+
+**Wave 4: AI Enrichment**
+- Plan 14-07: LLM instruction framework (Layer 2)
+- Plan 14-08: Query interface for LLMs
+
+---
+
+### 3. Graph Scope: Track Everything
+
+**Decision:** Index all project artifacts with semantic similarity detection
+
+**What gets tracked:**
+- ✅ Source code (`src/`) - all Python modules, classes, functions
+- ✅ Tests (`tests/`) - track what they test, coverage relationships
+- ✅ Planning docs (`.planning/`) - phases, plans, requirements (**CENTRAL NODES**)
+- ✅ Documentation (`docs/`) - architecture docs, guides, references
+
+**Relationships captured:**
+- **Explicit:** imports, calls, references, inheritance, tests, planning_doc_references
+- **Semantic:** vector similarity (find related code without explicit links)
+
+**Rationale:** Comprehensive graph enables finding anything related to anything else, eliminating need to read entire codebase.
+
+---
+
+### 4. Similarity Handling: Three-Tier Strategy
+
+**Decision:** Different actions based on similarity level with intelligent refactoring
+
+| Similarity | What It Means | Action | Pattern |
+|------------|---------------|--------|---------|
+| **95-100%** | True duplicates (copy-paste) | Delete duplicate | DRY principle |
+| **80-95%** | Shared core + parameterizable variants | Extract + parameterize | Single function with parameters |
+| **60-80%** | Shared pattern, different implementation | Extract utilities + interface | Template Method or Strategy pattern |
+| **40-60%** | Related domain | Share low-level utilities only | Utilities library |
+| **<40%** | Coincidental similarity | Keep separate | No action |
+
+**Key insight:**
+> "84% similar doesn't mean merge blindly - it means 84% shared logic + 16% variant behavior. Extract the 84%, parameterize the 16%."
+
+**Example (80-95% case):**
+```python
+# BEFORE: Two similar files (84% similar)
+def parse_colors_shopify(text):
+    colors = extract_keywords(text)  # 84% shared
+    return normalize_to_english(colors)  # 16% different
+
+def parse_colors_vendor(text):
+    colors = extract_keywords(text)  # 84% shared (DUPLICATE!)
+    return normalize_to_german(colors)  # 16% different
+
+# AFTER: Extract + parameterize
+def parse_colors(text, language='english'):
+    """Unified function serving both use cases"""
+    colors = extract_keywords(text)  # 84% extracted ONCE
+    if language == 'german':
+        return normalize_to_german(colors)
+    return normalize_to_english(colors)
+
+# Callers updated:
+shopify_colors = parse_colors(product.title, language='english')
+vendor_colors = parse_colors(catalog.name, language='german')
+```
+
+**Example (60-80% case):**
+```python
+# Two files 65% similar → Extract shared utilities + keep separate strategies
+
+# BEFORE: 200 lines each, 65% duplicated
+class PlaywrightScraper:  # 200 lines
+    # Duplicate validation, retry, parsing...
+
+class RequestsScraper:  # 200 lines
+    # Duplicate validation, retry, parsing...
+
+# AFTER: 3 files, 200 total lines (50% reduction)
+# base.py (100 lines) - shared template
+class BaseScraper(ABC):
+    def scrape(self, url, config):
+        self.validate_url(url)  # Shared
+        client = self.setup_client()  # Subclass implements
+        html = self.retry_with_backoff(lambda: self.fetch(url, client))  # Shared
+        return self.parse_html(html, config)  # Shared
+
+# strategies/playwright_scraper.py (50 lines) - Playwright specifics only
+class PlaywrightScraper(BaseScraper):
+    def setup_client(self): ...
+    def fetch(self, url, client): ...
+
+# strategies/requests_scraper.py (50 lines) - Requests specifics only
+class RequestsScraper(BaseScraper):
+    def setup_client(self): ...
+    def fetch(self, url, client): ...
+```
+
+---
+
+### 5. Refactoring Autonomy: Governed Auto-Apply
+
+**Decision:** Phase 14 detects and flags, Phase 15 executes with verification gates
+
+**Phase 14 role (detection only):**
+- Identifies similarity clusters
+- Calculates metrics:
+  - Similarity score (0.0-1.0)
+  - Impact radius (how many files import these)
+  - Test coverage (are they tested?)
+  - Complexity score (LOC, cyclomatic complexity)
+- **Outputs suggestions** to queue for Phase 15
+- **Does NOT modify code** (read-only)
+
+**Phase 15 role (execution with gates):**
+- Reads Phase 14's suggestions
+- For each suggestion, runs **6-gate verification pipeline**:
+  1. **Metric thresholds** (similarity ≥0.90, impact radius ≤15, coverage ≥0.80)
+  2. **LLM generates refactoring plan**
+  3. **Sandbox execution**
+  4. **All tests pass** (100%)
+  5. **Contract tests pass** (no breaking changes)
+  6. **Governance gate** (GREEN - no security issues)
+- **If all pass** → auto-apply, update graph, notify user
+- **If any fail** → escalate with detailed report
+
+**Rationale:** Separation of concerns - detection is Phase 14 (intelligence), execution is Phase 15 (action with safety).
+
+---
+
+### 6. File Organization Philosophy
+
+**Decision:** More files + less code > fewer files + more code
+
+**Key insight:**
+> "More files that are cleaner, smaller, and documented = faster codebase"
+
+**Why superior:**
+- Faster IDE indexing (smaller files to parse)
+- Faster git operations (smaller diffs, fewer merge conflicts)
+- Faster human comprehension (50 lines in 2 seconds vs 500 lines in 20 seconds)
+- Parallel team work (multiple devs editing different files)
+- Less memory (Python loads only imported modules)
+
+**Example:**
+- Before: 2 files, 400 total lines
+- After: 3 files (base + 2 strategies), 200 total lines
+- Result: +1 file, -50% code, better organization
+
+**Pattern:** Extract shared logic → new `base.py`, keep specific logic in separate files
+
+**Real-world validation:** This codebase already follows this pattern:
+- `src/assistant/runtime_tier1.py`, `runtime_tier2.py`, `runtime_tier3.py` (separate, not one file)
+- `src/scraping/strategies/playwright_scraper.py`, `requests_scraper.py` (separate strategies)
+
+---
+
+### 7. Vector Embedding Strategy: Hierarchical Summaries
+
+**Decision:** Embed file summaries + function summaries (NOT full content)
+
+**User's keyboard analogy:**
+> "I can see letters, numbers, special characters, Fn keys separately. I don't need to zoom in on each key."
+
+**Translation:**
+- **File-level embedding:** docstring + purpose + list of exports
+- **Function-level embedding:** signature + docstring (NOT full implementation)
+- **Class-level embedding:** docstring + method signatures
+
+**Embedding structure:**
+```python
+# File summary embedding
+file_embedding = embed(
+    f"File: {file_path}\n"
+    f"Purpose: {file_docstring}\n"
+    f"Exports: {', '.join(exported_names)}\n"
+    f"Imports: {', '.join(import_names)}"
 )
 
-# Example findings:
-{
-  "vendor_discovery": {
-    "avg_duration_ms": 2800,
-    "frequency": "500/day",
-    "optimization_potential": "HIGH",
-    "suggestion": "Cache vendor inference results for 24h"
-  },
-  "image_scraping": {
-    "avg_duration_ms": 1200,
-    "frequency": "1000/day",
-    "optimization_potential": "MEDIUM",
-    "suggestion": "Batch image downloads, use CDN caching"
-  }
-}
-```
-
----
-
-### 2. Machine Learning from User Behavior
-
-**Learn Usage Patterns**:
-```python
-# What do users do most frequently?
-usage_patterns = ml.analyze_user_behavior()
-
-{
-  "most_common_workflows": [
-    {
-      "pattern": "upload_csv -> scrape_products -> apply_to_shopify",
-      "frequency": "80% of users",
-      "avg_products": 50,
-      "optimization": "Predictive prefetch: when CSV uploaded, pre-warm scrapers"
-    },
-    {
-      "pattern": "single_sku -> discover_vendor -> scrape -> create_product",
-      "frequency": "60% of users",
-      "optimization": "Cache vendor discovery for similar SKUs"
-    }
-  ],
-
-  "common_vendors": [
-    {"name": "ITD Collection", "usage": "45%", "optimization": "Keep scraper warm"},
-    {"name": "Pentart", "usage": "30%", "optimization": "Pre-cache product catalog"}
-  ],
-
-  "peak_hours": {
-    "pattern": "9am-11am, 2pm-4pm CET",
-    "optimization": "Scale workers during peak, reduce during off-hours"
-  }
-}
-```
-
-**Predictive Intelligence**:
-- User uploads CSV with 50 SKUs → System predicts they'll want to scrape all
-  - Pre-warm scraper connections
-  - Pre-fetch vendor catalogs
-  - Allocate worker capacity
-- User searches for "R0530" → System predicts they might search for R0531, R0532 next
-  - Prefetch similar SKUs
-  - Cache search results
-
----
-
-### 3. Autonomous Optimization Agents
-
-**Self-Improving Agents**:
-
-```python
-# Agent: Cache Optimizer
-class CacheOptimizerAgent:
-    """
-    Monitors cache hit/miss rates and automatically adjusts TTLs
-    """
-    def run_hourly(self):
-        for cache_key_pattern in all_caches:
-            hit_rate = get_cache_hit_rate(cache_key_pattern)
-
-            if hit_rate < 50%:
-                # Cache not helping, reduce TTL or disable
-                adjust_cache_ttl(cache_key_pattern, decrease=True)
-            elif hit_rate > 95%:
-                # Very effective, increase TTL
-                adjust_cache_ttl(cache_key_pattern, increase=True)
-
-# Agent: Query Optimizer
-class QueryOptimizerAgent:
-    """
-    Detects N+1 queries and suggests/implements fixes
-    """
-    def run_daily(self):
-        slow_queries = db_profiler.get_slow_queries()
-
-        for query in slow_queries:
-            if is_n_plus_one(query):
-                # Automatically add eager loading
-                suggestion = generate_eager_load_fix(query)
-                create_github_issue(suggestion)
-                notify_developer()
-
-# Agent: Cost Optimizer
-class CostOptimizerAgent:
-    """
-    Reduces API costs through intelligent batching and caching
-    """
-    def run_continuous(self):
-        api_usage = monitor_api_calls()
-
-        # OpenAI/Gemini Vision API
-        if api_usage['vision_api']['cost_today'] > budget:
-            # Increase cache TTL for vision results
-            # Reduce image quality slightly
-            # Batch requests more aggressively
-            apply_cost_reduction_tactics()
-
-        # Firecrawl API
-        if api_usage['firecrawl']['redundant_calls'] > 20%:
-            # Cache collection page results for 7 days
-            # Reuse discovered URLs across users
-            implement_shared_cache()
-```
-
-**Autonomous Task Execution**:
-- User scrapes 100 ITD Collection products every Monday morning
-  → System learns pattern, pre-executes scrape Sunday night
-  → Results ready when user logs in Monday
-- Database backup takes 30 minutes during peak hours
-  → System automatically reschedules to off-peak
-- Vision API calls spike at month-end (budget strain)
-  → System proactively increases caching week before
-
----
-
-### 4. Intelligent Caching Strategies
-
-**Multi-Level Cache Optimization**:
-
-```python
-# L1: In-Memory Cache (Redis)
-cache_l1 = {
-    "vendor_discovery": {
-        "ttl": "24h",  # Learned: vendors change rarely
-        "hit_rate": "92%",
-        "cost_savings": "$50/month"
-    },
-    "product_search": {
-        "ttl": "1h",  # Learned: inventory changes frequently
-        "hit_rate": "78%"
-    }
-}
-
-# L2: Database Cache (PostgreSQL)
-cache_l2 = {
-    "scraped_products": {
-        "ttl": "7d",  # Learned: products stable for week
-        "hit_rate": "65%",
-        "cost_savings": "500 scraper calls/week"
-    }
-}
-
-# L3: CDN Cache (Cloudflare)
-cache_l3 = {
-    "product_images": {
-        "ttl": "30d",  # Learned: images never change
-        "hit_rate": "99%",
-        "bandwidth_savings": "100GB/month"
-    }
-}
-```
-
-**Smart Cache Invalidation**:
-- Vendor site structure changes detected → Invalidate all cached scrapers
-- Product price update in Shopify → Invalidate product cache
-- New vendor version released → Refresh YAML config cache
-
----
-
-### 5. Predictive Prefetching
-
-**Reduce Perceived Latency**:
-
-```python
-# User opens "Add Product" page
-# System predicts: 80% chance they'll search for ITD Collection product
-prefetch_in_background([
-    "warm_itd_scraper",
-    "load_itd_catalog_index",
-    "cache_itd_collection_page"
-])
-
-# User types "R05" in SKU field
-# System predicts: Likely ITD Collection based on pattern
-prefetch_in_background([
-    "vendor_discovery_for_R05xx",
-    "itd_product_page_for_R0530"  # Common SKU
-])
-
-# User uploads CSV with 100 SKUs
-# System analyzes CSV, detects 80 ITD + 20 Pentart
-prefetch_in_background([
-    "itd_scraper_warmup",
-    "pentart_scraper_warmup",
-    "allocate_batch_workers"
-])
-```
-
----
-
-### 6. A/B Testing Framework
-
-**Validate Optimizations**:
-
-```python
-# Test: Does caching vendor discovery improve latency?
-ab_test = ABTest(
-    name="cache_vendor_discovery",
-    variants={
-        "control": no_cache,
-        "treatment": cache_24h
-    },
-    metric="vendor_discovery_latency",
-    traffic_split=0.5  # 50/50
+# Function summary embedding (each function separately)
+function_embedding = embed(
+    f"Function: {module}.{class_name}.{function_name}\n"
+    f"Signature: {signature}\n"
+    f"Purpose: {function_docstring}\n"
+    f"File: {file_path}"
 )
-
-# After 1 week:
-results = ab_test.results()
-{
-    "control": {"avg_latency_ms": 2800, "success_rate": 85%},
-    "treatment": {"avg_latency_ms": 150, "success_rate": 92%},
-    "winner": "treatment",
-    "improvement": "18x faster, 7% more accurate",
-    "rollout": "automatically to 100% traffic"
-}
-
-# System automatically rolls out winning variant
 ```
 
-**Continuous Experimentation**:
-- Test different image scraping strategies
-- Compare Playwright vs Selenium performance per vendor
-- Optimize batch sizes dynamically
-- Test different cache TTLs
-- Validate cost reduction tactics
+**Why summaries, not full content:**
+- Current scale: small codebase, no users yet
+- Summaries capture intent without noise
+- Faster queries (smaller embeddings)
+- Future-proof: structure scales as codebase grows
+
+**Embedding model:**
+- Primary: `sentence-transformers` (local, free, already in use)
+- Fallback: OpenAI embeddings (for complex semantic queries if needed)
+
+**Update frequency:**
+- On file change (real-time via git hook)
+- Batch re-embed nightly (catch any missed changes)
 
 ---
 
-### 7. Self-Healing Systems
+### 8. Vector Storage: Neo4j Vector Index
 
-**Automatic Issue Detection & Resolution**:
+**Decision:** Store embeddings IN Neo4j as node properties, use Neo4j vector index for queries
 
+**Rationale:**
+- **Integrated queries:** Combine graph + vector in ONE query
+  ```cypher
+  // Find files similar to X that import Y
+  MATCH (f:File)-[:IMPORTS]->(target {path: 'src/core/cache.py'})
+  CALL db.index.vector.queryNodes('file_embeddings', 5, f.embedding)
+  YIELD node, score
+  RETURN node.path, score
+  ```
+
+- **Future Shopify semantic search:** Same vector infrastructure
+  ```cypher
+  // Find products similar to user query
+  CALL db.index.vector.queryNodes('product_embeddings', 10, $query_embedding)
+  YIELD node, score
+  WHERE node:Product
+  RETURN node.title, score
+  ```
+
+- **One database:** Simpler deployment, one connection pool, one backup strategy
+
+**Alternative considered:** PostgreSQL pgvector
+- **Rejected:** Would split vectors across two systems (code in Neo4j, products in PostgreSQL)
+- Trade-off: More complex setup now (Neo4j + vector extension) vs simpler architecture long-term
+
+**User insight:**
+> "More complex now, simpler later. PostgreSQL is tables, Neo4j uses Cypher for graph queries. Worth the investment."
+
+---
+
+### 9. Planning Docs Centrality: Both Natural + Auto-Link
+
+**Decision:** Hybrid approach - bootstrap with auto-linking, let natural references accumulate over time
+
+**Auto-linking at commit time:**
 ```python
-# Self-Healing: Vendor Site Changes
-class VendorSiteMonitor:
-    """
-    Detects when vendor sites change and auto-fixes
-    """
-    def check_hourly(self):
-        for vendor in all_vendors:
-            success_rate = get_scraper_success_rate(vendor)
+# Parse commit message for phase reference
+commit_msg = "feat(13.2-03): add graph oracle adapter"
 
-            if success_rate < 50%:  # Dramatic drop
-                # Site likely changed
-                trigger_site_reconnaissance(vendor)
-                update_yaml_config(vendor)
-                notify_user("ITD Collection site changed, auto-updated")
+# Extract: Phase 13.2, Plan 03
+phase_match = re.search(r'(\d+\.?\d*)-(\d+)', commit_msg)
+if phase_match:
+    phase = phase_match.group(1)  # "13.2"
+    plan = phase_match.group(2)   # "03"
 
-# Self-Healing: Database Connection Pool Exhaustion
-class DatabaseHealthMonitor:
-    """
-    Detects and fixes database issues
-    """
-    def check_continuous(self):
-        if connection_pool_exhausted():
-            # Increase pool size temporarily
-            scale_connection_pool(increase=10)
-            # Identify slow queries causing exhaustion
-            kill_long_running_queries(threshold="30s")
-            # Alert for permanent fix
-            create_incident("DB pool exhausted")
-
-# Self-Healing: API Rate Limiting
-class APIRateLimitHandler:
-    """
-    Automatically backs off when hitting rate limits
-    """
-    def on_rate_limit(api_name):
-        # Exponential backoff
-        backoff_duration = calculate_backoff()
-        pause_api_calls(api_name, duration=backoff_duration)
-        # Use cached results during backoff
-        fallback_to_cache()
-        # Resume when safe
-        resume_api_calls(api_name)
+    # Link all changed files to planning doc
+    plan_path = f".planning/phases/{phase}-*/13.2-03-PLAN.md"
+    for file in changed_files:
+        graph.create_edge(file, "IMPLEMENTS", plan_path)
 ```
+
+**Natural references:**
+```python
+# Code comments reference phases
+# src/core/graphiti_client.py
+def get_graphiti_client():
+    """
+    Graph client singleton with fail-open behavior.
+
+    Related to Phase 13.2-01: Neo4j runtime + graph client
+    """
+    ...
+
+# Automatically detected and linked when file is scanned
+```
+
+**Why hybrid:**
+- Auto-linking ensures every commit is traceable to a plan (governance)
+- Natural references capture design intent (semantic meaning)
+- Planning docs become central hubs organically (most-referenced = most-central)
+
+**Visualization:** Obsidian-style graph viewer showing planning docs as large central nodes with many connections
 
 ---
 
-### 8. Cost Optimization
+### 10. Query Interface for LLMs: Hybrid (Templates + Custom)
 
-**Reduce Operating Costs Over Time**:
+**Decision:** Pre-built query templates for common patterns (95% of use), natural language fallback for novel questions
 
+**Common query templates:**
 ```python
-# Vision API Cost Optimization
-cost_optimizer = {
-    "vision_api": {
-        "current_cost": "$120/month",
-        "optimizations": [
-            {
-                "tactic": "Increase cache TTL 24h -> 7d",
-                "savings": "$40/month (33%)"
-            },
-            {
-                "tactic": "Reduce image resolution 1200px -> 800px",
-                "savings": "$20/month (17%)",
-                "quality_impact": "minimal"
-            },
-            {
-                "tactic": "Batch similar images (same vendor)",
-                "savings": "$15/month (12%)"
-            }
-        ],
-        "projected_cost": "$45/month (62% reduction)"
-    },
+QUERY_TEMPLATES = {
+    "imports": """
+        MATCH (f:File {path: $file_path})-[:IMPORTS]->(imported:File)
+        RETURN imported.path, imported.purpose
+    """,
 
-    "database_storage": {
-        "current_cost": "$50/month",
-        "optimizations": [
-            {
-                "tactic": "Archive old scrape results >90d",
-                "savings": "$20/month"
-            },
-            {
-                "tactic": "Compress image metadata",
-                "savings": "$10/month"
-            }
-        ],
-        "projected_cost": "$20/month (60% reduction)"
-    }
+    "imported_by": """
+        MATCH (f:File {path: $file_path})<-[:IMPORTS]-(importer:File)
+        RETURN importer.path, importer.purpose
+    """,
+
+    "similar_files": """
+        MATCH (f:File {path: $file_path})
+        CALL db.index.vector.queryNodes('file_embeddings', 5, f.embedding)
+        YIELD node, score
+        WHERE score > 0.8
+        RETURN node.path, node.purpose, score
+    """,
+
+    "planning_context": """
+        MATCH (f:File {path: $file_path})-[:IMPLEMENTS]->(plan:PlanningDoc)
+        RETURN plan.path, plan.phase_number, plan.goal
+    """,
+
+    "impact_radius": """
+        MATCH (f:File {path: $file_path})<-[:IMPORTS*1..3]-(dependent:File)
+        RETURN dependent.path, length(path) as depth
+        ORDER BY depth
+    """,
+
+    "phase_code": """
+        MATCH (plan:PlanningDoc {phase_number: $phase})<-[:IMPLEMENTS]-(f:File)
+        RETURN f.path, f.purpose
+    """
 }
 ```
 
-**Smart Resource Allocation**:
-- Scale workers up during peak hours (9am-5pm)
-- Scale down during off-hours (midnight-6am)
-- Use spot instances for batch jobs (50-70% cost savings)
-- Predictively scale based on CSV upload patterns
+**Natural language fallback:**
+```python
+# For novel questions not in templates
+def query_graph_natural_language(question: str):
+    # LLM converts question to Cypher
+    cypher = llm.generate_cypher(
+        question=question,
+        schema=graph.get_schema(),
+        examples=QUERY_TEMPLATES
+    )
+
+    # Execute generated query
+    return graph.execute(cypher)
+
+# Example:
+# Q: "What files would break if I delete src/core/cache.py?"
+# Cypher: MATCH (f:File {path: 'src/core/cache.py'})<-[:IMPORTS]-(dependent) ...
+```
+
+**Why hybrid:**
+- Templates = fast, reliable, no LLM cost (95% of queries)
+- Natural language = flexible for edge cases (5% of queries)
+- Best of both worlds: performance + flexibility
+
+**Performance:**
+- Template queries: <100ms (direct Cypher)
+- Natural language queries: 500ms-2s (LLM translation + execution)
+- Timeout: 5s (fail gracefully if exceeded)
 
 ---
 
-## Telemetry & Metrics
+### Claude's Discretion
 
-**What We Measure**:
+**Areas where Claude decides during planning/implementation:**
+- Exact Neo4j indexes to create (based on common query patterns)
+- Cypher query optimization techniques
+- Error handling for graph unavailability
+- Daemon scheduling frequency (hourly vs daily)
+- LLM prompt engineering for Cypher generation
+- Graph visualization UI framework (if building viewer)
 
-```yaml
-performance_metrics:
-  - vendor_discovery_latency
-  - scraping_success_rate
-  - product_creation_time
-  - api_response_time
-  - database_query_time
-  - cache_hit_rate
-  - error_rate
-  - uptime
+</decisions>
 
-business_metrics:
-  - products_processed_per_day
-  - cost_per_product
-  - user_satisfaction_score
-  - time_saved_vs_manual
+<specifics>
+## Specific Ideas
 
-ml_metrics:
-  - prediction_accuracy
-  - prefetch_hit_rate
-  - optimization_effectiveness
-  - ab_test_win_rate
+### Keyboard Analogy (User's Mental Model)
+
+> "If I'm looking at my keyboard, I can see: letters, numbers, special characters, Fn keys separately. I don't need to zoom into each key."
+
+**Applied to codebase:**
+- **Letters** = files (see file names, purposes)
+- **Numbers** = classes (see class names, responsibilities)
+- **Special chars** = functions (see function signatures, purposes)
+- **Fn keys** = planning docs (see phase goals, requirements)
+- **Don't zoom in** = don't embed full implementations, just summaries
+
+### More Files = Faster Codebase
+
+**Mental model shift:**
+- OLD: "More files = larger codebase = slower"
+- NEW: "More files + less code = cleaner organization = faster"
+
+**Real example:**
+- Before refactoring: 2 files, 400 lines total
+- After refactoring: 3 files, 200 lines total
+- Benefit: -50% code, +better organization, +faster comprehension
+
+### Integration with Future Shopify Semantic Search
+
+**User mentioned:** Vector embeddings will be reused for Shopify product search
+
+**Implication:** Neo4j vector infrastructure built in Phase 14 enables:
+```cypher
+// Phase 14: Find similar code files
+CALL db.index.vector.queryNodes('file_embeddings', 5, $query_embedding)
+YIELD node WHERE node:File RETURN node
+
+// Future phase: Find similar Shopify products
+CALL db.index.vector.queryNodes('product_embeddings', 10, $query_embedding)
+YIELD node WHERE node:Product RETURN node
 ```
 
-**Week-over-Week Improvement Tracking**:
-```
-Week 1: Baseline
-  - Avg vendor discovery: 2800ms
-  - Scraping success: 85%
-  - Cost per product: $0.15
-
-Week 4: After Optimizations
-  - Avg vendor discovery: 150ms (18x faster ✓)
-  - Scraping success: 92% (+7% ✓)
-  - Cost per product: $0.06 (60% reduction ✓)
-```
+Same infrastructure, different node types = architectural consistency.
 
 ---
 
-## Technologies & Approaches
+</specifics>
 
-**Machine Learning**:
-- Scikit-learn for pattern detection
-- TensorFlow/PyTorch for predictive models
-- Time-series forecasting for usage prediction
-- Anomaly detection for issue identification
+<deferred>
+## Deferred Ideas
 
-**Performance Monitoring**:
-- OpenTelemetry for distributed tracing
-- Prometheus for metrics collection
-- Grafana for visualization
-- Sentry for error tracking
+None - discussion stayed within Phase 14 scope.
 
-**Experimentation**:
-- LaunchDarkly or Unleash for feature flags
-- Custom A/B testing framework
-- Statistical significance testing
+Runtime optimization, self-healing, and autonomous refactoring execution are Phase 15 territory (see `15-CONTEXT.md`).
 
-**Autonomous Agents**:
-- Celery Beat for scheduled tasks
-- Custom agent framework
-- Event-driven optimization triggers
+---
+
+</deferred>
 
 ---
 
 ## Success Criteria (What Must Be TRUE)
 
-**For Performance**:
-1. System identifies top 10 bottlenecks automatically each week
-2. Hot paths get 2x faster over 3 months without manual intervention
-3. 95th percentile latency improves 30% quarter-over-quarter
-4. Cache hit rate >80% for frequently-accessed data
-
-**For Intelligence**:
-1. ML models predict user actions with >70% accuracy
-2. Predictive prefetching reduces perceived latency by 50%
-3. Autonomous agents fix 90% of common issues without human intervention
-4. System learns new optimization patterns from production usage
-
-**For Cost**:
-1. Cost per product operation decreases 20% quarter-over-quarter
-2. API costs reduced through intelligent caching and batching
-3. Infrastructure costs scale sub-linearly with user growth
-4. ROI tracking shows optimization payback in <30 days
-
-**For Reliability**:
-1. Self-healing fixes 95% of transient issues automatically
-2. Uptime improves through predictive maintenance
-3. User-facing errors decrease 50% through proactive fixes
-4. System detects and adapts to vendor site changes within 1 hour
-
-**For User Experience**:
-1. Users notice system "getting faster" over time
-2. Common workflows feel instant (perceived latency <200ms)
-3. System anticipates needs (prefetching, suggestions)
-4. No manual performance tuning required from users
+1. **Every file is a node** - All `src/`, `tests/`, `.planning/`, `docs/` files indexed in graph
+2. **Relationships captured** - Imports, calls, references, tests, planning_doc links tracked
+3. **Semantic similarity works** - Vector search finds related files without explicit links
+4. **Planning docs are central** - Phases/plans have most connections, easy to query "what code implements Phase X?"
+5. **Graph updates automatically** - Git hook + daemon + manual trigger all working, cross-validating
+6. **LLMs can query efficiently** - Template queries <100ms, natural language queries <2s
+7. **Similarity detection accurate** - Correctly identifies 95-100% (duplicates), 80-95% (parameterizable), 60-80% (shared utilities)
+8. **Context visible without token cost** - Query graph instead of reading files, 10x reduction in tokens needed
 
 ---
 
-## Open Questions for Discussion Phase
+## Phase 14 → Phase 15 Handoff Requirements
 
-### Scope
-- [ ] Which optimizations are MVP vs nice-to-have?
-- [ ] Should ML models run locally (Ollama) or API (OpenAI)?
-- [ ] How much telemetry is too much? (privacy concerns)
+When Phase 15 planning begins, verify Phase 14 delivered:
 
-### Implementation
-- [ ] Build custom agent framework or use existing (Celery, Temporal)?
-- [ ] Real-time optimization or batch/scheduled?
-- [ ] User-visible optimization controls? (power users want knobs)
+- [ ] **Neo4j schema extended** - File, Module, Class, Function, PlanningDoc nodes exist
+- [ ] **Codebase fully indexed** - All src/ files in graph with relationships
+- [ ] **Vector embeddings generated** - All files embedded with hierarchical summaries
+- [ ] **Planning docs as central nodes** - Auto-linking at commit + natural references working
+- [ ] **Automatic update triggers working** - Git hook + daemon + manual all operational
+- [ ] **Query interface for LLMs** - Templates + natural language fallback ready
+- [ ] **Integration with Phase 13.2** - Can query both runtime and structural graphs
+- [ ] **Similarity detection operational** - Can identify refactoring candidates with metrics
 
-### Learning Approach
-- [ ] Supervised learning (train on historical data)?
-- [ ] Reinforcement learning (learn from outcomes)?
-- [ ] Unsupervised learning (discover patterns)?
-
-### Cost vs Benefit
-- [ ] ML infrastructure costs vs optimization savings?
-- [ ] Developer time to build vs automatic improvements?
-- [ ] Complexity vs maintainability trade-offs?
+If any requirement missing, Phase 15 cannot proceed.
 
 ---
 
-## Related Work
-
-**Files to Analyze During Planning**:
-- All phases 1-13 (complete system context)
-- Performance bottlenecks from production logs
-- User behavior analytics
-- Cost breakdowns per operation
-- Current cache strategies
-
-**Documentation to Create**:
-- `docs/guides/OPTIMIZATION_FRAMEWORK.md` - How continuous optimization works
-- `docs/reference/TELEMETRY.md` - Metrics and monitoring
-- `docs/guides/ML_MODELS.md` - Machine learning capabilities
-
----
-
-## Next Steps
-
-**When ready to plan this phase** (use `/gsd:discuss-phase 14` AFTER phases 1-13 complete):
-1. Review all system components from phases 1-13
-2. Identify actual bottlenecks from production data
-3. Prioritize optimizations by impact
-4. Design ML models for pattern learning
-5. Implement telemetry and monitoring
-6. Build autonomous agent framework
-7. Create A/B testing infrastructure
-8. Develop self-healing capabilities
-
----
-
-*This phase represents the "final evolution" - transforming a working system into an intelligent, self-improving platform that gets better every day without manual intervention.*
+*Phase: 14-continuous-optimization-learning*
+*Context gathered: 2026-02-19*
+*Ready for: Research → Planning → Execution*
