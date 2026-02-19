@@ -37,26 +37,42 @@ Canonical governance spec: `solutionsos/compound-engineering-os-policy.md`
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [x] **Phase 1: Codebase Cleanup & Analysis** - Foundation cleanup before building
-- [x] **Phase 1.1: Root Documentation Organization (INSERTED)** - Complete root directory cleanup
-- [x] **Phase 2: Docker Infrastructure Foundation** - Container orchestration and service architecture
-- [x] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** - Vendor-agnostic scraping with intelligent strategy selection
-- [x] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** - AI-powered enrichment with embeddings
-- [x] **Phase 3: Database Migration (SQLite to PostgreSQL)** - Production-grade data layer
-- [x] **Phase 4: Authentication & User Management** - User system in containerized environment
-- [x] **Phase 5: Backend API Design** - RESTful API structure and contracts
-- [x] **Phase 6: Job Processing Infrastructure (Celery)** - Async task processing foundation
-- [x] **Phase 7: Frontend Framework Setup (Next.js)** - Modern React-based UI foundation
-- [x] **Phase 8: Product Resolution Engine** - Intelligent product lookup and enrichment
-- [x] **Phase 9: Real-Time Progress Tracking** - Live job monitoring with WebSocket/SSE
-- [x] **Phase 10: Conversational AI Interface** - ChatGPT-style intelligent interface
-- [x] **Phase 11: Product Search & Discovery** - Advanced search and version tracking
-- [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
-- [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
-- [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
-- [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
-- [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
-- [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
+**Audience Tags:**
+- `[developer-facing]` - Benefits developers/maintainers/AI assistants (not visible to end users)
+- `[user-facing]` - Delivers features/value directly to Shopify store owners (end users)
+
+---
+
+### Completed Phases
+
+- [x] **Phase 1: Codebase Cleanup & Analysis** `[developer-facing]` - Foundation cleanup before building
+- [x] **Phase 1.1: Root Documentation Organization (INSERTED)** `[developer-facing]` - Complete root directory cleanup
+- [x] **Phase 2: Docker Infrastructure Foundation** `[developer-facing]` - Container orchestration and service architecture
+- [x] **Phase 2.1: Universal Vendor Scraping Engine (INSERTED)** `[user-facing]` - Vendor-agnostic scraping with intelligent strategy selection
+- [x] **Phase 2.2: Product Enrichment Pipeline (INSERTED)** `[user-facing]` - AI-powered enrichment (without vectorization)
+- [x] **Phase 3: Database Migration (SQLite to PostgreSQL)** `[developer-facing]` - Production-grade data layer
+- [x] **Phase 4: Authentication & User Management** `[user-facing]` - User system in containerized environment
+- [x] **Phase 5: Backend API Design** `[developer-facing]` - RESTful API structure and contracts
+- [x] **Phase 6: Job Processing Infrastructure (Celery)** `[developer-facing]` - Async task processing foundation
+- [x] **Phase 7: Frontend Framework Setup (Next.js)** `[user-facing]` - Modern React-based UI foundation
+- [x] **Phase 8: Product Resolution Engine** `[user-facing]` - Intelligent product lookup and enrichment
+- [x] **Phase 9: Real-Time Progress Tracking** `[user-facing]` - Live job monitoring with WebSocket/SSE
+- [x] **Phase 10: Conversational AI Interface** `[user-facing]` - ChatGPT-style intelligent interface
+- [x] **Phase 11: Product Search & Discovery** `[user-facing]` - Advanced search and version tracking
+- [x] **Phase 12: Tier System Architecture** `[developer-facing]` - Multi-tier capability routing (LLM to Full Agents)
+- [x] **Phase 13: Integration Hardening & Deployment** `[developer-facing]` - Production readiness and external API robustness
+- [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** `[user-facing]` - Canonical enrichment v2 as integrated platform feature
+- [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** `[developer-facing]` - Shared verifier/oracle adapters for cross-phase use
+
+### Active/Planned Phases
+
+- [ ] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
+- [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
+
+### Future Phases
+
+- [ ] **Future Phase: Production Refinement & Integration Cleanup** `[user-facing]` - Make existing features production-ready (frontend integration fixes, edge cases, polish)
+- [ ] **Future Phase: User Data Knowledge Graph & Semantic Search** `[user-facing]` - Knowledge graph of user's products/vendors with vector search, duplicate detection, smart recommendations
 
 ## Phase Details
 
@@ -452,41 +468,132 @@ Plans:
 - Plan 06: Unify OracleDecision and OracleSignal into single contract with harmonized decision types (Gap 1: Contract Unification)
 - Plan 07: Create 20 governance reports retroactively for plans 01-05 (Gap 2: Governance Reports Missing)
 
-### Phase 14: Continuous Optimization & Learning
-**Goal**: Build governed continuous optimization and learning loops for personalization, efficiency, and long-term quality
-**Depends on**: All previous phases (1-13) - Must have full context
-**Requirements**: TBD (will be defined during discussion phase)
+### Phase 14: Codebase Knowledge Graph & Continual Learning `[developer-facing]`
+**Goal**: Build self-learning codebase knowledge graph that makes all project context immediately visible to LLMs and developers, eliminating massive token consumption
+**Depends on**: Phase 13.2 (Oracle Framework - provides Neo4j infrastructure)
+**Requirements**: GRAPH-01 (Codebase entities), GRAPH-02 (Vector embeddings), GRAPH-03 (Automatic updates), GRAPH-04 (Query interface), GRAPH-05 (Similarity detection)
 **Success Criteria** (what must be TRUE):
-  1. The platform learns from approved user behavior and proposes reusable improvements.
-  2. Personalization evolves safely (for example, skill suggestions and policy refinements) with governance controls.
-  3. Optimization loops measurably improve latency, cost, and success rates over time.
-  4. Drift and quality regressions are monitored and corrected through governed feedback loops.
-  5. Telemetry demonstrates consistent week-over-week improvement in key product metrics.
+  1. Every file in codebase is a node in the graph with relationships captured
+  2. Semantic similarity works (vector search finds related code without explicit links)
+  3. Planning docs are central hubs (most-referenced nodes in graph)
+  4. Graph updates automatically (git hook + daemon operational)
+  5. LLMs can query efficiently (<100ms templates, <2s natural language)
+  6. Similarity detection accurate (identifies 95%+ duplicates, 80-95% parameterizable variants, 60-80% shared utilities)
+  7. Context visible without token cost (10x reduction in tokens needed to understand codebase)
+  8. Refactoring opportunities detected and flagged for Phase 15 execution
+**Plans**: 8 plans in 4 waves
+
+Plans:
+- [ ] 14-01: Extend Neo4j schema for codebase entities (File, Module, Class, Function, PlanningDoc)
+- [ ] 14-02: Vector embedding pipeline (hierarchical summaries, Neo4j vector index)
+- [ ] 14-03: Full codebase scanner + manual sync command
+- [ ] 14-04: Planning docs as central nodes (auto-linking + natural references)
+- [ ] 14-05: Git pre-commit hook integration (primary trigger)
+- [ ] 14-06: Periodic consistency daemon (fallback/repair)
+- [ ] 14-07: LLM instruction framework (intent capture for AI-generated code)
+- [ ] 14-08: Query interface for LLMs (templates + natural language fallback)
+
+**Context**: See `.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md`
+
+
+### Phase 15: Self-Healing & Runtime Optimization `[developer-facing]`
+**Goal**: Autonomous refactoring, performance optimization, and self-healing using Phase 14's knowledge graph for intelligent decisions
+**Depends on**: Phase 14 (Codebase Knowledge Graph - provides structure understanding)
+**Requirements**: HEAL-01 (Autonomous refactoring), HEAL-02 (Self-healing), OPTIMIZE-01 (Performance), OPTIMIZE-02 (Cost reduction), OPTIMIZE-03 (Predictive intelligence)
+**Success Criteria** (what must be TRUE):
+  1. Autonomous refactoring executes with 6-gate verification (metrics, sandbox, tests, contracts, governance, rollback plan)
+  2. Self-healing fixes 95% of transient issues without human intervention
+  3. Performance optimization measurably improves (P95 latency -30% per quarter, cost per operation -20% per quarter)
+  4. Predictive intelligence reduces perceived latency 50% through prefetching
+  5. System detects and adapts to vendor site changes within 1 hour
+  6. Week-over-week telemetry shows consistent improvement in latency/cost/error rates
+  7. Correlation between structural changes (Phase 14) and runtime failures (Phase 13.2) enables root cause detection
+  8. A/B testing validates optimizations before broad rollout
 **Plans**: TBD
 
 Plans:
-- [ ] 14-01: Performance profiling, telemetry, and bottleneck identification
-- [ ] 14-02: Machine learning from user behavior and usage patterns
-- [ ] 14-03: Autonomous optimization agents (governed, non-remediation)
-- [ ] 14-04: Predictive intelligence and cost optimization
+- [ ] 15-01: Autonomous refactoring execution (consumes Phase 14 similarity detection)
+- [ ] 15-02: Performance profiling and optimization agents (cache, query, cost)
+- [ ] 15-03: Self-healing workflows (vendor site monitoring, transient failure recovery)
+- [ ] 15-04: Predictive intelligence and A/B testing framework
 
+**Context**: See `.planning/phases/15-self-healing-dynamic-scripting/15-CONTEXT.md`
 
-### Phase 15: Self-Healing & Dynamic Scripting
-**Goal**: Implement guarded autonomous remediation workflows (research-plan-execute-verify) for unresolved integration/tool failures
-**Depends on**: Phase 13, Phase 14
-**Requirements**: TBD (will be defined during discussion phase)
-**Success Criteria** (what must be TRUE):
-  1. Self-healing execution only runs in sandboxed environments with strict policy controls.
-  2. Generated remediation actions are verified against explicit pass/fail contracts before promotion.
-  3. Every autonomous remediation has full audit lineage (trigger, plan, execution, verification, outcome).
-  4. Unsafe or low-confidence remediations fail closed and escalate to human review.
-  5. Reusable approved remediations are cataloged with versioning and rollback support.
-**Plans**: TBD
+---
 
-Plans:
-- [ ] 15-01: Emergency specialist trigger and constrained research loop
-- [ ] 15-02: Dynamic remediation generation with policy validation
-- [ ] 15-03: Sandbox execution, verifier loop, and promotion gate
+## Future Phases
+
+### Future Phase: Production Refinement & Integration Cleanup `[user-facing]`
+**Goal**: Make existing user-facing features production-ready by fixing frontend integration, edge cases, and polish issues
+**Depends on**: Phase 15
+**Scope**: Fix broken frontend integrations, API edge cases, error handling gaps, UI polish, and cross-browser compatibility
+
+**Motivation**: Backend features work but frontend integration is fragile. Users see errors when trying to use features. Need cleanup phase similar to Phase 1-2 but for production readiness rather than codebase organization.
+
+**What needs fixing:**
+- Frontend components that don't work with backend APIs
+- Missing error states and loading states
+- Edge cases in user workflows
+- Cross-browser compatibility issues
+- Mobile responsiveness gaps
+- Accessibility improvements
+- Performance optimization for user-facing features
+
+**Success Criteria:**
+- All existing features work reliably in production
+- Users can complete workflows without errors
+- Frontend integrates cleanly with backend APIs
+- Error messages are clear and actionable
+- Features work across browsers and devices
+
+**Plans**: TBD (will be defined after Phase 15 completes)
+
+---
+
+### Future Phase: User Data Knowledge Graph & Semantic Search `[user-facing]`
+**Goal**: Apply Phase 14's knowledge graph technology to user's product/vendor data for intelligent features
+**Depends on**: Future Phase (Production Refinement)
+**Scope**: Vector embeddings of enriched products, semantic search, duplicate detection, smart recommendations
+
+**Motivation**: Phase 14 builds knowledge graph infrastructure for CODE. This phase applies the same technology to user's DATA - their products, vendors, collections, orders.
+
+**What users see (features):**
+- 🔍 Semantic search: "Find red acrylic paint" → finds products even if not tagged "red"
+- ⚠️ Duplicate detection: "These 5 products might be duplicates" → intelligent clustering
+- 💡 Smart recommendations: "Suggested collection: Vintage Paper Crafts" → related products auto-grouped
+- 📊 Data quality score: "Your catalog is 85% complete" → graph-based completeness analysis
+
+**What users DON'T see (backend):**
+- Neo4j graph database
+- Vector embeddings
+- Cypher queries
+- Graph nodes and edges
+
+**Key difference from Phase 14:**
+- **Phase 14**: Knowledge graph of CODE (for developers/AI)
+- **This phase**: Knowledge graph of USER DATA (for end users)
+
+**Technical approach:**
+- Reuse Neo4j infrastructure from Phase 14
+- Product nodes with vector embeddings (enriched data FIRST, then embed)
+- Vendor relationship edges
+- Collection grouping logic
+- Semantic similarity search API
+- Duplicate detection algorithms
+
+**Success Criteria:**
+- All enriched products have vector embeddings
+- Semantic search works (finds products by meaning, not just keywords)
+- Duplicate detection accuracy >90%
+- Smart recommendations relevant to user's catalog
+- Graph queries respond in <500ms
+- Users report "search feels smarter"
+
+**Plans**: TBD (will be defined after Production Refinement completes)
+
+**Note**: Embeddings happen AFTER enrichment (Phase 13.1). Flow is: Raw product → Enrich (AI + extraction) → Embed → Search/similarity features.
+
+---
 
 ## Progress
 
@@ -512,7 +619,7 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
-| 13.2. Oracle Framework Reuse | 5/7 | Gap Closure | - |
-| 14. Continuous Optimization & Learning | 0/4 | Not started | - |
-| 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |
+| 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
+| 14. Codebase Knowledge Graph & Continual Learning | 0/8 | Context complete | - |
+| 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |
 
