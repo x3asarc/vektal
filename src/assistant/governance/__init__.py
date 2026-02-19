@@ -18,6 +18,12 @@ from .verification_oracle import (
     process_deferred_verifications,
     verify_execution_finality,
 )
+from .graph_oracle_adapter import (
+    GraphOracleAdapter,
+    OracleSignal,
+    query_graph_evidence,
+    FAIL_OPEN_SIGNAL,
+)
 
 __all__ = [
     "FieldPolicyDecision",
@@ -32,5 +38,9 @@ __all__ = [
     "get_kill_switch_decision",
     "process_deferred_verifications",
     "verify_execution_finality",
+    "GraphOracleAdapter",
+    "OracleSignal",
+    "query_graph_evidence",
+    "FAIL_OPEN_SIGNAL",
 ]
 
