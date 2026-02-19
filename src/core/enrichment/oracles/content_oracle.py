@@ -30,5 +30,6 @@ def evaluate_content_oracle(
         reason_codes=tuple(reason_codes),
         evidence_refs=tuple(evidence_refs or ()),
         requires_user_action=base.requires_user_action,
+        source='enrichment',
     )
 

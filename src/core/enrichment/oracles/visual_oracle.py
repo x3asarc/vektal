@@ -33,6 +33,7 @@ def evaluate_visual_oracle(
             reason_codes=("visual_hex_missing",),
             evidence_refs=tuple(evidence_refs or ()),
             requires_user_action=True,
+            source='enrichment',
         )
 
     expected_prefix = _COLOR_HINTS.get(normalized_text)
@@ -44,9 +45,10 @@ def evaluate_visual_oracle(
             reason_codes=tuple(reasons),
             evidence_refs=tuple(evidence_refs or ()),
             requires_user_action=True,
+            source='enrichment',
         )
 
-    decision = "accept" if confidence >= 0.7 else "suggest"
+    decision = "pass" if confidence >= 0.7 else "review"
     reasons.append("visual_consistent")
     if confidence < 0.7:
         reasons.append("visual_low_confidence")
@@ -55,6 +57,7 @@ def evaluate_visual_oracle(
         confidence=float(confidence),
         reason_codes=tuple(reasons),
         evidence_refs=tuple(evidence_refs or ()),
-        requires_user_action=decision != "accept",
+        requires_user_action=decision != "pass",
+        source='enrichment',
     )
 

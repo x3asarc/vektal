@@ -27,11 +27,12 @@ def evaluate_policy_oracle(
     thresholds = hitl_thresholds or {}
     if field_name in immutable:
         return OracleDecision(
-            decision="reject",
+            decision="fail",
             confidence=1.0,
             reason_codes=("policy_immutable_field",),
             evidence_refs=(),
             requires_user_action=True,
+            source='enrichment',
         )
 
     if field_name == "price":
@@ -44,13 +45,15 @@ def evaluate_policy_oracle(
                 reason_codes=("policy_threshold_hit", "policy_price_hitl_required"),
                 evidence_refs=(),
                 requires_user_action=True,
+                source='enrichment',
             )
 
     return OracleDecision(
-        decision="accept",
+        decision="pass",
         confidence=1.0,
         reason_codes=("policy_pass",),
         evidence_refs=(),
         requires_user_action=False,
+        source='enrichment',
     )
 

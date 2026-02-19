@@ -1,20 +1,20 @@
 """Phase 13.1-02 Oracle arbitration contracts."""
 from __future__ import annotations
 
-from src.core.enrichment.oracle_contract import merchant_first_arbitration
+from src.core.enrichment.oracle_contract import merchant_first_arbitration, normalize_legacy_decision
 from src.core.enrichment.oracles.content_oracle import evaluate_content_oracle
 from src.core.enrichment.oracles.policy_oracle import evaluate_policy_oracle
 from src.core.enrichment.oracles.visual_oracle import evaluate_visual_oracle
 
 
-def test_merchant_first_conflict_returns_suggest_not_overwrite():
+def test_merchant_first_conflict_returns_review_not_overwrite():
     decision = merchant_first_arbitration(
         merchant_value="Handmade Cotton",
         candidate_value="Polyester Blend",
         confidence=0.95,
         structural_conflict=False,
     )
-    assert decision.decision == "suggest"
+    assert decision.decision == "review"
     assert decision.requires_user_action is True
 
 
@@ -43,7 +43,7 @@ def test_visual_oracle_detects_text_image_mismatch():
     assert decision.requires_user_action is True
 
 
-def test_policy_oracle_rejects_immutable_and_holds_threshold():
+def test_policy_oracle_fails_immutable_and_holds_threshold():
     immutable = evaluate_policy_oracle(
         field_name="admin_email",
         before_value="a@example.com",
@@ -51,7 +51,7 @@ def test_policy_oracle_rejects_immutable_and_holds_threshold():
         immutable_fields=["admin_email"],
         hitl_thresholds={},
     )
-    assert immutable.decision == "reject"
+    assert immutable.decision == "fail"
     assert "policy_immutable_field" in immutable.reason_codes
 
     threshold = evaluate_policy_oracle(
@@ -63,3 +63,14 @@ def test_policy_oracle_rejects_immutable_and_holds_threshold():
     )
     assert threshold.decision == "hold"
     assert "policy_threshold_hit" in threshold.reason_codes
+
+
+def test_normalize_legacy_decision_maps_old_vocabulary():
+    assert normalize_legacy_decision("accept") == "pass"
+    assert normalize_legacy_decision("suggest") == "review"
+    assert normalize_legacy_decision("reject") == "fail"
+    assert normalize_legacy_decision("hold") == "hold"
+    # New vocabulary unchanged
+    assert normalize_legacy_decision("pass") == "pass"
+    assert normalize_legacy_decision("review") == "review"
+    assert normalize_legacy_decision("fail") == "fail"
