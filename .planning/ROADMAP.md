@@ -54,7 +54,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Tier System Architecture** - Multi-tier capability routing (LLM to Full Agents)
 - [x] **Phase 13: Integration Hardening & Deployment** - Production readiness and external API robustness
 - [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** - Canonical enrichment v2 as integrated platform feature
-- [ ] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
+- [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** - Shared verifier/oracle adapters for cross-phase use
 - [ ] **Phase 14: Continuous Optimization & Learning** - Self-improving system with ML-driven optimization
 - [ ] **Phase 15: Self-Healing & Dynamic Scripting** - Sandboxed autonomous remediation with verification gates
 
@@ -440,11 +440,11 @@ Plans:
 **Plans:** 5 plans in 4 waves
 
 Plans:
-- [ ] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types (Wave 1)
-- [ ] 13.2-02-PLAN.md - Episode Ingestion Pipeline (Wave 2)
-- [ ] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
-- [ ] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
-- [ ] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
+- [x] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types (Wave 1)
+- [x] 13.2-02-PLAN.md - Episode Ingestion Pipeline (Wave 2)
+- [x] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
+- [x] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
+- [x] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
 
 ### Phase 14: Continuous Optimization & Learning
 **Goal**: Build governed continuous optimization and learning loops for personalization, efficiency, and long-term quality

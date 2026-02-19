@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-16
+Last batch update: 2026-02-19
 Owner: ContextCurator
 
 ## TOC
@@ -139,6 +139,32 @@ Owner: ContextCurator
    - `reports/07/07.2-governance-operational-defaults/review.md`
    - `reports/07/07.2-governance-operational-defaults/structure-audit.md`
    - `reports/07/07.2-governance-operational-defaults/integrity-audit.md`
+
+## Phase 13.2 Graph Integration Modules
+
+**Core:**
+- `src/core/graphiti_client.py` - Graph client singleton with fail-open behavior
+- `src/core/synthex_entities.py` - Entity and edge type contracts for temporal knowledge
+
+**Tasks & Jobs:**
+- `src/tasks/graphiti_sync.py` - Celery tasks for graph episode emission
+- `src/jobs/graphiti_ingestor.py` - Episode ingestion with dedupe and timeout protection
+
+**Assistant & Governance:**
+- `src/assistant/governance/graph_oracle_adapter.py` - Graph-backed Oracle evidence adapter
+- `src/assistant/memory_retrieval.py` - Enhanced memory retrieval with vector + lexical blend
+
+**Scripts:**
+- `scripts/governance/graph_gate.py` - Graph integration governance gate (GREEN/RED verdict)
+
+**Tests:**
+- `tests/core/test_graphiti_client_contract.py` - Client contract tests (10 tests)
+- `tests/core/test_synthex_entities.py` - Entity/edge contract tests (16 tests)
+- `tests/tasks/test_graphiti_sync_contract.py` - Emission task tests (10 tests)
+- `tests/api/test_graph_oracle_adapter_contract.py` - Oracle adapter tests (13 tests)
+
+**Documentation:**
+- `.planning/KNOWLEDGE_GRAPH_ORACLE.md` - Integration guide for Phase 14/15
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`
