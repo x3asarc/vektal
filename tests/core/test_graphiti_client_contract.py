@@ -1,0 +1,254 @@
+"""
+Contract tests for Graphiti client singleton and fail-open behavior.
+
+Tests do NOT require live Neo4j - all tests use mocks and environment overrides.
+
+Phase 13.2 - Oracle Framework Reuse
+"""
+
+import os
+import pytest
+from unittest.mock import Mock, patch, MagicMock
+import asyncio
+
+
+# ===========================================
+# Test Client Singleton Behavior
+# ===========================================
+
+def test_get_graphiti_client_returns_none_when_disabled(monkeypatch):
+    """
+    Client returns None when GRAPH_ORACLE_ENABLED is false.
+    """
+    # Set environment to disabled
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'false')
+
+    # Import after environment is set
+    from src.core.graphiti_client import get_graphiti_client
+
+    client = get_graphiti_client()
+    assert client is None
+
+
+def test_get_graphiti_client_returns_none_when_password_missing(monkeypatch):
+    """
+    Client returns None when NEO4J_PASSWORD is not set.
+    """
+    # Enable graph but remove password
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'true')
+    monkeypatch.delenv('NEO4J_PASSWORD', raising=False)
+
+    # Import after environment is set
+    from src.core.graphiti_client import get_graphiti_client
+
+    client = get_graphiti_client()
+    assert client is None
+
+
+def test_check_graph_availability_returns_false_when_disabled(monkeypatch):
+    """
+    Availability check returns False when graph is disabled.
+    """
+    # Set environment to disabled
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'false')
+
+    # Import after environment is set
+    from src.core.graphiti_client import check_graph_availability
+
+    available = check_graph_availability()
+    assert available is False
+
+
+def test_check_graph_availability_returns_false_when_client_unavailable(monkeypatch):
+    """
+    Availability check returns False when client cannot be initialized.
+    """
+    # Enable graph but remove password
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'true')
+    monkeypatch.delenv('NEO4J_PASSWORD', raising=False)
+
+    # Import after environment is set
+    from src.core.graphiti_client import check_graph_availability
+
+    available = check_graph_availability()
+    assert available is False
+
+
+# ===========================================
+# Test Fail-Open Behavior
+# ===========================================
+
+def test_query_with_fallback_returns_fallback_on_timeout():
+    """
+    query_with_fallback returns fallback value when query times out.
+    """
+    from src.core.graphiti_client import query_with_fallback
+
+    # Create a query that hangs
+    async def slow_query():
+        await asyncio.sleep(10)  # Longer than timeout
+        return "should not reach this"
+
+    # Query with 0.1s timeout
+    result = query_with_fallback(
+        slow_query,
+        fallback_value="fallback_result",
+        timeout=0.1
+    )
+
+    assert result == "fallback_result"
+
+
+def test_query_with_fallback_returns_fallback_on_error():
+    """
+    query_with_fallback returns fallback value when query raises exception.
+    """
+    from src.core.graphiti_client import query_with_fallback
+
+    # Create a query that raises
+    async def failing_query():
+        raise ValueError("Intentional test error")
+
+    # Query should return fallback
+    result = query_with_fallback(
+        failing_query,
+        fallback_value=[],
+        timeout=2.0
+    )
+
+    assert result == []
+
+
+def test_query_with_fallback_returns_result_on_success():
+    """
+    query_with_fallback returns actual result when query succeeds.
+    """
+    from src.core.graphiti_client import query_with_fallback
+
+    # Create a successful query
+    async def successful_query():
+        return {"data": "success"}
+
+    # Query should return actual result
+    result = query_with_fallback(
+        successful_query,
+        fallback_value={},
+        timeout=2.0
+    )
+
+    assert result == {"data": "success"}
+
+
+# ===========================================
+# Test Environment Configuration
+# ===========================================
+
+def test_client_reads_neo4j_uri_from_env(monkeypatch):
+    """
+    Client initialization reads NEO4J_URI from environment.
+    """
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'true')
+    monkeypatch.setenv('NEO4J_URI', 'bolt://custom-host:7687')
+    monkeypatch.setenv('NEO4J_USER', 'test_user')
+    monkeypatch.setenv('NEO4J_PASSWORD', 'test_password')
+
+    # Import module first
+    import src.core.graphiti_client
+
+    # Save original state
+    original_client = src.core.graphiti_client._graphiti_client
+    original_import_failed = src.core.graphiti_client._import_failed
+
+    try:
+        # Reset singleton and import flag
+        src.core.graphiti_client._graphiti_client = None
+        src.core.graphiti_client._import_failed = False
+
+        # Mock Graphiti class
+        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
+            mock_instance = MagicMock()
+            mock_graphiti.return_value = mock_instance
+
+            from src.core.graphiti_client import get_graphiti_client
+
+            client = get_graphiti_client()
+
+            # Verify Graphiti was called with correct URI
+            mock_graphiti.assert_called_once_with(
+                uri='bolt://custom-host:7687',
+                user='test_user',
+                password='test_password'
+            )
+    finally:
+        # Restore original state
+        src.core.graphiti_client._graphiti_client = original_client
+        src.core.graphiti_client._import_failed = original_import_failed
+
+
+def test_client_reads_neo4j_credentials_from_env(monkeypatch):
+    """
+    Client initialization reads NEO4J_USER and NEO4J_PASSWORD from environment.
+    """
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'true')
+    monkeypatch.setenv('NEO4J_URI', 'bolt://localhost:7687')
+    monkeypatch.setenv('NEO4J_USER', 'custom_user')
+    monkeypatch.setenv('NEO4J_PASSWORD', 'custom_password')
+
+    # Import module first
+    import src.core.graphiti_client
+
+    # Save original state
+    original_client = src.core.graphiti_client._graphiti_client
+    original_import_failed = src.core.graphiti_client._import_failed
+
+    try:
+        # Reset singleton and import flag
+        src.core.graphiti_client._graphiti_client = None
+        src.core.graphiti_client._import_failed = False
+
+        # Mock Graphiti class
+        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
+            mock_instance = MagicMock()
+            mock_graphiti.return_value = mock_instance
+
+            from src.core.graphiti_client import get_graphiti_client
+
+            client = get_graphiti_client()
+
+            # Verify Graphiti was called with correct credentials
+            mock_graphiti.assert_called_once_with(
+                uri='bolt://localhost:7687',
+                user='custom_user',
+                password='custom_password'
+            )
+    finally:
+        # Restore original state
+        src.core.graphiti_client._graphiti_client = original_client
+        src.core.graphiti_client._import_failed = original_import_failed
+
+
+# ===========================================
+# Test Import Failure Handling
+# ===========================================
+
+def test_client_handles_missing_graphiti_import_gracefully():
+    """
+    Client handles missing graphiti-core package gracefully.
+    """
+    # Simulate import failure by setting _import_failed flag
+    import src.core.graphiti_client
+    original_flag = src.core.graphiti_client._import_failed
+
+    try:
+        src.core.graphiti_client._import_failed = True
+        src.core.graphiti_client.Graphiti = None
+
+        from src.core.graphiti_client import get_graphiti_client
+
+        # Client should return None
+        client = get_graphiti_client()
+        assert client is None
+
+    finally:
+        # Restore original state
+        src.core.graphiti_client._import_failed = original_flag
