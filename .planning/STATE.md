@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 13.2 of 15 (Oracle Framework Reuse)
-Plan: 13.2-02 complete (Episode ingestion pipeline with emission hooks). Plans 13.2-03 through 13.2-05 pending.
-Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` execution in progress (`2/5` plans complete).
-Last activity: 2026-02-19 - Executed `13.2-02`, created async episode emission tasks, added fail-open emission hooks to governance/apply paths.
+Plan: 13.2-04 complete (CI governance gate + contract tests). Plan 13.2-05 pending.
+Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` execution in progress (`4/5` plans complete).
+Last activity: 2026-02-19 - Executed `13.2-04`, created graph governance gate script with emission hook validation and 49 contract tests (all pass, no live Neo4j required).
 
-Progress: 97% (81/83 plans in roadmap complete)
+Progress: 98% (82/83 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: `13.2-03-graph-oracle-adapter`
-Last completed gate: `13.2-02 execution (Episode ingestion pipeline with emission hooks)`
+Current atomic task: `13.2-05-phase-closure`
+Last completed gate: `13.2-04 execution (CI governance gate + contract tests)`
 Current blocker: `N/A`
-Next action: `Execute 13.2-03-PLAN.md (Graph Oracle adapter + memory retrieval upgrade)`
+Next action: `Execute 13.2-05-PLAN.md (Phase closure + forward integration spec)`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -56,6 +56,45 @@ Gate board:
 1. `N/A` (no bypass invoked).
 
 ## Recent Session Summary (2026-02-19)
+
+**Phase 13.2-04 executed - CI governance gate + contract tests:**
+- Created CI governance gate script (`scripts/governance/graph_gate.py`):
+  - Binary GREEN/RED output for CI integration
+  - Emission hook validation (static analysis of required integration points)
+  - Module import checks (runtime availability verification)
+  - Contract test execution with timeout protection
+  - Flexible CLI modes (full gate, hooks-only, tests-only, dry-run)
+- Created comprehensive contract test suite (49 tests, 0 failures):
+  - Graph client tests (10): singleton behavior, fail-open, env config
+  - Entity/edge tests (16): all entity types, field validation, helpers
+  - Emission task tests (10): task behavior, ID generation, retry config
+  - Oracle adapter tests (13): fail-open, decision logic, signals
+- All tests pass without live Neo4j dependency (fully mocked)
+- Governance gate returns GREEN verdict
+- Artifacts created:
+  - `.planning/phases/13.2-oracle-framework-reuse/13.2-04-SUMMARY.md`
+- Verification result:
+  - 49 contract tests pass (0 failures)
+  - Governance gate: GREEN
+  - All commits verified (07eeb24, 6491ec8, 1b0f4e8)
+
+**Phase 13.2-03 executed - Graph Oracle adapter + memory retrieval upgrade:**
+- Created GraphOracleAdapter (`src/assistant/governance/graph_oracle_adapter.py`):
+  - Timeout-bounded evidence queries (2s default)
+  - Fail-open behavior (returns safe default on unavailability/timeout/error)
+  - OracleSignal contract (decision, confidence, reason codes, evidence refs)
+  - Decision logic based on failure history (pass/review/fail)
+  - Module-level convenience function (query_graph_evidence)
+- Enhanced memory retrieval (`src/assistant/memory_retrieval.py`):
+  - Blended vector + lexical scoring (0.7 vector + 0.3 lexical)
+  - Lexical fallback when embeddings unavailable
+  - Improved relevance for assistant memory queries
+- Artifacts created:
+  - `.planning/phases/13.2-oracle-framework-reuse/13.2-03-SUMMARY.md`
+- Verification result:
+  - All modules import successfully
+  - Fail-open behavior verified (returns safe defaults)
+  - All commits verified (f8b4e91, a5c7d32)
 
 **Phase 13.2-02 executed - Episode ingestion pipeline with emission hooks:**
 - Created Celery tasks for async graph episode emission:
@@ -627,6 +666,7 @@ Gate board:
 *Updated after each plan completion*
 | Phase 13.2 P01 | 5 | 3 tasks | 7 files |
 | Phase 13.2 P02 | 6 | 3 tasks | 7 files |
+| Phase 13.2 P04 | 8 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -844,7 +884,7 @@ Current blockers for Phase 6 closure: None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 13.2-02-PLAN.md (Episode ingestion pipeline with emission hooks)
+Stopped at: Completed 13.2-04-PLAN.md (CI governance gate + contract tests)
 Resume file: None
 
 Config (if exists):
