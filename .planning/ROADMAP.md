@@ -92,9 +92,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [x] 01.1-01-PLAN.md â€” Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
-- [x] 01.1-02-PLAN.md â€” Investigate and organize 13 questionable directories (Wave 2)
-- [x] 01.1-03-PLAN.md â€” Create documentation index and verify complete cleanup (Wave 3)
+- [x] 01.1-01-PLAN.md - Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
+- [x] 01.1-02-PLAN.md - Investigate and organize 13 questionable directories (Wave 2)
+- [x] 01.1-03-PLAN.md - Create documentation index and verify complete cleanup (Wave 3)
 
 **Insertion Reason**: Phase 1 archived scripts but left 42 loose files and 13 questionable directories unorganized in root. User feedback: "Only addressed 20 files but there are 70 ITEMS in root." Must handle ALL items before Docker phase.
 
@@ -111,17 +111,17 @@ Plans:
 **Plans**: 4 plans in 2 waves
 
 Plans:
-- [x] 02-01-PLAN.md â€” Foundation files: .gitattributes, Dockerfile.backend, gunicorn config, .env.example (Wave 1)
-- [x] 02-02-PLAN.md â€” Docker Compose with 6 services and Nginx reverse proxy (Wave 1)
-- [x] 02-03-PLAN.md â€” Documentation, frontend placeholder, and stack verification (Wave 2)
-- [x] 02-04-PLAN.md â€” Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
+- [x] 02-01-PLAN.md - Foundation files: .gitattributes, Dockerfile.backend, gunicorn config, .env.example (Wave 1)
+- [x] 02-02-PLAN.md - Docker Compose with 6 services and Nginx reverse proxy (Wave 1)
+- [x] 02-03-PLAN.md - Documentation, frontend placeholder, and stack verification (Wave 2)
+- [x] 02-04-PLAN.md - Docker secrets implementation (gap closure for DOCKER-08) (Wave 1)
 
 ### Phase 2.1: Universal Vendor Scraping Engine (INSERTED)
 **Goal**: Self-learning AI-powered vendor discovery with zero-configuration setup and niche-aware safety
 **Depends on**: Phase 2
 **Requirements**: TBD (will be defined during discussion phase)
 **Success Criteria** (what must be TRUE):
-  1. User provides ONLY SKU/barcode â†’ System auto-discovers vendor (confidence >70%)
+  1. User provides ONLY SKU/barcode - System auto-discovers vendor (confidence >70%)
   2. System learns vendor site structure and auto-generates YAML config
   3. Onboarding questionnaire builds store profile (niche, keywords, vendor scope)
   4. Niche mismatch detection prevents wrong vendors (car parts in arts store)
@@ -134,21 +134,21 @@ Plans:
 **Plans**: 11 plans in 5 waves
 
 Plans:
-- [x] 02.1-01-PLAN.md â€” Core Pydantic schemas and YAML loader (Wave 1)
-- [x] 02.1-02-PLAN.md â€” Store profile analyzer with TF-IDF extraction (Wave 1)
-- [x] 02.1-03-PLAN.md â€” Local pattern matching and SKU validation (Wave 1)
-- [x] 02.1-04-PLAN.md â€” Web search and niche validation (Wave 2)
-- [x] 02.1-05-PLAN.md â€” AI inference and vendor discovery pipeline (Wave 2)
-- [x] 02.1-06-PLAN.md â€” Multi-strategy scraping engine (Wave 3)
-- [x] 02.1-07-PLAN.md â€” YAML auto-generation and verification (Wave 3)
-- [x] 02.1-08-PLAN.md â€” Chat interface routing (Wave 4)
-- [x] 02.1-09-PLAN.md â€” Site reconnaissance and selector discovery (Wave 5, Gap Closure)
-- [x] 02.1-10-PLAN.md â€” Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
-- [x] 02.1-11-PLAN.md â€” Metrics tracking and adaptive learning (Wave 5, Gap Closure)
+- [x] 02.1-01-PLAN.md - Core Pydantic schemas and YAML loader (Wave 1)
+- [x] 02.1-02-PLAN.md - Store profile analyzer with TF-IDF extraction (Wave 1)
+- [x] 02.1-03-PLAN.md - Local pattern matching and SKU validation (Wave 1)
+- [x] 02.1-04-PLAN.md - Web search and niche validation (Wave 2)
+- [x] 02.1-05-PLAN.md - AI inference and vendor discovery pipeline (Wave 2)
+- [x] 02.1-06-PLAN.md - Multi-strategy scraping engine (Wave 3)
+- [x] 02.1-07-PLAN.md - YAML auto-generation and verification (Wave 3)
+- [x] 02.1-08-PLAN.md - Chat interface routing (Wave 4)
+- [x] 02.1-09-PLAN.md - Site reconnaissance and selector discovery (Wave 5, Gap Closure)
+- [x] 02.1-10-PLAN.md - Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
+- [x] 02.1-11-PLAN.md - Metrics tracking and adaptive learning (Wave 5, Gap Closure)
 
 **Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
 
-**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog â‰¥50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
+**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog >=50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
 
 **Context Document**: See `.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md` for detailed vision, architectural decisions, and open questions captured from user discussion.
 
@@ -175,12 +175,12 @@ Plans:
 **Plans**: 6 plans in 2 waves
 
 Plans:
-- [x] 02.2-01-PLAN.md â€” Attribute extraction and quality scoring foundation (Wave 1)
-- [x] 02.2-02-PLAN.md â€” AI description generation and SEO content (Wave 1)
-- [x] 02.2-03-PLAN.md â€” Product family grouping and quality gate (Wave 1)
-- [x] 02.2-04-PLAN.md â€” Vector embedding generation (Wave 1)
-- [x] 02.2-05-PLAN.md â€” EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
-- [x] 02.2-06-PLAN.md â€” Vendor YAML enrichment integration (Wave 2)
+- [x] 02.2-01-PLAN.md - Attribute extraction and quality scoring foundation (Wave 1)
+- [x] 02.2-02-PLAN.md - AI description generation and SEO content (Wave 1)
+- [x] 02.2-03-PLAN.md - Product family grouping and quality gate (Wave 1)
+- [x] 02.2-04-PLAN.md - Vector embedding generation (Wave 1)
+- [x] 02.2-05-PLAN.md - EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
+- [x] 02.2-06-PLAN.md - Vendor YAML enrichment integration (Wave 2)
 
 **Insertion Reason**: Product enrichment is critical before database design (Phase 3). The `/side-project` folder contains a mature 7-step enrichment pipeline that should be integrated. Vendor YAML now includes enrichment config (sections 12-22). Embeddings needed for semantic search in Phase 11. Keeps Phase 2.1 focused on discovery/scraping.
 
@@ -206,11 +206,11 @@ Plans:
 **Plans**: 5 plans in 1 wave
 
 Plans:
-- [x] 03-01-PLAN.md â€” Flask-SQLAlchemy + psycopg3 foundation (Wave 1)
-- [x] 03-02-PLAN.md â€” SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 1)
-- [x] 03-03-PLAN.md â€” Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
-- [x] 03-04-PLAN.md â€” Pentart import script & auto-migrations (Wave 1)
-- [x] 03-05-PLAN.md â€” app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
+- [x] 03-01-PLAN.md - Flask-SQLAlchemy + psycopg3 foundation (Wave 1)
+- [x] 03-02-PLAN.md - SQLAlchemy models: User, ShopifyStore, Vendor, Product, Job (Wave 1)
+- [x] 03-03-PLAN.md - Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
+- [x] 03-04-PLAN.md - Pentart import script & auto-migrations (Wave 1)
+- [x] 03-05-PLAN.md - app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
 
 **Context Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md` for implementation decisions and deferred items.
 
@@ -229,12 +229,12 @@ Plans:
 **Plans**: 6 plans in 4 waves
 
 Plans:
-- [x] 04-01-PLAN.md â€” Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
-- [x] 04-02-PLAN.md â€” Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
-- [x] 04-03-PLAN.md â€” Login/logout, email verification endpoints (Wave 2)
-- [x] 04-04-PLAN.md â€” Stripe checkout session creation (Wave 2)
-- [x] 04-05-PLAN.md â€” Stripe webhooks, subscription management (Wave 3)
-- [x] 04-06-PLAN.md â€” Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
+- [x] 04-01-PLAN.md - Database models: User auth fields, OAuthAttempt, dependencies (Wave 1)
+- [x] 04-02-PLAN.md - Flask-Session Redis config, decorators (@requires_tier, @email_verified_required) (Wave 1)
+- [x] 04-03-PLAN.md - Login/logout, email verification endpoints (Wave 2)
+- [x] 04-04-PLAN.md - Stripe checkout session creation (Wave 2)
+- [x] 04-05-PLAN.md - Stripe webhooks, subscription management (Wave 3)
+- [x] 04-06-PLAN.md - Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
 
 **Context Document**: See `.planning/phases/04-authentication-user-management/04-CONTEXT.md` for standalone SaaS architecture decisions, registration flow, and tier system design.
 
@@ -430,17 +430,21 @@ Plans:
 
 **Goal:** Establish one reusable Oracle framework for content, visual, execution, and policy verification that can be consumed by multiple phases and runtime surfaces.
 **Depends on:** Phase 13, Phase 13.1
-**Requirements:** TBD (define during phase planning)
+**Requirements:** GRAPH-01 (Neo4j + Graphiti integration), GRAPH-02 (Episode ingestion), GRAPH-03 (Graph Oracle adapter), GRAPH-04 (Memory retrieval upgrade), GRAPH-05 (CI governance gate)
 **Success Criteria** (what must be TRUE):
   1. A single Oracle contract is defined and reused across adapters (`decision`, `confidence`, `reason_codes`, `evidence_refs`, `requires_user_action`).
   2. Oracle adapters are split by purpose (execution/content/visual/policy) without duplicated orchestration logic.
   3. Existing and upcoming phases can call the Oracle framework through stable interfaces instead of bespoke verifier implementations.
   4. Telemetry, idempotency, and retry behavior are unified for Oracle-triggered paths.
   5. Phase 13.1 and later phases have explicit integration guidance to adopt Oracle reuse.
-**Plans:** TBD
+**Plans:** 5 plans in 4 waves
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 13.2 to break down)
+- [ ] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types (Wave 1)
+- [ ] 13.2-02-PLAN.md - Episode Ingestion Pipeline (Wave 2)
+- [ ] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
+- [ ] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
+- [ ] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
 
 ### Phase 14: Continuous Optimization & Learning
 **Goal**: Build governed continuous optimization and learning loops for personalization, efficiency, and long-term quality
@@ -502,9 +506,8 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
-| 13.2. Oracle Framework Reuse | 0/0 | Not started | - |
+| 13.2. Oracle Framework Reuse | 0/5 | Not started | - |
 | 14. Continuous Optimization & Learning | 0/4 | Not started | - |
 | 15. Self-Healing & Dynamic Scripting | 0/3 | Not started | - |
-
 
 
