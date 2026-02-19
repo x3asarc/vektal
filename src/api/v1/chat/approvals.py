@@ -295,6 +295,27 @@ def approve_product_action(
             status=409,
         ) from exc
 
+    # Emit user approval episode (Phase 13.2)
+    try:
+        from src.tasks.graphiti_sync import emit_episode
+        from src.core.synthex_entities import EpisodeType
+
+        approval_payload = {
+            'action_id': str(action.id),
+            'action_type': 'product_action',
+            'approval_decision': 'approved',
+            'user_id': str(actor_user_id),
+            'approved_at': now,
+        }
+        emit_episode.delay(
+            EpisodeType.USER_APPROVAL.value,
+            str(batch.store_id),
+            approval_payload,
+            correlation_id=runtime_ctx.correlation_id or f"chat-action-{action.id}"
+        )
+    except Exception:
+        pass  # Fail-open: do not break approval flow if graph emission fails
+
     db.session.commit()
     return action
 
@@ -481,6 +502,27 @@ def apply_product_action(
             detail=str(exc),
             status=409,
         ) from exc
+
+    # Emit vendor catalog change episode after successful apply (Phase 13.2)
+    try:
+        from src.tasks.graphiti_sync import emit_episode
+        from src.core.synthex_entities import EpisodeType
+
+        if result.status in {"applied", "applied_with_conflicts"} and result.applied_item_ids:
+            change_payload = {
+                'vendor_id': 'shopify',  # Shopify is the target system
+                'change_type': 'product_update',
+                'affected_product_count': len(result.applied_item_ids),
+                'change_summary': f"Applied {len(result.applied_item_ids)} product changes via chat action",
+            }
+            emit_episode.delay(
+                EpisodeType.VENDOR_CATALOG_CHANGE.value,
+                str(batch.store_id),
+                change_payload,
+                correlation_id=runtime_ctx.correlation_id or f"chat-action-{action.id}"
+            )
+    except Exception:
+        pass  # Fail-open: do not break apply flow if graph emission fails
 
     db.session.commit()
     return action

@@ -122,6 +122,27 @@ def finalize_job(job_id: int, mode: str | None = None) -> dict:
         job.completed_at = now
         db.session.commit()
         announce_job_progress(job_id=job.id, job=job)
+
+        # Emit vendor catalog change episode (Phase 13.2)
+        try:
+            from src.tasks.graphiti_sync import emit_episode
+            from src.core.synthex_entities import EpisodeType
+
+            ingest_summary = {
+                'vendor_id': 'shopify',
+                'change_type': 'catalog_ingest',
+                'affected_product_count': job.total_products or 0,
+                'change_summary': f"Vendor catalog ingest completed for job {job.id}",
+            }
+            emit_episode.delay(
+                EpisodeType.VENDOR_CATALOG_CHANGE.value,
+                str(job.store_id),
+                ingest_summary,
+                correlation_id=f"ingest-job-{job.id}"
+            )
+        except Exception:
+            pass  # Fail-open: do not break ingest flow if graph emission fails
+
         return {"status": "completed-empty", "job_status": job.status.value}
 
     terminal_chunks = counts[IngestChunkStatus.COMPLETED] + counts[IngestChunkStatus.FAILED_TERMINAL]
@@ -141,4 +162,26 @@ def finalize_job(job_id: int, mode: str | None = None) -> dict:
     job.completed_at = now
     db.session.commit()
     announce_job_progress(job_id=job.id, job=job)
+
+    # Emit vendor catalog change episode on successful completion (Phase 13.2)
+    if job.status == JobStatus.COMPLETED:
+        try:
+            from src.tasks.graphiti_sync import emit_episode
+            from src.core.synthex_entities import EpisodeType
+
+            ingest_summary = {
+                'vendor_id': 'shopify',
+                'change_type': 'catalog_ingest',
+                'affected_product_count': job.successful_items or 0,
+                'change_summary': f"Vendor catalog ingest finalized for job {job.id} ({job.successful_items} products)",
+            }
+            emit_episode.delay(
+                EpisodeType.VENDOR_CATALOG_CHANGE.value,
+                str(job.store_id),
+                ingest_summary,
+                correlation_id=f"ingest-job-{job.id}"
+            )
+        except Exception:
+            pass  # Fail-open: do not break ingest flow if graph emission fails
+
     return {"status": "finalized", "job_status": job.status.value, "mode": finalizer_mode}

@@ -124,6 +124,28 @@ def run_enrichment_batch(
         metadata["applied_at"] = _now().isoformat()
         metadata["policy_version"] = policy.policy_version
         run.metadata_json = metadata
+
+        # Emit enrichment outcome episode (Phase 13.2)
+        try:
+            from src.tasks.graphiti_sync import emit_episode
+            from src.core.synthex_entities import EpisodeType
+
+            outcome_payload = {
+                'product_count': total_items,
+                'profile_gear': run.profile_gear or 'balanced',
+                'fields_modified': ['seo_title', 'seo_description'],  # Summary
+                'quality_delta': 0.0,  # TODO: Calculate from enrichment metrics
+                'oracle_arbitration_used': False,
+            }
+            emit_episode.delay(
+                EpisodeType.ENRICHMENT_OUTCOME.value,
+                str(run.store_id),
+                outcome_payload,
+                correlation_id=f"enrichment-run-{run.id}"
+            )
+        except Exception:
+            pass  # Fail-open: do not break enrichment flow if graph emission fails
+
         job.status = JobStatus.COMPLETED
         job.completed_at = _now()
         params = dict(job.parameters or {})

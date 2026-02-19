@@ -191,6 +191,36 @@ def process_deferred_verifications(
 
     if checked:
         db.session.commit()
+
+    # Emit oracle decision episodes for verified/failed events (Phase 13.2)
+    try:
+        from src.tasks.graphiti_sync import emit_episode
+        from src.core.synthex_entities import EpisodeType
+
+        for row in rows:
+            if row.status in {"verified", "failed"}:
+                try:
+                    # Emit oracle decision episode
+                    payload = {
+                        'decision': row.status,
+                        'confidence': 0.95 if row.status == "verified" else 0.8,
+                        'reason_codes': [],
+                        'evidence_refs': [],
+                        'requires_user_action': row.status == "failed",
+                        'source_adapter': row.oracle_name or "verification_oracle",
+                    }
+                    emit_episode.delay(
+                        EpisodeType.ORACLE_DECISION.value,
+                        str(row.store_id),
+                        payload,
+                        correlation_id=row.correlation_id
+                    )
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning(f"Failed to emit oracle episode: {e}")
+    except Exception:
+        pass  # Fail-open: do not break verification flow if graph emission fails
+
     return {
         "checked": checked,
         "verified": verified,
