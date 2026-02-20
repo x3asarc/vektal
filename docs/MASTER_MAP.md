@@ -171,14 +171,21 @@ Owner: ContextCurator
 **Core:**
 - `src/core/codebase_entities.py` - Entity and edge models for codebase structure (File, Module, Class, Function, PlanningDoc)
 - `src/core/codebase_schema.py` - Neo4j schema definitions (indexes, constraints, ensure_schema)
+- `src/core/summary_generator.py` - Hierarchical summary extraction (file/function/class purpose without full content)
+- `src/core/embeddings.py` - Vector embedding generation with sentence-transformers (384-dim, local, Neo4j vector index)
 
 **Scripts:**
 - `scripts/graph/init_codebase_schema.py` - CLI script to initialize codebase graph schema
+
+**Tests:**
+- `tests/unit/test_embeddings.py` - Embedding and summary generator tests (16 tests)
 
 **Planning:**
 - `.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md` - Phase 14 context and decisions
 - `.planning/phases/14-continuous-optimization-learning/14-01-PLAN.md` - Entity schema foundation plan
 - `.planning/phases/14-continuous-optimization-learning/14-01-SUMMARY.md` - Plan 01 execution summary
+- `.planning/phases/14-continuous-optimization-learning/14-02-PLAN.md` - Vector embedding pipeline plan
+- `.planning/phases/14-continuous-optimization-learning/14-02-SUMMARY.md` - Plan 02 execution summary
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`

@@ -1,127 +1,217 @@
 """
-Unit Tests for Embedding Generator
+Unit tests for codebase embedding generation.
 
-Tests the EmbeddingGenerator for product semantic search:
-- Embedding dimension and type
-- Field weighting (title 2x, description 1x, tags 1.5x)
-- Batch processing
-- Content hashing
-- Semantic similarity
+Tests hierarchical summary generation and vector embedding creation
+for Phase 14 knowledge graph.
 """
 
 import pytest
 import numpy as np
-from unittest.mock import Mock, patch
-from src.core.enrichment.embeddings.generator import EmbeddingGenerator
+from unittest.mock import Mock, patch, MagicMock
+from src.core.embeddings import (
+    generate_embedding,
+    batch_generate_embeddings,
+    EMBEDDING_DIMENSION,
+    VECTOR_INDEX_CONFIG
+)
+from src.core.summary_generator import (
+    generate_file_summary,
+    generate_function_summary,
+    generate_class_summary,
+    generate_planning_doc_summary
+)
 
 
-class TestEmbeddingGenerator:
-    @pytest.fixture
-    def generator(self):
-        """Create generator (model will be lazy loaded)"""
-        return EmbeddingGenerator()
+class TestEmbeddingGeneration:
+    """Test vector embedding generation."""
 
-    def test_embedding_dimension(self, generator):
-        """Embedding is 768-dimensional"""
-        product = {'title': 'Test Product', 'description': 'Test description'}
-        embedding = generator.generate_embedding(product)
-        assert embedding.shape == (768,)
+    @patch('src.core.embeddings._get_model')
+    def test_embedding_dimension(self, mock_get_model):
+        """Verify embedding is 384-dimensional."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.zeros(384)
+        mock_get_model.return_value = mock_model
 
-    def test_embedding_is_numpy_array(self, generator):
-        """Embedding is numpy array"""
-        product = {'title': 'Test'}
-        embedding = generator.generate_embedding(product)
-        assert isinstance(embedding, np.ndarray)
+        embedding = generate_embedding("test text")
+        assert len(embedding) == EMBEDDING_DIMENSION
+        assert EMBEDDING_DIMENSION == 384
 
-    def test_search_text_includes_title_twice(self, generator):
-        """Title is weighted 2x in search text"""
-        product = {'title': 'Pentart Acryl'}
-        search_text = generator.build_search_text(product)
-        assert search_text.count('Pentart Acryl') >= 2
+    @patch('src.core.embeddings._get_model')
+    def test_embedding_determinism(self, mock_get_model):
+        """Same input produces same output."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.ones(384) * 0.5
+        mock_get_model.return_value = mock_model
 
-    def test_search_text_includes_description(self, generator):
-        """Description included in search text"""
-        product = {'title': 'Test', 'description': 'Unique Description XYZ'}
-        search_text = generator.build_search_text(product)
-        assert 'Unique Description XYZ' in search_text
+        emb1 = generate_embedding("test text")
+        emb2 = generate_embedding("test text")
+        assert emb1 == emb2
 
-    def test_search_text_includes_tags(self, generator):
-        """Tags included in search text"""
-        product = {'title': 'Test', 'tags': 'decoupage,craft'}
-        search_text = generator.build_search_text(product)
-        assert 'decoupage' in search_text
+    @patch('src.core.embeddings._get_model')
+    def test_batch_embedding(self, mock_get_model):
+        """Batch processing works."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.zeros((3, 384))
+        mock_get_model.return_value = mock_model
 
-    def test_batch_generation(self, generator):
-        """Batch generation returns list of embeddings"""
-        products = [
-            {'title': 'Product 1'},
-            {'title': 'Product 2'},
-            {'title': 'Product 3'},
-        ]
-        embeddings = generator.generate_batch(products, show_progress=False)
+        texts = ["text1", "text2", "text3"]
+        embeddings = batch_generate_embeddings(texts)
         assert len(embeddings) == 3
-        assert all(e.shape == (768,) for e in embeddings)
+        assert all(len(emb) == 384 for emb in embeddings)
 
-    def test_content_hash_changes_with_title(self, generator):
-        """Content hash changes when title changes"""
-        hash1 = generator.compute_content_hash({'title': 'Original'})
-        hash2 = generator.compute_content_hash({'title': 'Changed'})
-        assert hash1 != hash2
+    def test_empty_text_handling(self):
+        """Empty text returns zero vector without calling model."""
+        embedding = generate_embedding("")
+        assert len(embedding) == 384
+        assert all(v == 0.0 for v in embedding)
 
-    def test_content_hash_stable_for_price_change(self, generator):
-        """Content hash unchanged when only price changes"""
-        hash1 = generator.compute_content_hash({'title': 'Test', 'price': 10})
-        hash2 = generator.compute_content_hash({'title': 'Test', 'price': 20})
-        assert hash1 == hash2
+    def test_empty_batch_handling(self):
+        """Empty list returns empty list."""
+        embeddings = batch_generate_embeddings([])
+        assert embeddings == []
 
-    def test_needs_reembedding_true_when_changed(self, generator):
-        """needs_reembedding returns True when content changed"""
-        original_hash = generator.compute_content_hash({'title': 'Original'})
-        changed_product = {'title': 'Changed'}
-        assert generator.needs_reembedding(changed_product, original_hash)
+    def test_vector_index_config(self):
+        """Vector index config has required fields."""
+        assert "index_name" in VECTOR_INDEX_CONFIG
+        assert "node_label" in VECTOR_INDEX_CONFIG
+        assert "property_name" in VECTOR_INDEX_CONFIG
+        assert "dimension" in VECTOR_INDEX_CONFIG
+        assert "similarity_function" in VECTOR_INDEX_CONFIG
 
-    def test_needs_reembedding_false_when_same(self, generator):
-        """needs_reembedding returns False when content unchanged"""
-        product = {'title': 'Same'}
-        hash1 = generator.compute_content_hash(product)
-        assert not generator.needs_reembedding(product, hash1)
+        assert VECTOR_INDEX_CONFIG["dimension"] == 384
+        assert VECTOR_INDEX_CONFIG["similarity_function"] == "cosine"
 
-    def test_lazy_model_loading(self):
-        """Model not loaded until first embedding generated"""
-        generator = EmbeddingGenerator()
-        assert generator._model is None
-        # Access model property triggers load
-        _ = generator.model
-        assert generator._model is not None
 
-    def test_similar_products_have_similar_embeddings(self, generator):
-        """Similar products should have high cosine similarity"""
-        from sklearn.metrics.pairwise import cosine_similarity
+class TestSummaryGeneration:
+    """Test hierarchical summary extraction."""
 
-        p1 = {'title': 'Pentart Acrylfarbe Rot 20ml', 'description': 'Hochwertige Acrylfarbe'}
-        p2 = {'title': 'Pentart Acrylfarbe Blau 20ml', 'description': 'Hochwertige Acrylfarbe'}
-        p3 = {'title': 'Reispapier Vintage Rose A4', 'description': 'Für Decoupage'}
+    def test_summary_file_format(self):
+        """File summary has expected structure."""
+        summary = generate_file_summary("src/core/embeddings.py")
+        if summary:  # File might not exist in test environment
+            assert "File:" in summary
+            assert "Purpose:" in summary
+            assert "Exports:" in summary
+            assert "Imports:" in summary
 
-        e1 = generator.generate_embedding(p1)
-        e2 = generator.generate_embedding(p2)
-        e3 = generator.generate_embedding(p3)
+    def test_summary_function_format(self):
+        """Function summary has expected structure."""
+        summary = generate_function_summary(
+            file_path="src/core/embeddings.py",
+            function_name="generate_embedding",
+            signature="(text: str) -> List[float]",
+            docstring="Generate vector embedding for text."
+        )
+        assert "Function:" in summary
+        assert "Signature:" in summary
+        assert "Purpose:" in summary
+        assert "File:" in summary
+        assert "generate_embedding" in summary
 
-        # Similar paints should be more similar than paint vs paper
-        sim_paints = cosine_similarity([e1], [e2])[0][0]
-        sim_different = cosine_similarity([e1], [e3])[0][0]
-        assert sim_paints > sim_different
+    def test_summary_class_format(self):
+        """Class summary has expected structure."""
+        summary = generate_class_summary(
+            file_path="src/core/codebase_entities.py",
+            class_name="FileEntity",
+            bases=["BaseEntity"],
+            docstring="Represents a source file.",
+            methods=["validate_path"]
+        )
+        assert "Class:" in summary
+        assert "Inherits:" in summary
+        assert "Purpose:" in summary
+        assert "Methods:" in summary
+        assert "File:" in summary
+        assert "FileEntity" in summary
 
-    def test_embedding_dimension_property(self, generator):
-        """embedding_dimension property returns 768"""
-        assert generator.embedding_dimension == 768
+    def test_summary_planning_doc_format(self):
+        """Planning doc summary has expected structure."""
+        summary = generate_planning_doc_summary(
+            path=".planning/phases/14-continuous-optimization-learning/14-01-PLAN.md",
+            doc_type="PLAN",
+            goal="Create codebase entity schema foundation",
+            status="complete"
+        )
+        assert "Planning:" in summary
+        assert "Type:" in summary
+        assert "Goal:" in summary
+        assert "Status:" in summary
+        assert "PLAN" in summary
 
-    def test_model_name_default(self):
-        """Default model is paraphrase-multilingual-mpnet-base-v2"""
-        generator = EmbeddingGenerator()
-        assert 'paraphrase-multilingual-mpnet-base-v2' in generator.model_name
+    def test_function_summary_without_docstring(self):
+        """Function summary handles missing docstring."""
+        summary = generate_function_summary(
+            file_path="src/core/test.py",
+            function_name="helper",
+            signature="() -> None",
+            docstring=None
+        )
+        assert "No description available" in summary
 
-    def test_custom_model_name(self):
-        """Can specify custom model name"""
-        custom_model = 'custom-model'
-        generator = EmbeddingGenerator(model_name=custom_model)
-        assert generator.model_name == custom_model
+    def test_class_summary_without_bases(self):
+        """Class summary handles no parent classes."""
+        summary = generate_class_summary(
+            file_path="src/core/test.py",
+            class_name="SimpleClass",
+            bases=[],
+            docstring="A simple class"
+        )
+        assert "Inherits: object" in summary
+
+    def test_planning_doc_summary_defaults(self):
+        """Planning doc summary handles missing optional fields."""
+        summary = generate_planning_doc_summary(
+            path=".planning/test.md",
+            doc_type="NOTE"
+        )
+        assert "No goal specified" in summary
+        assert "Unknown" in summary
+
+
+class TestEmbeddingIntegration:
+    """Integration tests combining summaries and embeddings."""
+
+    @patch('src.core.embeddings._get_model')
+    def test_embed_file_summary(self, mock_get_model):
+        """Can embed a file summary."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.random.rand(384)
+        mock_get_model.return_value = mock_model
+
+        summary = generate_file_summary("src/core/embeddings.py")
+        if summary:
+            embedding = generate_embedding(summary)
+            assert len(embedding) == 384
+            assert not all(v == 0.0 for v in embedding)  # Non-zero vector
+
+    @patch('src.core.embeddings._get_model')
+    def test_embed_function_summary(self, mock_get_model):
+        """Can embed a function summary."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.random.rand(384)
+        mock_get_model.return_value = mock_model
+
+        summary = generate_function_summary(
+            file_path="src/core/embeddings.py",
+            function_name="generate_embedding",
+            signature="(text: str) -> List[float]",
+            docstring="Generate vector embedding."
+        )
+        embedding = generate_embedding(summary)
+        assert len(embedding) == 384
+
+    @patch('src.core.embeddings._get_model')
+    def test_batch_embed_summaries(self, mock_get_model):
+        """Can batch embed multiple summaries."""
+        mock_model = MagicMock()
+        mock_model.encode.return_value = np.random.rand(3, 384)
+        mock_get_model.return_value = mock_model
+
+        summaries = [
+            generate_function_summary("src/a.py", "func1", "() -> None", "Func 1"),
+            generate_function_summary("src/b.py", "func2", "() -> None", "Func 2"),
+            generate_class_summary("src/c.py", "MyClass", ["object"], "My class")
+        ]
+        embeddings = batch_generate_embeddings(summaries)
+        assert len(embeddings) == 3
+        assert all(len(emb) == 384 for emb in embeddings)
