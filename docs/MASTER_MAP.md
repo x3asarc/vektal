@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-19
+Last batch update: 2026-02-20
 Owner: ContextCurator
 
 ## TOC
@@ -165,6 +165,20 @@ Owner: ContextCurator
 
 **Documentation:**
 - `.planning/KNOWLEDGE_GRAPH_ORACLE.md` - Integration guide for Phase 14/15
+
+## Phase 14 Codebase Knowledge Graph Modules
+
+**Core:**
+- `src/core/codebase_entities.py` - Entity and edge models for codebase structure (File, Module, Class, Function, PlanningDoc)
+- `src/core/codebase_schema.py` - Neo4j schema definitions (indexes, constraints, ensure_schema)
+
+**Scripts:**
+- `scripts/graph/init_codebase_schema.py` - CLI script to initialize codebase graph schema
+
+**Planning:**
+- `.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md` - Phase 14 context and decisions
+- `.planning/phases/14-continuous-optimization-learning/14-01-PLAN.md` - Entity schema foundation plan
+- `.planning/phases/14-continuous-optimization-learning/14-01-SUMMARY.md` - Plan 01 execution summary
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`

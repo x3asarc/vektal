@@ -39,7 +39,161 @@ Build a self-learning codebase knowledge graph that makes all project context im
 
 ---
 
-### 2. Trigger Mechanism: Hybrid 4-Layer
+### 2. Progressive Verification MVP (PRE-PHASE 14 BASELINE)
+
+**Status:** ✅ IMPLEMENTED (2026-02-20) - Fully operational before Phase 14 begins
+
+**What exists NOW (file-based MVP):**
+
+Phase 14 begins with a **working progressive verification system** that must be upgraded from file-based to graph-based pattern detection.
+
+**MVP Components Created:**
+
+1. **Checkpoint Scripts** (`.claude/checkpoints/`)
+   - `checkpoint_1_discussion.sh` - Validates discussion completeness
+   - `checkpoint_2_research.sh` - Validates research depth
+   - `checkpoint_3_plan.sh` - Validates plan structure
+   - `checkpoint_4_execution.sh` - **CRITICAL** Validates tests + captures metrics
+   - `checkpoint_4_post_hook.sh` - **NEW** Auto-trigger after pytest (detects phase/plan from git)
+
+2. **Auto-Improvement Engine** (`.claude/auto-improver/`)
+   - `on_execution_complete.py` - Main orchestrator (triggered on test completion)
+   - `pattern_detector_file_based.py` - File-based pattern detection (5-10s latency)
+   - Threshold: ≥3 similar failures = pattern detected
+   - Confidence scoring: ≥60% = auto-apply, <60% = escalate
+
+3. **Verifier Agent** (`.claude/agents/change-verifier.md`)
+   - Validates improvements before auto-applying
+   - Checks: syntax valid, no conflicts, coherent fix, confidence threshold
+
+4. **Skills** (`.claude/skills/verify-phase/`)
+   - `verify.sh` - Runs all 4 checkpoints in sequence
+   - Available as `/verify-phase <phase>` command
+
+5. **Hooks** (`.claude/hooks/` + `.claude/settings.json`)
+   - **SessionStart:** `check-pending-improvements.py` - Shows escalated improvements
+   - **PostToolUse:** `checkpoint_4_post_hook.sh` - **NEW** Auto-runs after pytest commands
+   - **PreToolUse:** Risk gate on git commits (existing)
+
+6. **Data Storage** (file-based, Phase 14 will move to graph)
+   - `.claude/metrics/<phase>/<plan>.json` - Test results + timing + root cause
+   - `.claude/learnings.md` - First occurrences logged for pattern tracking
+   - `.claude/escalations/pending-improvements.json` - Low-confidence proposals
+   - `/tmp/auto-improver.log` - Execution history (optional)
+
+**How MVP Works Today:**
+
+```
+Developer runs tests
+    ↓
+PostToolUse hook triggers checkpoint_4_post_hook.sh (NEW - automatic!)
+    ↓
+Checkpoint detects phase/plan from git branch/commit/STATE.md
+    ↓
+Runs checkpoint_4_execution.sh
+    ↓
+Captures metrics: test_result, duration, root_cause, suggested_fix
+    ↓
+If FAIL → triggers on_execution_complete.py
+    ↓
+pattern_detector_file_based.py scans ALL metrics files (5-10s)
+    ↓
+Finds similar failures (same root_cause)
+    ↓
+If ≥3 similar → generates improvement proposal
+    ↓
+Verifier validates proposal → confidence score
+    ↓
+If ≥60% → auto-apply to .claude/agents/*.md
+If <60% → escalate to pending-improvements.json
+    ↓
+Next session → SessionStart hook shows pending improvements
+```
+
+**Performance (MVP):**
+- Checkpoint execution: 3-5s (pytest runtime)
+- Pattern detection: **5-10s** (scans all JSON files)
+- Auto-improvement: 2-3s (LLM + file write)
+- Total: **10-18s** per test failure
+
+**What Phase 14 MUST Upgrade:**
+
+| Component | MVP (File-Based) | Phase 14 Target (Graph-Based) |
+|-----------|------------------|-------------------------------|
+| **Pattern Detection** | Scan all `.claude/metrics/**/*.json` files (5-10s) | Cypher query on Episode nodes (<100ms) |
+| **Failure Storage** | JSON files in `.claude/metrics/` | Neo4j Episode entities (already in 13.2 schema) |
+| **Learnings** | `.claude/learnings.md` text file | Knowledge graph nodes + relationships |
+| **Similarity Search** | String matching on `root_cause` field | Vector embeddings + semantic similarity |
+| **Cross-Phase Patterns** | Manual grep across phases | Graph traversal: `MATCH (e:Episode)-[:SIMILAR_TO]->(other)` |
+| **Impact Analysis** | None | `MATCH (e:Episode)-[:AFFECTS]->(f:File)-[:IMPORTED_BY*]->(dep)` |
+
+**Critical Integration Points for Phase 14:**
+
+1. **Episode Emission Already Works** (from Phase 13.2):
+   ```python
+   # src/assistant/governance/verification_oracle.py
+   emit_episode(
+       episode_type=EpisodeType.ORACLE_DECISION,
+       store_id=...,
+       phase="14",
+       plan="14-01",
+       test_result="FAIL",
+       root_cause="missing_dependency:neo4j-driver",
+       suggested_fix="Add neo4j to requirements.txt"
+   )
+   ```
+   ✅ Episodes are already being emitted to Neo4j (13.2-02)
+   ✅ Emission hooks are fail-open (won't break if graph unavailable)
+   ❌ pattern_detector is still file-based (reads JSON, not graph)
+
+2. **File → Graph Migration Path:**
+   ```python
+   # Phase 14 Plan: Migrate pattern_detector_file_based.py → pattern_detector_graph.py
+
+   # OLD (MVP):
+   def find_similar_failures(metrics_file):
+       all_metrics = glob(".claude/metrics/**/*.json")  # 5-10s
+       similar = [m for m in all_metrics if m.root_cause == current.root_cause]
+       return similar
+
+   # NEW (Phase 14):
+   def find_similar_failures(episode_id):
+       query = """
+           MATCH (e:Episode {id: $episode_id})
+           MATCH (similar:Episode)
+           WHERE similar.root_cause = e.root_cause
+           AND similar.test_result = 'FAIL'
+           RETURN similar
+       """
+       return graph.execute(query)  # <100ms
+   ```
+
+3. **Hooks Keep Working:**
+   - PostToolUse hook (`checkpoint_4_post_hook.sh`) continues to trigger
+   - Instead of calling `pattern_detector_file_based.py`, calls `pattern_detector_graph.py`
+   - No user-facing changes - same workflow, 100x faster backend
+
+4. **Backward Compatibility:**
+   - Phase 14 must import existing `.claude/metrics/**/*.json` files as Episodes
+   - One-time migration script: `scripts/migrate_metrics_to_graph.py`
+   - After migration, file-based storage deprecated
+
+**Phase 14 Success Criteria Addition:**
+
+9. **Pattern detection <100ms** - Graph queries replace file scans (100x speedup)
+10. **Historical metrics in graph** - All `.claude/metrics/` data migrated to Episodes
+11. **Auto-improver uses graph** - `pattern_detector_graph.py` replaces file-based version
+12. **Hooks unchanged** - PostToolUse/SessionStart continue working (transparent upgrade)
+
+**Documentation References:**
+- MVP quickstart: `.claude/PROGRESSIVE_VERIFICATION_QUICKSTART.md`
+- MVP completion: `.claude/MVP_IMPLEMENTATION_COMPLETE.md`
+- Auto-improver README: `.claude/auto-improver/README.md`
+- Full specification: `.planning/enhancements/GSD_PROGRESSIVE_VERIFICATION.md`
+
+---
+
+### 4. Trigger Mechanism: Hybrid 4-Layer
 
 **Decision:** Multiple triggers that cross-validate each other with clear precedence
 

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent conversational AI interface.
-**Current focus:** Phase 13.2 - Oracle Framework Reuse
+**Current focus:** Phase 14 - Codebase Knowledge Graph & Continual Learning
 
 ## Current Position
 
 Phase: 14 of 15 (Continuous Optimization & Learning)
-Plan: Phase 13.2 closed `GREEN` (7/7 plans complete and verified); Phase 14 pending planning.
+Plan: 14-01 complete; Phase 14 execution in progress (1/8 plans complete).
 Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` closed `GREEN` (`7/7` plans complete and verified).
-Last activity: 2026-02-19 - Executed `13.2-07`, created all 20 governance reports for Phase 13.2 plans 01-05, closing governance gap.
+Last activity: 2026-02-20 - Executed `14-01`, created codebase entity schema foundation with 5 entity types and 6 edge types.
 
-Progress: 100% (85/85 plans in roadmap complete)
+Progress: 92% (86/93 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: Phase 13.2 governance gap closure complete
-Last completed gate: `13.2-07 execution + governance reports created (GREEN)`
+Current atomic task: Phase 14-01 execution complete
+Last completed gate: `14-01 execution + codebase entity models created (GREEN)`
 Current blocker: `N/A`
-Next action: `Run /gsd:discuss-phase 14 or /gsd:plan-phase 14`
+Next action: `Execute 14-02 (Vector embedding pipeline)`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -54,6 +54,33 @@ Gate board:
 ## Bypass Log
 
 1. `N/A` (no bypass invoked).
+
+## Recent Session Summary (2026-02-20)
+
+**Phase 14-01 executed - Codebase entity schema foundation:**
+- Created Pydantic v2 entity models for codebase knowledge graph:
+  - 5 entity types: FileEntity, ModuleEntity, ClassEntity, FunctionEntity, PlanningDocEntity
+  - 6 edge types: ImportsEdge, ContainsEdge, CallsEdge, InheritsEdge, ImplementsEdge, ReferencesEdge
+  - CodebaseEdgeType enum for consistent edge type usage
+- Created Neo4j schema definitions (`src/core/codebase_schema.py`):
+  - 7 indexes (5 unique constraints + 2 composite indexes)
+  - 2 EXISTS constraints (degrades gracefully on Community Edition)
+  - ensure_schema(client, dry_run) function with idempotent operations
+- Created CLI schema initialization script (`scripts/graph/init_codebase_schema.py`):
+  - --dry-run flag for schema preview
+  - Graceful degradation when graph unavailable (exits 0)
+  - Project root path resolution for imports
+- All entity models follow Phase 13.2 patterns (BaseEntity/BaseEdge inheritance, frozen discriminators)
+- Path normalization validators ensure cross-platform compatibility
+- Artifacts created:
+  - `.planning/phases/14-continuous-optimization-learning/14-01-SUMMARY.md`
+- Verification result:
+  - 33/33 graph-related tests pass (0 failures)
+  - All entities and edges import successfully
+  - Schema script dry-run shows planned indexes/constraints
+  - No regressions introduced
+- Files modified:
+  - `scripts/graph/init_codebase_schema.py` (3 lines - sys.path.insert for imports)
 
 ## Recent Session Summary (2026-02-19)
 
