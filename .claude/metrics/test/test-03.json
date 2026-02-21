@@ -1,0 +1,13 @@
+{
+  "phase": "test",
+  "plan": "test-03",
+  "timestamp": "2026-02-20T09:58:30+01:00",
+  "duration_seconds": 45,
+  "test_result": "FAIL",
+  "tests_passed": 0,
+  "tests_failed": 3,
+  "exit_code": 1,
+  "root_cause": "missing_dependency:sentry-sdk",
+  "suggested_fix": "Add sentry-sdk to requirements.txt",
+  "test_command": "pytest tests/"
+}

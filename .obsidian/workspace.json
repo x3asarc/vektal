@@ -1,0 +1,214 @@
+{
+  "main": {
+    "id": "91392439bfc56d86",
+    "type": "split",
+    "children": [
+      {
+        "id": "e765f67d089dc667",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bf1808d854f143ba",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6846035c68e33228",
+    "type": "split",
+    "children": [
+      {
+        "id": "6f19e018fac40e75",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "851402570cd8de23",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "2322fa228a51c793",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2a863362e3688784",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "4cceed1fa7cdfd7a",
+    "type": "split",
+    "children": [
+      {
+        "id": "f54ac4bd6c100988",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ec1ff4c9075a2e09",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "acfcb545d9e83cca",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "c3ef8021c9827c29",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "29231b9477928f3b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "db204e8a484cc26a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "bf1808d854f143ba",
+  "lastOpenFiles": [
+    "claudesplan.md",
+    "test-results/playwright-report-live-debug/data/9d0a8981cd88ffc5c7e3fdd8040a4243694f4b05.zip",
+    "test-results/playwright-report-live-debug/data/873531ede5add185f5ff80c22a70a0794f2c707a.md",
+    "test-results/playwright-report-live-debug/data/07506d05041053ee62bf2f88f1c26c9271f0623a.png",
+    "test-results/playwright-report-live-debug/data",
+    "test-results/playwright-artifacts-live-debug/search.png",
+    "test-results/playwright-artifacts-live-debug/jobs.png",
+    "test-results/playwright-artifacts-live-debug/dashboard.png",
+    "test-results/playwright-artifacts-live-debug/enrichment-interaction.png",
+    "test-results/playwright-artifacts-live-debug/chat-interaction.png",
+    "frontend/test-results",
+    "test-results/playwright-report-live-debug/trace/assets/defaultSettingsView-CJSZINFr.js",
+    "test-results/playwright-report-live-debug/trace/assets/codeMirrorModule-a5XoALAZ.js",
+    "test-results/playwright-report-live-debug/trace/uiMode.html",
+    "test-results/playwright-report-live-debug/trace/xtermModule.DYP7pi_n.css",
+    "test-results/playwright-report-live-debug/trace/uiMode.CQJ9SCIQ.js",
+    "test-results/playwright-report-live-debug/trace/uiMode.Btcz36p_.css",
+    "test-results/playwright-report-live-debug/trace/sw.bundle.js",
+    "test-results/playwright-report-live-debug/trace/playwright-logo.svg",
+    "test-results/playwright-report-remote-after-aaaa-remove/trace/playwright-logo.svg",
+    "test-results/playwright-report-remote-after-aaaa-remove/data/7a33d5db6370b6de345e990751aa1f1da65ad675.png",
+    "test-results/playwright-report-remote-final/trace/playwright-logo.svg",
+    "Untitled 3.canvas",
+    "Untitled 2.canvas",
+    "Untitled 1.canvas",
+    "Untitled.canvas",
+    "frontend/node_modules/eslint-plugin-import/README.md",
+    "frontend/node_modules/to-regex-range/README.md",
+    "frontend/node_modules/which-builtin-type/README.md",
+    "npm-badge-png.md",
+    "frontend/node_modules/eslint-plugin-react/README.md"
+  ]
+}

@@ -131,3 +131,4 @@ temp/
 
 # --- Archive backups ---
 archive/image_scraper_backup_*.py
+.aider*

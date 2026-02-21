@@ -30,6 +30,7 @@ class EpisodeType(str, Enum):
     ENRICHMENT_OUTCOME = "enrichment_outcome"
     USER_APPROVAL = "user_approval"
     VENDOR_CATALOG_CHANGE = "vendor_catalog_change"
+    CODE_INTENT = "code_intent"  # NEW: LLM code generation intent
 
 
 # ===========================================

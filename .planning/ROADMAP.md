@@ -66,7 +66,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### Active/Planned Phases
 
-- [ ] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
+- [x] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
 - [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
 
 ### Future Phases
@@ -620,6 +620,6 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
 | 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
-| 14. Codebase Knowledge Graph & Continual Learning | 3/8 | In progress | - |
+| 14. Codebase Knowledge Graph & Continual Learning | 8/8 | Complete | 2026-02-20 |
 | 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |
 

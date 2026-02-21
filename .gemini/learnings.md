@@ -36,7 +36,7 @@ Tier 1 write-block behavior isolated to `test_chat_tier_runtime_contract.py`.
 ### 2026-02-16 | Session workflow observation
 **Learning:** When a session ends without updating STATE.md and MASTER_MAP.md, the next session
 wastes 10–15 minutes re-orienting. The cost of the closing ritual is ~3 minutes.
-**Applied:** Session end ritual codified in CLAUDE.md.
+**Applied:** Session end ritual codified in GEMINI.md.
 **Status:** Applied — monitor compliance across sessions.
 
 ### 2026-02-16 | Phase 13.1 test patterns
@@ -59,4 +59,3 @@ app context via `tests/api/conftest.py`. Without it, SQLAlchemy sessions are uni
 **Learning:** Execution failed - Add sentry-sdk to requirements.txt
 **Root cause:** missing_dependency:sentry-sdk
 **Status:** First occurrence (watch for pattern)
-

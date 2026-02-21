@@ -6,10 +6,30 @@
           {
             "type": "command",
             "command": "node .claude/hooks/gsd-check-update.js"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/check-pending-improvements.py"
           }
         ]
       }
-    ]
+    ],
+    "PreToolUse": [
+      {
+        "filter": {
+          "tool": "Bash",
+          "commandPattern": "git commit.*"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/governance/risk_tier_gate_enforce.py",
+            "blockOnFailure": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": []
   },
   "statusLine": {
     "type": "command",

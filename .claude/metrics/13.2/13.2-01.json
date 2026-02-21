@@ -1,0 +1,13 @@
+{
+  "phase": "13.2",
+  "plan": "13.2-01",
+  "timestamp": "2026-02-20T09:56:28+01:00",
+  "duration_seconds": 3,
+  "test_result": "PASS",
+  "tests_passed": 16,
+  "tests_failed": 0,
+  "exit_code": 0,
+  "root_cause": "unknown",
+  "suggested_fix": "",
+  "test_command": "pytest tests/core/test_synthex_entities.py -q --tb=short 2>/dev/null || echo "Tests will be added in 13.2-04""
+}

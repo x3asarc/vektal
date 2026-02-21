@@ -1,0 +1,56 @@
+---
+phase: 13.2-oracle-framework-reuse
+verified: 2026-02-19T19:45:00Z
+status: passed
+score: 5/5
+re_verification: true
+previous_status: gaps_found
+previous_score: 3/5
+gaps_closed:
+  - "A single Oracle contract is defined and reused across adapters"
+  - "All plans have complete governance reports (self-check, review, structure-audit, integrity-audit)"
+gaps_remaining: []
+regressions: []
+---
+
+# Phase 13.2: Oracle Framework Reuse Verification Report
+
+**Phase Goal:** Establish one reusable Oracle framework for content, visual, execution, and policy verification that can be consumed by multiple phases and runtime surfaces.
+
+**Verified:** 2026-02-19T19:45:00Z
+**Status:** PASSED
+**Re-verification:** Yes - after gap closure plans 13.2-06 and 13.2-07
+
+---
+
+## Re-Verification Summary
+
+**Previous Verification (2026-02-19T16:30:00Z):**
+- Status: gaps_found
+- Score: 3/5 success criteria verified
+- Critical gaps identified: Oracle contract unification, governance reports missing
+
+**Gap Closure Plans Executed:**
+- 13.2-06: Oracle Contract Unification (11 minutes, 3 tasks, 9 files modified)
+- 13.2-07: Governance Reports Creation (4 minutes, 3 tasks, 20 files created)
+
+**Current Verification:**
+- Status: PASSED
+- Score: 5/5 success criteria verified
+- All gaps closed, zero regressions detected
+
+---
+
+## Goal Achievement
+
+### Observable Truths
+
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 1 | A single Oracle contract is defined and reused across adapters | VERIFIED | OracleDecision in oracle_contract.py with pass\|review\|hold\|fail types, imported by all adapters (content/visual/policy/graph) |
+| 2 | Oracle adapters are split by purpose | VERIFIED | content_oracle.py, visual_oracle.py, policy_oracle.py, graph_oracle_adapter.py exist with distinct responsibilities |
+| 3 | Stable interfaces for existing/upcoming phases | VERIFIED | KNOWLEDGE_GRAPH_ORACLE.md documents OracleDecision contract for Phase 14/15 consumption |
+| 4 | Unified telemetry, idempotency, retry | VERIFIED | emit_episode with content-hash deduplication, retry logic in GraphitiIngestor, fail-open semantics |
+| 5 | Integration guidance for Phase 13.1+ | VERIFIED | KNOWLEDGE_GRAPH_ORACLE.md with Phase 14/15 integration patterns and API examples |
+
+**Score:** 5/5 truths verified (was 3/5)
