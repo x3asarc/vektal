@@ -17,10 +17,22 @@ from typing import List, Dict, Any, Optional
 from src.graph.query_templates import QUERY_TEMPLATES, execute_template
 from src.graph.search_expand_bridge import search_then_expand
 from src.graph.semantic_cache import get_semantic_cache
+from src.graph.convention_checker import check_against_conventions, load_default_conventions
 from src.core.embeddings import generate_embedding
 from src.core.synthex_entities import EpisodeType
 
 logger = logging.getLogger(__name__)
+_ARCHITECTURE_KEYWORDS = (
+    "architecture",
+    "architectural",
+    "convention",
+    "refactor",
+    "design",
+    "pattern",
+    "guardrail",
+    "dependency",
+    "dependencies",
+)
 
 
 @dataclass
@@ -35,6 +47,7 @@ class QueryResult:
     error: Optional[str] = None
     source: str = "template"
     discrepancy_flagged: bool = False
+    conventions_checked: List[str] = field(default_factory=list)
 
 
 def _emit_episode(episode_type: EpisodeType, payload: Dict[str, Any]) -> None:
@@ -76,6 +89,11 @@ def _filesystem_fallback_paths(template_name: Optional[str], params: Dict[str, A
             return [candidate]
 
     return []
+
+
+def _is_architectural_query(query: str) -> bool:
+    lowered = query.lower()
+    return any(keyword in lowered for keyword in _ARCHITECTURE_KEYWORDS)
 
 
 def match_query_to_template(query: str) -> Optional[tuple]:
@@ -150,6 +168,10 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
 
     def _finalize() -> QueryResult:
         result.duration_ms = (time.time() - start_time) * 1000
+        if _is_architectural_query(query):
+            conventions = load_default_conventions(limit=10)
+            check_against_conventions(query, conventions=conventions, threshold=0.7)
+            result.conventions_checked = [item["rule"] for item in conventions if item.get("rule")]
         if result.success and result.source != "semantic_cache":
             referenced_paths = [item.get("path") for item in result.data if isinstance(item, dict) and item.get("path")]
             semantic_cache.store(

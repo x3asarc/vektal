@@ -75,6 +75,20 @@ QUERY_TEMPLATES = {
         RETURN callee.full_name as full_name, callee.file_path as file_path
     """,
 
+    "functions_in_file": """
+        MATCH (f:Function {file_path: $file_path})
+        RETURN f.full_name as full_name, f.file_path as file_path
+    """,
+
+    "top_conventions": """
+        MATCH (c:Convention)
+        OPTIONAL MATCH ()-[:EXPLAINS]->(c)
+        WITH c, count(*) as references
+        RETURN c.rule as rule, c.scope as scope, c.enforcement as enforcement, references
+        ORDER BY references DESC, c.rule ASC
+        LIMIT $limit
+    """,
+
     "recent_discrepancies": """
         MATCH (e:Episode {episode_type: 'graph_discrepancy'})
         RETURN e.query_text as query_text, e.paths as paths, e.created_at as created_at
