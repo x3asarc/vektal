@@ -67,6 +67,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Active/Planned Phases
 
 - [x] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
+- [ ] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
 - [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
 
 ### Future Phases
@@ -495,6 +496,31 @@ Plans:
 
 **Context**: See `.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md`
 
+### Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED) `[developer-facing]`
+**Goal**: Upgrade the Phase 14 knowledge graph from passive indexing into an active dual-layer reasoning engine with MCP tool access, memory engineering, semantic caching, and bounded search-then-expand retrieval.
+**Depends on**: Phase 14 (Codebase Knowledge Graph - provides Neo4j schema, scanner, embeddings, and query templates)
+**Requirements**: RAG-01, RAG-02, RAG-03, RAG-04, RAG-05, RAG-06, RAG-07, RAG-08
+**Success Criteria** (what must be TRUE):
+  1. Claude Code can query the knowledge graph through MCP tools (`query_graph`, `get_dependencies`, `retrieve_intent`).
+  2. Decision, Convention, and BugRootCause memory entities exist with EXPLAINS, RESOLVED_BY, and SUPERCEDES relationships.
+  3. Search-then-Expand retrieval runs in two phases with enforced limits (max initial nodes 5, traversal depth 2, token budget 8192).
+  4. Semantic cache serves near-identical queries (cosine >= 0.92) and improves hit latency materially.
+  5. Session initialization pulls top Convention nodes automatically for architectural context.
+  6. Null graph responses fall back to filesystem search and emit discrepancy tracking signals.
+**Plans**: 6 plans in 3 waves
+
+Plans:
+- [ ] 14.1-01-PLAN.md - Memory entity types and relationships (Wave 1)
+- [ ] 14.1-02-PLAN.md - Reasoning provenance and discrepancy tracking (Wave 1)
+- [ ] 14.1-03-PLAN.md - Search-then-Expand bridge (Wave 2)
+- [ ] 14.1-04-PLAN.md - Semantic cache layer (Wave 2)
+- [ ] 14.1-05-PLAN.md - MCP tool server (Wave 3)
+- [ ] 14.1-06-PLAN.md - Session lifecycle hooks and convention guardrails (Wave 3)
+
+**Context**: See `.planning/phases/14.1-rag-enhancement/14.1-PLAN.md` and `.planning/phases/14.1-rag-enhancement/14.1-CROSS-REFERENCE.md`
+
+**Insertion Reason**: Phase 14 established graph/vector foundations, but the YAML blueprint gap analysis shows the majority of agentic retrieval features are still missing. Phase 14.1 closes these gaps before Phase 15 self-healing execution.
+
 
 ### Phase 15: Self-Healing & Runtime Optimization `[developer-facing]`
 **Goal**: Autonomous refactoring, performance optimization, and self-healing using Phase 14's knowledge graph for intelligent decisions
@@ -598,7 +624,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 15
+Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 14.1 -> 15
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -621,5 +647,5 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
 | 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
 | 14. Codebase Knowledge Graph & Continual Learning | 8/8 | Complete | 2026-02-20 |
+| 14.1. Neo4j-Vector-Hybrid-RAG Enhancement | 0/6 | Not started | - |
 | 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |
-
