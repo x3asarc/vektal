@@ -67,3 +67,4 @@ requests-mock==1.12.1
 # Graph Database and Temporal Knowledge (Phase 13.2)
 graphiti-core==0.26.0
 neo4j==5.26.0
+mcp==1.12.4

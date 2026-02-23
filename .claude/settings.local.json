@@ -1,4 +1,12 @@
 {
+  "mcpServers": {
+    "synthex-knowledge-graph": {
+      "command": "python",
+      "args": [
+        "src/graph/mcp_server.py"
+      ]
+    }
+  },
   "permissions": {
     "allow": [
       "Bash(python *.py:*)",
