@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-20
+Last batch update: 2026-02-23
 Owner: ContextCurator
 
 ## TOC
@@ -86,7 +86,25 @@ Owner: ContextCurator
 7. ContextCurator updates this map at daily batch and phase close.
 
 ## Active Plans
-1. Phase 13 canonical artifacts:
+1. Phase 14.1 execution artifacts:
+   - `.planning/phases/14.1-rag-enhancement/14.1-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-CROSS-REFERENCE.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-RESEARCH.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-01-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-02-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-03-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-04-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-05-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-06-PLAN.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-01-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-02-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-03-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-04-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-05-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-06-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-SUMMARY.md`
+   - `.planning/phases/14.1-rag-enhancement/14.1-EXECUTION-VALIDATION.md`
+2. Phase 13 canonical artifacts:
    - `.planning/phases/13-integration-hardening-deployment/13-PRE-CONTEXT-SCOPE.md`
    - `.planning/phases/13-integration-hardening-deployment/13-CONTEXT.md`
    - `.planning/phases/13-integration-hardening-deployment/13-RESEARCH.md`
@@ -100,7 +118,7 @@ Owner: ContextCurator
    - `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`
    - `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`
    - `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`
-2. Phase 13 governance evidence:
+3. Phase 13 governance evidence:
    - `reports/13/13-01/self-check.md`
    - `reports/13/13-01/review.md`
    - `reports/13/13-01/structure-audit.md`
@@ -117,7 +135,7 @@ Owner: ContextCurator
    - `reports/13/13-04/review.md`
    - `reports/13/13-04/structure-audit.md`
    - `reports/13/13-04/integrity-audit.md`
-3. Phase 13.1 closure artifacts:
+4. Phase 13.1 closure artifacts:
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PRE-CONTEXT-SCOPE.md`
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-CONTEXT.md`
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-RESEARCH.md`
@@ -131,10 +149,10 @@ Owner: ContextCurator
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`
-4. Canonical trackers:
-   - `.planning/ROADMAP.md` (Phase 13.1 marked complete `4/4`)
-   - `.planning/STATE.md` (current atomic task: `phase-13.2-pre-context-scope-gate`)
-5. Governance closure evidence:
+5. Canonical trackers:
+   - `.planning/ROADMAP.md` (Phase 14.1 marked complete `6/6`)
+   - `.planning/STATE.md` (current atomic task: Phase 14.1 phase-close verification + Phase 15 readiness)
+6. Governance closure evidence:
    - `reports/07/07.2-governance-operational-defaults/self-check.md`
    - `reports/07/07.2-governance-operational-defaults/review.md`
    - `reports/07/07.2-governance-operational-defaults/structure-audit.md`
@@ -186,6 +204,31 @@ Owner: ContextCurator
 - `.planning/phases/14-continuous-optimization-learning/14-01-SUMMARY.md` - Plan 01 execution summary
 - `.planning/phases/14-continuous-optimization-learning/14-02-PLAN.md` - Vector embedding pipeline plan
 - `.planning/phases/14-continuous-optimization-learning/14-02-SUMMARY.md` - Plan 02 execution summary
+
+## Phase 14.1 Hybrid-RAG Modules
+
+**Graph Retrieval and Caching:**
+- `src/graph/search_expand_bridge.py` - Two-phase search-then-expand retrieval with depth and token constraints
+- `src/graph/semantic_cache.py` - Similarity-threshold query cache with TTL/eviction/invalidation
+- `src/graph/query_interface.py` - Unified cache-first query pipeline with discrepancy + convention metadata
+- `src/graph/query_templates.py` - Shared query templates including discrepancy, convention, and CALLS support
+
+**Lifecycle + Guardrails:**
+- `src/graph/mcp_server.py` - MCP stdio server with session context preload and convention-aware tools
+- `src/graph/convention_checker.py` - Convention conflict scoring for architectural suggestions
+- `src/graph/refactor_guard.py` - CALLS-topology refactor risk scoring
+
+**Scripts:**
+- `scripts/graph/seed_memory_nodes.py` - Memory entity seeding from project docs
+- `scripts/graph/start_mcp_server.sh` - MCP startup wrapper
+
+**Tests:**
+- `tests/unit/test_search_expand_bridge.py`
+- `tests/unit/test_semantic_cache.py`
+- `tests/unit/test_query_interface.py`
+- `tests/unit/test_mcp_server_contract.py`
+- `tests/unit/test_convention_checker.py`
+- `tests/unit/test_refactor_guard.py`
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`

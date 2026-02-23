@@ -118,14 +118,14 @@
 
 ### Neo4j-Vector-Hybrid-RAG Enhancement (RAG)
 
-- [ ] **RAG-01**: MCP tool access to graph retrieval (`query_graph`, `get_dependencies`, `retrieve_intent`)
-- [ ] **RAG-02**: Memory entity families (Decision, Convention, BugRootCause) with typed relationships
-- [ ] **RAG-03**: Search-then-Expand retrieval (vector seed -> bounded graph expansion)
-- [ ] **RAG-04**: Semantic caching for near-identical query reuse with thresholded similarity
-- [ ] **RAG-05**: Session lifecycle hooks that preload key conventions for architectural context
-- [ ] **RAG-06**: Discrepancy flagging when graph misses but filesystem fallback finds evidence
-- [ ] **RAG-07**: Convention guardrails and refactor-safety checks before architectural suggestions
-- [ ] **RAG-08**: Reasoning provenance capture (query traces, template/cypher metadata, duration)
+- [x] **RAG-01**: MCP tool access to graph retrieval (`query_graph`, `get_dependencies`, `retrieve_intent`)
+- [x] **RAG-02**: Memory entity families (Decision, Convention, BugRootCause) with typed relationships
+- [x] **RAG-03**: Search-then-Expand retrieval (vector seed -> bounded graph expansion)
+- [x] **RAG-04**: Semantic caching for near-identical query reuse with thresholded similarity
+- [x] **RAG-05**: Session lifecycle hooks that preload key conventions for architectural context
+- [x] **RAG-06**: Discrepancy flagging when graph misses but filesystem fallback finds evidence
+- [x] **RAG-07**: Convention guardrails and refactor-safety checks before architectural suggestions
+- [x] **RAG-08**: Reasoning provenance capture (query traces, template/cypher metadata, duration)
 
 ### User Management & Authentication (AUTH)
 
@@ -346,14 +346,14 @@
 | ENRICHV2-08 | Phase 13.1 | Complete |
 | ENRICHV2-09 | Phase 13.1 | Complete |
 | ENRICHV2-10 | Phase 13.1 | Complete |
-| RAG-01 | Phase 14.1 | Pending |
-| RAG-02 | Phase 14.1 | Pending |
-| RAG-03 | Phase 14.1 | Pending |
-| RAG-04 | Phase 14.1 | Pending |
-| RAG-05 | Phase 14.1 | Pending |
-| RAG-06 | Phase 14.1 | Pending |
-| RAG-07 | Phase 14.1 | Pending |
-| RAG-08 | Phase 14.1 | Pending |
+| RAG-01 | Phase 14.1 | Complete |
+| RAG-02 | Phase 14.1 | Complete |
+| RAG-03 | Phase 14.1 | Complete |
+| RAG-04 | Phase 14.1 | Complete |
+| RAG-05 | Phase 14.1 | Complete |
+| RAG-06 | Phase 14.1 | Complete |
+| RAG-07 | Phase 14.1 | Complete |
+| RAG-08 | Phase 14.1 | Complete |
 
 **Coverage:**
 - v1.0 requirements: 104 total
@@ -384,6 +384,6 @@
 
 ---
 *Requirements defined: 2026-02-03 after comprehensive questioning and research*
-*Last updated: 2026-02-23 after Phase 14.1 governance registration*
+*Last updated: 2026-02-23 after Phase 14.1 execution completion (RAG-01..RAG-08 closed)*
 
 

@@ -12,7 +12,7 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 
 **Goal:** Transform organic codebase into maintainable, containerized architecture ready for SaaS scaling.
 **Status:** Active
-**Current checkpoint:** Phase 13.1 is closed `GREEN` (plans `13.1-01`..`13.1-04` complete and verified); next is Phase 13.2 planning/execution.
+**Current checkpoint:** Phase 14.1 execution complete (`14.1-01`..`14.1-06`); next is phase-close verification and Phase 15 planning.
 
 **Target outcomes:**
 - Clean, organized codebase (30+ scripts archived, duplicates consolidated)
@@ -28,12 +28,12 @@ Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendo
 | Milestone A: Foundation Buildout | Phases 1-6 | Complete | `.planning/ROADMAP.md`, `.planning/STATE.md` |
 | Milestone B: Frontend + Resolution | Phases 7-8 | Complete | `.planning/phases/07-frontend-framework-setup/07-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md` |
 | Milestone C: Real-Time + Conversational Ops | Phases 9-10 | Complete | `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md` |
-| Milestone D: Scale + Optimization | Phases 11-14 | In Progress | Phases 11-13 complete (`13-01`..`13-04` and phase-level verification closed `GREEN`) |
+| Milestone D: Scale + Optimization | Phases 11-14 (+14.1 insertion) | Complete | Phases 11-14.1 complete (`11`..`14.1`, plan execution closed) |
 
-## Execution Snapshot (2026-02-16)
+## Execution Snapshot (2026-02-23)
 
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13.1
-- Current phase: 13.2 (Oracle Framework Reuse - pre-context/discuss next)
+- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13.1, 13.2, 14, 14.1
+- Current phase: transition window before Phase 15 (Self-Healing & Runtime Optimization)
 - Phase 5 outcomes:
   - OpenAPI/Swagger docs at `/api/docs`
   - Versioned v1 API domains: products, jobs, vendors, user versioning

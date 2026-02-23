@@ -67,7 +67,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Active/Planned Phases
 
 - [x] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
-- [ ] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
+- [x] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
 - [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
 
 ### Future Phases
@@ -510,12 +510,12 @@ Plans:
 **Plans**: 6 plans in 3 waves
 
 Plans:
-- [ ] 14.1-01-PLAN.md - Memory entity types and relationships (Wave 1)
-- [ ] 14.1-02-PLAN.md - Reasoning provenance and discrepancy tracking (Wave 1)
-- [ ] 14.1-03-PLAN.md - Search-then-Expand bridge (Wave 2)
-- [ ] 14.1-04-PLAN.md - Semantic cache layer (Wave 2)
-- [ ] 14.1-05-PLAN.md - MCP tool server (Wave 3)
-- [ ] 14.1-06-PLAN.md - Session lifecycle hooks and convention guardrails (Wave 3)
+- [x] 14.1-01-PLAN.md - Memory entity types and relationships (Wave 1)
+- [x] 14.1-02-PLAN.md - Reasoning provenance and discrepancy tracking (Wave 1)
+- [x] 14.1-03-PLAN.md - Search-then-Expand bridge (Wave 2)
+- [x] 14.1-04-PLAN.md - Semantic cache layer (Wave 2)
+- [x] 14.1-05-PLAN.md - MCP tool server (Wave 3)
+- [x] 14.1-06-PLAN.md - Session lifecycle hooks and convention guardrails (Wave 3)
 
 **Context**: See `.planning/phases/14.1-rag-enhancement/14.1-PLAN.md` and `.planning/phases/14.1-rag-enhancement/14.1-CROSS-REFERENCE.md`
 
@@ -647,5 +647,5 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
 | 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
 | 14. Codebase Knowledge Graph & Continual Learning | 8/8 | Complete | 2026-02-20 |
-| 14.1. Neo4j-Vector-Hybrid-RAG Enhancement | 0/6 | Not started | - |
+| 14.1. Neo4j-Vector-Hybrid-RAG Enhancement | 6/6 | Complete | 2026-02-23 |
 | 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |
