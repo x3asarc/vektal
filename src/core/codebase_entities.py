@@ -10,7 +10,17 @@ from typing import List, Optional
 from enum import Enum
 from pydantic import Field, field_validator
 
-from .synthex_entities import BaseEntity, BaseEdge
+from .synthex_entities import (
+    BaseEntity,
+    BaseEdge,
+    DecisionEntity,
+    ConventionEntity,
+    BugRootCauseEntity,
+)
+
+# Memory entities are part of the same graph domain and are intentionally
+# imported here for discoverability by codebase graph tooling.
+MEMORY_ENTITY_TYPES = (DecisionEntity, ConventionEntity, BugRootCauseEntity)
 
 
 # ===========================================

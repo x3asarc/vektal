@@ -13,15 +13,22 @@ CODEBASE_INDEXES = [
     {"label": "Class", "property": "full_name", "type": "UNIQUE"},
     {"label": "Function", "property": "full_name", "type": "UNIQUE"},
     {"label": "PlanningDoc", "property": "path", "type": "UNIQUE"},
+    {"label": "Decision", "property": "title", "type": "UNIQUE"},
+    {"label": "Convention", "property": "rule", "type": "UNIQUE"},
+    {"label": "BugRootCause", "property": "symptom", "type": "UNIQUE"},
     # Composite indexes for common queries
     {"label": "File", "properties": ["language", "last_modified"]},
     {"label": "Function", "properties": ["file_path", "name"]},
+    {"label": "Convention", "property": "scope"},
+    {"label": "Decision", "property": "status"},
 ]
 
 CODEBASE_CONSTRAINTS = [
     # Ensure referential integrity
     {"type": "EXISTS", "label": "File", "property": "path"},
     {"type": "EXISTS", "label": "Function", "property": "full_name"},
+    {"type": "EXISTS", "label": "Decision", "property": "title"},
+    {"type": "EXISTS", "label": "Convention", "property": "rule"},
 ]
 
 async def ensure_schema(client, dry_run=False):

@@ -31,6 +31,9 @@ class EpisodeType(str, Enum):
     USER_APPROVAL = "user_approval"
     VENDOR_CATALOG_CHANGE = "vendor_catalog_change"
     CODE_INTENT = "code_intent"  # NEW: LLM code generation intent
+    DECISION_RECORDED = "decision_recorded"
+    CONVENTION_ESTABLISHED = "convention_established"
+    BUG_ROOT_CAUSE_IDENTIFIED = "bug_root_cause_identified"
 
 
 # ===========================================
@@ -132,6 +135,44 @@ class UserApprovalEntity(BaseEntity):
     approved_at: datetime = Field(default_factory=lambda: datetime.utcnow(), description="Approval timestamp")
 
 
+class DecisionEntity(BaseEntity):
+    """
+    Architectural decision memory entity.
+
+    Captures durable project decisions including rationale and alternatives.
+    """
+    entity_type: str = Field(default="decision", frozen=True)
+    title: str = Field(..., description="Short decision title")
+    context: str = Field(..., description="Decision context and scope")
+    rationale: str = Field(..., description="Why this decision was chosen")
+    alternatives: List[str] = Field(default_factory=list, description="Alternatives considered")
+    status: str = Field(default="active", description="Decision status: active or superseded")
+    phase_ref: Optional[str] = Field(None, description="Phase reference (e.g. 14.1)")
+
+
+class ConventionEntity(BaseEntity):
+    """
+    Project convention or standard memory entity.
+    """
+    entity_type: str = Field(default="convention", frozen=True)
+    rule: str = Field(..., description="Convention rule text")
+    scope: str = Field(default="global", description="Scope: global/module/file")
+    enforcement: str = Field(default="soft", description="Enforcement: hard or soft")
+    examples: List[str] = Field(default_factory=list, description="Example paths or snippets")
+
+
+class BugRootCauseEntity(BaseEntity):
+    """
+    Verified bug root cause memory entity.
+    """
+    entity_type: str = Field(default="bug_root_cause", frozen=True)
+    symptom: str = Field(..., description="Observed symptom")
+    root_cause: str = Field(..., description="Verified root cause")
+    fix_description: str = Field(..., description="How it was fixed")
+    affected_files: List[str] = Field(default_factory=list, description="Files affected by bug")
+    resolved_by_commit: Optional[str] = Field(None, description="Commit hash that resolved the issue")
+
+
 # ===========================================
 # Edge Families
 # ===========================================
@@ -196,6 +237,30 @@ class ApprovedByUserEdge(BaseEdge):
     edge_type: str = Field(default="approved_by_user", frozen=True)
     user_id: str = Field(..., description="User who approved")
     approved_at: datetime = Field(default_factory=lambda: datetime.utcnow(), description="Approval timestamp")
+
+
+class ExplainsEdge(BaseEdge):
+    """
+    Links an entity to a Decision/Convention that explains it.
+    """
+    edge_type: str = Field(default="explains", frozen=True)
+    explanation_type: str = Field(default="design", description="Explanation category")
+
+
+class ResolvedByEdge(BaseEdge):
+    """
+    Links BugRootCause to the fixing entity/change.
+    """
+    edge_type: str = Field(default="resolved_by", frozen=True)
+    resolution_type: str = Field(default="code_change", description="Resolution type")
+
+
+class SupersedesEdge(BaseEdge):
+    """
+    Links a newer decision/convention to a superseded one.
+    """
+    edge_type: str = Field(default="supersedes", frozen=True)
+    reason: str = Field(..., description="Reason the previous node was superseded")
 
 
 # ===========================================

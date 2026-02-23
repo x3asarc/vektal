@@ -276,3 +276,26 @@ def test_generate_episode_id_handles_missing_correlation_id():
 
     assert isinstance(episode_id, str)
     assert len(episode_id) == 16
+
+
+def test_generate_episode_id_supports_memory_episode_types():
+    """
+    Memory episode types use stable identifying payload fields.
+    """
+    from src.tasks.graphiti_sync import _generate_episode_id
+    from src.core.synthex_entities import EpisodeType
+
+    payload = {
+        "rule": "Always use RFC 7807 errors",
+        "scope": "global",
+    }
+
+    episode_id = _generate_episode_id(
+        episode_type=EpisodeType.CONVENTION_ESTABLISHED.value,
+        store_id="store_123",
+        correlation_id="corr_1",
+        payload=payload,
+    )
+
+    assert isinstance(episode_id, str)
+    assert len(episode_id) == 16

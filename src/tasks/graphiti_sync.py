@@ -76,6 +76,21 @@ def _generate_episode_id(
         key_parts.extend([
             payload.get('vendor_id', ''),
         ])
+    elif episode_type == EpisodeType.DECISION_RECORDED.value:
+        key_parts.extend([
+            payload.get('title', ''),
+            payload.get('status', ''),
+        ])
+    elif episode_type == EpisodeType.CONVENTION_ESTABLISHED.value:
+        key_parts.extend([
+            payload.get('rule', ''),
+            payload.get('scope', ''),
+        ])
+    elif episode_type == EpisodeType.BUG_ROOT_CAUSE_IDENTIFIED.value:
+        key_parts.extend([
+            payload.get('symptom', ''),
+            payload.get('root_cause', ''),
+        ])
 
     # Generate stable hash
     key_string = '|'.join(str(part) for part in key_parts)

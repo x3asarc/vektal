@@ -20,11 +20,17 @@ from src.core.synthex_entities import (
     ModuleEntity,
     EnrichmentOutcomeEntity,
     UserApprovalEntity,
+    DecisionEntity,
+    ConventionEntity,
+    BugRootCauseEntity,
     BaseEdge,
     WasVerifiedByEdge,
     HasFailureWarningEdge,
     YieldedOutcomeEdge,
     ApprovedByUserEdge,
+    ExplainsEdge,
+    ResolvedByEdge,
+    SupersedesEdge,
     create_episode_payload
 )
 
@@ -43,10 +49,16 @@ __all__ = [
     'ModuleEntity',
     'EnrichmentOutcomeEntity',
     'UserApprovalEntity',
+    'DecisionEntity',
+    'ConventionEntity',
+    'BugRootCauseEntity',
     # Edge families
     'BaseEdge',
     'WasVerifiedByEdge',
     'HasFailureWarningEdge',
     'YieldedOutcomeEdge',
-    'ApprovedByUserEdge'
+    'ApprovedByUserEdge',
+    'ExplainsEdge',
+    'ResolvedByEdge',
+    'SupersedesEdge'
 ]

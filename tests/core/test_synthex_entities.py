@@ -17,10 +17,16 @@ from src.core.synthex_entities import (
     ModuleEntity,
     EnrichmentOutcomeEntity,
     UserApprovalEntity,
+    DecisionEntity,
+    ConventionEntity,
+    BugRootCauseEntity,
     WasVerifiedByEdge,
     HasFailureWarningEdge,
     YieldedOutcomeEdge,
     ApprovedByUserEdge,
+    ExplainsEdge,
+    ResolvedByEdge,
+    SupersedesEdge,
     create_episode_payload,
 )
 
@@ -193,6 +199,46 @@ def test_user_approval_entity_has_required_fields():
     assert isinstance(entity.approved_at, datetime)
 
 
+def test_decision_entity_has_required_fields():
+    entity = DecisionEntity(
+        store_id="store_123",
+        title="Use RFC 7807 errors",
+        context="API error response unification",
+        rationale="Consistent machine-readable errors",
+        alternatives=["ad-hoc json", "string errors"],
+        status="active",
+        phase_ref="14.1",
+    )
+    assert entity.entity_type == "decision"
+    assert entity.status == "active"
+    assert "ad-hoc json" in entity.alternatives
+
+
+def test_convention_entity_has_required_fields():
+    entity = ConventionEntity(
+        store_id="store_123",
+        rule="Always return RFC 7807 error payloads",
+        scope="global",
+        enforcement="hard",
+        examples=["src/api/errors.py"],
+    )
+    assert entity.entity_type == "convention"
+    assert entity.enforcement == "hard"
+
+
+def test_bug_root_cause_entity_has_required_fields():
+    entity = BugRootCauseEntity(
+        store_id="store_123",
+        symptom="Null response from graph query",
+        root_cause="Graph sync lagged behind filesystem",
+        fix_description="Run incremental sync before query path",
+        affected_files=["src/core/graphiti_client.py"],
+        resolved_by_commit="abc1234",
+    )
+    assert entity.entity_type == "bug_root_cause"
+    assert entity.resolved_by_commit == "abc1234"
+
+
 # ===========================================
 # Test Edge Contracts
 # ===========================================
@@ -270,6 +316,36 @@ def test_approved_by_user_edge_has_required_fields():
     assert isinstance(edge.approved_at, datetime)
 
 
+def test_explains_edge_has_required_fields():
+    edge = ExplainsEdge(
+        from_entity_id="file_1",
+        to_entity_id="decision_1",
+        explanation_type="architecture"
+    )
+    assert edge.edge_type == "explains"
+    assert edge.explanation_type == "architecture"
+
+
+def test_resolved_by_edge_has_required_fields():
+    edge = ResolvedByEdge(
+        from_entity_id="bug_1",
+        to_entity_id="commit_1",
+        resolution_type="commit"
+    )
+    assert edge.edge_type == "resolved_by"
+    assert edge.resolution_type == "commit"
+
+
+def test_supersedes_edge_has_required_fields():
+    edge = SupersedesEdge(
+        from_entity_id="decision_new",
+        to_entity_id="decision_old",
+        reason="New architecture baseline"
+    )
+    assert edge.edge_type == "supersedes"
+    assert edge.reason == "New architecture baseline"
+
+
 # ===========================================
 # Test Episode Payload Helper
 # ===========================================
@@ -341,15 +417,23 @@ def test_episode_type_enum_has_expected_values():
     assert EpisodeType.ENRICHMENT_OUTCOME.value == "enrichment_outcome"
     assert EpisodeType.USER_APPROVAL.value == "user_approval"
     assert EpisodeType.VENDOR_CATALOG_CHANGE.value == "vendor_catalog_change"
+    assert EpisodeType.CODE_INTENT.value == "code_intent"
+    assert EpisodeType.DECISION_RECORDED.value == "decision_recorded"
+    assert EpisodeType.CONVENTION_ESTABLISHED.value == "convention_established"
+    assert EpisodeType.BUG_ROOT_CAUSE_IDENTIFIED.value == "bug_root_cause_identified"
 
     # Verify all values are present
     all_values = [e.value for e in EpisodeType]
-    assert len(all_values) == 5
+    assert len(all_values) == 9
     assert "oracle_decision" in all_values
     assert "failure_pattern" in all_values
     assert "enrichment_outcome" in all_values
     assert "user_approval" in all_values
     assert "vendor_catalog_change" in all_values
+    assert "code_intent" in all_values
+    assert "decision_recorded" in all_values
+    assert "convention_established" in all_values
+    assert "bug_root_cause_identified" in all_values
 
 
 def test_episode_type_can_be_constructed_from_string():
