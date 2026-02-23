@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 
 from src.graph.query_templates import QUERY_TEMPLATES, execute_template
+from src.graph.search_expand_bridge import search_then_expand
 from src.core.synthex_entities import EpisodeType
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,21 @@ def match_query_to_template(query: str) -> Optional[tuple]:
     return None
 
 
+def query_with_bridge(query_text: str) -> QueryResult:
+    """
+    Run bridge retrieval for unmatched natural-language queries.
+    """
+    bridge = search_then_expand(query_text)
+    data = bridge.initial_nodes + bridge.expanded_nodes
+    return QueryResult(
+        success=bool(data),
+        data=data,
+        query_type="natural_language",
+        source="bridge",
+        error=None if data else "No bridge results found",
+    )
+
+
 def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
     """
     Unified query interface for the codebase knowledge graph.
@@ -177,14 +193,12 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
                 )
         return _finalize()
         
-    # 3. Fallback to natural language via LLM (if enabled)
-    if use_natural_language:
-        result.query_type = "natural_language"
-        result.source = "natural_language_unimplemented"
-        # cypher = generate_cypher_from_natural_language(query)
-        # result.cypher_generated = cypher
-        # result.data = execute_cypher(cypher)
-        # result.success = True
-        result.error = "Natural language querying not yet implemented"
+    # 3. Fallback to bridge retrieval for unmatched natural language queries
+    bridge_result = query_with_bridge(query)
+    result.success = bridge_result.success
+    result.data = bridge_result.data
+    result.query_type = bridge_result.query_type
+    result.source = bridge_result.source
+    result.error = bridge_result.error
 
     return _finalize()

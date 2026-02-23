@@ -34,3 +34,20 @@ def test_query_graph_flags_discrepancy_on_filesystem_fallback():
             assert len(result.data) == 1
             assert result.data[0]["path"] == "src/core/synthex_entities.py"
             assert mock_emit.delay.called
+
+
+def test_query_graph_uses_bridge_for_unmatched_queries():
+    with patch("src.graph.query_interface.search_then_expand") as mock_bridge:
+        mock_bridge.return_value.initial_nodes = [{"path": "src/core/codebase_schema.py"}]
+        mock_bridge.return_value.expanded_nodes = []
+        mock_bridge.return_value.total_tokens_estimated = 50
+        mock_bridge.return_value.truncated = False
+        mock_bridge.return_value.relationships_followed = ["IMPORTS"]
+
+        with patch("src.tasks.graphiti_sync.emit_episode") as mock_emit:
+            mock_emit.delay = MagicMock()
+            result = query_graph("explain architecture constraints around schema initialization")
+
+            assert result.query_type == "natural_language"
+            assert result.source == "bridge"
+            assert result.success is True
