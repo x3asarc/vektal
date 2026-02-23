@@ -63,6 +63,22 @@ def get_graphiti_client() -> Optional[Any]:
     if _graphiti_client is not None:
         return _graphiti_client
 
+    def _bridge_openrouter_env() -> None:
+        """
+        Bridge OpenRouter env vars into OpenAI-compatible vars expected by graphiti-core defaults.
+        """
+        openai_key = os.environ.get('OPENAI_API_KEY')
+        openrouter_key = os.environ.get('OPENROUTER_API_KEY')
+        if not openai_key and openrouter_key:
+            os.environ['OPENAI_API_KEY'] = openrouter_key
+            logger.info("OPENAI_API_KEY not set; bridged from OPENROUTER_API_KEY for Graphiti")
+
+        openai_base = os.environ.get('OPENAI_BASE_URL')
+        openrouter_base = os.environ.get('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
+        if not openai_base and os.environ.get('OPENROUTER_API_KEY'):
+            os.environ['OPENAI_BASE_URL'] = openrouter_base
+            logger.info("OPENAI_BASE_URL not set; bridged to %s for Graphiti", openrouter_base)
+
     # Initialize new client
     try:
         neo4j_uri = os.environ.get('NEO4J_URI', 'bolt://localhost:7687')
@@ -72,6 +88,8 @@ def get_graphiti_client() -> Optional[Any]:
         if not neo4j_password:
             logger.warning("NEO4J_PASSWORD not set - graph Oracle unavailable")
             return None
+
+        _bridge_openrouter_env()
 
         # Initialize Graphiti client
         _graphiti_client = Graphiti(

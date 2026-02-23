@@ -255,6 +255,48 @@ def test_client_reads_neo4j_credentials_from_env(monkeypatch):
         src.core.graphiti_client._import_failed = original_import_failed
 
 
+def test_client_bridges_openrouter_env_to_openai(monkeypatch):
+    """
+    Client bridges OPENROUTER_* env vars to OPENAI_* vars for Graphiti defaults.
+    """
+    monkeypatch.setenv('GRAPH_ORACLE_ENABLED', 'true')
+    monkeypatch.setenv('NEO4J_URI', 'bolt://localhost:7687')
+    monkeypatch.setenv('NEO4J_USER', 'neo4j')
+    monkeypatch.setenv('NEO4J_PASSWORD', 'test_password')
+    monkeypatch.delenv('OPENAI_API_KEY', raising=False)
+    monkeypatch.delenv('OPENAI_BASE_URL', raising=False)
+    monkeypatch.setenv('OPENROUTER_API_KEY', 'or_test_key')
+    monkeypatch.setenv('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
+
+    import src.core.graphiti_client
+
+    original_client = src.core.graphiti_client._graphiti_client
+    original_import_failed = src.core.graphiti_client._import_failed
+
+    try:
+        src.core.graphiti_client._graphiti_client = None
+        src.core.graphiti_client._import_failed = False
+
+        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
+            mock_instance = MagicMock()
+            mock_graphiti.return_value = mock_instance
+
+            from src.core.graphiti_client import get_graphiti_client
+
+            client = get_graphiti_client()
+            assert client is mock_instance
+            assert os.environ.get('OPENAI_API_KEY') == 'or_test_key'
+            assert os.environ.get('OPENAI_BASE_URL') == 'https://openrouter.ai/api/v1'
+            mock_graphiti.assert_called_once_with(
+                uri='bolt://localhost:7687',
+                user='neo4j',
+                password='test_password'
+            )
+    finally:
+        src.core.graphiti_client._graphiti_client = original_client
+        src.core.graphiti_client._import_failed = original_import_failed
+
+
 # ===========================================
 # Test Import Failure Handling
 # ===========================================
