@@ -16,6 +16,8 @@ from typing import List, Dict, Any, Optional
 
 from src.graph.query_templates import QUERY_TEMPLATES, execute_template
 from src.graph.search_expand_bridge import search_then_expand
+from src.graph.semantic_cache import get_semantic_cache
+from src.core.embeddings import generate_embedding
 from src.core.synthex_entities import EpisodeType
 
 logger = logging.getLogger(__name__)
@@ -143,11 +145,31 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
     """
     start_time = time.time()
     result = QueryResult()
-    
+    semantic_cache = get_semantic_cache()
+    query_embedding = generate_embedding(query)
+
     def _finalize() -> QueryResult:
         result.duration_ms = (time.time() - start_time) * 1000
+        if result.success and result.source != "semantic_cache":
+            referenced_paths = [item.get("path") for item in result.data if isinstance(item, dict) and item.get("path")]
+            semantic_cache.store(
+                query_embedding=query_embedding,
+                query_text=query,
+                result=result.data,
+                duration_ms=result.duration_ms,
+                referenced_paths=referenced_paths,
+            )
         _emit_reasoning_trace(result, query)
         return result
+
+    # 0. Semantic cache lookup before any graph traversal/querying.
+    cached = semantic_cache.lookup(query_embedding)
+    if cached is not None:
+        result.success = True
+        result.data = cached.result if isinstance(cached.result, list) else [cached.result]
+        result.source = "semantic_cache"
+        result.query_type = "template"
+        return _finalize()
 
     # 1. Try direct template match by name
     if query in QUERY_TEMPLATES:

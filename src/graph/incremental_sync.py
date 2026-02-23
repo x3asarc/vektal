@@ -40,6 +40,7 @@ from src.graph.file_parser import (
 from src.graph.commit_parser import parse_commit_message, CommitInfo
 from src.graph.planning_linker import link_commit_to_plan, detect_natural_references, resolve_plan_path
 from src.core.graphiti_client import get_graphiti_client
+from src.graph.semantic_cache import get_semantic_cache
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +166,12 @@ def sync_changed_files(changed_files: List[str], commit_message: str) -> Increme
         except Exception as e:
             logger.error(f"Error syncing {rel_path}: {e}")
             result.errors.append(f"{rel_path}: {e}")
+
+    # Invalidate semantic cache entries that reference changed files.
+    try:
+        get_semantic_cache().invalidate(changed_files)
+    except Exception as e:
+        logger.debug(f"Semantic cache invalidation skipped: {e}")
             
     result.duration_ms = (time.time() - start_time) * 1000
     return result

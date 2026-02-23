@@ -5,6 +5,7 @@ Unit tests for query interface provenance and discrepancy behavior.
 from unittest.mock import patch, MagicMock
 
 from src.graph.query_interface import query_graph
+from src.graph.semantic_cache import SemanticCache, CacheConfig
 
 
 def test_query_graph_template_success_emits_trace():
@@ -51,3 +52,19 @@ def test_query_graph_uses_bridge_for_unmatched_queries():
             assert result.query_type == "natural_language"
             assert result.source == "bridge"
             assert result.success is True
+
+
+def test_query_graph_uses_semantic_cache_on_repeat_query():
+    local_cache = SemanticCache(CacheConfig(similarity_threshold=0.92, max_entries=10, ttl_seconds=3600))
+    with patch("src.graph.query_interface.get_semantic_cache", return_value=local_cache):
+        with patch("src.graph.query_interface.generate_embedding", return_value=[1.0, 0.0]):
+            with patch("src.graph.query_interface.execute_template", return_value=[{"path": "src/core/embeddings.py"}]) as mock_exec:
+                with patch("src.tasks.graphiti_sync.emit_episode") as mock_emit:
+                    mock_emit.delay = MagicMock()
+
+                    first = query_graph("imports")
+                    second = query_graph("imports")
+
+                    assert first.source == "template"
+                    assert second.source == "semantic_cache"
+                    assert mock_exec.call_count == 1
