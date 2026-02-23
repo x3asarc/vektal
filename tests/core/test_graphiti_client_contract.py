@@ -139,6 +139,34 @@ def test_query_with_fallback_returns_result_on_success():
     assert result == {"data": "success"}
 
 
+def test_query_with_fallback_flags_discrepancy_with_filesystem_results():
+    """
+    query_with_fallback returns filesystem results and triggers discrepancy callback on graph miss.
+    """
+    from src.core.graphiti_client import query_with_fallback
+
+    async def empty_query():
+        return []
+
+    captured = {}
+
+    def callback(payload):
+        captured.update(payload)
+
+    result = query_with_fallback(
+        empty_query,
+        fallback_value=[],
+        filesystem_search_fn=lambda q: ["src/core/synthex_entities.py"],
+        query_text="what imports src/core/synthex_entities.py",
+        discrepancy_callback=callback,
+        include_source_metadata=True,
+    )
+
+    assert result["source"] == "filesystem_fallback"
+    assert result["discrepancy"] is True
+    assert captured["query_text"] == "what imports src/core/synthex_entities.py"
+
+
 # ===========================================
 # Test Environment Configuration
 # ===========================================

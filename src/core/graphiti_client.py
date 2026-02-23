@@ -10,7 +10,7 @@ Phase 13.2 - Oracle Framework Reuse
 
 import os
 import logging
-from typing import Optional, Callable, TypeVar, Any
+from typing import Optional, Callable, TypeVar, Any, Dict
 import asyncio
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,11 @@ except ImportError:
     _import_failed = True
 
 T = TypeVar('T')
+
+
+def _is_empty_result(result: Any) -> bool:
+    """Return True for graph miss-like results."""
+    return result is None or result == [] or result == {} or result == ""
 
 
 def get_graphiti_client() -> Optional[Any]:
@@ -128,7 +133,11 @@ def check_graph_availability(timeout_seconds: float = 2.0) -> bool:
 def query_with_fallback(
     query_fn: Callable[[], T],
     fallback_value: T,
-    timeout: float = 2.0
+    timeout: float = 2.0,
+    filesystem_search_fn: Optional[Callable[[str], Any]] = None,
+    query_text: str = "",
+    discrepancy_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+    include_source_metadata: bool = False,
 ) -> T:
     """
     Execute graph query with timeout and fallback.
@@ -140,6 +149,10 @@ def query_with_fallback(
         query_fn: Async callable that performs graph query
         fallback_value: Value to return on timeout or error
         timeout: Maximum time to wait for query completion
+        filesystem_search_fn: Optional callable for fallback filesystem lookup
+        query_text: Query text used by filesystem fallback and discrepancy logs
+        discrepancy_callback: Optional callback to emit discrepancy event payload
+        include_source_metadata: Return dict payload with source metadata when True
 
     Returns:
         Query result or fallback_value
@@ -158,12 +171,51 @@ def query_with_fallback(
         result = asyncio.run(
             asyncio.wait_for(query_fn(), timeout=timeout)
         )
-        return result
+        if not _is_empty_result(result):
+            if include_source_metadata:
+                return {"results": result, "source": "graph"}  # type: ignore[return-value]
+            return result
+
+        # Graph returned empty; check filesystem fallback for discrepancy detection.
+        if filesystem_search_fn and query_text:
+            fs_results = filesystem_search_fn(query_text)
+            if fs_results:
+                payload = {
+                    "query_text": query_text,
+                    "paths": fs_results if isinstance(fs_results, list) else [],
+                    "fallback_source": "filesystem",
+                }
+                logger.warning(
+                    "Graph discrepancy detected for query '%s' - filesystem found %s result(s)",
+                    query_text,
+                    len(payload["paths"]) if isinstance(payload["paths"], list) else 0,
+                )
+                if discrepancy_callback:
+                    try:
+                        discrepancy_callback(payload)
+                    except Exception as callback_error:
+                        logger.warning("Discrepancy callback failed: %s", callback_error)
+
+                if include_source_metadata:
+                    return {
+                        "results": fs_results,
+                        "source": "filesystem_fallback",
+                        "discrepancy": True,
+                    }  # type: ignore[return-value]
+                return fs_results
+
+        if include_source_metadata:
+            return {"results": fallback_value, "source": "fallback"}  # type: ignore[return-value]
+        return fallback_value
 
     except asyncio.TimeoutError:
         logger.warning(f"Graph query timed out after {timeout}s - using fallback")
+        if include_source_metadata:
+            return {"results": fallback_value, "source": "timeout_fallback"}  # type: ignore[return-value]
         return fallback_value
 
     except Exception as e:
         logger.warning(f"Graph query failed: {e} - using fallback")
+        if include_source_metadata:
+            return {"results": fallback_value, "source": "error_fallback"}  # type: ignore[return-value]
         return fallback_value

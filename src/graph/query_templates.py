@@ -73,6 +73,13 @@ QUERY_TEMPLATES = {
     "function_callees": """
         MATCH (f:Function {full_name: $function_name})-[:CALLS]->(callee:Function)
         RETURN callee.full_name as full_name, callee.file_path as file_path
+    """,
+
+    "recent_discrepancies": """
+        MATCH (e:Episode {episode_type: 'graph_discrepancy'})
+        RETURN e.query_text as query_text, e.paths as paths, e.created_at as created_at
+        ORDER BY e.created_at DESC
+        LIMIT $limit
     """
 }
 

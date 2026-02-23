@@ -34,6 +34,8 @@ class EpisodeType(str, Enum):
     DECISION_RECORDED = "decision_recorded"
     CONVENTION_ESTABLISHED = "convention_established"
     BUG_ROOT_CAUSE_IDENTIFIED = "bug_root_cause_identified"
+    QUERY_REASONING_TRACE = "query_reasoning_trace"
+    GRAPH_DISCREPANCY = "graph_discrepancy"
 
 
 # ===========================================
@@ -171,6 +173,19 @@ class BugRootCauseEntity(BaseEntity):
     fix_description: str = Field(..., description="How it was fixed")
     affected_files: List[str] = Field(default_factory=list, description="Files affected by bug")
     resolved_by_commit: Optional[str] = Field(None, description="Commit hash that resolved the issue")
+
+
+class ReasoningTraceEntity(BaseEntity):
+    """
+    Query reasoning provenance record.
+    """
+    entity_type: str = Field(default="reasoning_trace", frozen=True)
+    query_text: str = Field(..., description="Original query text")
+    cypher_generated: Optional[str] = Field(None, description="Generated Cypher query")
+    template_used: Optional[str] = Field(None, description="Matched template name")
+    result_summary: str = Field(..., description="Condensed query result summary")
+    duration_ms: float = Field(..., ge=0.0, description="Execution duration in milliseconds")
+    was_cache_hit: bool = Field(default=False, description="Whether response came from semantic cache")
 
 
 # ===========================================

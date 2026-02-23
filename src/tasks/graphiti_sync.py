@@ -91,6 +91,16 @@ def _generate_episode_id(
             payload.get('symptom', ''),
             payload.get('root_cause', ''),
         ])
+    elif episode_type == EpisodeType.QUERY_REASONING_TRACE.value:
+        key_parts.extend([
+            payload.get('query_text', ''),
+            payload.get('template_used', ''),
+        ])
+    elif episode_type == EpisodeType.GRAPH_DISCREPANCY.value:
+        key_parts.extend([
+            payload.get('query_text', ''),
+            ','.join(payload.get('paths', [])[:3]) if isinstance(payload.get('paths'), list) else '',
+        ])
 
     # Generate stable hash
     key_string = '|'.join(str(part) for part in key_parts)

@@ -23,6 +23,7 @@ from src.core.synthex_entities import (
     DecisionEntity,
     ConventionEntity,
     BugRootCauseEntity,
+    ReasoningTraceEntity,
     BaseEdge,
     WasVerifiedByEdge,
     HasFailureWarningEdge,
@@ -52,6 +53,7 @@ __all__ = [
     'DecisionEntity',
     'ConventionEntity',
     'BugRootCauseEntity',
+    'ReasoningTraceEntity',
     # Edge families
     'BaseEdge',
     'WasVerifiedByEdge',

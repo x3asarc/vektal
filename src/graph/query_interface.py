@@ -7,15 +7,15 @@ natural language fallback for more complex scenarios.
 Phase 14 - Codebase Knowledge Graph & Continual Learning
 """
 
-import os
 import time
 import logging
 import re
+from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 
-from src.core.graphiti_client import get_graphiti_client
 from src.graph.query_templates import QUERY_TEMPLATES, execute_template
+from src.core.synthex_entities import EpisodeType
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,49 @@ class QueryResult:
     cypher_generated: Optional[str] = None  # For natural language
     duration_ms: float = 0.0
     error: Optional[str] = None
+    source: str = "template"
+    discrepancy_flagged: bool = False
+
+
+def _emit_episode(episode_type: EpisodeType, payload: Dict[str, Any]) -> None:
+    """Best-effort async episode emission."""
+    try:
+        from src.tasks.graphiti_sync import emit_episode
+        emit_episode.delay(episode_type.value, "global", payload)
+    except Exception as e:
+        logger.debug("Episode emission skipped: %s", e)
+
+
+def _emit_reasoning_trace(result: QueryResult, query: str) -> None:
+    if not result.success:
+        return
+    payload = {
+        "query_text": query,
+        "template_used": result.template_used,
+        "cypher_generated": result.cypher_generated,
+        "result_summary": f"rows={len(result.data)} source={result.source}",
+        "duration_ms": result.duration_ms,
+        "was_cache_hit": result.source == "semantic_cache",
+    }
+    _emit_episode(EpisodeType.QUERY_REASONING_TRACE, payload)
+
+
+def _filesystem_fallback_paths(template_name: Optional[str], params: Dict[str, Any], query: str) -> List[str]:
+    """
+    Return fallback paths when graph returns null but filesystem has evidence.
+    """
+    path = params.get("file_path")
+    if path and Path(path).exists():
+        return [path]
+
+    # Coarse fallback: extract explicit path-like token from query and verify it exists.
+    token_match = re.search(r'([\w./-]+\.(py|md|json|yml|yaml|ts|tsx|js|jsx))', query)
+    if token_match:
+        candidate = token_match.group(1)
+        if Path(candidate).exists():
+            return [candidate]
+
+    return []
 
 
 def match_query_to_template(query: str) -> Optional[tuple]:
@@ -85,13 +128,31 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
     start_time = time.time()
     result = QueryResult()
     
+    def _finalize() -> QueryResult:
+        result.duration_ms = (time.time() - start_time) * 1000
+        _emit_reasoning_trace(result, query)
+        return result
+
     # 1. Try direct template match by name
     if query in QUERY_TEMPLATES:
         result.template_used = query
         result.data = execute_template(query, {})
         result.success = True
-        result.duration_ms = (time.time() - start_time) * 1000
-        return result
+        if not result.data:
+            fallback_paths = _filesystem_fallback_paths(query, {}, query)
+            if fallback_paths:
+                result.data = [{"path": p} for p in fallback_paths]
+                result.source = "filesystem_fallback"
+                result.discrepancy_flagged = True
+                _emit_episode(
+                    EpisodeType.GRAPH_DISCREPANCY,
+                    {
+                        "query_text": query,
+                        "template_used": query,
+                        "paths": fallback_paths,
+                    },
+                )
+        return _finalize()
         
     # 2. Try matching natural language to a template
     template_match = match_query_to_template(query)
@@ -100,17 +161,30 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
         result.template_used = template_name
         result.data = execute_template(template_name, params)
         result.success = True
-        result.duration_ms = (time.time() - start_time) * 1000
-        return result
+        if not result.data:
+            fallback_paths = _filesystem_fallback_paths(template_name, params, query)
+            if fallback_paths:
+                result.data = [{"path": p} for p in fallback_paths]
+                result.source = "filesystem_fallback"
+                result.discrepancy_flagged = True
+                _emit_episode(
+                    EpisodeType.GRAPH_DISCREPANCY,
+                    {
+                        "query_text": query,
+                        "template_used": template_name,
+                        "paths": fallback_paths,
+                    },
+                )
+        return _finalize()
         
     # 3. Fallback to natural language via LLM (if enabled)
     if use_natural_language:
         result.query_type = "natural_language"
+        result.source = "natural_language_unimplemented"
         # cypher = generate_cypher_from_natural_language(query)
         # result.cypher_generated = cypher
         # result.data = execute_cypher(cypher)
         # result.success = True
         result.error = "Natural language querying not yet implemented"
-        
-    result.duration_ms = (time.time() - start_time) * 1000
-    return result
+
+    return _finalize()

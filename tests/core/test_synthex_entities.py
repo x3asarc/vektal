@@ -20,6 +20,7 @@ from src.core.synthex_entities import (
     DecisionEntity,
     ConventionEntity,
     BugRootCauseEntity,
+    ReasoningTraceEntity,
     WasVerifiedByEdge,
     HasFailureWarningEdge,
     YieldedOutcomeEdge,
@@ -239,6 +240,20 @@ def test_bug_root_cause_entity_has_required_fields():
     assert entity.resolved_by_commit == "abc1234"
 
 
+def test_reasoning_trace_entity_has_required_fields():
+    entity = ReasoningTraceEntity(
+        store_id="store_123",
+        query_text="what imports src/core/embeddings.py",
+        template_used="imports",
+        result_summary="rows=3 source=template",
+        duration_ms=42.0,
+        was_cache_hit=False,
+    )
+    assert entity.entity_type == "reasoning_trace"
+    assert entity.duration_ms == 42.0
+    assert entity.was_cache_hit is False
+
+
 # ===========================================
 # Test Edge Contracts
 # ===========================================
@@ -421,10 +436,12 @@ def test_episode_type_enum_has_expected_values():
     assert EpisodeType.DECISION_RECORDED.value == "decision_recorded"
     assert EpisodeType.CONVENTION_ESTABLISHED.value == "convention_established"
     assert EpisodeType.BUG_ROOT_CAUSE_IDENTIFIED.value == "bug_root_cause_identified"
+    assert EpisodeType.QUERY_REASONING_TRACE.value == "query_reasoning_trace"
+    assert EpisodeType.GRAPH_DISCREPANCY.value == "graph_discrepancy"
 
     # Verify all values are present
     all_values = [e.value for e in EpisodeType]
-    assert len(all_values) == 9
+    assert len(all_values) == 11
     assert "oracle_decision" in all_values
     assert "failure_pattern" in all_values
     assert "enrichment_outcome" in all_values
@@ -434,6 +451,8 @@ def test_episode_type_enum_has_expected_values():
     assert "decision_recorded" in all_values
     assert "convention_established" in all_values
     assert "bug_root_cause_identified" in all_values
+    assert "query_reasoning_trace" in all_values
+    assert "graph_discrepancy" in all_values
 
 
 def test_episode_type_can_be_constructed_from_string():
