@@ -3,7 +3,12 @@ MCP server exposing knowledge graph tools for Claude Code.
 """
 
 import asyncio
+import os
+import sys
 from typing import Any, Dict, List
+
+# Ensure absolute imports resolve when running as `python src/graph/mcp_server.py`
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src.graph.convention_checker import check_against_conventions, load_default_conventions
 from src.graph.query_interface import query_graph

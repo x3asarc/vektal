@@ -35,6 +35,10 @@ _ARCHITECTURE_KEYWORDS = (
 )
 
 
+def _normalize_query_path(path: str) -> str:
+    return path.replace("\\", "/")
+
+
 @dataclass
 class QueryResult:
     """Result of a knowledge graph query."""
@@ -109,24 +113,24 @@ def match_query_to_template(query: str) -> Optional[tuple]:
     query = query.lower().strip()
     
     # "what imports X" or "X imported by" -> imports template
-    if match := re.search(r'what imports ([\w/.-]+)', query):
-        return "imports", {"file_path": match.group(1)}
+    if match := re.search(r'what imports ([\w./\\-]+)', query):
+        return "imported_by", {"file_path": _normalize_query_path(match.group(1))}
     
     # "what does X depend on" or "X imports" -> imported_by template
-    if match := re.search(r'what does ([\w/.-]+) depend on', query):
-        return "imported_by", {"file_path": match.group(1)}
+    if match := re.search(r'what does ([\w./\\-]+) depend on', query):
+        return "imports", {"file_path": _normalize_query_path(match.group(1))}
     
     # "find similar to X" -> similar_files template
-    if match := re.search(r'find similar to ([\w/.-]+)', query):
-        return "similar_files", {"file_path": match.group(1), "limit": 5, "threshold": 0.6}
+    if match := re.search(r'find similar to ([\w./\\-]+)', query):
+        return "similar_files", {"file_path": _normalize_query_path(match.group(1)), "limit": 5, "threshold": 0.6}
     
     # "what implements Phase X" -> phase_code template
     if match := re.search(r'what implements phase ([\d.]+)', query):
         return "phase_code", {"phase": match.group(1)}
         
     # "impact radius of X" -> impact_radius template
-    if match := re.search(r'impact radius of ([\w/.-]+)', query):
-        return "impact_radius", {"file_path": match.group(1)}
+    if match := re.search(r'impact radius of ([\w./\\-]+)', query):
+        return "impact_radius", {"file_path": _normalize_query_path(match.group(1))}
         
     # "callers of function X" -> function_callers template
     if match := re.search(r'callers of function ([\w.]+)', query):

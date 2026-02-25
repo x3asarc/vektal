@@ -30,6 +30,19 @@ from src.graph.file_parser import (
 logger = logging.getLogger(__name__)
 
 
+def _normalize_rel_path(path: str) -> str:
+    """Normalize scanned relative paths for cross-platform graph consistency."""
+    return path.replace("\\", "/")
+
+
+def _to_module_name(rel_path: str) -> str:
+    """Convert normalized file path to dotted module form."""
+    normalized = _normalize_rel_path(rel_path)
+    if normalized.endswith(".py"):
+        normalized = normalized[:-3]
+    return normalized.replace("/", ".")
+
+
 @dataclass
 class ScanConfig:
     """Configuration for codebase scan."""
@@ -77,7 +90,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
     for filename in os.listdir(root_path):
         file_path = os.path.join(root_path, filename)
         if os.path.isfile(file_path):
-            rel_path = filename  # Relative path is just the filename
+            rel_path = _normalize_rel_path(filename)  # Relative path is just the filename
             
             # Skip excluded patterns
             if any(excl in rel_path for excl in config.exclude_patterns):
@@ -111,7 +124,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
                         classes.append({
                             'file_path': rel_path,
                             'name': cls.name,
-                            'full_name': f"{cls.name}",
+                            'full_name': f"{_to_module_name(rel_path)}.{cls.name}",
                             'summary': cls_summary,
                             'embedding': cls_embedding
                         })
@@ -121,7 +134,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
                         functions.append({
                             'file_path': rel_path,
                             'name': func.name,
-                            'full_name': f"{func.name}",
+                            'full_name': f"{_to_module_name(rel_path)}.{func.name}",
                             'signature': func.signature,
                             'summary': func_summary,
                             'embedding': func_embedding
@@ -157,7 +170,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
 
             for filename in filenames:
                 file_path = os.path.join(root, filename)
-                rel_path = os.path.relpath(file_path, root_path)
+                rel_path = _normalize_rel_path(os.path.relpath(file_path, root_path))
 
                 # Skip excluded patterns
                 if any(excl in rel_path for excl in config.exclude_patterns):
@@ -195,7 +208,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
                             classes.append({
                                 'file_path': rel_path,
                                 'name': cls.name,
-                                'full_name': f"{rel_path.replace('/', '.').replace('.py', '')}.{cls.name}",
+                                'full_name': f"{_to_module_name(rel_path)}.{cls.name}",
                                 'summary': cls_summary,
                                 'embedding': cls_embedding
                             })
@@ -209,7 +222,7 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
                             functions.append({
                                 'file_path': rel_path,
                                 'name': func.name,
-                                'full_name': f"{rel_path.replace('/', '.').replace('.py', '')}.{func.name}",
+                                'full_name': f"{_to_module_name(rel_path)}.{func.name}",
                                 'signature': func.signature,
                                 'summary': func_summary,
                                 'embedding': func_embedding

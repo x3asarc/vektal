@@ -12,10 +12,17 @@ fi
 
 export PYTHONPATH="$ROOT_DIR:${PYTHONPATH:-}"
 
-python - <<'PY'
+PYTHON_BIN="${ROOT_DIR}/venv/bin/python"
+if [[ -x "${ROOT_DIR}/venv/Scripts/python.exe" ]]; then
+  PYTHON_BIN="${ROOT_DIR}/venv/Scripts/python.exe"
+elif [[ ! -x "$PYTHON_BIN" ]]; then
+  PYTHON_BIN="python"
+fi
+
+"$PYTHON_BIN" - <<'PY'
 from src.core.graphiti_client import check_graph_availability
 ok = check_graph_availability(timeout_seconds=1.5)
 print("graph_available=" + ("true" if ok else "false"))
 PY
 
-exec python src/graph/mcp_server.py
+exec "$PYTHON_BIN" src/graph/mcp_server.py

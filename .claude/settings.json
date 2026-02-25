@@ -17,6 +17,18 @@
     "PreToolUse": [
       {
         "filter": {
+          "tool": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/governance/ensure_neo4j_runtime.py",
+            "blockOnFailure": true
+          }
+        ]
+      },
+      {
+        "filter": {
           "tool": "Bash",
           "commandPattern": "git commit.*"
         },

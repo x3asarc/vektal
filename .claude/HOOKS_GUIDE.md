@@ -2,7 +2,17 @@
 
 ## Active Hooks
 
-### 1. PreToolUse Hook (BLOCKING)
+### 1. PreToolUse Runtime Guard (BLOCKING)
+**Triggers:** Before every `Bash` tool command
+**Script:** `scripts/governance/ensure_neo4j_runtime.py`
+**Blocks:** YES - Prevents tool execution if Neo4j runtime cannot be restored
+
+#### What It Does:
+1. Ensures `neo4j` and `graphiti_core` are importable from the project runtime
+2. If missing, installs pinned package specs from `requirements.txt` into the project venv
+3. Fails fast if runtime cannot be repaired
+
+### 2. PreToolUse Commit Gate (BLOCKING)
 **Triggers:** Before every `git commit` command
 **Script:** `scripts/governance/risk_tier_gate_enforce.py`
 **Blocks:** YES - Prevents commit if checks fail
@@ -60,7 +70,7 @@ Fix the issues above before committing
 
 Your commit will NOT happen. Fix the issues and try again.
 
-### 2. SessionStart Hooks (NON-BLOCKING)
+### 3. SessionStart Hooks (NON-BLOCKING)
 **Triggers:** When you start a new Claude Code session
 
 - `node .claude/hooks/gsd-check-update.js` - Checks for GSD updates
@@ -68,7 +78,7 @@ Your commit will NOT happen. Fix the issues and try again.
 
 These are informational only and don't block anything.
 
-### 3. PostToolUse Hook (DISABLED)
+### 4. PostToolUse Hook (DISABLED)
 **Status:** Disabled due to Windows compatibility issues
 **Previous Purpose:** Auto-checkpoint after pytest runs
 
