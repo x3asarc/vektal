@@ -10,6 +10,8 @@ Phase 14 - Codebase Knowledge Graph & Continual Learning
 import time
 import logging
 import re
+import json
+import os
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
@@ -35,6 +37,18 @@ _ARCHITECTURE_KEYWORDS = (
 )
 
 
+def _runtime_backend_mode() -> str:
+    state_path = Path(".graph/runtime-backend.json")
+    if not state_path.exists():
+        return ""
+    try:
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+        mode = payload.get("mode", "")
+        return mode if isinstance(mode, str) else ""
+    except Exception:
+        return ""
+
+
 def _normalize_query_path(path: str) -> str:
     return path.replace("\\", "/")
 
@@ -56,6 +70,9 @@ class QueryResult:
 
 def _emit_episode(episode_type: EpisodeType, payload: Dict[str, Any]) -> None:
     """Best-effort async episode emission."""
+    disable_on_fallback = os.environ.get("GRAPH_DISABLE_EPISODE_EMIT_ON_FALLBACK", "true").lower() == "true"
+    if disable_on_fallback and _runtime_backend_mode() == "local_snapshot":
+        return
     try:
         from src.tasks.graphiti_sync import emit_episode
         emit_episode.delay(episode_type.value, "global", payload)

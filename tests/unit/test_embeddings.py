@@ -90,6 +90,15 @@ class TestEmbeddingGeneration:
         assert emb1 == emb2
         assert any(v != 0.0 for v in emb1)
 
+    @patch('src.core.embeddings._runtime_backend_mode', return_value="local_snapshot")
+    @patch('src.core.embeddings._get_model')
+    def test_local_snapshot_mode_forces_hash_embeddings(self, mock_get_model, _mock_mode, monkeypatch):
+        monkeypatch.setenv("GRAPH_EMBEDDINGS_LOCAL_SNAPSHOT_HASH", "true")
+        emb = generate_embedding("local snapshot query")
+        assert len(emb) == 384
+        assert any(v != 0.0 for v in emb)
+        mock_get_model.assert_not_called()
+
 
 class TestSummaryGeneration:
     """Test hierarchical summary extraction."""

@@ -32,9 +32,10 @@ def test_execute_template_sync_driver_path():
     class Client:
         driver = SyncDriver()
 
-    with patch("src.graph.query_templates.get_graphiti_client", return_value=Client()):
-        rows = execute_template("imports", {"file_path": "src/a.py"})
-        assert rows == [{"path": "src/b.py"}]
+    with patch("src.graph.query_templates._runtime_backend_mode", return_value=""):
+        with patch("src.graph.query_templates.get_graphiti_client", return_value=Client()):
+            rows = execute_template("imports", {"file_path": "src/a.py"})
+            assert rows == [{"path": "src/b.py"}]
 
 
 @pytest.mark.asyncio
@@ -77,9 +78,10 @@ def test_execute_template_session_fallback_when_execute_query_unavailable():
     class Client:
         driver = Driver()
 
-    with patch("src.graph.query_templates.get_graphiti_client", return_value=Client()):
-        rows = execute_template("imports", {"file_path": "src/a.py"})
-        assert rows == [{"path": "src/d.py"}]
+    with patch("src.graph.query_templates._runtime_backend_mode", return_value=""):
+        with patch("src.graph.query_templates.get_graphiti_client", return_value=Client()):
+            rows = execute_template("imports", {"file_path": "src/a.py"})
+            assert rows == [{"path": "src/d.py"}]
 
 
 def test_execute_template_returns_empty_for_missing_client():
@@ -101,3 +103,33 @@ def test_execute_template_uses_filesystem_fallback_for_imports(monkeypatch):
         rows = execute_template("imports", {"file_path": "src/graph/query_interface.py"})
         paths = {item.get("path") for item in rows}
         assert "src/graph/query_templates.py" in paths
+
+
+def test_execute_template_uses_local_snapshot_for_functions(monkeypatch):
+    monkeypatch.setenv("GRAPH_TEMPLATE_PREFER_SYNC", "true")
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "true")
+    monkeypatch.setenv("NEO4J_URI", "bolt://127.0.0.1:1")
+    monkeypatch.setenv("NEO4J_URI_FALLBACKS", "")
+    monkeypatch.setenv("NEO4J_USER", "neo4j")
+    monkeypatch.setenv("NEO4J_PASSWORD", "sandbox")
+    monkeypatch.setenv("NEO4J_CONNECT_TIMEOUT_SECONDS", "0.1")
+
+    with patch("src.graph.query_templates.get_graphiti_client", return_value=None):
+        functions = execute_template("functions_in_file", {"file_path": "src/graph/query_interface.py"})
+        assert any("query_graph" in row.get("full_name", "") for row in functions)
+
+        callers = execute_template("function_callers", {"function_name": "src.graph.query_interface.query_graph"})
+        assert isinstance(callers, list)
+
+        callees = execute_template("function_callees", {"function_name": "src.graph.query_interface.query_graph"})
+        assert isinstance(callees, list)
+
+
+def test_execute_template_respects_local_snapshot_runtime_pin(monkeypatch):
+    monkeypatch.setenv("GRAPH_TEMPLATE_PREFER_SYNC", "true")
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "true")
+    monkeypatch.setenv("GRAPH_FORCE_NEO4J_PROBE", "false")
+    with patch("src.graph.query_templates._runtime_backend_mode", return_value="local_snapshot"):
+        with patch("src.graph.query_templates.get_graphiti_client", return_value=None):
+            rows = execute_template("imports", {"file_path": "src/graph/query_interface.py"})
+            assert any(row.get("path") == "src/graph/query_templates.py" for row in rows)

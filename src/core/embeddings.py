@@ -10,6 +10,8 @@ Phase 14 - Codebase Knowledge Graph & Continual Learning
 import logging
 import os
 import hashlib
+import json
+from pathlib import Path
 from typing import List, Optional, Callable, Any
 import numpy as np
 
@@ -31,6 +33,25 @@ VECTOR_INDEX_CONFIG = {
 # Lazy model loading (singleton pattern)
 _model: Optional[Any] = None
 _model_loaded = False
+
+
+def _runtime_backend_mode() -> str:
+    state_path = Path(".graph/runtime-backend.json")
+    if not state_path.exists():
+        return ""
+    try:
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+        mode = payload.get("mode", "")
+        return mode if isinstance(mode, str) else ""
+    except Exception:
+        return ""
+
+
+def _should_force_hash_fallback() -> bool:
+    if os.environ.get("GRAPH_EMBEDDINGS_FORCE_HASH", "false").lower() == "true":
+        return True
+    local_snapshot_hash = os.environ.get("GRAPH_EMBEDDINGS_LOCAL_SNAPSHOT_HASH", "true").lower() == "true"
+    return local_snapshot_hash and _runtime_backend_mode() == "local_snapshot"
 
 
 def _deterministic_embedding(text: str) -> List[float]:
@@ -109,6 +130,9 @@ def generate_embedding(text: str) -> List[float]:
         logger.warning("Empty text provided for embedding - returning zero vector")
         return [0.0] * EMBEDDING_DIMENSION
 
+    if _should_force_hash_fallback():
+        return _deterministic_embedding(text)
+
     model = _get_model()
     if model is None:
         if os.environ.get("GRAPH_EMBEDDINGS_HASH_FALLBACK", "true").lower() == "true":
@@ -151,6 +175,9 @@ def batch_generate_embeddings(
     # Handle empty list
     if not texts:
         return []
+
+    if _should_force_hash_fallback():
+        return [_deterministic_embedding(text or "") for text in texts]
 
     model = _get_model()
     if model is None:

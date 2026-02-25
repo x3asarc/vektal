@@ -12,14 +12,26 @@ import inspect
 import threading
 import os
 import time
+import json
 from pathlib import Path
-from functools import lru_cache
 from typing import List, Dict, Any, Optional
 from src.core.graphiti_client import get_graphiti_client
-from src.graph.file_parser import parse_python_file
+from src.graph.local_graph_store import query_template as local_query_template
 
 logger = logging.getLogger(__name__)
 _NEO4J_UNAVAILABLE_UNTIL = 0.0
+
+
+def _runtime_backend_mode() -> str:
+    state_path = Path(".graph/runtime-backend.json")
+    if not state_path.exists():
+        return ""
+    try:
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+        mode = payload.get("mode", "")
+        return mode if isinstance(mode, str) else ""
+    except Exception:
+        return ""
 
 
 # Standard query templates (Cypher)
@@ -107,125 +119,6 @@ QUERY_TEMPLATES = {
 }
 
 
-def _normalize_path(path: str) -> str:
-    return path.replace("\\", "/")
-
-
-@lru_cache(maxsize=1)
-def _python_files_index() -> List[str]:
-    roots = [Path("src"), Path("tests"), Path("scripts")]
-    files: List[str] = []
-    for root in roots:
-        if not root.exists():
-            continue
-        for candidate in root.rglob("*.py"):
-            files.append(_normalize_path(str(candidate)))
-    return files
-
-
-def _module_name_candidates(file_path: str) -> List[str]:
-    normalized = _normalize_path(file_path)
-    if normalized.endswith(".py"):
-        without_ext = normalized[:-3]
-    else:
-        without_ext = normalized
-    candidates = [without_ext.replace("/", ".")]
-    if without_ext.startswith("src/"):
-        candidates.append(without_ext[4:].replace("/", "."))
-    return list(dict.fromkeys(candidates))
-
-
-def _resolve_module_to_file(module_name: str) -> Optional[str]:
-    if not module_name:
-        return None
-    dotted = module_name.strip(".")
-    if not dotted:
-        return None
-
-    src_relative = dotted[4:] if dotted.startswith("src.") else dotted
-    tests_relative = dotted[6:] if dotted.startswith("tests.") else dotted
-    scripts_relative = dotted[8:] if dotted.startswith("scripts.") else dotted
-
-    options = [
-        Path("src") / f"{src_relative.replace('.', '/')}.py",
-        Path("src") / src_relative.replace(".", "/") / "__init__.py",
-        Path("tests") / f"{tests_relative.replace('.', '/')}.py",
-        Path("scripts") / f"{scripts_relative.replace('.', '/')}.py",
-    ]
-    for option in options:
-        if option.exists():
-            return _normalize_path(str(option))
-    return None
-
-
-def _fallback_imports(file_path: str) -> List[Dict[str, Any]]:
-    if not file_path or not Path(file_path).exists():
-        return []
-    parsed = parse_python_file(file_path)
-    rows: List[Dict[str, Any]] = []
-    seen_paths = set()
-    for item in parsed.imports:
-        module = item.from_module or item.name
-        resolved = _resolve_module_to_file(module)
-        if resolved and resolved not in seen_paths:
-            rows.append({"path": resolved, "purpose": ""})
-            seen_paths.add(resolved)
-    return rows
-
-
-def _fallback_imported_by(file_path: str) -> List[Dict[str, Any]]:
-    if not file_path:
-        return []
-    normalized_target = _normalize_path(file_path)
-    if not Path(normalized_target).exists():
-        return []
-
-    module_candidates = set(_module_name_candidates(normalized_target))
-    rows: List[Dict[str, Any]] = []
-    for candidate in _python_files_index():
-        parsed = parse_python_file(candidate)
-        imports = {imp.from_module or imp.name for imp in parsed.imports if (imp.from_module or imp.name)}
-        if imports.intersection(module_candidates):
-            rows.append({"path": candidate, "purpose": ""})
-    return rows
-
-
-def _fallback_functions_in_file(file_path: str) -> List[Dict[str, Any]]:
-    if not file_path or not Path(file_path).exists():
-        return []
-    parsed = parse_python_file(file_path)
-    return [
-        {"full_name": f"{file_path}:{fn.name}", "file_path": _normalize_path(file_path)}
-        for fn in parsed.functions
-    ]
-
-
-def _fallback_impact_radius(file_path: str, depth: int = 3) -> List[Dict[str, Any]]:
-    if not file_path:
-        return []
-    target = _normalize_path(file_path)
-    if not Path(target).exists():
-        return []
-
-    frontier = {target}
-    seen = {target}
-    rows: List[Dict[str, Any]] = []
-    for current_depth in range(1, max(1, depth) + 1):
-        next_frontier = set()
-        for item in frontier:
-            for importer in _fallback_imported_by(item):
-                path = importer.get("path")
-                if not path or path in seen:
-                    continue
-                seen.add(path)
-                next_frontier.add(path)
-                rows.append({"path": path, "depth": current_depth})
-        frontier = next_frontier
-        if not frontier:
-            break
-    return rows
-
-
 def _fallback_top_conventions(limit: int = 5) -> List[Dict[str, Any]]:
     try:
         from src.graph.convention_checker import load_default_conventions
@@ -245,15 +138,9 @@ def _fallback_top_conventions(limit: int = 5) -> List[Dict[str, Any]]:
 
 
 def _execute_local_template_fallback(template_name: str, params: Dict[str, Any]) -> List[Dict[str, Any]]:
-    file_path = _normalize_path(str(params.get("file_path", "")))
-    if template_name == "imports":
-        return _fallback_imports(file_path)
-    if template_name == "imported_by":
-        return _fallback_imported_by(file_path)
-    if template_name == "functions_in_file":
-        return _fallback_functions_in_file(file_path)
-    if template_name == "impact_radius":
-        return _fallback_impact_radius(file_path, depth=3)
+    rows = local_query_template(template_name, params)
+    if rows:
+        return rows
     if template_name == "top_conventions":
         limit = int(params.get("limit", 5) or 5)
         return _fallback_top_conventions(limit=limit)
@@ -384,6 +271,10 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
     def _execute_via_sync_neo4j_env() -> List[Dict[str, Any]]:
         global _NEO4J_UNAVAILABLE_UNTIL
 
+        force_probe = os.environ.get("GRAPH_FORCE_NEO4J_PROBE", "false").lower() == "true"
+        if _runtime_backend_mode() == "local_snapshot" and not force_probe:
+            raise RuntimeError("Runtime backend pinned to local_snapshot")
+
         if _neo4j_temporarily_unavailable():
             raise RuntimeError("Neo4j temporarily unavailable in this runtime")
 
@@ -399,7 +290,7 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
             raise RuntimeError(f"neo4j driver unavailable for sync fallback: {exc}") from exc
 
         last_error: Optional[Exception] = None
-        connect_timeout = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "1.5"))
+        connect_timeout = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "0.25"))
         for uri in uris:
             try:
                 with GraphDatabase.driver(uri, auth=(user, password), connection_timeout=connect_timeout) as driver:
@@ -418,8 +309,14 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
 
     try:
         logger.debug(f"Executing template {template_name} with params {params}")
+        force_probe = os.environ.get("GRAPH_FORCE_NEO4J_PROBE", "false").lower() == "true"
+        runtime_mode = _runtime_backend_mode()
         prefer_sync = os.environ.get("GRAPH_TEMPLATE_PREFER_SYNC", "true").lower() == "true"
         graph_enabled = os.environ.get("GRAPH_ORACLE_ENABLED", "false").lower() == "true"
+
+        if runtime_mode == "local_snapshot" and not force_probe:
+            return _execute_local_template_fallback(template_name, params)
+
         if prefer_sync and graph_enabled:
             try:
                 return _execute_via_sync_neo4j_env()
@@ -433,11 +330,15 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         else:
             client = get_graphiti_client()
         if not client:
+            if runtime_mode == "local_snapshot" and not force_probe:
+                return _execute_local_template_fallback(template_name, params)
             logger.warning("Graphiti client unavailable - using direct Neo4j fallback for template %s", template_name)
             return _execute_via_sync_neo4j_env()
 
         driver = getattr(client, "driver", None)
         if driver is None:
+            if runtime_mode == "local_snapshot" and not force_probe:
+                return _execute_local_template_fallback(template_name, params)
             logger.warning("Graphiti client has no driver - using direct Neo4j fallback for template %s", template_name)
             return _execute_via_sync_neo4j_env()
 

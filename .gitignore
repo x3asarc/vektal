@@ -125,6 +125,7 @@ STRIPE_WEBHOOK_SETUP.md
 
 # --- Temp dirs ---
 temp/
+.graph/
 
 # --- Screenshots in root ---
 *.png

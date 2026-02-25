@@ -11,6 +11,8 @@ Phase 13.2 - Oracle Framework Reuse
 import os
 import logging
 import time
+import json
+from pathlib import Path
 from typing import Optional, Callable, TypeVar, Any, Dict
 import asyncio
 
@@ -40,8 +42,20 @@ def _neo4j_uri_candidates() -> list[str]:
     return list(dict.fromkeys(ordered))
 
 
+def _runtime_backend_mode() -> str:
+    state_path = Path(".graph/runtime-backend.json")
+    if not state_path.exists():
+        return ""
+    try:
+        payload = json.loads(state_path.read_text(encoding="utf-8"))
+        mode = payload.get("mode", "")
+        return mode if isinstance(mode, str) else ""
+    except Exception:
+        return ""
+
+
 def _find_reachable_neo4j_uri(user: str, password: str) -> Optional[str]:
-    timeout_seconds = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "1.5"))
+    timeout_seconds = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "0.25"))
     try:
         from neo4j import GraphDatabase
     except Exception:
@@ -86,6 +100,11 @@ def get_graphiti_client() -> Optional[Any]:
 
     # Check if graph Oracle is enabled
     if not os.environ.get('GRAPH_ORACLE_ENABLED', 'false').lower() == 'true':
+        return None
+
+    pinned_local_snapshot = _runtime_backend_mode() == "local_snapshot"
+    force_probe = os.environ.get("GRAPH_FORCE_NEO4J_PROBE", "false").lower() == "true"
+    if pinned_local_snapshot and not force_probe:
         return None
 
     if time.time() < _graph_unavailable_until:

@@ -12,8 +12,8 @@ def test_query_graph_template_success_emits_trace():
     with patch("src.graph.query_interface.execute_template", return_value=[{"path": "src/core/embeddings.py"}]):
         with patch("src.tasks.graphiti_sync.emit_episode") as mock_emit:
             mock_emit.delay = MagicMock()
-
-            result = query_graph("imports")
+            with patch("src.graph.query_interface._runtime_backend_mode", return_value=""):
+                result = query_graph("imports")
 
             assert result.success is True
             assert result.template_used == "imports"
@@ -26,8 +26,8 @@ def test_query_graph_flags_discrepancy_on_filesystem_fallback():
     with patch("src.graph.query_interface.execute_template", return_value=[]):
         with patch("src.tasks.graphiti_sync.emit_episode") as mock_emit:
             mock_emit.delay = MagicMock()
-
-            result = query_graph("what imports src/core/synthex_entities.py")
+            with patch("src.graph.query_interface._runtime_backend_mode", return_value=""):
+                result = query_graph("what imports src/core/synthex_entities.py")
 
             assert result.success is True
             assert result.source == "filesystem_fallback"
