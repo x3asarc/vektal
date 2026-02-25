@@ -81,6 +81,15 @@ class TestEmbeddingGeneration:
         assert VECTOR_INDEX_CONFIG["dimension"] == 384
         assert VECTOR_INDEX_CONFIG["similarity_function"] == "cosine"
 
+    @patch('src.core.embeddings._get_model', return_value=None)
+    def test_model_unavailable_uses_deterministic_fallback(self, _mock_get_model, monkeypatch):
+        monkeypatch.setenv("GRAPH_EMBEDDINGS_HASH_FALLBACK", "true")
+        emb1 = generate_embedding("sandbox query")
+        emb2 = generate_embedding("sandbox query")
+        assert len(emb1) == 384
+        assert emb1 == emb2
+        assert any(v != 0.0 for v in emb1)
+
 
 class TestSummaryGeneration:
     """Test hierarchical summary extraction."""

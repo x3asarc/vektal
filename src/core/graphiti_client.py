@@ -10,6 +10,7 @@ Phase 13.2 - Oracle Framework Reuse
 
 import os
 import logging
+import time
 from typing import Optional, Callable, TypeVar, Any, Dict
 import asyncio
 
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Singleton client instance
 _graphiti_client: Optional[Any] = None
 _import_failed = False
+_graph_unavailable_until: float = 0.0
 
 # Try to import graphiti-core (may not be installed in all environments)
 try:
@@ -28,6 +30,35 @@ except ImportError:
     _import_failed = True
 
 T = TypeVar('T')
+
+
+def _neo4j_uri_candidates() -> list[str]:
+    primary = (os.environ.get("NEO4J_URI") or "").strip()
+    fallback_raw = os.environ.get("NEO4J_URI_FALLBACKS", "bolt://localhost:7687")
+    fallbacks = [item.strip() for item in fallback_raw.split(",") if item.strip()]
+    ordered = [uri for uri in [primary, *fallbacks] if uri]
+    return list(dict.fromkeys(ordered))
+
+
+def _find_reachable_neo4j_uri(user: str, password: str) -> Optional[str]:
+    timeout_seconds = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "1.5"))
+    try:
+        from neo4j import GraphDatabase
+    except Exception:
+        return None
+
+    for uri in _neo4j_uri_candidates():
+        try:
+            with GraphDatabase.driver(uri, auth=(user, password), connection_timeout=timeout_seconds) as driver:
+                driver.verify_connectivity()
+            return uri
+        except Exception:
+            continue
+    return None
+
+
+def _graph_backoff_seconds() -> float:
+    return float(os.environ.get("NEO4J_UNAVAILABLE_BACKOFF_SECONDS", "30"))
 
 
 def _is_empty_result(result: Any) -> bool:
@@ -51,8 +82,13 @@ def get_graphiti_client() -> Optional[Any]:
     """
     global _graphiti_client
 
+    global _graph_unavailable_until
+
     # Check if graph Oracle is enabled
     if not os.environ.get('GRAPH_ORACLE_ENABLED', 'false').lower() == 'true':
+        return None
+
+    if time.time() < _graph_unavailable_until:
         return None
 
     # Return None if import failed
@@ -81,7 +117,7 @@ def get_graphiti_client() -> Optional[Any]:
 
     # Initialize new client
     try:
-        neo4j_uri = os.environ.get('NEO4J_URI', 'bolt://localhost:7687')
+        configured_uri = os.environ.get('NEO4J_URI', 'bolt://localhost:7687')
         neo4j_user = os.environ.get('NEO4J_USER', 'neo4j')
         neo4j_password = os.environ.get('NEO4J_PASSWORD')
 
@@ -89,20 +125,31 @@ def get_graphiti_client() -> Optional[Any]:
             logger.warning("NEO4J_PASSWORD not set - graph Oracle unavailable")
             return None
 
+        reachable_uri = _find_reachable_neo4j_uri(neo4j_user, neo4j_password)
+        if reachable_uri is None:
+            logger.warning(
+                "No reachable Neo4j endpoint from candidates %s; graph Oracle unavailable",
+                _neo4j_uri_candidates(),
+            )
+            _graph_unavailable_until = time.time() + _graph_backoff_seconds()
+            return None
+
         _bridge_openrouter_env()
 
         # Initialize Graphiti client
         _graphiti_client = Graphiti(
-            uri=neo4j_uri,
+            uri=reachable_uri,
             user=neo4j_user,
             password=neo4j_password
         )
 
-        logger.info(f"Graphiti client initialized with URI: {neo4j_uri}")
+        logger.info(f"Graphiti client initialized with URI: {reachable_uri} (configured={configured_uri})")
+        _graph_unavailable_until = 0.0
         return _graphiti_client
 
     except Exception as e:
         logger.error(f"Failed to initialize Graphiti client: {e}", exc_info=True)
+        _graph_unavailable_until = time.time() + _graph_backoff_seconds()
         return None
 
 

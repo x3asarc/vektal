@@ -8,6 +8,8 @@ Phase 14 - Codebase Knowledge Graph & Continual Learning
 """
 
 import logging
+import os
+import hashlib
 from typing import List, Optional, Callable, Any
 import numpy as np
 
@@ -31,6 +33,24 @@ _model: Optional[Any] = None
 _model_loaded = False
 
 
+def _deterministic_embedding(text: str) -> List[float]:
+    """
+    Generate a deterministic offline embedding from text.
+
+    This is a sandbox-safe fallback when sentence-transformers model files
+    are unavailable and remote downloads are blocked.
+    """
+    seed = hashlib.sha256(text.encode("utf-8")).digest()
+    repeats = (EMBEDDING_DIMENSION // len(seed)) + 1
+    raw = (seed * repeats)[:EMBEDDING_DIMENSION]
+    vector = np.frombuffer(raw, dtype=np.uint8).astype(np.float32)
+    vector = (vector - 127.5) / 127.5
+    norm = float(np.linalg.norm(vector))
+    if norm > 0:
+        vector = vector / norm
+    return vector.tolist()
+
+
 def _get_model():
     """
     Get or load sentence-transformers model (lazy loading).
@@ -45,9 +65,15 @@ def _get_model():
 
     try:
         from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer(EMBEDDING_MODEL)
+        offline_mode = os.environ.get("GRAPH_EMBEDDINGS_OFFLINE", "true").lower() == "true"
+        kwargs = {"local_files_only": True} if offline_mode else {}
+        _model = SentenceTransformer(EMBEDDING_MODEL, **kwargs)
         _model_loaded = True
-        logger.info(f"Loaded embedding model: {EMBEDDING_MODEL}")
+        logger.info(
+            "Loaded embedding model: %s (offline=%s)",
+            EMBEDDING_MODEL,
+            offline_mode,
+        )
         return _model
     except ImportError:
         logger.warning("sentence-transformers not installed - embeddings unavailable")
@@ -85,6 +111,9 @@ def generate_embedding(text: str) -> List[float]:
 
     model = _get_model()
     if model is None:
+        if os.environ.get("GRAPH_EMBEDDINGS_HASH_FALLBACK", "true").lower() == "true":
+            logger.warning("Model unavailable - using deterministic hash embedding fallback")
+            return _deterministic_embedding(text)
         logger.warning("Model unavailable - returning zero vector")
         return [0.0] * EMBEDDING_DIMENSION
 
@@ -125,6 +154,9 @@ def batch_generate_embeddings(
 
     model = _get_model()
     if model is None:
+        if os.environ.get("GRAPH_EMBEDDINGS_HASH_FALLBACK", "true").lower() == "true":
+            logger.warning("Model unavailable - using deterministic hash embedding fallback")
+            return [_deterministic_embedding(text or "") for text in texts]
         logger.warning("Model unavailable - returning zero vectors")
         return [[0.0] * EMBEDDING_DIMENSION] * len(texts)
 

@@ -87,3 +87,17 @@ def test_execute_template_returns_empty_for_missing_client():
         rows = execute_template("imports", {"file_path": "src/a.py"})
         assert rows == []
 
+
+def test_execute_template_uses_filesystem_fallback_for_imports(monkeypatch):
+    monkeypatch.setenv("GRAPH_TEMPLATE_PREFER_SYNC", "true")
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "true")
+    monkeypatch.setenv("NEO4J_URI", "bolt://127.0.0.1:1")
+    monkeypatch.setenv("NEO4J_URI_FALLBACKS", "")
+    monkeypatch.setenv("NEO4J_USER", "neo4j")
+    monkeypatch.setenv("NEO4J_PASSWORD", "sandbox")
+    monkeypatch.setenv("NEO4J_CONNECT_TIMEOUT_SECONDS", "0.1")
+
+    with patch("src.graph.query_templates.get_graphiti_client", return_value=None):
+        rows = execute_template("imports", {"file_path": "src/graph/query_interface.py"})
+        paths = {item.get("path") for item in rows}
+        assert "src/graph/query_templates.py" in paths
