@@ -1,6 +1,7 @@
 # Phase 15: Self-Healing & Runtime Optimization - Context
 
 **Gathered:** 2026-02-19
+**Updated:** 2026-02-26
 **Status:** Ready for planning (after Phase 14 completes)
 
 ## Phase Boundary
@@ -13,6 +14,9 @@ Build governed autonomous remediation and runtime optimization capabilities that
 - Sandbox execution with verification gates for safe autonomous changes
 - Predictive intelligence for prefetching and resource allocation
 - Integration with Phase 14's knowledge graph for impact analysis
+- Input-output congruence validation for every autonomous action
+- Autonomous mistake learning that turns repeated failures into reusable fix recipes
+- Next-prompt memory injection of validated fixes to reduce recurrence
 
 **What this phase does NOT include:**
 - Codebase knowledge graph infrastructure (Phase 14)
@@ -178,6 +182,27 @@ Sandbox outcomes:
 - **YELLOW (minor warnings)** → Human review
 - **RED (any failure)** → Block, escalate, log to FAILURE_JOURNEY.md
 
+### Output-Input Congruence and Learning Loop
+
+Every autonomous action must satisfy a request contract and emit a congruence verdict.
+
+Input contract requirements:
+- Requested intent
+- Mandatory constraints
+- Expected output format and acceptance criteria
+
+Validation requirements:
+- Completeness: all requested objectives are covered
+- Correctness: no policy, format, or logic violations
+- Relevance: no off-target output
+
+Operational rules:
+- Emit `congruence_score` (0.0-1.0) and structured `congruence_failures` taxonomy.
+- If score is below threshold, classify root cause and generate remediation candidate.
+- Promote candidate to reusable fix recipe only after repeated successful outcomes.
+- Record each miss and fix attempt in FAILURE_JOURNEY.md and phase reports metadata.
+- Inject only relevant, non-expired, high-confidence remedies into the next prompt context.
+
 ### Daemon vs Event-Driven
 
 **Daemon-based (scheduled, Celery Beat):**
@@ -193,6 +218,12 @@ Sandbox outcomes:
 - Vendor site change detected → scraper update
 - Memory/CPU spike → scale up
 - Error threshold breach → alert + investigate
+
+**Sentry event channel (priority source):**
+- Pull new/open Sentry issues on a short interval for production feedback.
+- Normalize issues to remediation taxonomy before any fix generation.
+- Correlate issue fingerprints with graph impact radius and prior fix history.
+- Re-check issue state after remediation to validate closure and detect regressions.
 
 **Hybrid (daemon monitors, events trigger):**
 - Daemon detects "high failure rate" → triggers investigation
@@ -285,6 +316,36 @@ Sandbox outcomes:
 
 ---
 
+### 7. Output Congruence Gate + Prompt Memory Injection
+
+**Decision:** Add a formal congruence validator and autonomous memory loop:
+1. Validate output against input contract
+2. Classify failure type when incongruent
+3. Record remediation attempts and outcomes
+4. Inject only validated, relevant remedies into subsequent prompts
+
+**Rationale:**
+- Prevents output that is active but not aligned to the request
+- Reduces repeated mistakes by carrying proven fixes forward automatically
+- Preserves governance with confidence and freshness thresholds
+
+**Alternative considered:** Manual retrospective only -> Rejected (too slow, not autonomous)
+
+### 8. Sentry-Driven Feedback Loop
+
+**Decision:** Use Sentry as a first-class external signal in autonomous triage:
+1. Ingest issues into normalized remediation events
+2. Route to classifier and fix planner with graph context
+3. Validate outcomes against issue state over a stability window
+4. Promote remedies to prompt memory only after stable post-fix outcomes
+
+**Rationale:**
+- Converts production incidents into fast, structured remediation input
+- Enables closed-loop verification (fix applied -> issue actually resolved)
+- Prevents premature promotion of fixes that do not hold in production
+
+**Alternative considered:** Treat Sentry as dashboard-only observability -> Rejected (no autonomous closure)
+
 </decisions>
 
 <specifics>
@@ -314,6 +375,55 @@ for bottleneck in bottlenecks:
     # High-impact bottleneck = prioritize optimization
     if sum(i['call_frequency'] for i in impact) > 100:
         create_optimization_task(bottleneck, priority='high')
+```
+
+### Input-Output Congruence Validation and Learning Loop
+
+```python
+def validate_and_learn(request_contract, output_payload, execution_context):
+    validation = congruence_validator.evaluate(
+        contract=request_contract,
+        output=output_payload,
+        context=execution_context,
+    )
+
+    emit_episode(
+        episode_type="congruence_validation",
+        data={
+            "score": validation.score,
+            "failures": validation.failures,
+            "request_id": execution_context.request_id,
+        },
+    )
+
+    if validation.score >= 0.9:
+        return {"status": "GREEN", "validation": validation}
+
+    root_cause = failure_classifier.classify(validation.failures, execution_context)
+    candidate_fix = remedy_generator.generate(root_cause, execution_context)
+
+    outcome = sandbox_verifier.run(candidate_fix)
+    learning_store.record_attempt(
+        request_fingerprint=request_contract.fingerprint,
+        root_cause=root_cause,
+        candidate_fix=candidate_fix,
+        sandbox_outcome=outcome.status,
+    )
+
+    if outcome.status == "GREEN" and learning_store.is_repeat_success(candidate_fix, min_hits=3):
+        remedy_catalog.promote(candidate_fix, ttl_days=30, min_confidence=0.8)
+
+    return {"status": outcome.status, "validation": validation}
+
+
+def build_next_prompt_context(current_request):
+    remedies = remedy_catalog.retrieve_relevant(
+        request_fingerprint=current_request.fingerprint,
+        top_k=3,
+        min_confidence=0.8,
+        exclude_expired=True,
+    )
+    return prompt_context_builder.merge(current_request.base_context, remedies)
 ```
 
 ### Cost Optimization (from existing Phase 14 vision)

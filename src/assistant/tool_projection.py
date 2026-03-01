@@ -31,6 +31,7 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_1", "tier_2", "tier_3"],
         "required_role": None,
         "enabled": True,
+        "input_examples": [{"content": "I have found 5 products matching your search."}],
     },
     {
         "tool_id": "products.read",
@@ -41,6 +42,7 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_1", "tier_2", "tier_3"],
         "required_role": None,
         "enabled": True,
+        "input_examples": [{"sku": "R0530"}, {"sku": "PENTART-123"}],
     },
     {
         "tool_id": "products.search",
@@ -51,6 +53,10 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_1", "tier_2", "tier_3"],
         "required_role": None,
         "enabled": True,
+        "input_examples": [
+            {"query": "red acrylic paint"},
+            {"query": "decoupage glue 100ml"},
+        ],
     },
     {
         "tool_id": "resolution.dry_run",
@@ -61,6 +67,13 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_2", "tier_3"],
         "required_role": "member",
         "enabled": True,
+        "input_examples": [
+            {
+                "sku": "R0530",
+                "action": "update",
+                "fields": {"price": 12.50, "inventory_quantity": 20},
+            }
+        ],
     },
     {
         "tool_id": "resolution.apply",
@@ -71,6 +84,7 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_2", "tier_3"],
         "required_role": "manager",
         "enabled": True,
+        "input_examples": [{"dry_run_id": 123}, {"dry_run_id": 456}],
     },
     {
         "tool_id": "agent.spawn_sub_agent",
@@ -81,6 +95,12 @@ _DEFAULT_TOOLS: list[dict[str, Any]] = [
         "allowed_tiers": ["tier_3"],
         "required_role": "manager",
         "enabled": True,
+        "input_examples": [
+            {
+                "objective": "Research competitive pricing for acrylic paints",
+                "tool_scope": ["products.search", "web.search"],
+            }
+        ],
     },
 ]
 
@@ -136,6 +156,7 @@ def _load_registry() -> list[dict[str, Any]]:
                 "allowed_tiers": _normalize_allowed_tiers(row.allowed_tiers),
                 "required_role": row.required_role,
                 "enabled": bool(row.enabled),
+                "input_examples": (row.metadata_json or {}).get("input_examples", []),
             }
         )
     return payloads
@@ -208,6 +229,7 @@ def project_effective_toolset(
                 "mutates_data": bool(tool.get("mutates_data", False)),
                 "requires_integration": required_integration,
                 "required_role": required_role,
+                "input_examples": tool.get("input_examples", []),
             }
         )
 

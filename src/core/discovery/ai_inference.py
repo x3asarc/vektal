@@ -42,9 +42,11 @@ class OpenRouterInference:
     API_URL = "https://openrouter.ai/api/v1/chat/completions"
     DEFAULT_MODEL = "google/gemini-flash-1.5"
 
+    _API_KEY_UNSET = object()
+
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: Optional[str] = _API_KEY_UNSET,
         model: Optional[str] = None
     ):
         """
@@ -54,7 +56,10 @@ class OpenRouterInference:
             api_key: OpenRouter API key (defaults to env var)
             model: Model to use (defaults to Gemini Flash)
         """
-        self.api_key = api_key or os.getenv('OPENROUTER_API_KEY')
+        if api_key is self._API_KEY_UNSET:
+            self.api_key = os.getenv('OPENROUTER_API_KEY')
+        else:
+            self.api_key = api_key
         self.model = model or self.DEFAULT_MODEL
 
         if not self.api_key:

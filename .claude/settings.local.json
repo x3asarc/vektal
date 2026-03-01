@@ -1,9 +1,25 @@
 {
+  "project_name": "Shopify Multi-Supplier Platform",
+  "model_profile": "balanced",
+  "commit_docs": true,
+  "autonomous_cleanup_enabled": true,
+  "mcp_server": {
+    "deferred_loading": true,
+    "base_tools": ["search_tools"],
+    "discovery_threshold": 10
+  },
   "mcpServers": {
     "synthex-knowledge-graph": {
       "command": "./venv/Scripts/python.exe",
       "args": [
         "src/graph/mcp_server.py"
+      ]
+    },
+    "perplexity": {
+      "command": "perplexity-mcp.cmd",
+      "args": [
+        "--cwd",
+        "."
       ]
     }
   },

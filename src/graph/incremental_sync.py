@@ -174,7 +174,149 @@ def sync_changed_files(changed_files: List[str], commit_message: str) -> Increme
         logger.debug(f"Semantic cache invalidation skipped: {e}")
             
     result.duration_ms = (time.time() - start_time) * 1000
+    
+    # Sync tool nodes to graph on every sync run to ensure they are up-to-date
+    try:
+        synced_tools = sync_tool_nodes_to_graph()
+        result.entities_updated += synced_tools
+    except Exception as e:
+        logger.error(f"Error syncing tool nodes: {e}")
+        result.errors.append(f"tool_sync: {e}")
+        
     return result
+
+
+def sync_tool_nodes_to_graph() -> int:
+    """
+    Sync MCP + assistant tools to Neo4j as ToolEntity entities.
+    Returns: Number of tool nodes synced.
+    """
+    from src.graph.mcp_server import list_tool_contracts
+    from src.models.assistant_tool_registry import AssistantToolRegistry
+    from src.jobs.graphiti_ingestor import GraphitiIngestor
+    from src.core.synthex_entities import ToolEntity, EpisodeType, create_episode_payload
+    import hashlib
+    import json
+    from datetime import datetime, timezone
+
+    ingestor = GraphitiIngestor()
+    synced_count = 0
+    episodes_to_emit = []
+
+    # 1. MCP tools from code
+    for tool in list_tool_contracts():
+        # Schema for hash excludes dynamic fields if any
+        schema_json = json.dumps(tool, sort_keys=True)
+        schema_hash = hashlib.sha256(schema_json.encode()).hexdigest()[:16]
+
+        tool_entity = ToolEntity(
+            store_id="global",
+            name=tool["name"],
+            description=tool["description"],
+            tool_type="mcp",
+            tier_restriction=None,  # MCP tools available to all tiers
+            schema_json=schema_json,
+            schema_hash=schema_hash,
+            input_examples=json.dumps(tool.get("input_examples", [])),
+            entity_created_at=datetime.now(timezone.utc),
+            last_updated=datetime.now(timezone.utc),
+        )
+
+        episodes_to_emit.append(
+            create_episode_payload(
+                EpisodeType.TOOL_REGISTRATION,
+                store_id="global",
+                entity=tool_entity.model_dump(mode="json"),
+                correlation_id=f"tool-sync-mcp-{tool_entity.name}-{schema_hash}",
+                entity_created_at=tool_entity.entity_created_at,
+            )
+        )
+
+    # 2. Assistant tools from PostgreSQL (if in app context)
+    try:
+        assistant_tools = AssistantToolRegistry.query.all()
+        for tool in assistant_tools:
+            # metadata_json contains inputSchema and input_examples
+            metadata = tool.metadata_json or {}
+            schema_json = json.dumps(metadata, sort_keys=True)
+            schema_hash = hashlib.sha256(schema_json.encode()).hexdigest()[:16]
+
+            # Determine min tier from allowed_tiers list
+            min_tier = 1
+            if tool.allowed_tiers:
+                try:
+                    tiers = [int(str(t).split("_")[-1]) for t in tool.allowed_tiers if "_" in str(t)]
+                    if tiers:
+                        min_tier = min(tiers)
+                except Exception:
+                    pass
+
+            tool_entity = ToolEntity(
+                store_id="global",
+                name=tool.tool_id,
+                description=tool.description or tool.display_name,
+                tool_type="assistant",
+                tier_restriction=min_tier,
+                schema_json=schema_json,
+                schema_hash=schema_hash,
+                input_examples=json.dumps(metadata.get("input_examples", [])),
+                entity_created_at=tool.updated_at or datetime.now(timezone.utc),
+                last_updated=tool.updated_at or datetime.now(timezone.utc),
+            )
+
+            episodes_to_emit.append(
+                create_episode_payload(
+                    EpisodeType.TOOL_REGISTRATION,
+                    store_id="global",
+                    entity=tool_entity.model_dump(mode="json"),
+                    correlation_id=f"tool-sync-assistant-{tool_entity.name}-{schema_hash}",
+                    entity_created_at=tool_entity.entity_created_at,
+                )
+            )
+    except Exception as e:
+        logger.debug("Skipping assistant tool sync (likely no DB context): %s", e)
+
+    # 3. External Research Tools
+    from src.graph.mcp_server import _research_vendor_schema, _search_documentation_schema
+
+    external_tools = [
+        {"schema": _research_vendor_schema(), "type": "mcp_external"},
+        {"schema": _search_documentation_schema(), "type": "mcp_external"},
+    ]
+
+    for tool in external_tools:
+        schema = tool["schema"]
+        schema_json = json.dumps(schema, sort_keys=True)
+        schema_hash = hashlib.sha256(schema_json.encode()).hexdigest()[:16]
+
+        tool_entity = ToolEntity(
+            store_id="global",
+            name=schema["name"],
+            description=schema["description"],
+            tool_type=tool["type"],
+            tier_restriction=None,
+            schema_json=schema_json,
+            schema_hash=schema_hash,
+            input_examples=json.dumps(schema.get("input_examples", [])),
+            entity_created_at=datetime.now(timezone.utc),
+            last_updated=datetime.now(timezone.utc),
+        )
+
+        episodes_to_emit.append(
+            create_episode_payload(
+                EpisodeType.TOOL_REGISTRATION,
+                store_id="global",
+                entity=tool_entity.model_dump(mode="json"),
+                correlation_id=f"tool-sync-external-{tool_entity.name}-{schema_hash}",
+                entity_created_at=tool_entity.entity_created_at,
+            )
+        )
+
+    if episodes_to_emit:
+        result = ingestor.ingest_episodes_batch(episodes_to_emit)
+        synced_count = result.get("successful", 0)
+
+    return synced_count
 
 
 def _sync_python_file(rel_path: str, commit_info: CommitInfo, result: IncrementalSyncResult):

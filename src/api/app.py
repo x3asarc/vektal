@@ -24,6 +24,7 @@ from flask_openapi3 import OpenAPI, Info, Tag
 from flask_compress import Compress
 from src.api.core.errors import register_error_handlers
 from src.api.core.rate_limit import create_limiter
+from src.config.sentry_config import configure_sentry
 from src.models import db
 
 
@@ -161,6 +162,9 @@ def create_openapi_app(config_object=None):
         # Use database.py configure_app for consistent configuration
         from src.database import configure_app
         configure_app(app, config_override=None)
+
+    # Initialize Sentry error/performance monitoring if configured.
+    configure_sentry()
 
     # Initialize database
     from src.database import db

@@ -70,6 +70,8 @@ class QueryResult:
 
 def _emit_episode(episode_type: EpisodeType, payload: Dict[str, Any]) -> None:
     """Best-effort async episode emission."""
+    if os.environ.get("GRAPH_DISABLE_ASYNC_EMIT", "false").lower() == "true":
+        return
     disable_on_fallback = os.environ.get("GRAPH_DISABLE_EPISODE_EMIT_ON_FALLBACK", "true").lower() == "true"
     if disable_on_fallback and _runtime_backend_mode() == "local_snapshot":
         return
@@ -156,11 +158,11 @@ def match_query_to_template(query: str) -> Optional[tuple]:
     return None
 
 
-def query_with_bridge(query_text: str) -> QueryResult:
+def query_with_bridge(query_text: str, compact: bool = False) -> QueryResult:
     """
     Run bridge retrieval for unmatched natural-language queries.
     """
-    bridge = search_then_expand(query_text)
+    bridge = search_then_expand(query_text, compact=compact)
     data = bridge.initial_nodes + bridge.expanded_nodes
     return QueryResult(
         success=bool(data),
@@ -171,13 +173,14 @@ def query_with_bridge(query_text: str) -> QueryResult:
     )
 
 
-def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
+def query_graph(query: str, use_natural_language: bool = False, compact: bool = False) -> QueryResult:
     """
     Unified query interface for the codebase knowledge graph.
     
     Args:
         query: The query string (can be natural language or template name).
         use_natural_language: Whether to fallback to LLM-generated Cypher.
+        compact: Whether to return compact node representations.
         
     Returns:
         QueryResult with data and metadata.
@@ -193,6 +196,13 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
             conventions = load_default_conventions(limit=10)
             check_against_conventions(query, conventions=conventions, threshold=0.7)
             result.conventions_checked = [item["rule"] for item in conventions if item.get("rule")]
+        
+        # If compact mode, results are already serialized in query_with_bridge
+        # For templates, we might need to serialize them here
+        if compact and result.template_used:
+            from src.graph.search_expand_bridge import serialize_node
+            result.data = [serialize_node(n, compact=True) for n in result.data]
+
         if result.success and result.source != "semantic_cache":
             referenced_paths = [item.get("path") for item in result.data if isinstance(item, dict) and item.get("path")]
             semantic_cache.store(
@@ -259,7 +269,7 @@ def query_graph(query: str, use_natural_language: bool = False) -> QueryResult:
         return _finalize()
         
     # 3. Fallback to bridge retrieval for unmatched natural language queries
-    bridge_result = query_with_bridge(query)
+    bridge_result = query_with_bridge(query, compact=compact)
     result.success = bridge_result.success
     result.data = bridge_result.data
     result.query_type = bridge_result.query_type

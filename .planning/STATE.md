@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 14 closed GREEN; 14.1 execution complete; 15 queued.
-Plan: Phase 14 complete (8/8 plans); Phase 14.1 complete (6/6 plans executed + summaries); Phase 15 deferred until 14.1 phase verification closeout.
-Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` closed `GREEN` (`7/7` plans complete and verified); Phase `14` closed `GREEN` (`8/8` plans complete and verified); Phase `14.1` execution complete (`6/6` plans complete, verification artifacts pending).
-Last activity: 2026-02-23 - Executed 14.1-01..14.1-06, completed lifecycle hooks/guardrails, and validated plan structure/artifacts/key-links.
+Phase: 14 closed GREEN; 14.1 execution complete; 14.2 execution complete; 15 queued.
+Plan: Phase 14 complete (8/8 plans); Phase 14.1 complete (6/6 plans executed); Phase 14.2 complete (6/6 plans executed + summaries); Phase 15 deferred until phase verification closeouts.
+Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` closed `GREEN` (`7/7` plans complete and verified); Phase `14` closed `GREEN` (`8/8` plans complete and verified); Phase `14.1` execution complete (`6/6` plans complete); Phase `14.2` execution complete (`6/6` plans complete).
+Last activity: 2026-02-26 - Executed 14.2-01..14.2-06, integrated Tool Calling 2.0 patterns (batching, deferred loading, compact mode, input examples).
 
-Progress: 96% (98/102 plans in roadmap complete)
+Progress: 98% (101/103 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: Phase 14.1 phase-close verification + governance artifact sync
-Last completed gate: `Phase 14.1 execution wave completion (14.1-01..14.1-06)`
+Current atomic task: Phase 14.2 phase-close verification + Phase 14.3 readiness
+Last completed gate: `Phase 14.2 execution wave completion (including 14.2-07)`
 Current blocker: `N/A`
-Next action: `Run/record phase-level verification artifact for 14.1 and transition to Phase 15 planning`
+Next action: `Phase 14.3 planning and execution`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.

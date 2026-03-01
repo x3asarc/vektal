@@ -194,30 +194,40 @@ def process_deferred_verifications(
 
     # Emit oracle decision episodes for verified/failed events (Phase 13.2)
     try:
-        from src.tasks.graphiti_sync import emit_episode
+        from src.tasks.graphiti_sync import emit_episode, emit_episodes_batch
         from src.core.synthex_entities import EpisodeType
 
+        episodes_to_emit = []
         for row in rows:
             if row.status in {"verified", "failed"}:
                 try:
-                    # Emit oracle decision episode
                     payload = {
-                        'decision': row.status,
-                        'confidence': 0.95 if row.status == "verified" else 0.8,
-                        'reason_codes': [],
-                        'evidence_refs': [],
-                        'requires_user_action': row.status == "failed",
-                        'source_adapter': row.oracle_name or "verification_oracle",
+                        "decision": row.status,
+                        "confidence": 0.95 if row.status == "verified" else 0.8,
+                        "reason_codes": [],
+                        "evidence_refs": [],
+                        "requires_user_action": row.status == "failed",
+                        "source_adapter": row.oracle_name or "verification_oracle",
                     }
-                    emit_episode.delay(
-                        EpisodeType.ORACLE_DECISION.value,
-                        str(row.store_id),
-                        payload,
-                        correlation_id=row.correlation_id
+                    episodes_to_emit.append(
+                        {
+                            "episode_type": EpisodeType.ORACLE_DECISION.value,
+                            "store_id": str(row.store_id),
+                            "payload": payload,
+                            "correlation_id": row.correlation_id,
+                        }
                     )
-                except Exception as e:
+                except Exception as inner_e:
                     import logging
-                    logging.getLogger(__name__).warning(f"Failed to emit oracle episode: {e}")
+
+                    logging.getLogger(__name__).warning(f"Failed to prepare oracle episode: {inner_e}")
+
+        if len(episodes_to_emit) > 5:
+            emit_episodes_batch.delay(episodes_to_emit)
+        else:
+            for ep in episodes_to_emit:
+                emit_episode.delay(**ep)
+
     except Exception:
         pass  # Fail-open: do not break verification flow if graph emission fails
 

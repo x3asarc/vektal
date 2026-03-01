@@ -3,7 +3,8 @@
 
 Usage:
     python scripts/governance/risk_tier_gate.py --changed-files <file1> <file2> ...
-    python scripts/governance/risk_tier_gate.py --from-git-diff  # reads `git diff --name-only`
+    python scripts/governance/risk_tier_gate.py --from-git-diff  # reads working tree diff
+    python scripts/governance/risk_tier_gate.py --from-staged-diff  # reads staged diff
 
 Exit codes:
     0 — classification complete (always exits 0; consumers decide gate logic)
@@ -73,10 +74,20 @@ def resolve_overall_tier(file_tiers: dict[str, str]) -> str:
     return min(file_tiers.values(), key=lambda t: TIER_ORDER.index(t))
 
 
-def get_changed_files_from_git() -> list[str]:
+def get_changed_files_from_git(staged_only: bool = False) -> list[str]:
     try:
+        if staged_only:
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "--cached"],
+                capture_output=True,
+                text=True,
+                cwd=REPO_ROOT,
+                check=True,
+            )
+            return [f.strip() for f in result.stdout.splitlines() if f.strip()]
+
         result = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
+            ["git", "diff", "--name-only"],
             capture_output=True,
             text=True,
             cwd=REPO_ROOT,
@@ -84,7 +95,7 @@ def get_changed_files_from_git() -> list[str]:
         )
         files = [f.strip() for f in result.stdout.splitlines() if f.strip()]
         if not files:
-            # Fallback: staged files
+            # Fallback for clean working tree: staged files
             result = subprocess.run(
                 ["git", "diff", "--name-only", "--cached"],
                 capture_output=True,
@@ -111,7 +122,12 @@ def parse_args() -> argparse.Namespace:
     group.add_argument(
         "--from-git-diff",
         action="store_true",
-        help="Auto-detect changed files from git diff HEAD~1..HEAD",
+        help="Auto-detect changed files from working tree git diff",
+    )
+    group.add_argument(
+        "--from-staged-diff",
+        action="store_true",
+        help="Auto-detect changed files from staged git diff",
     )
     parser.add_argument(
         "--policy",
@@ -127,7 +143,9 @@ def main() -> int:
     policy = load_policy()
 
     if args.from_git_diff:
-        changed_files = get_changed_files_from_git()
+        changed_files = get_changed_files_from_git(staged_only=False)
+    elif args.from_staged_diff:
+        changed_files = get_changed_files_from_git(staged_only=True)
     else:
         changed_files = args.changed_files or []
 

@@ -55,7 +55,7 @@ def _runtime_backend_mode() -> str:
 
 
 def _find_reachable_neo4j_uri(user: str, password: str) -> Optional[str]:
-    timeout_seconds = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "0.25"))
+    timeout_seconds = float(os.environ.get("NEO4J_CONNECT_TIMEOUT_SECONDS", "5.0"))
     try:
         from neo4j import GraphDatabase
     except Exception:
@@ -172,7 +172,7 @@ def get_graphiti_client() -> Optional[Any]:
         return None
 
 
-def check_graph_availability(timeout_seconds: float = 2.0) -> bool:
+def check_graph_availability(timeout_seconds: float = 5.0) -> bool:
     """
     Check if graph database is available and responsive.
 

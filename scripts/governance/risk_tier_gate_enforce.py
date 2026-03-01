@@ -155,7 +155,7 @@ def main() -> int:
     print(f"{BLUE}Step 1: Classifying changed files...{RESET}")
     try:
         result = subprocess.run(
-            ["python", "scripts/governance/risk_tier_gate.py", "--from-git-diff"],
+            ["python", "scripts/governance/risk_tier_gate.py", "--from-staged-diff"],
             capture_output=True,
             text=True,
             timeout=10,

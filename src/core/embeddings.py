@@ -11,6 +11,8 @@ import logging
 import os
 import hashlib
 import json
+import asyncio
+import threading
 from pathlib import Path
 from typing import List, Optional, Callable, Any
 import numpy as np
@@ -202,129 +204,134 @@ def batch_generate_embeddings(
         return [[0.0] * EMBEDDING_DIMENSION] * len(texts)
 
 
+def _execute_query(driver, query: str, parameters: dict) -> List[dict]:
+    """Execute query using driver, automatically handling sync/async and existing event loops."""
+    # Definitively detect sync vs async by inspecting a session instance
+    session = driver.session()
+    
+    if hasattr(session, "__enter__"):
+        # Synchronous driver
+        with session:
+            result = session.run(query, **parameters)
+            return [record.data() for record in result]
+
+    # Asynchronous driver (Aura / Graphiti default)
+    async def _run_async():
+        async with session:
+            result = await session.run(query, **parameters)
+            return await result.data()
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(_run_async())
+
+    if loop.is_running():
+        res_container = []
+        err_container = []
+
+        def _thread_target():
+            try:
+                # New loop in new thread
+                res_container.append(asyncio.run(_run_async()))
+            except Exception as e:
+                err_container.append(e)
+
+        t = threading.Thread(target=_thread_target)
+        t.start()
+        t.join()
+        
+        if err_container:
+            raise err_container[0]
+        return res_container[0]
+    else:
+        return loop.run_until_complete(_run_async())
+
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No loop, we can safe run it
+        return asyncio.run(_run_async())
+
+    if loop.is_running():
+        # Loop is running, we must run in a separate thread to avoid "cannot be called from a running event loop"
+        res_container = []
+        err_container = []
+
+        def _thread_target():
+            try:
+                res_container.append(asyncio.run(_run_async()))
+            except Exception as e:
+                err_container.append(e)
+
+        t = threading.Thread(target=_thread_target)
+        t.start()
+        t.join()
+        
+        if err_container:
+            raise err_container[0]
+        return res_container[0]
+    else:
+        return loop.run_until_complete(_run_async())
+
+import inspect
+
 def create_vector_index(client) -> bool:
     """
     Create Neo4j vector index for codebase embeddings.
-
-    Uses configuration from VECTOR_INDEX_CONFIG. Idempotent - safe to call multiple times.
-
-    Args:
-        client: Graphiti client instance
-
-    Returns:
-        True if index created/exists, False on error
-
-    Cypher:
-        CALL db.index.vector.createNodeIndex(
-            'codebase_embeddings',
-            'CodeEntity',
-            'embedding',
-            384,
-            'cosine'
-        )
     """
-    if client is None:
-        logger.warning("Client is None - cannot create vector index")
+    if client is None or not hasattr(client, "driver"):
         return False
 
     try:
-        if not hasattr(client, 'driver'):
-            logger.error("Client does not have a valid driver")
-            return False
-
-        # Check if index already exists
-        async def _create_index():
-            async with client.driver.session() as session:
-                # Try to create index (will fail if exists, but that's ok)
-                try:
-                    query = f"""
-                    CALL db.index.vector.createNodeIndex(
-                        '{VECTOR_INDEX_CONFIG['index_name']}',
-                        '{VECTOR_INDEX_CONFIG['node_label']}',
-                        '{VECTOR_INDEX_CONFIG['property_name']}',
-                        {VECTOR_INDEX_CONFIG['dimension']},
-                        '{VECTOR_INDEX_CONFIG['similarity_function']}'
-                    )
-                    """
-                    await session.run(query)
-                    logger.info(f"Created vector index: {VECTOR_INDEX_CONFIG['index_name']}")
-                except Exception as e:
-                    # Index might already exist
-                    if 'already exists' in str(e).lower() or 'equivalent index' in str(e).lower():
-                        logger.info(f"Vector index already exists: {VECTOR_INDEX_CONFIG['index_name']}")
-                    else:
-                        raise
-
-        import asyncio
-        asyncio.run(_create_index())
+        query = f"""
+        CALL db.index.vector.createNodeIndex(
+            '{VECTOR_INDEX_CONFIG['index_name']}',
+            '{VECTOR_INDEX_CONFIG['node_label']}',
+            '{VECTOR_INDEX_CONFIG['property_name']}',
+            {VECTOR_INDEX_CONFIG['dimension']},
+            '{VECTOR_INDEX_CONFIG['similarity_function']}'
+        )
+        """
+        try:
+            _execute_query(client.driver, query, {})
+            logger.info(f"Created vector index: {VECTOR_INDEX_CONFIG['index_name']}")
+        except Exception as e:
+            if "already exists" in str(e).lower() or "equivalent index" in str(e).lower():
+                logger.info(f"Vector index already exists: {VECTOR_INDEX_CONFIG['index_name']}")
+            else:
+                raise
         return True
-
     except Exception as e:
         logger.error(f"Failed to create vector index: {e}")
         return False
 
 
-def similarity_search(
-    client,
-    query_embedding: List[float],
-    top_k: int = 5,
-    min_score: float = 0.7
-) -> List[dict]:
+def similarity_search(client, query_embedding: List[float], top_k: int = 5, min_score: float = 0.7) -> List[dict]:
     """
     Search for similar code entities using vector similarity.
-
-    Args:
-        client: Graphiti client instance
-        query_embedding: Query vector (384 dimensions)
-        top_k: Number of results to return
-        min_score: Minimum similarity score (0.0-1.0)
-
-    Returns:
-        List of similar entities with scores
-
-    Example:
-        >>> query = generate_file_summary("src/core/new_module.py")
-        >>> query_emb = generate_embedding(query)
-        >>> similar = similarity_search(client, query_emb, top_k=5)
-        >>> for item in similar:
-        ...     print(f"{item['path']}: {item['score']:.2f}")
     """
-    if client is None or not query_embedding:
+    if client is None or not hasattr(client, "driver") or not query_embedding:
         return []
 
     try:
-        if not hasattr(client, 'driver'):
-            return []
-
-        async def _search():
-            async with client.driver.session() as session:
-                query = f"""
-                CALL db.index.vector.queryNodes(
-                    '{VECTOR_INDEX_CONFIG['index_name']}',
-                    {top_k * 2},  // Get more results to filter by score
-                    $embedding
-                )
-                YIELD node, score
-                WHERE score >= $min_score
-                RETURN node.path as path, node.entity_type as entity_type, score
-                ORDER BY score DESC
-                LIMIT $top_k
-                """
-
-                result = await session.run(
-                    query,
-                    embedding=query_embedding,
-                    min_score=min_score,
-                    top_k=top_k
-                )
-
-                records = await result.data()
-                return records
-
-        import asyncio
-        results = asyncio.run(_search())
-        return results
-
+        query = f"""
+        CALL db.index.vector.queryNodes(
+            '{VECTOR_INDEX_CONFIG['index_name']}',
+            {top_k * 2},
+            $embedding
+        )
+        YIELD node, score
+        WHERE score >= $min_score
+        RETURN node.path as path, node.entity_type as entity_type, score, node.summary as summary
+        ORDER BY score DESC
+        LIMIT $top_k
+        """
+        return _execute_query(client.driver, query, {
+            "embedding": query_embedding,
+            "min_score": min_score,
+            "top_k": top_k
+        })
     except Exception as e:
         logger.error(f"Failed to search similar entities: {e}")
         return []

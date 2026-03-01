@@ -221,6 +221,8 @@ Owner: ContextCurator
 **Scripts:**
 - `scripts/graph/seed_memory_nodes.py` - Memory entity seeding from project docs
 - `scripts/graph/start_mcp_server.sh` - MCP startup wrapper
+- `scripts/graph/init_tool_search_index.py` - Initialize Neo4j vector index for tool search
+- `scripts/graph/check_graphiti_batch_api.py` - Check for native batch API support
 
 **Tests:**
 - `tests/unit/test_search_expand_bridge.py`
@@ -229,6 +231,21 @@ Owner: ContextCurator
 - `tests/unit/test_mcp_server_contract.py`
 - `tests/unit/test_convention_checker.py`
 - `tests/unit/test_refactor_guard.py`
+- `tests/graph/test_mcp_tool_examples.py` - MCP tool example validation
+- `tests/graph/test_tool_search.py` - Tool semantic search tests
+- `tests/graph/test_deferred_loading.py` - Deferred loading logic tests
+- `tests/graph/test_batch_tools.py` - Batch tool execution tests
+- `tests/tasks/test_batch_emission.py` - Batch episode emission tests
+
+## Phase 14.2 Tool Calling 2.0 Modules
+
+**Optimized Retrieval:**
+- `src/graph/batch_handlers.py` - Concurrent batch processing for graph and dependency queries
+- `src/graph/mcp_server.py` - Enhanced with Tool Calling 2.0 patterns (input examples, deferred loading, compact mode)
+
+**Sync & Ingestion:**
+- `src/tasks/graphiti_sync.py` - Updated with Celery group-based batch emission
+- `src/jobs/graphiti_ingestor.py` - Updated with batch ingestion support and fallback loop
 
 ## Governance Links
 1. Policy source: `solutionsos/compound-engineering-os-policy.md`

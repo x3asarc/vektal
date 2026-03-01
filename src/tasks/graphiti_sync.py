@@ -16,6 +16,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from pathlib import Path
 
+from celery import group
 from src.celery_app import app
 from src.core.graphiti_client import get_graphiti_client, check_graph_availability
 from src.core.synthex_entities import EpisodeType, create_episode_payload
@@ -102,6 +103,9 @@ def _generate_episode_id(
             ','.join(payload.get('paths', [])[:3]) if isinstance(payload.get('paths'), list) else '',
         ])
 
+    # Add temporal anchor
+    key_parts.append(str(payload.get('entity_created_at', '')))
+
     # Generate stable hash
     key_string = '|'.join(str(part) for part in key_parts)
     hash_obj = hashlib.sha256(key_string.encode('utf-8'))
@@ -161,7 +165,14 @@ def emit_episode(
             return False
 
         # Generate episode ID for idempotency
-        episode_id = _generate_episode_id(episode_type, store_id, correlation_id, payload)
+        # Use entity_created_at if provided, else current time
+        payload_with_time = dict(payload)
+        if "entity_created_at" not in payload_with_time:
+            payload_with_time["entity_created_at"] = datetime.utcnow()
+
+        episode_id = _generate_episode_id(
+            episode_type, store_id, correlation_id, payload_with_time
+        )
 
         # Create full episode payload
         episode = create_episode_payload(
@@ -169,7 +180,7 @@ def emit_episode(
             store_id,
             episode_id=episode_id,
             correlation_id=correlation_id,
-            **payload
+            **payload_with_time,
         )
 
         # Ingest episode via GraphitiIngestor
@@ -198,6 +209,47 @@ def emit_episode(
         except self.MaxRetriesExceededError:
             logger.error(f"Episode emission failed after max retries: {e}", exc_info=True)
             return False
+
+
+@app.task(name="src.tasks.graphiti_sync.emit_episodes_batch", queue="assistant.t1")
+def emit_episodes_batch(episodes_data: list[dict]) -> dict:
+    """
+    Emit multiple episodes using Celery group pattern.
+
+    Args:
+        episodes_data: List of dicts, each containing:
+            - episode_type: str
+            - store_id: str
+            - payload: dict
+            - correlation_id: Optional[str]
+    """
+    if not episodes_data:
+        return {"status": "no_episodes"}
+
+    # Chunk episodes (max 50 per chunk to prevent worker overload)
+    CHUNK_SIZE = 50
+    chunks = [episodes_data[i : i + CHUNK_SIZE] for i in range(0, len(episodes_data), CHUNK_SIZE)]
+
+    total_queued = 0
+    for chunk in chunks:
+        tasks = [
+            emit_episode.s(
+                episode_type=ep.get("episode_type"),
+                store_id=ep.get("store_id"),
+                payload=ep.get("payload"),
+                correlation_id=ep.get("correlation_id"),
+            )
+            for ep in chunk
+        ]
+        group(tasks).apply_async()
+        total_queued += len(chunk)
+
+    return {
+        "status": "queued",
+        "total_episodes": len(episodes_data),
+        "chunks": len(chunks),
+        "total_queued": total_queued,
+    }
 
 
 @app.task(
@@ -245,58 +297,64 @@ def sync_failure_journey(store_id: str) -> Dict[str, int]:
         skipped_count = 0
 
         # Parse entries (simplified parser - looks for ## headers)
-        lines = content.split('\n')
+        lines = content.split("\n")
         current_entry = None
+        episodes_to_emit = []
 
         for line in lines:
             # Look for failure entry headers
-            if line.startswith('## [') and 'Module:' in line:
+            if line.startswith("## [") and "Module:" in line:
                 # Parse header: ## [2026-02-19 11:30] Module: src.tasks.enrichment
                 try:
-                    timestamp_str = line.split('[')[1].split(']')[0]
-                    module_path = line.split('Module:')[1].strip()
+                    timestamp_str = line.split("[")[1].split("]")[0]
+                    module_path = line.split("Module:")[1].strip()
 
-                    current_entry = {
-                        'timestamp': timestamp_str,
-                        'module_path': module_path,
-                        'error_lines': []
-                    }
+                    current_entry = {"timestamp": timestamp_str, "module_path": module_path, "error_lines": []}
                 except IndexError:
                     continue
 
-            elif current_entry and line.startswith('Error:'):
-                error_msg = line.replace('Error:', '').strip()
-                current_entry['error_lines'].append(error_msg)
+            elif current_entry and line.startswith("Error:"):
+                error_msg = line.replace("Error:", "").strip()
+                current_entry["error_lines"].append(error_msg)
 
-            elif current_entry and (line.startswith('##') or not line.strip()):
-                # End of current entry - emit episode
-                if current_entry['error_lines']:
+            elif current_entry and (line.startswith("##") or not line.strip()):
+                # End of current entry - prepare episode
+                if current_entry["error_lines"]:
                     # Generate error signature (hash of error message)
-                    error_text = ' '.join(current_entry['error_lines'])
+                    error_text = " ".join(current_entry["error_lines"])
                     error_signature = hashlib.sha256(error_text.encode()).hexdigest()[:16]
 
-                    # Emit failure pattern episode
+                    # Prepare failure pattern episode payload
                     payload = {
-                        'failure_type': 'runtime_error',
-                        'module_path': current_entry['module_path'],
-                        'error_signature': error_signature,
-                        'occurrence_count': 1,
-                        'last_seen_at': datetime.utcnow(),
+                        "failure_type": "runtime_error",
+                        "module_path": current_entry["module_path"],
+                        "error_signature": error_signature,
+                        "occurrence_count": 1,
+                        "entity_created_at": datetime.utcnow(),
                     }
 
-                    success = emit_episode.delay(
-                        EpisodeType.FAILURE_PATTERN.value,
-                        store_id,
-                        payload,
-                        correlation_id=f"failure_journey_{error_signature}"
+                    episodes_to_emit.append(
+                        {
+                            "episode_type": EpisodeType.FAILURE_PATTERN.value,
+                            "store_id": store_id,
+                            "payload": payload,
+                            "correlation_id": f"failure_journey_{error_signature}",
+                        }
                     )
 
-                    if success:
-                        synced_count += 1
-                    else:
-                        failed_count += 1
-
                 current_entry = None
+
+        # Emit prepare episodes
+        if len(episodes_to_emit) > 5:
+            emit_episodes_batch.delay(episodes_to_emit)
+            synced_count = len(episodes_to_emit)
+        else:
+            for ep in episodes_to_emit:
+                success = emit_episode.delay(**ep)
+                if success:
+                    synced_count += 1
+                else:
+                    failed_count += 1
 
         logger.info(f"FAILURE_JOURNEY sync complete: {synced_count} success, {failed_count} failed")
         return {'success': synced_count, 'failed': failed_count, 'skipped': skipped_count}

@@ -33,6 +33,11 @@ class AssistantToolRegistry(db.Model, TimestampMixin):
     required_role = db.Column(String(64), nullable=True)
     enabled = db.Column(Boolean, nullable=False, default=True)
     metadata_json = db.Column(JSON, nullable=True)
+    schema_json = db.Column(JSON, nullable=False, server_default='{}')
+
+    def to_tool_schema(self) -> dict:
+        """Return full tool schema for MCP interface."""
+        return self.schema_json if isinstance(self.schema_json, dict) else {}
 
     def __repr__(self) -> str:
         return f"<AssistantToolRegistry tool_id={self.tool_id} risk={self.risk_class}>"

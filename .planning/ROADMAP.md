@@ -68,6 +68,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
 - [x] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
+- [x] **Phase 14.2: Tool Calling 2.0 Integration (INSERTED)** `[developer-facing]` - Optimize MCP/tool call semantics (batching, deferred loading, schema examples)
+- [ ] **Phase 14.3: Graph Availability + Sync Reliability (INSERTED)** `[developer-facing]` - Guarantee Aura-first graph availability with local Neo4j and snapshot fallback
 - [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
 
 ### Future Phases
@@ -521,6 +523,56 @@ Plans:
 
 **Insertion Reason**: Phase 14 established graph/vector foundations, but the YAML blueprint gap analysis shows the majority of agentic retrieval features are still missing. Phase 14.1 closes these gaps before Phase 15 self-healing execution.
 
+### Phase 14.2: Tool Calling 2.0 Integration (INSERTED) `[developer-facing]`
+**Goal**: Optimize how graph and assistant tools are invoked (batching, deferred loading, input examples, compact output) to reduce token overhead and improve tool-call correctness.
+**Depends on**: Phase 14.1 (Neo4j-Vector-Hybrid-RAG Enhancement)
+**Requirements**: TOOL-20-01, TOOL-20-02, TOOL-20-03, TOOL-20-04, TOOL-20-05, TOOL-20-06
+**Success Criteria** (what must be TRUE):
+  1. MCP schemas include practical input examples for tool-call accuracy.
+  2. Tool discovery can be graph-driven (`search_tools`) and support deferred loading.
+  3. Batch query/dependency operations run in single MCP interactions where applicable.
+  4. Compact output mode lowers token footprint for retrieval-heavy flows.
+  5. Tool schema registry and sync behavior remain auditable and test-covered.
+  6. Existing graph retrieval behavior remains backward compatible.
+**Plans**: 6 plans in 4 waves
+
+Plans:
+- [x] 14.2-01-PLAN.md - Input examples on tool schemas (Wave 1)
+- [x] 14.2-02-PLAN.md - Tool nodes + `search_tools` in Neo4j (Wave 2)
+- [x] 14.2-03-PLAN.md - Deferred loading + schema persistence (Wave 2)
+- [x] 14.2-04-PLAN.md - `batch_query` + `batch_dependencies` tools (Wave 3)
+- [x] 14.2-05-PLAN.md - Compact output optimization path (Wave 3)
+- [x] 14.2-06-PLAN.md - Batch episode emission in sync pipeline (Wave 4)
+- [x] 14.2-07-PLAN.md - External Research Tools Integration (Firecrawl + Perplexity) (Wave 4)
+- [x] 14.2-07-PLAN.md - External Research Tools Integration (Firecrawl + Perplexity)
+
+**Context**: See `.planning/phases/14.2-tool-calling-v2/README.md` and `.planning/phases/14.2-tool-calling-v2/14.2-PLAN.md`
+
+### Phase 14.3: Graph Availability + Sync Reliability (INSERTED) `[developer-facing]`
+**Goal**: Guarantee graph context availability in all sessions via Aura-first routing, automatic local Neo4j fallback, and snapshot query fallback with explicit freshness metadata.
+**Depends on**: Phase 14.2 (Tool Calling 2.0 Integration)
+**Requirements**: AVAIL-01, AVAIL-02, AVAIL-03, AVAIL-04, AVAIL-05, AVAIL-06
+**Success Criteria** (what must be TRUE):
+  1. Graph reads succeed through one of three backends: `aura`, `local_neo4j`, or `local_snapshot`.
+  2. Session bootstrap auto-selects backend and records runtime status.
+  3. Aura outage triggers automatic local Neo4j startup attempt before snapshot fallback.
+  4. MCP outputs include `backend_source` and sync freshness indicators.
+  5. Sync mode (`auto` vs `manual`) and last successful sync are queryable through a status command.
+  6. Governance gate reports binary `GREEN`/`RED` readiness for graph availability.
+  7. Sentry issue ingestion produces normalized, deduplicated remediation signals without blocking bootstrap.
+**Plans**: 7 plans in 4 waves
+
+Plans:
+- [ ] 14.3-01-PLAN.md - Backend resolver contract + runtime manifest (Wave 1)
+- [ ] 14.3-02-PLAN.md - Shared bootstrap command + local Neo4j auto-start (Wave 1)
+- [ ] 14.3-03-PLAN.md - Sync status contract + metadata updates (Wave 2)
+- [ ] 14.3-04-PLAN.md - PreTool/session integration across local agent entry points (Wave 2)
+- [ ] 14.3-05-PLAN.md - MCP response metadata + degraded-mode guardrails (Wave 3)
+- [ ] 14.3-06-PLAN.md - Governance availability gate + integration tests (Wave 3)
+- [ ] 14.3-07-PLAN.md - Sentry issue ingestion + autonomous triage normalization (Wave 4)
+
+**Context**: See `.planning/phases/14.3-graph-availability-sync/README.md` and `.planning/phases/14.3-graph-availability-sync/14.3-PLAN.md`
+
 
 ### Phase 15: Self-Healing & Runtime Optimization `[developer-facing]`
 **Goal**: Autonomous refactoring, performance optimization, and self-healing using Phase 14's knowledge graph for intelligent decisions
@@ -535,6 +587,7 @@ Plans:
   6. Week-over-week telemetry shows consistent improvement in latency/cost/error rates
   7. Correlation between structural changes (Phase 14) and runtime failures (Phase 13.2) enables root cause detection
   8. A/B testing validates optimizations before broad rollout
+  9. Sentry incidents are closed-loop validated (issue state after remediation) before remedies are promoted into autonomous prompt memory
 **Plans**: TBD
 
 Plans:
@@ -542,6 +595,7 @@ Plans:
 - [ ] 15-02: Performance profiling and optimization agents (cache, query, cost)
 - [ ] 15-03: Self-healing workflows (vendor site monitoring, transient failure recovery)
 - [ ] 15-04: Predictive intelligence and A/B testing framework
+- [ ] 15-05: Sentry-driven issue triage, remediation closure validation, and memory promotion guardrails
 
 **Context**: See `.planning/phases/15-self-healing-dynamic-scripting/15-CONTEXT.md`
 
@@ -624,7 +678,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 14.1 -> 15
+Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 14.1 -> 14.2 -> 14.3 -> 15
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -648,4 +702,6 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
 | 14. Codebase Knowledge Graph & Continual Learning | 8/8 | Complete | 2026-02-20 |
 | 14.1. Neo4j-Vector-Hybrid-RAG Enhancement | 6/6 | Complete | 2026-02-23 |
+| 14.2. Tool Calling 2.0 Integration | 0/6 | Not started | - |
+| 14.3. Graph Availability + Sync Reliability | 0/6 | Not started | - |
 | 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |

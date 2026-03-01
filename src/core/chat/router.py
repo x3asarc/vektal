@@ -207,6 +207,10 @@ class LocalLLMClassifier:
         except ImportError:
             logger.warning("sentence-transformers not available for local classification")
             self._model = False
+        except Exception as exc:
+            # Fail open if model initialization fails (network/cache/runtime issues).
+            logger.warning("local classification unavailable: %s", exc)
+            self._model = False
 
     def classify(self, message: str) -> Optional[Intent]:
         """
@@ -482,4 +486,3 @@ class ChatRouter:
                 handler_name=intent.type.value,
                 error=str(e)
             )
-

@@ -36,6 +36,7 @@ class EpisodeType(str, Enum):
     BUG_ROOT_CAUSE_IDENTIFIED = "bug_root_cause_identified"
     QUERY_REASONING_TRACE = "query_reasoning_trace"
     GRAPH_DISCREPANCY = "graph_discrepancy"
+    TOOL_REGISTRATION = "tool_registration"
 
 
 # ===========================================
@@ -49,12 +50,14 @@ class BaseEntity(BaseModel):
     All entities must include:
     - entity_type: Discriminator for entity family
     - store_id: Multi-tenant isolation
-    - created_at: Temporal validity anchor
+    - entity_created_at: Temporal validity anchor
     - correlation_id: Lineage tracking (when available)
     """
     entity_type: str = Field(..., description="Entity type discriminator")
     store_id: str = Field(..., description="Store ID for multi-tenant isolation")
-    created_at: datetime = Field(default_factory=lambda: datetime.utcnow(), description="Entity creation timestamp (UTC)")
+    entity_created_at: datetime = Field(
+        default_factory=lambda: datetime.utcnow(), description="Entity creation timestamp (UTC)"
+    )
     correlation_id: Optional[str] = Field(None, description="Correlation ID for lineage tracking")
 
 
@@ -188,6 +191,21 @@ class ReasoningTraceEntity(BaseEntity):
     was_cache_hit: bool = Field(default=False, description="Whether response came from semantic cache")
 
 
+class ToolEntity(BaseEntity):
+    """
+    Represents a tool (MCP or assistant) in the knowledge graph.
+    """
+    entity_type: str = Field(default="tool", frozen=True)
+    name: str = Field(..., description="Tool name (e.g., 'query_graph')")
+    description: str = Field(..., description="Tool description and purpose")
+    tool_type: str = Field(..., description="Tool type: mcp or assistant")
+    tier_restriction: Optional[int] = Field(None, description="Minimum tier required (1, 2, 3)")
+    schema_json: str = Field(..., description="Full JSON schema as string")
+    schema_hash: str = Field(..., description="SHA256 hash of schema for change detection")
+    input_examples: str = Field(default="[]", description="JSON array of input examples")
+    last_updated: datetime = Field(default_factory=lambda: datetime.utcnow())
+
+
 # ===========================================
 # Edge Families
 # ===========================================
@@ -278,6 +296,22 @@ class SupersedesEdge(BaseEdge):
     reason: str = Field(..., description="Reason the previous node was superseded")
 
 
+class RequiresIntegrationEdge(BaseEdge):
+    """
+    Links a tool to an integration it depends on.
+    """
+    edge_type: str = Field(default="requires_integration", frozen=True)
+    integration_name: str = Field(..., description="Integration name (e.g., 'shopify', 'neo4j')")
+
+
+class AllowedInEdge(BaseEdge):
+    """
+    Links a tool to a tier where it is explicitly allowed.
+    """
+    edge_type: str = Field(default="allowed_in", frozen=True)
+    tier: int = Field(..., description="Tier level (1, 2, 3)")
+
+
 # ===========================================
 # Episode Payload Helper
 # ===========================================
@@ -290,7 +324,7 @@ def create_episode_payload(
     """
     Create compliant episode payload for Graphiti ingestion.
 
-    Ensures required base fields are present and adds created_at
+    Ensures required base fields are present and adds entity_created_at
     if not provided.
 
     Args:
@@ -299,7 +333,7 @@ def create_episode_payload(
         **kwargs: Additional episode-specific fields
 
     Returns:
-        Dict with episode_type, store_id, created_at, and kwargs
+        Dict with episode_type, store_id, entity_created_at, and kwargs
 
     Example:
         >>> payload = create_episode_payload(
@@ -316,8 +350,8 @@ def create_episode_payload(
         **kwargs
     }
 
-    # Add created_at if not provided
-    if 'created_at' not in payload:
-        payload['created_at'] = datetime.utcnow()
+    # Add entity_created_at if not provided
+    if 'entity_created_at' not in payload:
+        payload['entity_created_at'] = datetime.utcnow()
 
     return payload

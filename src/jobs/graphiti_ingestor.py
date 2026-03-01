@@ -10,6 +10,7 @@ Phase 13.2 - Oracle Framework Reuse
 import logging
 import hashlib
 import asyncio
+from datetime import datetime
 from typing import Optional, Dict, Any, List
 from functools import lru_cache
 
@@ -74,7 +75,7 @@ class GraphitiIngestor:
         Raises:
             ValueError: If required fields are missing
         """
-        required_fields = ['episode_type', 'store_id', 'created_at']
+        required_fields = ["episode_type", "store_id", "entity_created_at"]
         missing_fields = [field for field in required_fields if field not in episode]
 
         if missing_fields:
@@ -95,20 +96,20 @@ class GraphitiIngestor:
         Returns:
             str: Episode ID (16-char hex)
         """
-        if 'episode_id' in episode:
-            return episode['episode_id']
+        if "episode_id" in episode:
+            return episode["episode_id"]
 
         # Generate from content hash
-        # Use episode_type, store_id, and created_at as minimal key
+        # Use episode_type, store_id, and entity_created_at as minimal key
         key_parts = [
-            episode.get('episode_type', ''),
-            episode.get('store_id', ''),
-            str(episode.get('created_at', '')),
-            episode.get('correlation_id', ''),
+            episode.get("episode_type", ""),
+            episode.get("store_id", ""),
+            str(episode.get("entity_created_at", "")),
+            episode.get("correlation_id", ""),
         ]
 
-        key_string = '|'.join(key_parts)
-        hash_obj = hashlib.sha256(key_string.encode('utf-8'))
+        key_string = "|".join(key_parts)
+        hash_obj = hashlib.sha256(key_string.encode("utf-8"))
         return hash_obj.hexdigest()[:16]
 
     def _run_async(self, coro) -> Any:
@@ -181,12 +182,65 @@ class GraphitiIngestor:
 
             # Ingest episode with timeout
             async def _ingest():
-                # Wrap in timeout
                 try:
-                    # TODO: Replace with actual Graphiti client.add_episode() call
-                    # For now, simulate async operation
-                    await asyncio.sleep(0.01)
-                    return True
+                    # Map entities for Graphiti to recognize them during extraction
+                    from src.core.codebase_entities import (
+                        FileEntity,
+                        ModuleEntity,
+                        ClassEntity,
+                        FunctionEntity,
+                        PlanningDocEntity,
+                        ImportsEdge,
+                        ContainsEdge,
+                        ImplementsEdge,
+                        ReferencesEdge,
+                    )
+                    from src.core.synthex_entities import (
+                        ToolEntity,
+                        ConventionEntity,
+                        DecisionEntity,
+                        BugRootCauseEntity,
+                        RequiresIntegrationEdge,
+                        AllowedInEdge,
+                    )
+
+                    entity_types = {
+                        "File": FileEntity,
+                        "Module": ModuleEntity,
+                        "Class": ClassEntity,
+                        "Function": FunctionEntity,
+                        "PlanningDoc": PlanningDocEntity,
+                        "Tool": ToolEntity,
+                        "Convention": ConventionEntity,
+                        "Decision": DecisionEntity,
+                        "BugRootCause": BugRootCauseEntity,
+                    }
+                    edge_types = {
+                        "IMPORTS": ImportsEdge,
+                        "CONTAINS": ContainsEdge,
+                        "IMPLEMENTS": ImplementsEdge,
+                        "REFERENCES": ReferencesEdge,
+                        "REQUIRES_INTEGRATION": RequiresIntegrationEdge,
+                        "ALLOWED_IN": AllowedInEdge,
+                    }
+
+                    # Actual Graphiti client call
+                    # entity_created_at is used as reference_time, not body attribute
+                    # Use a prefix for all attributes to avoid protected names (like 'name', 'created_at')
+                    body_dict = {f"attr_{k}": v for k, v in episode.items() if k not in ("entity_created_at", "correlation_id", "store_id", "episode_type")}
+                    # Keep essential fields for manual inspection if needed
+                    body_dict["episode_type"] = episode.get("episode_type")
+                    body_dict["store_id"] = episode.get("store_id")
+
+                    return await self.client.add_episode(
+                        name=episode.get("correlation_id") or episode_id,
+                        episode_body=str(body_dict),
+                        source_description="synthex_platform",
+                        reference_time=episode.get("entity_created_at") or datetime.utcnow(),
+                        group_id=str(episode.get("store_id", "global")),
+                        entity_types=entity_types,
+                        edge_types=edge_types,
+                    )
                 except Exception as e:
                     logger.warning(f"Episode ingestion error: {e}")
                     return False
@@ -270,4 +324,39 @@ class GraphitiIngestor:
             'success': success_count,
             'failed': failed_count,
             'skipped': skipped_count
+        }
+
+    def ingest_episodes_batch(self, episodes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Ingest multiple episodes in one call.
+        
+        Provides a unified interface for batch ingestion, favoring native
+        Graphiti batch API if available, falling back to sequential loop.
+        """
+        if not episodes:
+            return {"status": "skipped", "reason": "no_episodes"}
+
+        # FAVOR: Native batch API if client supports it (check for add_episodes)
+        if hasattr(self.client, 'add_episodes'):
+            try:
+                # Assuming client.add_episodes exists and takes list + timeout
+                # This is future-proofing based on expected Graphiti API evolution
+                async def _native_batch():
+                    return await self.client.add_episodes(episodes)
+                
+                success = self._run_async(asyncio.wait_for(_native_batch(), timeout=30.0))
+                if success:
+                    return {"status": "success", "method": "native_batch", "count": len(episodes)}
+            except Exception as e:
+                logger.warning(f"Native batch ingestion failed, falling back: {e}")
+
+        # FALLBACK: Use existing ingest_batch which handles loop + dedupe
+        result = self.ingest_batch(episodes)
+        return {
+            "status": "completed",
+            "method": "fallback_loop",
+            "total": len(episodes),
+            "successful": result["success"],
+            "failed": result["failed"],
+            "skipped": result["skipped"]
         }

@@ -135,7 +135,7 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 2. Update `STATE.md`: what done, what next, open questions
 3. Learning loop — for every finding, triage as one of:
    - **Apply now** → make the change
-   - **Capture** → add to `.gemini/learnings.md` with date + context
+   - **Capture** → add to `LEARNINGS.md` with date + context
    - **Dismiss** → say why, move on
 
 ---
@@ -156,7 +156,7 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 ## Pointers
 
 `AGENTS.md` · `STANDARDS.md` · `ops/STRUCTURE_SPEC.md` · `ops/governance/roles/README.md`
-`FAILURE_JOURNEY.md` · `.gemini/learnings.md` · `docs/MASTER_MAP.md`
+`FAILURE_JOURNEY.md` · `LEARNINGS.md` · `docs/MASTER_MAP.md`
 
 **Code Factory CI layer:**
 `risk-policy.json` · `scripts/governance/risk_tier_gate.py` · `scripts/governance/sha_gate.py`

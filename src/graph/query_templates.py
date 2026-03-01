@@ -115,6 +115,36 @@ QUERY_TEMPLATES = {
         RETURN e.query_text as query_text, e.paths as paths, e.created_at as created_at
         ORDER BY e.created_at DESC
         LIMIT $limit
+    """,
+
+    "tool_search": """
+        CALL db.index.vector.queryNodes('tool_embedding_index', $top_k, $query_embedding)
+        YIELD node, score
+        WHERE node:Tool
+        AND ($tier IS NULL OR EXISTS {
+            MATCH (node)-[:ALLOWED_IN]->(tier:Tier {level: $tier})
+        })
+        RETURN node.name AS name,
+               node.description AS description,
+               node.schema_json AS schema,
+               node.input_examples AS examples,
+               score
+        ORDER BY score DESC
+        LIMIT $top_k
+    """,
+
+    "tool_search_text": """
+        MATCH (t:Tool)
+        WHERE (t.description CONTAINS $query OR t.name CONTAINS $query)
+        AND ($tier IS NULL OR EXISTS {
+            MATCH (t)-[:ALLOWED_IN]->(tier:Tier {level: $tier})
+        })
+        RETURN t.name AS name,
+               t.description AS description,
+               t.schema_json AS schema,
+               t.input_examples AS examples,
+               1.0 AS score
+        LIMIT $top_k
     """
 }
 
@@ -219,24 +249,16 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         if not hasattr(driver, "execute_query"):
             raise AttributeError("driver.execute_query unavailable")
 
-        query_call_error: Optional[Exception] = None
-        query_result: Any = None
-        for kwargs in (
-            {"parameters_": params},
-            {"params": params},
-            {"parameters": params},
-            {},
-        ):
+        # Standard Neo4j 5.x AsyncDriver.execute_query signature uses query_ and parameters_
+        # We wrap the call to handle potential sync/async driver variations gracefully
+        try:
+            query_result = driver.execute_query(cypher, parameters_=params)
+        except TypeError:
+            # Fallback for older drivers or different signatures
             try:
-                query_result = driver.execute_query(cypher, **kwargs)
-                query_call_error = None
-                break
-            except TypeError as exc:
-                query_call_error = exc
-                continue
-
-        if query_call_error is not None:
-            raise query_call_error
+                query_result = driver.execute_query(cypher, parameters=params)
+            except TypeError:
+                query_result = driver.execute_query(cypher, params=params)
 
         if inspect.isawaitable(query_result):
             async def _await_query() -> List[Dict[str, Any]]:
