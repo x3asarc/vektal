@@ -6,14 +6,15 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
-# Setup environment for localhost connection
-# Using credentials from .env
-os.environ['DATABASE_URL'] = 'postgresql+psycopg://admin:An0th3rStr4wngH3ld3nV4nH3Vt3@localhost:5432/shopify_platform'
-
 from src.models.pending_approvals import PendingApproval
 from src.app_factory import create_app
 
 def create_test_approval():
+    # The app should load DB settings from the existing environment/.env.
+    if not os.getenv("DATABASE_URL"):
+        print("DATABASE_URL is not set; skipping test approval creation.")
+        return
+
     app = create_app()
     with app.app_context():
         approval = PendingApproval.create_approval(

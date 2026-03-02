@@ -78,6 +78,7 @@ services:
       - API_VERSION=${API_VERSION:-2024-01}
       - APP_URL=${APP_URL}
       - FRONTEND_URL=${FRONTEND_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
       # Neo4j graph database (Phase 13.2)
       - NEO4J_URI=${NEO4J_URI}
       - NEO4J_USER=${NEO4J_USER}
@@ -152,7 +153,7 @@ services:
       --loglevel=info
       --concurrency=${CELERY_INTERACTIVE_CONCURRENCY:-2}
       --hostname=interactive@%h
-      -Q control,interactive.t1,interactive.t2,interactive.t3
+      -Q control,interactive.t1,interactive.t2,interactive.t3,assistant.t1,assistant.t2,assistant.t3,assistant.t3.dlq
     depends_on:
       db:
         condition: service_healthy
@@ -410,4 +411,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-
