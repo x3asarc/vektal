@@ -1,4 +1,4 @@
-﻿# MASTER_MAP
+# MASTER_MAP
 
 Last batch update: 2026-03-02
 Owner: ContextCurator
@@ -23,11 +23,11 @@ Owner: ContextCurator
 |-- frontend/
 |-- scripts/
 |-- ops/
-`-- (full tracked manifest listed below)
+`-- (full tracked filesystem tree listed below)
 ```
 
 ## Module Index
-1. Full repository tracking snapshot: `1741` git-tracked paths (from `git ls-files`).
+1. Full repository tracking snapshot: `1739` git-tracked paths (from `git ls-files`).
 2. Top-level tracked path counts:
 - `.claude`: `165`
 - `.codex`: `5`
@@ -58,7 +58,7 @@ Owner: ContextCurator
 - `demo_framework.py`: `1`
 - `docker-compose.secrets.yml`: `1`
 - `docker-compose.yml`: `1`
-- `docs`: `51`
+- `docs`: `49`
 - `frontend`: `130`
 - `gunicorn_config.py`: `1`
 - `migrations`: `22`
@@ -108,1749 +108,2052 @@ Owner: ContextCurator
 3. Next required synthesis: end of the next 3-phase window.
 
 ## GitHub Tracked File Manifest (Complete)
-Tracked path count: `1741`
+Tracked path count: `1739`
 
 ```text
-.claude/AUTOMATIC_VERIFICATION_ENABLED.md
-.claude/HOOKS_GUIDE.md
-.claude/MVP_IMPLEMENTATION_COMPLETE.md
-.claude/PROGRESSIVE_VERIFICATION_QUICKSTART.md
-.claude/SESSION_PRIMER_TEMPLATE.md
-.claude/agents/change-verifier.md
-.claude/agents/code-generator.md
-.claude/agents/gsd-codebase-mapper.md
-.claude/agents/gsd-debugger.md
-.claude/agents/gsd-executor.md
-.claude/agents/gsd-integration-checker.md
-.claude/agents/gsd-phase-research-deep.md
-.claude/agents/gsd-phase-researcher.md
-.claude/agents/gsd-plan-checker.md
-.claude/agents/gsd-planner.md
-.claude/agents/gsd-project-researcher.md
-.claude/agents/gsd-research-synthesizer.md
-.claude/agents/gsd-roadmapper.md
-.claude/agents/gsd-verifier.md
-.claude/auto-improver/README.md
-.claude/auto-improver/on_execution_complete.py
-.claude/auto-improver/pattern_detector_file_based.py
-.claude/auto-improver/pattern_detector_graph.py
-.claude/checkpoints/checkpoint_1_discussion.sh
-.claude/checkpoints/checkpoint_2_research.sh
-.claude/checkpoints/checkpoint_3_plan.sh
-.claude/checkpoints/checkpoint_4_execution.sh
-.claude/checkpoints/checkpoint_4_post_hook.sh
-.claude/commands/gsd/add-phase.md
-.claude/commands/gsd/add-todo.md
-.claude/commands/gsd/audit-milestone.md
-.claude/commands/gsd/check-todos.md
-.claude/commands/gsd/complete-milestone.md
-.claude/commands/gsd/compound-execute.md
-.claude/commands/gsd/debug.md
-.claude/commands/gsd/discuss-phase.md
-.claude/commands/gsd/execute-phase.md
-.claude/commands/gsd/help.md
-.claude/commands/gsd/insert-phase.md
-.claude/commands/gsd/join-discord.md
-.claude/commands/gsd/list-phase-assumptions.md
-.claude/commands/gsd/map-codebase.md
-.claude/commands/gsd/new-milestone.md
-.claude/commands/gsd/new-project.md
-.claude/commands/gsd/new-project.md.bak
-.claude/commands/gsd/pause-work.md
-.claude/commands/gsd/plan-milestone-gaps.md
-.claude/commands/gsd/plan-phase.md
-.claude/commands/gsd/progress.md
-.claude/commands/gsd/quick.md
-.claude/commands/gsd/reapply-patches.md
-.claude/commands/gsd/remove-phase.md
-.claude/commands/gsd/research-phase.md
-.claude/commands/gsd/resume-work.md
-.claude/commands/gsd/set-profile.md
-.claude/commands/gsd/settings.md
-.claude/commands/gsd/update.md
-.claude/commands/gsd/verify-work.md
-.claude/escalations/pending-improvements.json
-.claude/get-shit-done/VERSION
-.claude/get-shit-done/bin/gsd-tools.js
-.claude/get-shit-done/bin/gsd-tools.test.js
-.claude/get-shit-done/references/checkpoints.md
-.claude/get-shit-done/references/continuation-format.md
-.claude/get-shit-done/references/decimal-phase-calculation.md
-.claude/get-shit-done/references/git-integration.md
-.claude/get-shit-done/references/git-planning-commit.md
-.claude/get-shit-done/references/model-profile-resolution.md
-.claude/get-shit-done/references/model-profiles.md
-.claude/get-shit-done/references/phase-argument-parsing.md
-.claude/get-shit-done/references/planning-config.md
-.claude/get-shit-done/references/questioning.md
-.claude/get-shit-done/references/tdd.md
-.claude/get-shit-done/references/ui-brand.md
-.claude/get-shit-done/references/verification-patterns.md
-.claude/get-shit-done/templates/DEBUG.md
-.claude/get-shit-done/templates/UAT.md
-.claude/get-shit-done/templates/codebase/architecture.md
-.claude/get-shit-done/templates/codebase/concerns.md
-.claude/get-shit-done/templates/codebase/conventions.md
-.claude/get-shit-done/templates/codebase/integrations.md
-.claude/get-shit-done/templates/codebase/stack.md
-.claude/get-shit-done/templates/codebase/structure.md
-.claude/get-shit-done/templates/codebase/testing.md
-.claude/get-shit-done/templates/config.json
-.claude/get-shit-done/templates/context.md
-.claude/get-shit-done/templates/continue-here.md
-.claude/get-shit-done/templates/debug-subagent-prompt.md
-.claude/get-shit-done/templates/discovery.md
-.claude/get-shit-done/templates/milestone-archive.md
-.claude/get-shit-done/templates/milestone.md
-.claude/get-shit-done/templates/phase-prompt.md
-.claude/get-shit-done/templates/planner-subagent-prompt.md
-.claude/get-shit-done/templates/project.md
-.claude/get-shit-done/templates/requirements.md
-.claude/get-shit-done/templates/research-project/ARCHITECTURE.md
-.claude/get-shit-done/templates/research-project/FEATURES.md
-.claude/get-shit-done/templates/research-project/PITFALLS.md
-.claude/get-shit-done/templates/research-project/STACK.md
-.claude/get-shit-done/templates/research-project/SUMMARY.md
-.claude/get-shit-done/templates/research.md
-.claude/get-shit-done/templates/roadmap.md
-.claude/get-shit-done/templates/state.md
-.claude/get-shit-done/templates/summary-complex.md
-.claude/get-shit-done/templates/summary-minimal.md
-.claude/get-shit-done/templates/summary-standard.md
-.claude/get-shit-done/templates/summary.md
-.claude/get-shit-done/templates/user-setup.md
-.claude/get-shit-done/templates/verification-report.md
-.claude/get-shit-done/workflows/add-phase.md
-.claude/get-shit-done/workflows/add-todo.md
-.claude/get-shit-done/workflows/audit-milestone.md
-.claude/get-shit-done/workflows/check-todos.md
-.claude/get-shit-done/workflows/complete-milestone.md
-.claude/get-shit-done/workflows/compound-execute.md
-.claude/get-shit-done/workflows/diagnose-issues.md
-.claude/get-shit-done/workflows/discovery-phase.md
-.claude/get-shit-done/workflows/discuss-phase.md
-.claude/get-shit-done/workflows/execute-phase.md
-.claude/get-shit-done/workflows/execute-plan.md
-.claude/get-shit-done/workflows/help.md
-.claude/get-shit-done/workflows/insert-phase.md
-.claude/get-shit-done/workflows/list-phase-assumptions.md
-.claude/get-shit-done/workflows/map-codebase.md
-.claude/get-shit-done/workflows/new-milestone.md
-.claude/get-shit-done/workflows/new-project.md
-.claude/get-shit-done/workflows/pause-work.md
-.claude/get-shit-done/workflows/plan-milestone-gaps.md
-.claude/get-shit-done/workflows/plan-phase.md
-.claude/get-shit-done/workflows/progress.md
-.claude/get-shit-done/workflows/quick.md
-.claude/get-shit-done/workflows/remove-phase.md
-.claude/get-shit-done/workflows/research-phase.md
-.claude/get-shit-done/workflows/resume-project.md
-.claude/get-shit-done/workflows/set-profile.md
-.claude/get-shit-done/workflows/settings.md
-.claude/get-shit-done/workflows/transition.md
-.claude/get-shit-done/workflows/update.md
-.claude/get-shit-done/workflows/verify-phase.md
-.claude/get-shit-done/workflows/verify-work.md
-.claude/gsd-file-manifest.json
-.claude/hooks/check-pending-improvements.py
-.claude/hooks/gsd-check-update.js
-.claude/hooks/gsd-statusline.js
-.claude/hooks/start-health-daemon.py
-.claude/learnings.md
-.claude/metrics/13.2/13.2-01.json
-.claude/metrics/test/test-01.json
-.claude/metrics/test/test-02.json
-.claude/metrics/test/test-03.json
-.claude/metrics/test/test-04.json
-.claude/plugins/ralph-wiggum/.claude-plugin/plugin.json
-.claude/plugins/ralph-wiggum/README.md
-.claude/plugins/ralph-wiggum/commands/cancel-ralph.md
-.claude/plugins/ralph-wiggum/commands/quality-loop.md
-.claude/plugins/ralph-wiggum/commands/ralph-loop.md
-.claude/plugins/ralph-wiggum/hooks/hooks.json
-.claude/plugins/ralph-wiggum/hooks/stop-hook.sh
-.claude/plugins/ralph-wiggum/scripts/setup-ralph-loop.sh
-.claude/settings.json
-.claude/settings.local.json
-.claude/skills/quality-loop.yaml
-.claude/skills/seo-update.yaml
-.claude/skills/verify-phase/SKILL.md
-.claude/skills/verify-phase/verify.sh
-.codex/SESSION_PRIMER_TEMPLATE.md
-.codex/hooks/start-health-daemon.py
-.codex/learnings.md
-.codex/preToolUseHook.sh
-.codex/settings.json
-.env.example
-.gemini/SESSION_PRIMER_TEMPLATE.md
-.gemini/hooks/start-health-daemon.py
-.gemini/learnings.md
-.gemini/preToolUseHook.sh
-.gemini/settings.json
-.gitattributes
-.github/workflows/auto-remediate.yml
-.github/workflows/ci-backend.yml
-.github/workflows/phase13-deploy-guard.yml
-.github/workflows/resolve-bot-threads.yml
-.github/workflows/review-agent-rerun.yml
-.github/workflows/risk-policy-gate.yml
-.gitignore
-.obsidian/app.json
-.obsidian/appearance.json
-.obsidian/core-plugins.json
-.obsidian/graph.json
-.obsidian/workspace.json
-.planning/AGENTS.override.md
-.planning/DIRTY_WORKTREE_REPORT.md
-.planning/INCIDENT_LOG.md
-.planning/KNOWLEDGE_GRAPH_ORACLE.md
-.planning/MILESTONES.md
-.planning/PROJECT.md
-.planning/REQUIREMENTS.md
-.planning/ROADMAP.md
-.planning/STATE.md
-.planning/TOOL_CALLING_2_INTEGRATION.md
-.planning/archive/README.md
-.planning/config.json
-.planning/debug/chat-unfilled-template-and-ingest-broken.md
-.planning/debug/live-authenticated-playwright-pass.md
-.planning/debug/url-frontdoor-restoration-vektal.md
-.planning/debug/vektal-domain-cutover-not-reachable.md
-.planning/enhancements/GSD_PROGRESSIVE_VERIFICATION.md
-.planning/phases/01-codebase-cleanup-analysis/01-01-PLAN.md
-.planning/phases/01-codebase-cleanup-analysis/01-01-SUMMARY.md
-.planning/phases/01-codebase-cleanup-analysis/01-02-PLAN.md
-.planning/phases/01-codebase-cleanup-analysis/01-02-SUMMARY.md
-.planning/phases/01-codebase-cleanup-analysis/01-03-PLAN.md
-.planning/phases/01-codebase-cleanup-analysis/01-03-SUMMARY.md
-.planning/phases/01-codebase-cleanup-analysis/01-RESEARCH.md
-.planning/phases/01-codebase-cleanup-analysis/01-VERIFICATION.md
-.planning/phases/01.1-root-documentation-organization/01.1-01-PLAN.md
-.planning/phases/01.1-root-documentation-organization/01.1-01-SUMMARY.md
-.planning/phases/01.1-root-documentation-organization/01.1-02-PLAN.md
-.planning/phases/01.1-root-documentation-organization/01.1-02-SUMMARY.md
-.planning/phases/01.1-root-documentation-organization/01.1-03-PLAN.md
-.planning/phases/01.1-root-documentation-organization/01.1-03-SUMMARY.md
-.planning/phases/01.1-root-documentation-organization/01.1-VERIFICATION.md
-.planning/phases/01.1-root-documentation-organization/VERIFICATION_SUMMARY.txt
-.planning/phases/02-docker-infrastructure-foundation/02-01-PLAN.md
-.planning/phases/02-docker-infrastructure-foundation/02-01-SUMMARY.md
-.planning/phases/02-docker-infrastructure-foundation/02-02-PLAN.md
-.planning/phases/02-docker-infrastructure-foundation/02-02-SUMMARY.md
-.planning/phases/02-docker-infrastructure-foundation/02-03-PLAN.md
-.planning/phases/02-docker-infrastructure-foundation/02-03-SUMMARY.md
-.planning/phases/02-docker-infrastructure-foundation/02-04-PLAN.md
-.planning/phases/02-docker-infrastructure-foundation/02-04-SUMMARY.md
-.planning/phases/02-docker-infrastructure-foundation/02-CONTEXT.md
-.planning/phases/02-docker-infrastructure-foundation/02-RESEARCH.md
-.planning/phases/02-docker-infrastructure-foundation/02-UAT.md
-.planning/phases/02-docker-infrastructure-foundation/02-VERIFICATION.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-01-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-01-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-02-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-02-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-03-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-03-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-04-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-04-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-05-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-05-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-06-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-06-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-07-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-07-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-08-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-08-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-09-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-09-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-10-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-10-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-11-PLAN.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-11-SUMMARY.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-RESEARCH.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-VERIFICATION-backup.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-VERIFICATION-old.md
-.planning/phases/02.1-universal-vendor-scraping-engine/02.1-VERIFICATION.md
-.planning/phases/02.1-universal-vendor-scraping-engine/README.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-01-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-01-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-02-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-02-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-03-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-03-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-04-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-04-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-05-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-05-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-06-PLAN.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-06-SUMMARY.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-CONTEXT.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-RESEARCH.md
-.planning/phases/02.2-product-enrichment-pipeline/02.2-VERIFICATION.md
-.planning/phases/02.2-product-enrichment-pipeline/ENHANCEMENTS.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-01-PLAN.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-01-SUMMARY.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-02-PLAN.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-02-SUMMARY.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-03-PLAN.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-03-SUMMARY.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-04-PLAN.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-04-SUMMARY.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-05-PLAN.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-05-SUMMARY.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-RESEARCH.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/03-VERIFICATION.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/PHASE3_VERIFICATION.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/PHASE3_VERIFICATION_COMPLETE.md
-.planning/phases/03-database-migration-sqlite-to-postgresql/PHASE3_VERIFICATION_STATUS.md
-.planning/phases/04-authentication-user-management/04-01-PLAN.md
-.planning/phases/04-authentication-user-management/04-01-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-02-PLAN.md
-.planning/phases/04-authentication-user-management/04-02-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-03-PLAN.md
-.planning/phases/04-authentication-user-management/04-03-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-03-USER-SETUP.md
-.planning/phases/04-authentication-user-management/04-04-PLAN.md
-.planning/phases/04-authentication-user-management/04-04-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-04-USER-SETUP.md
-.planning/phases/04-authentication-user-management/04-05-IMPLEMENTATION-NOTES.md
-.planning/phases/04-authentication-user-management/04-05-PLAN.md
-.planning/phases/04-authentication-user-management/04-05-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-05-USER-SETUP.md
-.planning/phases/04-authentication-user-management/04-06-PLAN.md
-.planning/phases/04-authentication-user-management/04-06-SUMMARY.md
-.planning/phases/04-authentication-user-management/04-CONTEXT.md
-.planning/phases/04-authentication-user-management/04-PRICING-ANALYSIS.md
-.planning/phases/04-authentication-user-management/04-RESEARCH.md
-.planning/phases/04-authentication-user-management/04-UAT.md
-.planning/phases/04-authentication-user-management/STRIPE_WEBHOOK_INTEGRATION_STATUS.md
-.planning/phases/05-backend-api-design/05-01-PLAN-CODEX.md
-.planning/phases/05-backend-api-design/05-01-PLAN.md
-.planning/phases/05-backend-api-design/05-01-SUMMARY.md
-.planning/phases/05-backend-api-design/05-02-PLAN-CODEX.md
-.planning/phases/05-backend-api-design/05-02-PLAN.md
-.planning/phases/05-backend-api-design/05-02-SUMMARY.md
-.planning/phases/05-backend-api-design/05-03-PLAN.md
-.planning/phases/05-backend-api-design/05-03-SUMMARY.md
-.planning/phases/05-backend-api-design/05-04-01-PLAN.md
-.planning/phases/05-backend-api-design/05-04-01-SUMMARY.md
-.planning/phases/05-backend-api-design/05-04-PLAN.md
-.planning/phases/05-backend-api-design/05-04-SUMMARY.md
-.planning/phases/05-backend-api-design/05-05-PLAN.md
-.planning/phases/05-backend-api-design/05-05-SUMMARY.md
-.planning/phases/05-backend-api-design/05-CONTEXT.md
-.planning/phases/05-backend-api-design/05-RESEARCH-CODEX.md
-.planning/phases/05-backend-api-design/05-RESEARCH.md
-.planning/phases/05-backend-api-design/05-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-01-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-01-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-02-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-02-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-03-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-03-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-04-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-04-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-05-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-05-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-06-PLAN.md
-.planning/phases/06-job-processing-infrastructure-celery/06-06-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-CONTEXT.md
-.planning/phases/06-job-processing-infrastructure-celery/06-POST-UAT-WORKTREE-INVENTORY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-RESEARCH.md
-.planning/phases/06-job-processing-infrastructure-celery/06-SUMMARY.md
-.planning/phases/06-job-processing-infrastructure-celery/06-UAT.md
-.planning/phases/06-job-processing-infrastructure-celery/06-VERIFICATION.md
-.planning/phases/07-frontend-framework-setup/07-01-PLAN.md
-.planning/phases/07-frontend-framework-setup/07-01-SUMMARY.md
-.planning/phases/07-frontend-framework-setup/07-01-currentstate.md
-.planning/phases/07-frontend-framework-setup/07-02-PLAN.md
-.planning/phases/07-frontend-framework-setup/07-02-SUMMARY.md
-.planning/phases/07-frontend-framework-setup/07-03-PLAN.md
-.planning/phases/07-frontend-framework-setup/07-03-SUMMARY.md
-.planning/phases/07-frontend-framework-setup/07-CONTEXT.md
-.planning/phases/07-frontend-framework-setup/07-DISCOVERY.md
-.planning/phases/07-frontend-framework-setup/07-MODULE-BOUNDARY-MAP.md
-.planning/phases/07-frontend-framework-setup/07-PLANNING-COVERAGE.md
-.planning/phases/07-frontend-framework-setup/07-RESEARCH.md
-.planning/phases/07-frontend-framework-setup/07-UAT.md
-.planning/phases/07-frontend-framework-setup/07.1-governance-baseline/PLAN.md
-.planning/phases/07-frontend-framework-setup/07.2-governance-operational-defaults/PLAN.md
-.planning/phases/08-product-resolution-engine/08-01-PLAN.md
-.planning/phases/08-product-resolution-engine/08-01-SUMMARY.md
-.planning/phases/08-product-resolution-engine/08-02-PLAN.md
-.planning/phases/08-product-resolution-engine/08-02-SUMMARY.md
-.planning/phases/08-product-resolution-engine/08-03-PLAN.md
-.planning/phases/08-product-resolution-engine/08-03-SUMMARY.md
-.planning/phases/08-product-resolution-engine/08-04-PLAN.md
-.planning/phases/08-product-resolution-engine/08-04-SUMMARY.md
-.planning/phases/08-product-resolution-engine/08-CONTEXT.md
-.planning/phases/08-product-resolution-engine/08-PLANNING-COVERAGE.md
-.planning/phases/08-product-resolution-engine/08-RESEARCH.md
-.planning/phases/08-product-resolution-engine/08-UAT.md
-.planning/phases/08-product-resolution-engine/08-VERIFICATION.md
-.planning/phases/09-real-time-progress-tracking/09-01-PLAN.md
-.planning/phases/09-real-time-progress-tracking/09-01-SUMMARY.md
-.planning/phases/09-real-time-progress-tracking/09-02-PLAN.md
-.planning/phases/09-real-time-progress-tracking/09-02-SUMMARY.md
-.planning/phases/09-real-time-progress-tracking/09-CONTEXT.md
-.planning/phases/09-real-time-progress-tracking/09-PLANNING-COVERAGE.md
-.planning/phases/09-real-time-progress-tracking/09-RESEARCH.md
-.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md
-.planning/phases/10-conversational-ai-interface/10-01-PLAN.md
-.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md
-.planning/phases/10-conversational-ai-interface/10-02-PLAN.md
-.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md
-.planning/phases/10-conversational-ai-interface/10-03-PLAN.md
-.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md
-.planning/phases/10-conversational-ai-interface/10-04-PLAN.md
-.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md
-.planning/phases/10-conversational-ai-interface/10-CONTEXT.md
-.planning/phases/10-conversational-ai-interface/10-PLANNING-COVERAGE.md
-.planning/phases/10-conversational-ai-interface/10-RESEARCH.md
-.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md
-.planning/phases/11-product-search-discovery/11-01-PLAN.md
-.planning/phases/11-product-search-discovery/11-01-SUMMARY.md
-.planning/phases/11-product-search-discovery/11-02-PLAN.md
-.planning/phases/11-product-search-discovery/11-02-SUMMARY.md
-.planning/phases/11-product-search-discovery/11-03-PLAN.md
-.planning/phases/11-product-search-discovery/11-03-SUMMARY.md
-.planning/phases/11-product-search-discovery/11-CONTEXT.md
-.planning/phases/11-product-search-discovery/11-PLANNING-COVERAGE.md
-.planning/phases/11-product-search-discovery/11-RESEARCH.md
-.planning/phases/11-product-search-discovery/11-VERIFICATION.md
-.planning/phases/11-product-search-discovery/GOV_REL_GLOSSARY.md
-.planning/phases/12-tier-system-architecture/12-01-PLAN.md
-.planning/phases/12-tier-system-architecture/12-01-SUMMARY.md
-.planning/phases/12-tier-system-architecture/12-02-PLAN.md
-.planning/phases/12-tier-system-architecture/12-02-SUMMARY.md
-.planning/phases/12-tier-system-architecture/12-03-PLAN.md
-.planning/phases/12-tier-system-architecture/12-03-SUMMARY.md
-.planning/phases/12-tier-system-architecture/12-CONTEXT.md
-.planning/phases/12-tier-system-architecture/12-PLANNING-COVERAGE.md
-.planning/phases/12-tier-system-architecture/12-PRE-CONTEXT-SCOPE.md
-.planning/phases/12-tier-system-architecture/12-RESEARCH.md
-.planning/phases/12-tier-system-architecture/12-VERIFICATION.md
-.planning/phases/13-integration-hardening-deployment/13-01-PLAN.md
-.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md
-.planning/phases/13-integration-hardening-deployment/13-02-PLAN.md
-.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md
-.planning/phases/13-integration-hardening-deployment/13-03-PLAN.md
-.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md
-.planning/phases/13-integration-hardening-deployment/13-04-PLAN.md
-.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md
-.planning/phases/13-integration-hardening-deployment/13-CONTEXT.md
-.planning/phases/13-integration-hardening-deployment/13-PLANNING-COVERAGE.md
-.planning/phases/13-integration-hardening-deployment/13-PRE-CONTEXT-SCOPE.md
-.planning/phases/13-integration-hardening-deployment/13-RESEARCH-core.md
-.planning/phases/13-integration-hardening-deployment/13-RESEARCH-deep.md
-.planning/phases/13-integration-hardening-deployment/13-RESEARCH.md
-.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-PLAN.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-PLAN.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-PLAN.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-PLAN.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-CONTEXT.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PLANNING-COVERAGE.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-PRE-CONTEXT-SCOPE.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-RESEARCH-core.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-RESEARCH-deep.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-RESEARCH.md
-.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-01-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-01-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-02-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-02-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-03-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-03-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-04-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-04-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-05-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-05-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-06-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-06-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-07-PLAN.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-07-SUMMARY.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-PLANNING-COVERAGE.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-PRE-CONTEXT-SCOPE.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-VERIFICATION.md
-.planning/phases/13.2-oracle-framework-reuse/13.2-VERIFICATION.md.backup
-.planning/phases/14-continuous-optimization-learning/14-01-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-01-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-02-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-02-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-03-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-03-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-04-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-04-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-05-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-05-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-06-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-06-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-07-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-07-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-08-PLAN.md
-.planning/phases/14-continuous-optimization-learning/14-08-SUMMARY.md
-.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md
-.planning/phases/14-continuous-optimization-learning/14-DISCUSSION-STATE.md
-.planning/phases/14-continuous-optimization-learning/14-STATE-AFTER.md
-.planning/phases/14-continuous-optimization-learning/README.md
-.planning/phases/14.1-rag-enhancement/14.1-01-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-01-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-02-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-02-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-03-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-03-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-04-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-04-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-05-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-05-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-06-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-06-SUMMARY.md
-.planning/phases/14.1-rag-enhancement/14.1-CROSS-REFERENCE.md
-.planning/phases/14.1-rag-enhancement/14.1-EXECUTION-VALIDATION.md
-.planning/phases/14.1-rag-enhancement/14.1-PLAN-VALIDATION.md
-.planning/phases/14.1-rag-enhancement/14.1-PLAN.md
-.planning/phases/14.1-rag-enhancement/14.1-RESEARCH.md
-.planning/phases/14.1-rag-enhancement/14.1-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-01-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-01-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-02-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-02-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-03-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-03-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-04-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-04-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-05-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-05-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-06-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-06-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-07-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-07-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/14.2-PLAN.md
-.planning/phases/14.2-tool-calling-v2/14.2-RESEARCH.md
-.planning/phases/14.2-tool-calling-v2/PLANNING-SUMMARY.md
-.planning/phases/14.2-tool-calling-v2/README.md
-.planning/phases/14.3-graph-availability-sync/14.3-01-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-01-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-02-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-02-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-03-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-03-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-04-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-04-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-05-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-05-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-06-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-06-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-07-PLAN.md
-.planning/phases/14.3-graph-availability-sync/14.3-07-SUMMARY.md
-.planning/phases/14.3-graph-availability-sync/14.3-CONTEXT.md
-.planning/phases/14.3-graph-availability-sync/14.3-RESEARCH.md
-.planning/phases/14.3-graph-availability-sync/14.3-VERIFICATION-GATE.md
-.planning/phases/14.3-graph-availability-sync/README.md
-.planning/phases/15-self-healing-dynamic-scripting/15-01-03-VERIFICATION-GATE.md
-.planning/phases/15-self-healing-dynamic-scripting/15-01-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-01-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-02-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-02-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-03-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-03-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-04-08-VERIFICATION-GATE.md
-.planning/phases/15-self-healing-dynamic-scripting/15-04-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-04-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-05-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-05-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-06-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-06-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-07-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-07-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-08-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-08-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-09-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-09-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-10-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-10-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-11a-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-11a-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-11b-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-11b-SUMMARY.md
-.planning/phases/15-self-healing-dynamic-scripting/15-ARCHITECTURE-LOCKED.md
-.planning/phases/15-self-healing-dynamic-scripting/15-CONTEXT.md
-.planning/phases/15-self-healing-dynamic-scripting/15-PLAN.md
-.planning/phases/15-self-healing-dynamic-scripting/15-PRE-CONTEXT-SCOPE.md
-.planning/phases/15-self-healing-dynamic-scripting/15-RESEARCH.md
-.planning/phases/15-self-healing-dynamic-scripting/15-UAT.md
-.planning/phases/15-self-healing-dynamic-scripting/RESEARCH-COMPLETION.md
-.planning/phases/15-self-healing-dynamic-scripting/changes.md
-.planning/phases/15-self-healing-dynamic-scripting/health-daemon-implementation-summary.md
-.planning/phases/15-self-healing-dynamic-scripting/research.md
-.planning/quick/1-os-self-actualization/1-PLAN.md
-.planning/quick/1-os-self-actualization/1-SUMMARY.md
-.planning/research/ARCHITECTURE.md
-.planning/research/FEATURES.md
-.planning/research/PITFALLS.md
-.planning/research/RUVECTOR-LEARNINGS.md
-.planning/research/STACK.md
-.planning/research/SUMMARY.md
-.pre-commit-config.yaml
-.rules
-.verb.md
-AGENTS.md
-ARCHITECTURE.md
-CLAUDE.md
-Dockerfile.backend
-FAILURE_JOURNEY.md
-GEMINI.md
-HARNESS_GAPS.md
-LEARNINGS.md
-README.md
-STANDARDS.md
-Vektal/.obsidian/app.json
-Vektal/.obsidian/appearance.json
-Vektal/.obsidian/core-plugins.json
-Vektal/.obsidian/graph.json
-Vektal/.obsidian/workspace.json
-Vektal/Welcome.md
-archive/2026-directories/cli-old-argparse/__init__.py
-archive/2026-directories/cli-old-argparse/bulk/__init__.py
-archive/2026-directories/cli-old-argparse/bulk/push_images_only.py
-archive/2026-directories/cli-old-argparse/bulk/push_metadata_only.py
-archive/2026-directories/cli-old-argparse/main.py
-archive/2026-directories/cli-old-argparse/pentart/__init__.py
-archive/2026-directories/cli-old-argparse/pentart/pentart_manager.py
-archive/2026-directories/cli-old-argparse/products/__init__.py
-archive/2026-directories/cli-old-argparse/products/check_product.py
-archive/2026-directories/cli-old-argparse/products/find_and_update_by_barcode.py
-archive/2026-directories/cli-old-argparse/products/find_and_update_sku.py
-archive/2026-directories/cli-old-argparse/products/quick_update_product.py
-archive/2026-directories/cli-old-argparse/products/update_barcode_product.py
-archive/2026-directories/cli-old-argparse/products/update_pentart_barcode.py
-archive/2026-directories/cli-old-argparse/products/update_pentart_product.py
-archive/2026-directories/cli-old-argparse/products/update_sku.py
-archive/2026-directories/cli-old-argparse/products/update_sku_rest.py
-archive/2026-directories/cli-old-argparse/products/update_via_rest.py
-archive/2026-directories/cli-old-argparse/search/__init__.py
-archive/2026-directories/cli-old-argparse/search/get_barcode.py
-archive/2026-directories/cli-old-argparse/search/scrape_pentacolor_images.py
-archive/2026-directories/cli-old-argparse/search/scrape_pentart_sku.py
-archive/2026-directories/cli-old-argparse/search/search_barcode.py
-archive/2026-directories/cli-old-argparse/temu_exporter.py
-archive/2026-directories/cli-old-argparse/vision/generate_vision_alt_text.py
-archive/2026-directories/orchestrator-quality-experiment/__init__.py
-archive/2026-directories/orchestrator-quality-experiment/product_quality_agent.py
-archive/2026-directories/orchestrator-quality-experiment/quality_loop_ralph.py
-archive/2026-directories/orchestrator-quality-experiment/trigger_quality_check.py
-archive/2026-directories/scripts-utility-operations/add_metadata_columns.py
-archive/2026-directories/scripts-utility-operations/amend_handles.py
-archive/2026-directories/scripts-utility-operations/analyze_timing.py
-archive/2026-directories/scripts-utility-operations/audit_v3.py
-archive/2026-directories/scripts-utility-operations/auto_organize.py
-archive/2026-directories/scripts-utility-operations/bulk_update_pentart_shopify.py
-archive/2026-directories/scripts-utility-operations/clean_push_proof.py
-archive/2026-directories/scripts-utility-operations/cleanup_shopify_tags.py
-archive/2026-directories/scripts-utility-operations/cleanup_workspace.py
-archive/2026-directories/scripts-utility-operations/debug_ddg.py
-archive/2026-directories/scripts-utility-operations/debug_ean.py
-archive/2026-directories/scripts-utility-operations/dedupe_not_found.py
-archive/2026-directories/scripts-utility-operations/export_farbe_metafields.py
-archive/2026-directories/scripts-utility-operations/export_paperdesigns.py
-archive/2026-directories/scripts-utility-operations/export_shared_clusters.py
-archive/2026-directories/scripts-utility-operations/extract_missing_proofs.py
-archive/2026-directories/scripts-utility-operations/find_correct_eans.py
-archive/2026-directories/scripts-utility-operations/find_dupes.py
-archive/2026-directories/scripts-utility-operations/fix_itd_pricing.py
-archive/2026-directories/scripts-utility-operations/import_pentart_catalog.py
-archive/2026-directories/scripts-utility-operations/itd_debug.py
-archive/2026-directories/scripts-utility-operations/list_collections.py
-archive/2026-directories/scripts-utility-operations/list_vendors.py
-archive/2026-directories/scripts-utility-operations/not_found_finder_v4_optimized.py
-archive/2026-directories/scripts-utility-operations/prep_all_itd_prices.py
-archive/2026-directories/scripts-utility-operations/prep_custom_scrape.py
-archive/2026-directories/scripts-utility-operations/prep_data_for_push.py
-archive/2026-directories/scripts-utility-operations/rebuild_push_proof.py
-archive/2026-directories/scripts-utility-operations/remove_dupes_push_proof.py
-archive/2026-directories/scripts-utility-operations/review_shared_alt.py
-archive/2026-directories/scripts-utility-operations/seo_plan_v1.py
-archive/2026-directories/scripts-utility-operations/sync_to_proof.py
-archive/2026-directories/scripts-utility-operations/system_organizer.py
-archive/2026-directories/scripts-utility-operations/test_app.py
-archive/2026-directories/scripts-utility-operations/test_dynamic_scraper.py
-archive/2026-directories/scripts-utility-operations/update_metadata.py
-archive/2026-directories/scripts-utility-operations/variant_image_sync.py
-archive/2026-directories/scripts-utility-operations/verify_push_proof_final.py
-archive/2026-directories/scripts-utility-operations/verify_shopify_updates.py
-archive/2026-directories/test_data-original/README.md
-archive/2026-directories/test_data-original/sample_existing_products.csv
-archive/2026-directories/test_data-original/sample_mixed_products.csv
-archive/2026-directories/test_data-original/sample_new_products.csv
-archive/2026-directories/vision_ai-old-structure/__init__.py
-archive/2026-directories/vision_ai-old-structure/cache.py
-archive/2026-directories/vision_ai-old-structure/client.py
-archive/2026-directories/vision_ai-old-structure/generator.py
-archive/2026-directories/vision_ai-old-structure/prompts.py
-archive/2026-directories/vision_ai-old-structure/stats.py
-archive/2026-directories/vision_ai-old-structure/test.py
-archive/2026-scripts/DEAD_CODE_REPORT.md
-archive/2026-scripts/MANIFEST.md
-archive/2026-scripts/analysis/analyze_deleted_images.py
-archive/2026-scripts/analysis/analyze_reispapier_vendors.py
-archive/2026-scripts/analysis/find_missing_products.py
-archive/2026-scripts/analysis/find_products_by_sku.py
-archive/2026-scripts/analysis/find_remaining_products.py
-archive/2026-scripts/analysis/list_all_products.py
-archive/2026-scripts/analysis/search_broad.py
-archive/2026-scripts/analysis/search_by_title.py
-archive/2026-scripts/apply/apply_all_galaxy_flakes_sop.py
-archive/2026-scripts/apply/apply_saturn_green.py
-archive/2026-scripts/apply/apply_saturn_green_with_filename.py
-archive/2026-scripts/debug/debug_aistcraft.js
-archive/2026-scripts/debug/debug_itd.js
-archive/2026-scripts/debug/debug_pentart.js
-archive/2026-scripts/debug/debug_single_vendor.js
-archive/2026-scripts/dry-run/dry_run_pluto_yellow.py
-archive/2026-scripts/dry-run/dry_run_restore_all_images.py
-archive/2026-scripts/dry-run/dry_run_restore_shared_images.py
-archive/2026-scripts/dry-run/dry_run_saturn_green.py
-archive/2026-scripts/fix/auto_fix_images.py
-archive/2026-scripts/fix/fix_and_add_images.py
-archive/2026-scripts/fix/fix_pentart_products.py
-archive/2026-scripts/fix/fix_pentart_rest.py
-archive/2026-scripts/misc/add_pentart_products.py
-archive/2026-scripts/misc/catalog_paperdesigns.py
-archive/2026-scripts/misc/complete_pentart_products.py
-archive/2026-scripts/misc/download_galaxy_flakes_images.py
-archive/2026-scripts/misc/generate_square_versions.py
-archive/2026-scripts/misc/get_test_skus.py
-archive/2026-scripts/misc/infer_paperdesigns_urls.py
-archive/2026-scripts/misc/inspect_pentacolor.py
-archive/2026-scripts/misc/preview_galaxy_flakes_updates.py
-archive/2026-scripts/misc/process_products_by_id.py
-archive/2026-scripts/misc/quick_image_test.py
-archive/2026-scripts/misc/recreate_pentart_products.py
-archive/2026-scripts/misc/replace_juno_rose_primary.py
-archive/2026-scripts/misc/replace_primary_image_safe.py
-archive/2026-scripts/misc/restore_shared_images_to_all_products.py
-archive/2026-scripts/misc/scrape_missing_products.js
-archive/2026-scripts/misc/set_inventory_final.py
-archive/2026-scripts/misc/set_inventory_levels.py
-archive/2026-scripts/misc/universal_vendor_scraper.js
-archive/2026-scripts/misc/universal_vendor_scraper_v2.js
-archive/2026-scripts/misc/update_saturn_green_final.py
-archive/2026-scripts/misc/update_three_products.py
-archive/2026-scripts/misc/upload_scraped_images.py
-archive/2026-scripts/misc/verify_image_types_with_vision.py
-archive/2026-scripts/misc/verify_uploaded_images.py
-archive/2026-scripts/scrape/scrape_and_upload_images.py
-archive/2026-scripts/scrape/scrape_missing.js
-archive/2026-scripts/scrape/scrape_paperdesigns_missing.py
-archive/2026-scripts/scrape/scrape_single_paperdesign.py
-archive/2026-scripts/scrape/scrape_three_images.py
-archive/2026-scripts/scrape/scrape_views_0009_direct.py
-archive/2026-scripts/test-scripts/test_pentart_scraper.py
-archive/2026-scripts/test-scripts/test_product_creation.py
-archive/2026-scripts/test-scripts/test_universal_scraper.js
-archive/2026-scripts/tool-output/deadcode_output.txt
-archive/2026-scripts/tool-output/safety_audit.sql
-archive/2026-scripts/tool-output/vulture_output.txt
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181321.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181400.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181438.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181532.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181617.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181703.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181742.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181814.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181847.csv
-archive/v4_progress/test_results_v4_dryrun_progress_20260126_181923.csv
-claudesplan.md
-config/image_processing_rules.yaml
-config/product_quality_rules.yaml
-config/vendor_configs.yaml
-config/vendors/_template.yaml
-demo_framework.py
-docker-compose.secrets.yml
-docker-compose.yml
-docs/CRITICAL_BUG_FIX.md
-docs/DIRECTORY_STRUCTURE.md
-docs/IMAGE_FINDING_SYSTEM.md
-docs/IMAGE_PROCESSING_FRAMEWORK.md
-docs/IMAGE_VERIFICATION_SYSTEM.md
-docs/INDEX.md
-docs/MASTER_MAP.md
-docs/MASTER_MAP.md
-docs/MASTER_MAP.md
-docs/NEXT_PHASE_PLAN.md
-docs/PAYLOAD_SCHEMA.md
-docs/PROJECT_SUMMARY.md
-docs/QA_CHECKLIST.md
-docs/RALPH_WIGGUM_INTEGRATION.md
-docs/README.md
-docs/SCRAPER_STRATEGY.md
-docs/galaxy_flakes_image_plan_summary.md
-docs/guides/CRITICAL_SAFEGUARDS.md
-docs/guides/DOCKER_QUICKSTART.md
-docs/guides/DOCKER_SECRETS.md
-docs/guides/ORCHESTRATOR_INTEGRATION_EXAMPLE.md
-docs/guides/ORCHESTRATOR_QUICK_START.md
-docs/guides/PRODUCT_CREATION_GUIDE.md
-docs/guides/QUICK_START.md
-docs/guides/SEO_QUICK_START.md
-docs/guides/SEO_SKILL_GUIDE.md
-docs/health-daemon-system.md
-docs/implementation/IMPLEMENTATION_SUMMARY.md
-docs/implementation/PENTART_IMPLEMENTATION.md
-docs/implementation/PRODUCT_QUALITY_ORCHESTRATOR.md
-docs/investigation-notes.md
-docs/legacy/IMPLEMENTATION_SUMMARY.md
-docs/legacy/PENTART_PRODUCTS_SUMMARY.md
-docs/legacy/SolutionContextProfile.md
-docs/legacy/phase1-CONTEXT.md
-docs/legacy/phase1-PLAN.md
-docs/ops/graph-availability-runbook.md
-docs/phase-reports/FINAL_SUMMARY_PHASE_2.md
-docs/phase-reports/PHASE_2_COMPLETE.md
-docs/phase-reports/TASK_1_VENDOR_CONFIG_SUMMARY.md
-docs/pretooluse-hook-system.md
-docs/reference/FRAMEWORK_QUICK_REFERENCE.md
-docs/reference/README_VISION_AI.md
-docs/reference/VERIFICATION_CHECKLIST.md
-docs/reference/hybrid_naming_example.md
-docs/requirements/PRODUCT_REQUIREMENTS_DOCUMENT.md
-docs/setup/README_APP.md
-docs/setup/SETUP.md
-docs/tasks/SVSE_SESSION_SUMMARY.md
-docs/tasks/orchestrator_setup_tasks.md
-docs/tasks/tag_cleanup_context.md
-frontend/.codex_tmp.chat-diag.spec.ts
-frontend/.codex_tmp.enrichment-diag.spec.ts
-frontend/.codex_tmp.enrichment-submit-trace.spec.ts
-frontend/.codex_tmp.live-debug.spec.ts
-frontend/.codex_tmp.oauth-status.spec.ts
-frontend/.codex_tmp.playwright.chat.config.ts
-frontend/.codex_tmp.playwright.enrichment.config.ts
-frontend/.codex_tmp.playwright.live.config.ts
-frontend/.codex_tmp.playwright.oauth.config.ts
-frontend/.design/design-context.md
-frontend/README.md
-frontend/eslint.config.mjs
-frontend/next-env.d.ts
-frontend/next.config.ts
-frontend/package-lock.json
-frontend/package.json
-frontend/src/app/(app)/chat/page.test.tsx
-frontend/src/app/(app)/chat/page.tsx
-frontend/src/app/(app)/dashboard/page.tsx
-frontend/src/app/(app)/enrichment/page.tsx
-frontend/src/app/(app)/jobs/[id]/page.test.tsx
-frontend/src/app/(app)/jobs/[id]/page.tsx
-frontend/src/app/(app)/jobs/page.tsx
-frontend/src/app/(app)/layout.tsx
-frontend/src/app/(app)/onboarding/page.tsx
-frontend/src/app/(app)/search/page.test.tsx
-frontend/src/app/(app)/search/page.tsx
-frontend/src/app/(app)/settings/page.tsx
-frontend/src/app/(auth)/auth/login/page.tsx
-frontend/src/app/(auth)/auth/verify/page.tsx
-frontend/src/app/approvals/page.tsx
-frontend/src/app/dashboard.contract.test.ts
-frontend/src/app/globals.css
-frontend/src/app/layout.tsx
-frontend/src/app/page.tsx
-frontend/src/app/routing.contract.test.ts
-frontend/src/app/routing.guard.integration.test.ts
-frontend/src/features/approvals/components/ApprovalQueue.css
-frontend/src/features/approvals/components/ApprovalQueue.test.tsx
-frontend/src/features/approvals/components/ApprovalQueue.tsx
-frontend/src/features/approvals/pages/ApprovalsPage.tsx
-frontend/src/features/chat/api/chat-api.ts
-frontend/src/features/chat/components/ActionCard.test.tsx
-frontend/src/features/chat/components/ActionCard.tsx
-frontend/src/features/chat/components/BulkRunPanel.tsx
-frontend/src/features/chat/components/ChatWorkspace.test.tsx
-frontend/src/features/chat/components/ChatWorkspace.tsx
-frontend/src/features/chat/components/DelegationTracePanel.tsx
-frontend/src/features/chat/components/MessageBlockRenderer.tsx
-frontend/src/features/chat/hooks/useChatSession.ts
-frontend/src/features/chat/hooks/useChatStream.test.ts
-frontend/src/features/chat/hooks/useChatStream.ts
-frontend/src/features/enrichment/api/enrichment-api.ts
-frontend/src/features/enrichment/components/EnrichmentConflictPanel.tsx
-frontend/src/features/enrichment/components/EnrichmentReviewTable.test.tsx
-frontend/src/features/enrichment/components/EnrichmentReviewTable.tsx
-frontend/src/features/enrichment/components/EnrichmentRunConfigurator.tsx
-frontend/src/features/enrichment/components/EnrichmentWorkspace.test.tsx
-frontend/src/features/enrichment/components/EnrichmentWorkspace.tsx
-frontend/src/features/index.ts
-frontend/src/features/jobs/components/GlobalJobTracker.tsx
-frontend/src/features/jobs/components/JobTerminalNotifications.test.ts
-frontend/src/features/jobs/components/JobTerminalNotifications.tsx
-frontend/src/features/jobs/components/JobsWorkspace.tsx
-frontend/src/features/jobs/hooks/useJobDetailObserver.test.ts
-frontend/src/features/jobs/hooks/useJobDetailObserver.ts
-frontend/src/features/jobs/hooks/useJobListStateFromUrl.test.ts
-frontend/src/features/jobs/hooks/useJobListStateFromUrl.ts
-frontend/src/features/jobs/hooks/useJobRehydrate.test.ts
-frontend/src/features/jobs/hooks/useJobRehydrate.ts
-frontend/src/features/jobs/observer/job-observer.ts
-frontend/src/features/jobs/observer/transport-ladder.test.ts
-frontend/src/features/jobs/observer/transport-ladder.ts
-frontend/src/features/manifest.contract.test.ts
-frontend/src/features/manifest.ts
-frontend/src/features/onboarding/api/onboarding-mutations.test.ts
-frontend/src/features/onboarding/api/onboarding-mutations.ts
-frontend/src/features/onboarding/components/OnboardingWizard.test.tsx
-frontend/src/features/onboarding/components/OnboardingWizard.tsx
-frontend/src/features/onboarding/state/onboarding-machine.test.ts
-frontend/src/features/onboarding/state/onboarding-machine.ts
-frontend/src/features/resolution/api/resolution-api.ts
-frontend/src/features/resolution/components/ActivityPanels.tsx
-frontend/src/features/resolution/components/CollaborationBadge.tsx
-frontend/src/features/resolution/components/DryRunReview.tsx
-frontend/src/features/resolution/components/FieldChangeRow.tsx
-frontend/src/features/resolution/components/ProductChangeCard.tsx
-frontend/src/features/resolution/components/TechnicalDetailsToggle.tsx
-frontend/src/features/resolution/state/review-store.ts
-frontend/src/features/search/api/search-api.ts
-frontend/src/features/search/components/ApprovalBlockCard.tsx
-frontend/src/features/search/components/BulkActionBuilder.test.tsx
-frontend/src/features/search/components/BulkActionBuilder.tsx
-frontend/src/features/search/components/ProductDetailPanel.tsx
-frontend/src/features/search/components/ProductDiffPanel.tsx
-frontend/src/features/search/components/SearchResultGrid.tsx
-frontend/src/features/search/components/SearchWorkspace.tsx
-frontend/src/features/search/hooks/useBulkStaging.ts
-frontend/src/features/search/hooks/useSearchWorkspace.ts
-frontend/src/features/settings/components/RuleSuggestionsInbox.tsx
-frontend/src/features/settings/components/StrategyQuiz.tsx
-frontend/src/lib/api/client.ts
-frontend/src/lib/api/problem-details.test.ts
-frontend/src/lib/api/problem-details.ts
-frontend/src/lib/auth/guards.test.ts
-frontend/src/lib/auth/guards.ts
-frontend/src/lib/auth/session-flags.ts
-frontend/src/lib/query/keys.test.ts
-frontend/src/lib/query/keys.ts
-frontend/src/shared/contracts/chat.ts
-frontend/src/shared/contracts/index.ts
-frontend/src/shared/contracts/resolution.ts
-frontend/src/shared/errors/error-presenter.ts
-frontend/src/shell/components/AppShell.tsx
-frontend/src/shell/components/ChatSurface.tsx
-frontend/src/shell/components/GlobalPendingIndicator.tsx
-frontend/src/shell/components/NotificationStack.tsx
-frontend/src/shell/components/Sidebar.tsx
-frontend/src/shell/providers.tsx
-frontend/src/shell/responsive-layout.test.ts
-frontend/src/shell/state/pending-store.ts
-frontend/src/state/drafts-store.test.ts
-frontend/src/state/drafts-store.ts
-frontend/src/state/ui-prefs-store.test.ts
-frontend/src/state/ui-prefs-store.ts
-frontend/tests/frontend/resolution/review.contract.test.tsx
-frontend/tests/frontend/settings/strategy-quiz.contract.test.tsx
-frontend/tsconfig.json
-frontend/vitest.config.ts
-frontend/vitest.setup.ts
-gunicorn_config.py
-migrations/README
-migrations/alembic.ini
-migrations/env.py
-migrations/script.py.mako
-migrations/versions/3c9b2f7d5a1e_add_auth_fields_and_oauth_attempts.py
-migrations/versions/4d8f6b9c2e1a_add_user_api_version_fields.py
-migrations/versions/a7b8c9d0e1f2_phase11_product_history_and_staging.py
-migrations/versions/a9f3c7d5e1b2_phase13_runtime_policy_and_idempotency.py
-migrations/versions/b2f4c6d8e0a1_phase13_governance_recovery.py
-migrations/versions/b7d5c4a9e8f1_phase6_ingest_chunks_audit_checkpoints.py
-migrations/versions/c1d9e8f7a6b5_phase8_resolution_foundation.py
-migrations/versions/c4d5e6f7a8b9_phase13_deploy_observability.py
-migrations/versions/d4e5f6a7b8c9_phase12_tier_routing_and_profiles.py
-migrations/versions/e5f6a7b8c9d0_phase13_instrumentation_foundation.py
-migrations/versions/e6eec7532bd6_initial_schema_users_stores_vendors_.py
-migrations/versions/f0a1b2c3d4e5_phase10_chat_foundation.py
-migrations/versions/f1a2b3c4d5e6_phase11_snapshot_lifecycle.py
-migrations/versions/f2b3c4d5e6f7_phase13_1_enrichment_capability_policy.py
-migrations/versions/g14_2_01_tool_input_examples.py
-migrations/versions/g14_2_03_schema_json.py
-migrations/versions/p15_01_sandbox_runs.py
-migrations/versions/p15_02_remedy_template_cache.py
-nginx/nginx.conf
-npm-badge-png.md
-ops/STRUCTURE_SPEC.md
-ops/governance/roles/README.md
-ops/governance/roles/builder.md
-ops/governance/roles/context-curator.md
-ops/governance/roles/integrity-warden.md
-ops/governance/roles/phase-manager.md
-ops/governance/roles/reviewer.md
-ops/governance/roles/structure-guardian.md
-playwright.config.ts
-pyproject.toml
-reports/07/07.1-governance-baseline-dry-run/integrity-audit.md
-reports/07/07.1-governance-baseline-dry-run/review.md
-reports/07/07.1-governance-baseline-dry-run/self-check.md
-reports/07/07.1-governance-baseline-dry-run/structure-audit.md
-reports/07/07.2-governance-operational-defaults/integrity-audit.md
-reports/07/07.2-governance-operational-defaults/review.md
-reports/07/07.2-governance-operational-defaults/self-check.md
-reports/07/07.2-governance-operational-defaults/structure-audit.md
-reports/11/11-01/integrity-audit.md
-reports/11/11-01/review.md
-reports/11/11-01/self-check.md
-reports/11/11-01/structure-audit.md
-reports/11/11-02/integrity-audit.md
-reports/11/11-02/review.md
-reports/11/11-02/self-check.md
-reports/11/11-02/structure-audit.md
-reports/11/11-03/integrity-audit.md
-reports/11/11-03/review.md
-reports/11/11-03/self-check.md
-reports/11/11-03/structure-audit.md
-reports/12/12-01/integrity-audit.md
-reports/12/12-01/review.md
-reports/12/12-01/self-check.md
-reports/12/12-01/structure-audit.md
-reports/12/12-02/integrity-audit.md
-reports/12/12-02/review.md
-reports/12/12-02/self-check.md
-reports/12/12-02/structure-audit.md
-reports/12/12-03/integrity-audit.md
-reports/12/12-03/review.md
-reports/12/12-03/self-check.md
-reports/12/12-03/structure-audit.md
-reports/13.1/13.1-01/integrity-audit.md
-reports/13.1/13.1-01/review.md
-reports/13.1/13.1-01/self-check.md
-reports/13.1/13.1-01/structure-audit.md
-reports/13.1/13.1-02/integrity-audit.md
-reports/13.1/13.1-02/review.md
-reports/13.1/13.1-02/self-check.md
-reports/13.1/13.1-02/structure-audit.md
-reports/13.1/13.1-03/integrity-audit.md
-reports/13.1/13.1-03/review.md
-reports/13.1/13.1-03/self-check.md
-reports/13.1/13.1-03/structure-audit.md
-reports/13.1/13.1-04/integrity-audit.md
-reports/13.1/13.1-04/review.md
-reports/13.1/13.1-04/self-check.md
-reports/13.1/13.1-04/structure-audit.md
-reports/13.2/13.2-01/integrity-audit.md
-reports/13.2/13.2-01/review.md
-reports/13.2/13.2-01/self-check.md
-reports/13.2/13.2-01/structure-audit.md
-reports/13.2/13.2-02/integrity-audit.md
-reports/13.2/13.2-02/review.md
-reports/13.2/13.2-02/self-check.md
-reports/13.2/13.2-02/structure-audit.md
-reports/13.2/13.2-03/integrity-audit.md
-reports/13.2/13.2-03/review.md
-reports/13.2/13.2-03/self-check.md
-reports/13.2/13.2-03/structure-audit.md
-reports/13.2/13.2-04/integrity-audit.md
-reports/13.2/13.2-04/review.md
-reports/13.2/13.2-04/self-check.md
-reports/13.2/13.2-04/structure-audit.md
-reports/13.2/13.2-05/integrity-audit.md
-reports/13.2/13.2-05/review.md
-reports/13.2/13.2-05/self-check.md
-reports/13.2/13.2-05/structure-audit.md
-reports/13/13-01/integrity-audit.md
-reports/13/13-01/review.md
-reports/13/13-01/self-check.md
-reports/13/13-01/structure-audit.md
-reports/13/13-02/integrity-audit.md
-reports/13/13-02/review.md
-reports/13/13-02/self-check.md
-reports/13/13-02/structure-audit.md
-reports/13/13-03/integrity-audit.md
-reports/13/13-03/review.md
-reports/13/13-03/self-check.md
-reports/13/13-03/structure-audit.md
-reports/13/13-04/integrity-audit.md
-reports/13/13-04/review.md
-reports/13/13-04/self-check.md
-reports/13/13-04/structure-audit.md
-reports/14.2/14.2-01/integrity-audit.md
-reports/14.2/14.2-01/review.md
-reports/14.2/14.2-01/self-check.md
-reports/14.2/14.2-01/structure-audit.md
-reports/14.2/14.2-02/integrity-audit.md
-reports/14.2/14.2-02/review.md
-reports/14.2/14.2-02/self-check.md
-reports/14.2/14.2-02/structure-audit.md
-reports/14.2/14.2-03/integrity-audit.md
-reports/14.2/14.2-03/review.md
-reports/14.2/14.2-03/self-check.md
-reports/14.2/14.2-03/structure-audit.md
-reports/14.2/14.2-04/integrity-audit.md
-reports/14.2/14.2-04/review.md
-reports/14.2/14.2-04/self-check.md
-reports/14.2/14.2-04/structure-audit.md
-reports/14.2/14.2-05/integrity-audit.md
-reports/14.2/14.2-05/review.md
-reports/14.2/14.2-05/self-check.md
-reports/14.2/14.2-05/structure-audit.md
-reports/14.2/14.2-06/integrity-audit.md
-reports/14.2/14.2-06/review.md
-reports/14.2/14.2-06/self-check.md
-reports/14.2/14.2-06/structure-audit.md
-reports/14.2/14.2-07/integrity-audit.md
-reports/14.2/14.2-07/review.md
-reports/14.2/14.2-07/self-check.md
-reports/14.2/14.2-07/structure-audit.md
-reports/14.3/14.3-01/integrity-audit.md
-reports/14.3/14.3-01/review.md
-reports/14.3/14.3-01/self-check.md
-reports/14.3/14.3-01/structure-audit.md
-reports/14.3/14.3-02/integrity-audit.md
-reports/14.3/14.3-02/review.md
-reports/14.3/14.3-02/self-check.md
-reports/14.3/14.3-02/structure-audit.md
-reports/14.3/14.3-03/integrity-audit.md
-reports/14.3/14.3-03/review.md
-reports/14.3/14.3-03/self-check.md
-reports/14.3/14.3-03/structure-audit.md
-reports/14.3/14.3-04/integrity-audit.md
-reports/14.3/14.3-04/review.md
-reports/14.3/14.3-04/self-check.md
-reports/14.3/14.3-04/structure-audit.md
-reports/14.3/14.3-05/integrity-audit.md
-reports/14.3/14.3-05/review.md
-reports/14.3/14.3-05/self-check.md
-reports/14.3/14.3-05/structure-audit.md
-reports/14.3/14.3-06/integrity-audit.md
-reports/14.3/14.3-06/review.md
-reports/14.3/14.3-06/self-check.md
-reports/14.3/14.3-06/structure-audit.md
-reports/14.3/14.3-07/integrity-audit.md
-reports/14.3/14.3-07/review.md
-reports/14.3/14.3-07/self-check.md
-reports/14.3/14.3-07/structure-audit.md
-reports/15/15-01/integrity-audit.md
-reports/15/15-01/review.md
-reports/15/15-01/self-check.md
-reports/15/15-01/structure-audit.md
-reports/15/15-02/integrity-audit.md
-reports/15/15-02/review.md
-reports/15/15-02/self-check.md
-reports/15/15-02/structure-audit.md
-reports/15/15-03/integrity-audit.md
-reports/15/15-03/review.md
-reports/15/15-03/self-check.md
-reports/15/15-03/structure-audit.md
-reports/15/15-04/integrity-audit.md
-reports/15/15-04/review.md
-reports/15/15-04/self-check.md
-reports/15/15-04/structure-audit.md
-reports/15/15-05/integrity-audit.md
-reports/15/15-05/review.md
-reports/15/15-05/self-check.md
-reports/15/15-05/structure-audit.md
-reports/15/15-06/integrity-audit.md
-reports/15/15-06/review.md
-reports/15/15-06/self-check.md
-reports/15/15-06/structure-audit.md
-reports/15/15-07/integrity-audit.md
-reports/15/15-07/review.md
-reports/15/15-07/self-check.md
-reports/15/15-07/structure-audit.md
-reports/15/15-08/integrity-audit.md
-reports/15/15-08/review.md
-reports/15/15-08/self-check.md
-reports/15/15-08/structure-audit.md
-reports/15/15-09/integrity-audit.md
-reports/15/15-09/review.md
-reports/15/15-09/self-check.md
-reports/15/15-09/structure-audit.md
-reports/15/15-10/integrity-audit.md
-reports/15/15-10/review.md
-reports/15/15-10/self-check.md
-reports/15/15-10/structure-audit.md
-reports/15/15-11a/integrity-audit.md
-reports/15/15-11a/review.md
-reports/15/15-11a/self-check.md
-reports/15/15-11a/structure-audit.md
-reports/15/15-11b/integrity-audit.md
-reports/15/15-11b/review.md
-reports/15/15-11b/self-check.md
-reports/15/15-11b/structure-audit.md
-reports/AGENTS.override.md
-reports/meta/governance-baseline-implementation-report-2026-02-12.md
-reports/meta/governance-validation-runbook-2026-02-12.md
-reports/meta/journey-synthesis-13-15.md
-reports/meta/journey-synthesis-template.md
-reports/templates/integrity-audit.template.md
-reports/templates/review.template.md
-reports/templates/self-check.template.md
-reports/templates/structure-audit.template.md
-requirements.txt
-risk-policy.json
-scripts/backup_db.sh
-scripts/checkpoints/log_approval.py
-scripts/daemons/README.md
-scripts/daemons/health_monitor.py
-scripts/daemons/start_health_monitor.sh
-scripts/daemons/status_health_monitor.sh
-scripts/daemons/stop_health_monitor.sh
-scripts/debug_driver_params.py
-scripts/debug_neo4j_drivers.py
-scripts/governance/README.md
-scripts/governance/check_harness_slas.py
-scripts/governance/ensure_neo4j_runtime.py
-scripts/governance/graph_availability_gate.py
-scripts/governance/graph_gate.py
-scripts/governance/health_gate.py
-scripts/governance/phase13_1_enrichment_gate.py
-scripts/governance/phase13_canary_gate.py
-scripts/governance/risk_tier_gate.py
-scripts/governance/risk_tier_gate_enforce.py
-scripts/governance/sandbox_seccomp.json
-scripts/governance/sha_gate.py
-scripts/governance/validate_governance.py
-scripts/graph/analyze_performance.py
-scripts/graph/apply_optimizations.py
-scripts/graph/auto_apply_infrastructure.py
-scripts/graph/bootstrap_graph_backend.py
-scripts/graph/graph_status.py
-scripts/graph/init_codebase_schema.py
-scripts/graph/init_tool_search_index.py
-scripts/graph/load_session_context.py
-scripts/graph/orchestrate_healers.py
-scripts/graph/pretool_gate.py
-scripts/graph/promote_to_template.py
-scripts/graph/run_consistency_check.py
-scripts/graph/seed_memory_nodes.py
-scripts/graph/sentry_auto_heal.py
-scripts/graph/start_mcp_server.sh
-scripts/graph/sync_codebase.py
-scripts/graph/sync_to_neo4j.py
-scripts/graph/validate_remedy_efficacy.py
-scripts/harness/ui/evidence_index.py
-scripts/harness/ui/run_e2e.sh
-scripts/hooks/antigravity_notify.py
-scripts/hooks/antigravity_watchdog.py
-scripts/hooks/pre-commit-graph-sync.py
-scripts/import_pentart.py
-scripts/infra/redis_health_fixer.py
-scripts/migrate_metrics_to_graph.py
-scripts/observability/ensure_sentry_worker.py
-scripts/observability/sentry_issue_puller.py
-scripts/observability/test_sentry_flow.py
-scripts/restore_db.sh
-scripts/test_sandbox.py
-scripts/verify_phase_14_2_comprehensive.py
-secrets/.gitkeep
-seo/CHANGELOG.md
-seo/IMPLEMENTATION.md
-seo/QUICKSTART.md
-seo/README.md
-seo/__init__.py
-seo/generate_seo_quick.py
-seo/run_seo_generator.bat
-seo/run_seo_generator.sh
-seo/seo_generator.py
-seo/seo_prompts.py
-seo/seo_validator.py
-solutionsos/compound-engineering-os-policy.md
-solutionsos/gsd-plan-execution.md
-solutionsos/os-self-actualization.md
-src/__init__.py
-src/ai_bot_server.py
-src/api/__init__.py
-src/api/app.py
-src/api/core/__init__.py
-src/api/core/errors.py
-src/api/core/pagination.py
-src/api/core/rate_limit.py
-src/api/core/sse.py
-src/api/core/versioning.py
-src/api/jobs/__init__.py
-src/api/jobs/events.py
-src/api/jobs/schemas.py
-src/api/v1/__init__.py
-src/api/v1/approvals.py
-src/api/v1/chat/__init__.py
-src/api/v1/chat/approvals.py
-src/api/v1/chat/bulk.py
-src/api/v1/chat/orchestrator.py
-src/api/v1/chat/routes.py
-src/api/v1/chat/schemas.py
-src/api/v1/jobs/__init__.py
-src/api/v1/jobs/routes.py
-src/api/v1/jobs/schemas.py
-src/api/v1/ops/__init__.py
-src/api/v1/ops/routes.py
-src/api/v1/products/__init__.py
-src/api/v1/products/routes.py
-src/api/v1/products/schemas.py
-src/api/v1/products/search_query.py
-src/api/v1/products/staging.py
-src/api/v1/resolution/__init__.py
-src/api/v1/resolution/routes.py
-src/api/v1/resolution/schemas.py
-src/api/v1/vendors/__init__.py
-src/api/v1/vendors/routes.py
-src/api/v1/vendors/schemas.py
-src/api/v1/versioning/__init__.py
-src/api/v1/versioning/routes.py
-src/api/v1/versioning/schemas.py
-src/app.py
-src/app_factory.py
-src/assistant/__init__.py
-src/assistant/delegation.py
-src/assistant/deployment/__init__.py
-src/assistant/deployment/canary_guard.py
-src/assistant/deployment/observability.py
-src/assistant/deployment/provider_router.py
-src/assistant/deployment/redaction.py
-src/assistant/governance/__init__.py
-src/assistant/governance/field_policy.py
-src/assistant/governance/graph_oracle_adapter.py
-src/assistant/governance/kill_switch.py
-src/assistant/governance/mutation_guard.py
-src/assistant/governance/verification_oracle.py
-src/assistant/instrumentation/__init__.py
-src/assistant/instrumentation/export.py
-src/assistant/instrumentation/signals.py
-src/assistant/memory_retrieval.py
-src/assistant/policy_resolver.py
-src/assistant/reliability/__init__.py
-src/assistant/reliability/breakers.py
-src/assistant/reliability/idempotency.py
-src/assistant/reliability/policy_store.py
-src/assistant/reliability/retry_matrix.py
-src/assistant/runtime_tier1.py
-src/assistant/runtime_tier2.py
-src/assistant/runtime_tier3.py
-src/assistant/session_primer.py
-src/assistant/tool_projection.py
-src/auth/__init__.py
-src/auth/decorators.py
-src/auth/email_sender.py
-src/auth/email_verification.py
-src/auth/login.py
-src/auth/oauth.py
-src/billing/__init__.py
-src/billing/checkout.py
-src/billing/routes.py
-src/billing/stripe_client.py
-src/billing/subscription.py
-src/billing/webhooks.py
-src/bot_server.py
-src/celery_app.py
-src/cli/__init__.py
-src/cli/approvals.py
-src/cli/commands/__init__.py
-src/cli/commands/products.py
-src/cli/commands/search.py
-src/cli/main.py
-src/config/__init__.py
-src/config/email_config.py
-src/config/logging_config.py
-src/config/sentry_config.py
-src/config/session_config.py
-src/core/__init__.py
-src/core/chat/__init__.py
-src/core/chat/handlers/__init__.py
-src/core/chat/handlers/generic.py
-src/core/chat/handlers/product.py
-src/core/chat/handlers/vendor.py
-src/core/chat/router.py
-src/core/codebase_entities.py
-src/core/codebase_schema.py
-src/core/config/__init__.py
-src/core/config/generator.py
-src/core/config/loader.py
-src/core/config/store_profile_schema.py
-src/core/config/vendor_schema.py
-src/core/config/verifier.py
-src/core/diff_engine.py
-src/core/discovery/__init__.py
-src/core/discovery/ai_inference.py
-src/core/discovery/catalog_extractor.py
-src/core/discovery/firecrawl_client.py
-src/core/discovery/gsd_populator.py
-src/core/discovery/local_classifier.py
-src/core/discovery/local_patterns.py
-src/core/discovery/niche_validator.py
-src/core/discovery/pipeline.py
-src/core/discovery/site_recon.py
-src/core/discovery/sku_validator.py
-src/core/discovery/store_analyzer.py
-src/core/discovery/web_search.py
-src/core/embeddings.py
-src/core/encryption.py
-src/core/enrichment/INTEGRATION.md
-src/core/enrichment/README.md
-src/core/enrichment/__init__.py
-src/core/enrichment/benchmarks.py
-src/core/enrichment/capability_audit.py
-src/core/enrichment/color_learning.py
-src/core/enrichment/config.py
-src/core/enrichment/contracts.py
-src/core/enrichment/eligibility.py
-src/core/enrichment/embeddings/__init__.py
-src/core/enrichment/embeddings/generator.py
-src/core/enrichment/evaluation.py
-src/core/enrichment/extractors/__init__.py
-src/core/enrichment/extractors/attributes.py
-src/core/enrichment/families/__init__.py
-src/core/enrichment/families/grouper.py
-src/core/enrichment/generators/__init__.py
-src/core/enrichment/generators/descriptions.py
-src/core/enrichment/generators/seo.py
-src/core/enrichment/idempotency.py
-src/core/enrichment/oracle_contract.py
-src/core/enrichment/oracles/__init__.py
-src/core/enrichment/oracles/content_oracle.py
-src/core/enrichment/oracles/policy_oracle.py
-src/core/enrichment/oracles/visual_oracle.py
-src/core/enrichment/pipeline.py
-src/core/enrichment/profiles.py
-src/core/enrichment/provenance.py
-src/core/enrichment/quality/__init__.py
-src/core/enrichment/quality/scorer.py
-src/core/enrichment/retries.py
-src/core/enrichment/retrieval_payload.py
-src/core/enrichment/templating/__init__.py
-src/core/enrichment/templating/engine.py
-src/core/enrichment/vendor_integration.py
-src/core/enrichment/write_plan.py
-src/core/graphiti_client.py
-src/core/hs_code_resolver.py
-src/core/hybrid_image_naming.py
-src/core/image_framework.py
-src/core/image_scraper.py
-src/core/image_verifier.py
-src/core/llm_client.py
-src/core/memory_loader.py
-src/core/paths.py
-src/core/pipeline.py
-src/core/product_analyzer.py
-src/core/quality_assessor.py
-src/core/scrape_engine.py
-src/core/scraping/__init__.py
-src/core/scraping/adaptive.py
-src/core/scraping/engine.py
-src/core/scraping/metrics.py
-src/core/scraping/strategies/__init__.py
-src/core/scraping/strategies/base.py
-src/core/scraping/strategies/playwright_strategy.py
-src/core/scraping/strategies/requests_strategy.py
-src/core/secrets.py
-src/core/sentry_client.py
-src/core/seo_engine.py
-src/core/shopify_apply.py
-src/core/shopify_resolver.py
-src/core/summary_generator.py
-src/core/synthex_entities.py
-src/core/vendor_config.py
-src/core/vision_cache.py
-src/core/vision_client.py
-src/core/vision_engine.py
-src/core/vision_prompts.py
-src/database.py
-src/graph/ab_test_validator.py
-src/graph/backend_resolver.py
-src/graph/batch_handlers.py
-src/graph/bottleneck_detector.py
-src/graph/codebase_scanner.py
-src/graph/commit_parser.py
-src/graph/consistency_daemon.py
-src/graph/convention_checker.py
-src/graph/file_parser.py
-src/graph/fix_generator.py
-src/graph/incremental_sync.py
-src/graph/infra_probe.py
-src/graph/intent_capture.py
-src/graph/local_graph_store.py
-src/graph/mcp_response_metadata.py
-src/graph/mcp_server.py
-src/graph/orchestrate_healers.py
-src/graph/performance_profiler.py
-src/graph/planning_linker.py
-src/graph/query_interface.py
-src/graph/query_templates.py
-src/graph/refactor_guard.py
-src/graph/remediation_registry.py
-src/graph/remediators/aura_remediator.py
-src/graph/remediators/bash_agent.py
-src/graph/remediators/code_remediator.py
-src/graph/remediators/docker_remediator.py
-src/graph/remediators/git_staleness_guard.py
-src/graph/remediators/llm_remediator.py
-src/graph/remediators/optimizer_remediator.py
-src/graph/remediators/redis_remediator.py
-src/graph/remediators/snapshot_remediator.py
-src/graph/remediators/sync_remediator.py
-src/graph/research_tools.py
-src/graph/root_cause_classifier.py
-src/graph/runtime_optimizer.py
-src/graph/sandbox_docker.py
-src/graph/sandbox_gates.py
-src/graph/sandbox_persistence.py
-src/graph/sandbox_types.py
-src/graph/sandbox_verifier.py
-src/graph/sandbox_workspace.py
-src/graph/search_expand_bridge.py
-src/graph/semantic_cache.py
-src/graph/sentry_feedback_loop.py
-src/graph/sentry_ingestor.py
-src/graph/similarity_detector.py
-src/graph/sync_status.py
-src/graph/telemetry_dashboard.py
-src/graph/template_extractor.py
-src/graph/universal_fixer.py
-src/integrations/perplexity_client.py
-src/jobs/__init__.py
-src/jobs/cancellation.py
-src/jobs/checkpoints.py
-src/jobs/dispatcher.py
-src/jobs/finalizer.py
-src/jobs/graphiti_ingestor.py
-src/jobs/metrics.py
-src/jobs/orchestrator.py
-src/jobs/progress.py
-src/jobs/queueing.py
-src/models/__init__.py
-src/models/assistant_delegation_event.py
-src/models/assistant_deployment_policy.py
-src/models/assistant_execution_ledger.py
-src/models/assistant_field_policy.py
-src/models/assistant_kill_switch.py
-src/models/assistant_memory_embedding.py
-src/models/assistant_memory_fact.py
-src/models/assistant_preference_signal.py
-src/models/assistant_profile.py
-src/models/assistant_provider_route_event.py
-src/models/assistant_route_event.py
-src/models/assistant_runtime_policy.py
-src/models/assistant_tenant_tool_policy.py
-src/models/assistant_tool_registry.py
-src/models/assistant_verification_event.py
-src/models/assistant_verification_signal.py
-src/models/audit_checkpoint.py
-src/models/chat_action.py
-src/models/chat_message.py
-src/models/chat_session.py
-src/models/ingest_chunk.py
-src/models/job.py
-src/models/oauth_attempt.py
-src/models/pending_approvals.py
-src/models/product.py
-src/models/product_change_event.py
-src/models/product_enrichment_item.py
-src/models/product_enrichment_run.py
-src/models/recovery_log.py
-src/models/remedy_templates.py
-src/models/resolution_batch.py
-src/models/resolution_rule.py
-src/models/resolution_snapshot.py
-src/models/sandbox_runs.py
-src/models/shopify.py
-src/models/user.py
-src/models/vendor.py
-src/models/vendor_field_mapping.py
-src/resolution/__init__.py
-src/resolution/adapters/__init__.py
-src/resolution/adapters/shopify_adapter.py
-src/resolution/adapters/supplier_adapter.py
-src/resolution/adapters/web_adapter.py
-src/resolution/apply_engine.py
-src/resolution/audit_export.py
-src/resolution/contracts.py
-src/resolution/dry_run_compiler.py
-src/resolution/lineage.py
-src/resolution/locks.py
-src/resolution/media_ingest.py
-src/resolution/normalize.py
-src/resolution/policy.py
-src/resolution/preflight.py
-src/resolution/progress_contract.py
-src/resolution/scoring.py
-src/resolution/shopify_graphql.py
-src/resolution/snapshot_lifecycle.py
-src/resolution/structural.py
-src/resolution/throttle.py
-src/tasks/__init__.py
-src/tasks/assistant_runtime.py
-src/tasks/audits.py
-src/tasks/chat_bulk.py
-src/tasks/control.py
-src/tasks/enrichment.py
-src/tasks/graphiti_sync.py
-src/tasks/ingest.py
-src/tasks/resolution_apply.py
-src/tasks/scrape_jobs.py
-src/utils/sku_ean_validator.py
-tests/__init__.py
-tests/api/__init__.py
-tests/api/conftest.py
-tests/api/test_apply_progress_contract.py
-tests/api/test_approvals_api.py
-tests/api/test_assistant_profile_contract.py
-tests/api/test_audit_export_contract.py
-tests/api/test_chat_bulk_workflow.py
-tests/api/test_chat_contract.py
-tests/api/test_chat_delegation_contract.py
-tests/api/test_chat_memory_retrieval_contract.py
-tests/api/test_chat_routing_contract.py
-tests/api/test_chat_single_sku_workflow.py
-tests/api/test_chat_stream.py
-tests/api/test_chat_tier_runtime_contract.py
-tests/api/test_core.py
-tests/api/test_endpoints.py
-tests/api/test_enrichment_audit_export_contract.py
-tests/api/test_enrichment_capability_audit_contract.py
-tests/api/test_enrichment_dry_run_contract.py
-tests/api/test_enrichment_field_policy_contract.py
-tests/api/test_fallback_stage_telemetry_contract.py
-tests/api/test_field_policy_threshold_contract.py
-tests/api/test_graph_oracle_adapter_contract.py
-tests/api/test_idempotency_terminal_states_contract.py
-tests/api/test_instrumentation_export_contract.py
-tests/api/test_jobs_progress_contract.py
-tests/api/test_jobs_retry.py
-tests/api/test_jobs_stream_status_contract.py
-tests/api/test_kill_switch_contract.py
-tests/api/test_observability_correlation_contract.py
-tests/api/test_oracle_signal_join_contract.py
-tests/api/test_preference_signal_contract.py
-tests/api/test_products_bulk_staging_contract.py
-tests/api/test_products_history_diff_contract.py
-tests/api/test_products_search_contract.py
-tests/api/test_provider_fallback_contract.py
-tests/api/test_recovery_logs.py
-tests/api/test_redaction_retention_contract.py
-tests/api/test_reliability_policy_contract.py
-tests/api/test_resolution_dry_run.py
-tests/api/test_resolution_rules.py
-tests/api/test_snapshot_chain_contract.py
-tests/api/test_tenant_rls_readiness_contract.py
-tests/api/test_tool_projection_contract.py
-tests/api/test_verification_oracle_contract.py
-tests/api/test_versioning.py
-tests/assistant/test_session_primer.py
-tests/cli/__init__.py
-tests/cli/test_commands.py
-tests/conftest.py
-tests/core/test_graphiti_client_contract.py
-tests/core/test_synthex_entities.py
-tests/daemons/benchmark_health_gate.py
-tests/daemons/test_health_monitor.py
-tests/e2e/chat.e2e.ts
-tests/e2e/enrichment.e2e.ts
-tests/e2e/job-progress.e2e.ts
-tests/graph/test_bash_agent.py
-tests/graph/test_batch_tools.py
-tests/graph/test_compact_output.py
-tests/graph/test_deferred_loading.py
-tests/graph/test_fix_generation.py
-tests/graph/test_mcp_tool_examples.py
-tests/graph/test_performance_profiling.py
-tests/graph/test_root_cause_classifier.py
-tests/graph/test_runtime_optimizer.py
-tests/graph/test_sandbox_verifier.py
-tests/graph/test_sentry_feedback.py
-tests/graph/test_sentry_integration.py
-tests/graph/test_template_extraction.py
-tests/graph/test_tool_search.py
-tests/integration/__init__.py
-tests/integration/test_enrichment_color_finish_accuracy.py
-tests/integration/test_enrichment_pipeline.py
-tests/integration/test_enrichment_retrieval_readiness.py
-tests/integration/test_enrichment_semantic_uplift_smoke.py
-tests/integration/test_gemini_verify.py
-tests/integration/test_graph_resilience.py
-tests/integration/test_image_improvements.py
-tests/integration/test_pentart_search.py
-tests/integration/test_planning_linker.py
-tests/integration/test_vendor_yaml_integration.py
-tests/integrations/test_research_fallback.py
-tests/jobs/__init__.py
-tests/jobs/test_assistant_tier_queue_routing.py
-tests/jobs/test_canary_rollback_contract.py
-tests/jobs/test_cancellation.py
-tests/jobs/test_chat_bulk_chunking.py
-tests/jobs/test_chat_bulk_fairness.py
-tests/jobs/test_deferred_verification_flow.py
-tests/jobs/test_dispatcher.py
-tests/jobs/test_enrichment_batch_queue_contract.py
-tests/jobs/test_finalizer.py
-tests/jobs/test_ingest_chunk_flow.py
-tests/jobs/test_non_blocking_api_flow.py
-tests/jobs/test_observability_metrics.py
-tests/jobs/test_phase6_requirements.py
-tests/jobs/test_priority_under_load.py
-tests/jobs/test_progress_payload.py
-tests/jobs/test_queue_routing.py
-tests/jobs/test_restart_persistence.py
-tests/jobs/test_retention_cleanup.py
-tests/jobs/test_scraper_service_routing.py
-tests/jobs/test_tier3_queue_ttl_deadletter_contract.py
-tests/jobs/test_tier_queue_qos_contract.py
-tests/resolution/test_apply_engine.py
-tests/resolution/test_media_ingest.py
-tests/resolution/test_policy.py
-tests/resolution/test_preflight.py
-tests/resolution/test_resolution_pipeline.py
-tests/resolution/test_snapshot_lifecycle.py
-tests/tasks/test_batch_emission.py
-tests/tasks/test_graphiti_sync_contract.py
-tests/unit/__init__.py
-tests/unit/test_adaptive_scraping.py
-tests/unit/test_ai_descriptions.py
-tests/unit/test_ai_inference.py
-tests/unit/test_antigravity_notify.py
-tests/unit/test_antigravity_watchdog.py
-tests/unit/test_attribute_extraction.py
-tests/unit/test_chat_router.py
-tests/unit/test_color_learning.py
-tests/unit/test_config_generator.py
-tests/unit/test_convention_checker.py
-tests/unit/test_embeddings.py
-tests/unit/test_enrichment_eligibility_matrix.py
-tests/unit/test_enrichment_oracle_contract.py
-tests/unit/test_enrichment_profile_contract.py
-tests/unit/test_enrichment_retry_idempotency.py
-tests/unit/test_firecrawl.py
-tests/unit/test_image_framework.py
-tests/unit/test_local_graph_store.py
-tests/unit/test_local_patterns.py
-tests/unit/test_mcp_server_contract.py
-tests/unit/test_product_families.py
-tests/unit/test_query_interface.py
-tests/unit/test_query_templates.py
-tests/unit/test_refactor_guard.py
-tests/unit/test_scraping_engine.py
-tests/unit/test_search_expand_bridge.py
-tests/unit/test_semantic_cache.py
-tests/unit/test_site_recon.py
-tests/unit/test_store_analyzer.py
-tests/unit/test_vendor_schema.py
-tests/unit/test_wave_sync.py
-tests/unit/test_web_search.py
-utils/__init__.py
-utils/add_product_image.py
-utils/approve_seo_csv.py
-utils/assign_collections.py
-utils/categorize_product.py
-utils/create_shopify_redirect.py
-utils/display_seo_comparison.py
-utils/enrich_product_logistics.py
-utils/find_product_image.py
-utils/fix_product_handles.py
-utils/generate_product_tags.py
-utils/pentart_db.py
-web/app.js
-web/auth_required.html
-web/index.html
-web/job_detail.html
+.
+|-- .claude/
+|   |-- agents/
+|   |   |-- change-verifier.md
+|   |   |-- code-generator.md
+|   |   |-- gsd-codebase-mapper.md
+|   |   |-- gsd-debugger.md
+|   |   |-- gsd-executor.md
+|   |   |-- gsd-integration-checker.md
+|   |   |-- gsd-phase-research-deep.md
+|   |   |-- gsd-phase-researcher.md
+|   |   |-- gsd-plan-checker.md
+|   |   |-- gsd-planner.md
+|   |   |-- gsd-project-researcher.md
+|   |   |-- gsd-research-synthesizer.md
+|   |   |-- gsd-roadmapper.md
+|   |   `-- gsd-verifier.md
+|   |-- auto-improver/
+|   |   |-- on_execution_complete.py
+|   |   |-- pattern_detector_file_based.py
+|   |   |-- pattern_detector_graph.py
+|   |   `-- README.md
+|   |-- checkpoints/
+|   |   |-- checkpoint_1_discussion.sh
+|   |   |-- checkpoint_2_research.sh
+|   |   |-- checkpoint_3_plan.sh
+|   |   |-- checkpoint_4_execution.sh
+|   |   `-- checkpoint_4_post_hook.sh
+|   |-- commands/
+|   |   `-- gsd/
+|   |       |-- add-phase.md
+|   |       |-- add-todo.md
+|   |       |-- audit-milestone.md
+|   |       |-- check-todos.md
+|   |       |-- complete-milestone.md
+|   |       |-- compound-execute.md
+|   |       |-- debug.md
+|   |       |-- discuss-phase.md
+|   |       |-- execute-phase.md
+|   |       |-- help.md
+|   |       |-- insert-phase.md
+|   |       |-- join-discord.md
+|   |       |-- list-phase-assumptions.md
+|   |       |-- map-codebase.md
+|   |       |-- new-milestone.md
+|   |       |-- new-project.md
+|   |       |-- new-project.md.bak
+|   |       |-- pause-work.md
+|   |       |-- plan-milestone-gaps.md
+|   |       |-- plan-phase.md
+|   |       |-- progress.md
+|   |       |-- quick.md
+|   |       |-- reapply-patches.md
+|   |       |-- remove-phase.md
+|   |       |-- research-phase.md
+|   |       |-- resume-work.md
+|   |       |-- set-profile.md
+|   |       |-- settings.md
+|   |       |-- update.md
+|   |       `-- verify-work.md
+|   |-- escalations/
+|   |   `-- pending-improvements.json
+|   |-- get-shit-done/
+|   |   |-- bin/
+|   |   |   |-- gsd-tools.js
+|   |   |   `-- gsd-tools.test.js
+|   |   |-- references/
+|   |   |   |-- checkpoints.md
+|   |   |   |-- continuation-format.md
+|   |   |   |-- decimal-phase-calculation.md
+|   |   |   |-- git-integration.md
+|   |   |   |-- git-planning-commit.md
+|   |   |   |-- model-profile-resolution.md
+|   |   |   |-- model-profiles.md
+|   |   |   |-- phase-argument-parsing.md
+|   |   |   |-- planning-config.md
+|   |   |   |-- questioning.md
+|   |   |   |-- tdd.md
+|   |   |   |-- ui-brand.md
+|   |   |   `-- verification-patterns.md
+|   |   |-- templates/
+|   |   |   |-- codebase/
+|   |   |   |   |-- architecture.md
+|   |   |   |   |-- concerns.md
+|   |   |   |   |-- conventions.md
+|   |   |   |   |-- integrations.md
+|   |   |   |   |-- stack.md
+|   |   |   |   |-- structure.md
+|   |   |   |   `-- testing.md
+|   |   |   |-- research-project/
+|   |   |   |   |-- ARCHITECTURE.md
+|   |   |   |   |-- FEATURES.md
+|   |   |   |   |-- PITFALLS.md
+|   |   |   |   |-- STACK.md
+|   |   |   |   `-- SUMMARY.md
+|   |   |   |-- config.json
+|   |   |   |-- context.md
+|   |   |   |-- continue-here.md
+|   |   |   |-- debug-subagent-prompt.md
+|   |   |   |-- DEBUG.md
+|   |   |   |-- discovery.md
+|   |   |   |-- milestone-archive.md
+|   |   |   |-- milestone.md
+|   |   |   |-- phase-prompt.md
+|   |   |   |-- planner-subagent-prompt.md
+|   |   |   |-- project.md
+|   |   |   |-- requirements.md
+|   |   |   |-- research.md
+|   |   |   |-- roadmap.md
+|   |   |   |-- state.md
+|   |   |   |-- summary-complex.md
+|   |   |   |-- summary-minimal.md
+|   |   |   |-- summary-standard.md
+|   |   |   |-- summary.md
+|   |   |   |-- UAT.md
+|   |   |   |-- user-setup.md
+|   |   |   `-- verification-report.md
+|   |   |-- workflows/
+|   |   |   |-- add-phase.md
+|   |   |   |-- add-todo.md
+|   |   |   |-- audit-milestone.md
+|   |   |   |-- check-todos.md
+|   |   |   |-- complete-milestone.md
+|   |   |   |-- compound-execute.md
+|   |   |   |-- diagnose-issues.md
+|   |   |   |-- discovery-phase.md
+|   |   |   |-- discuss-phase.md
+|   |   |   |-- execute-phase.md
+|   |   |   |-- execute-plan.md
+|   |   |   |-- help.md
+|   |   |   |-- insert-phase.md
+|   |   |   |-- list-phase-assumptions.md
+|   |   |   |-- map-codebase.md
+|   |   |   |-- new-milestone.md
+|   |   |   |-- new-project.md
+|   |   |   |-- pause-work.md
+|   |   |   |-- plan-milestone-gaps.md
+|   |   |   |-- plan-phase.md
+|   |   |   |-- progress.md
+|   |   |   |-- quick.md
+|   |   |   |-- remove-phase.md
+|   |   |   |-- research-phase.md
+|   |   |   |-- resume-project.md
+|   |   |   |-- set-profile.md
+|   |   |   |-- settings.md
+|   |   |   |-- transition.md
+|   |   |   |-- update.md
+|   |   |   |-- verify-phase.md
+|   |   |   `-- verify-work.md
+|   |   `-- VERSION
+|   |-- hooks/
+|   |   |-- check-pending-improvements.py
+|   |   |-- gsd-check-update.js
+|   |   |-- gsd-statusline.js
+|   |   `-- start-health-daemon.py
+|   |-- metrics/
+|   |   |-- 13.2/
+|   |   |   `-- 13.2-01.json
+|   |   `-- test/
+|   |       |-- test-01.json
+|   |       |-- test-02.json
+|   |       |-- test-03.json
+|   |       `-- test-04.json
+|   |-- plugins/
+|   |   `-- ralph-wiggum/
+|   |       |-- .claude-plugin/
+|   |       |   `-- plugin.json
+|   |       |-- commands/
+|   |       |   |-- cancel-ralph.md
+|   |       |   |-- quality-loop.md
+|   |       |   `-- ralph-loop.md
+|   |       |-- hooks/
+|   |       |   |-- hooks.json
+|   |       |   `-- stop-hook.sh
+|   |       |-- scripts/
+|   |       |   `-- setup-ralph-loop.sh
+|   |       `-- README.md
+|   |-- skills/
+|   |   |-- verify-phase/
+|   |   |   |-- SKILL.md
+|   |   |   `-- verify.sh
+|   |   |-- quality-loop.yaml
+|   |   `-- seo-update.yaml
+|   |-- AUTOMATIC_VERIFICATION_ENABLED.md
+|   |-- gsd-file-manifest.json
+|   |-- HOOKS_GUIDE.md
+|   |-- learnings.md
+|   |-- MVP_IMPLEMENTATION_COMPLETE.md
+|   |-- PROGRESSIVE_VERIFICATION_QUICKSTART.md
+|   |-- SESSION_PRIMER_TEMPLATE.md
+|   |-- settings.json
+|   `-- settings.local.json
+|-- .codex/
+|   |-- hooks/
+|   |   `-- start-health-daemon.py
+|   |-- learnings.md
+|   |-- preToolUseHook.sh
+|   |-- SESSION_PRIMER_TEMPLATE.md
+|   `-- settings.json
+|-- .gemini/
+|   |-- hooks/
+|   |   `-- start-health-daemon.py
+|   |-- learnings.md
+|   |-- preToolUseHook.sh
+|   |-- SESSION_PRIMER_TEMPLATE.md
+|   `-- settings.json
+|-- .github/
+|   `-- workflows/
+|       |-- auto-remediate.yml
+|       |-- ci-backend.yml
+|       |-- phase13-deploy-guard.yml
+|       |-- resolve-bot-threads.yml
+|       |-- review-agent-rerun.yml
+|       `-- risk-policy-gate.yml
+|-- .obsidian/
+|   |-- app.json
+|   |-- appearance.json
+|   |-- core-plugins.json
+|   |-- graph.json
+|   `-- workspace.json
+|-- .planning/
+|   |-- archive/
+|   |   `-- README.md
+|   |-- debug/
+|   |   |-- chat-unfilled-template-and-ingest-broken.md
+|   |   |-- live-authenticated-playwright-pass.md
+|   |   |-- url-frontdoor-restoration-vektal.md
+|   |   `-- vektal-domain-cutover-not-reachable.md
+|   |-- enhancements/
+|   |   `-- GSD_PROGRESSIVE_VERIFICATION.md
+|   |-- phases/
+|   |   |-- 01-codebase-cleanup-analysis/
+|   |   |   |-- 01-01-PLAN.md
+|   |   |   |-- 01-01-SUMMARY.md
+|   |   |   |-- 01-02-PLAN.md
+|   |   |   |-- 01-02-SUMMARY.md
+|   |   |   |-- 01-03-PLAN.md
+|   |   |   |-- 01-03-SUMMARY.md
+|   |   |   |-- 01-RESEARCH.md
+|   |   |   `-- 01-VERIFICATION.md
+|   |   |-- 01.1-root-documentation-organization/
+|   |   |   |-- 01.1-01-PLAN.md
+|   |   |   |-- 01.1-01-SUMMARY.md
+|   |   |   |-- 01.1-02-PLAN.md
+|   |   |   |-- 01.1-02-SUMMARY.md
+|   |   |   |-- 01.1-03-PLAN.md
+|   |   |   |-- 01.1-03-SUMMARY.md
+|   |   |   |-- 01.1-VERIFICATION.md
+|   |   |   `-- VERIFICATION_SUMMARY.txt
+|   |   |-- 02-docker-infrastructure-foundation/
+|   |   |   |-- 02-01-PLAN.md
+|   |   |   |-- 02-01-SUMMARY.md
+|   |   |   |-- 02-02-PLAN.md
+|   |   |   |-- 02-02-SUMMARY.md
+|   |   |   |-- 02-03-PLAN.md
+|   |   |   |-- 02-03-SUMMARY.md
+|   |   |   |-- 02-04-PLAN.md
+|   |   |   |-- 02-04-SUMMARY.md
+|   |   |   |-- 02-CONTEXT.md
+|   |   |   |-- 02-RESEARCH.md
+|   |   |   |-- 02-UAT.md
+|   |   |   `-- 02-VERIFICATION.md
+|   |   |-- 02.1-universal-vendor-scraping-engine/
+|   |   |   |-- 02.1-01-PLAN.md
+|   |   |   |-- 02.1-01-SUMMARY.md
+|   |   |   |-- 02.1-02-PLAN.md
+|   |   |   |-- 02.1-02-SUMMARY.md
+|   |   |   |-- 02.1-03-PLAN.md
+|   |   |   |-- 02.1-03-SUMMARY.md
+|   |   |   |-- 02.1-04-PLAN.md
+|   |   |   |-- 02.1-04-SUMMARY.md
+|   |   |   |-- 02.1-05-PLAN.md
+|   |   |   |-- 02.1-05-SUMMARY.md
+|   |   |   |-- 02.1-06-PLAN.md
+|   |   |   |-- 02.1-06-SUMMARY.md
+|   |   |   |-- 02.1-07-PLAN.md
+|   |   |   |-- 02.1-07-SUMMARY.md
+|   |   |   |-- 02.1-08-PLAN.md
+|   |   |   |-- 02.1-08-SUMMARY.md
+|   |   |   |-- 02.1-09-PLAN.md
+|   |   |   |-- 02.1-09-SUMMARY.md
+|   |   |   |-- 02.1-10-PLAN.md
+|   |   |   |-- 02.1-10-SUMMARY.md
+|   |   |   |-- 02.1-11-PLAN.md
+|   |   |   |-- 02.1-11-SUMMARY.md
+|   |   |   |-- 02.1-CONTEXT.md
+|   |   |   |-- 02.1-RESEARCH.md
+|   |   |   |-- 02.1-VERIFICATION-backup.md
+|   |   |   |-- 02.1-VERIFICATION-old.md
+|   |   |   |-- 02.1-VERIFICATION.md
+|   |   |   `-- README.md
+|   |   |-- 02.2-product-enrichment-pipeline/
+|   |   |   |-- 02.2-01-PLAN.md
+|   |   |   |-- 02.2-01-SUMMARY.md
+|   |   |   |-- 02.2-02-PLAN.md
+|   |   |   |-- 02.2-02-SUMMARY.md
+|   |   |   |-- 02.2-03-PLAN.md
+|   |   |   |-- 02.2-03-SUMMARY.md
+|   |   |   |-- 02.2-04-PLAN.md
+|   |   |   |-- 02.2-04-SUMMARY.md
+|   |   |   |-- 02.2-05-PLAN.md
+|   |   |   |-- 02.2-05-SUMMARY.md
+|   |   |   |-- 02.2-06-PLAN.md
+|   |   |   |-- 02.2-06-SUMMARY.md
+|   |   |   |-- 02.2-CONTEXT.md
+|   |   |   |-- 02.2-RESEARCH.md
+|   |   |   |-- 02.2-VERIFICATION.md
+|   |   |   `-- ENHANCEMENTS.md
+|   |   |-- 03-database-migration-sqlite-to-postgresql/
+|   |   |   |-- 03-01-PLAN.md
+|   |   |   |-- 03-01-SUMMARY.md
+|   |   |   |-- 03-02-PLAN.md
+|   |   |   |-- 03-02-SUMMARY.md
+|   |   |   |-- 03-03-PLAN.md
+|   |   |   |-- 03-03-SUMMARY.md
+|   |   |   |-- 03-04-PLAN.md
+|   |   |   |-- 03-04-SUMMARY.md
+|   |   |   |-- 03-05-PLAN.md
+|   |   |   |-- 03-05-SUMMARY.md
+|   |   |   |-- 03-CONTEXT.md
+|   |   |   |-- 03-RESEARCH.md
+|   |   |   |-- 03-VERIFICATION.md
+|   |   |   |-- PHASE3_VERIFICATION.md
+|   |   |   |-- PHASE3_VERIFICATION_COMPLETE.md
+|   |   |   `-- PHASE3_VERIFICATION_STATUS.md
+|   |   |-- 04-authentication-user-management/
+|   |   |   |-- 04-01-PLAN.md
+|   |   |   |-- 04-01-SUMMARY.md
+|   |   |   |-- 04-02-PLAN.md
+|   |   |   |-- 04-02-SUMMARY.md
+|   |   |   |-- 04-03-PLAN.md
+|   |   |   |-- 04-03-SUMMARY.md
+|   |   |   |-- 04-03-USER-SETUP.md
+|   |   |   |-- 04-04-PLAN.md
+|   |   |   |-- 04-04-SUMMARY.md
+|   |   |   |-- 04-04-USER-SETUP.md
+|   |   |   |-- 04-05-IMPLEMENTATION-NOTES.md
+|   |   |   |-- 04-05-PLAN.md
+|   |   |   |-- 04-05-SUMMARY.md
+|   |   |   |-- 04-05-USER-SETUP.md
+|   |   |   |-- 04-06-PLAN.md
+|   |   |   |-- 04-06-SUMMARY.md
+|   |   |   |-- 04-CONTEXT.md
+|   |   |   |-- 04-PRICING-ANALYSIS.md
+|   |   |   |-- 04-RESEARCH.md
+|   |   |   |-- 04-UAT.md
+|   |   |   `-- STRIPE_WEBHOOK_INTEGRATION_STATUS.md
+|   |   |-- 05-backend-api-design/
+|   |   |   |-- 05-01-PLAN-CODEX.md
+|   |   |   |-- 05-01-PLAN.md
+|   |   |   |-- 05-01-SUMMARY.md
+|   |   |   |-- 05-02-PLAN-CODEX.md
+|   |   |   |-- 05-02-PLAN.md
+|   |   |   |-- 05-02-SUMMARY.md
+|   |   |   |-- 05-03-PLAN.md
+|   |   |   |-- 05-03-SUMMARY.md
+|   |   |   |-- 05-04-01-PLAN.md
+|   |   |   |-- 05-04-01-SUMMARY.md
+|   |   |   |-- 05-04-PLAN.md
+|   |   |   |-- 05-04-SUMMARY.md
+|   |   |   |-- 05-05-PLAN.md
+|   |   |   |-- 05-05-SUMMARY.md
+|   |   |   |-- 05-CONTEXT.md
+|   |   |   |-- 05-RESEARCH-CODEX.md
+|   |   |   |-- 05-RESEARCH.md
+|   |   |   `-- 05-SUMMARY.md
+|   |   |-- 06-job-processing-infrastructure-celery/
+|   |   |   |-- 06-01-PLAN.md
+|   |   |   |-- 06-01-SUMMARY.md
+|   |   |   |-- 06-02-PLAN.md
+|   |   |   |-- 06-02-SUMMARY.md
+|   |   |   |-- 06-03-PLAN.md
+|   |   |   |-- 06-03-SUMMARY.md
+|   |   |   |-- 06-04-PLAN.md
+|   |   |   |-- 06-04-SUMMARY.md
+|   |   |   |-- 06-05-PLAN.md
+|   |   |   |-- 06-05-SUMMARY.md
+|   |   |   |-- 06-06-PLAN.md
+|   |   |   |-- 06-06-SUMMARY.md
+|   |   |   |-- 06-CONTEXT.md
+|   |   |   |-- 06-POST-UAT-WORKTREE-INVENTORY.md
+|   |   |   |-- 06-RESEARCH.md
+|   |   |   |-- 06-SUMMARY.md
+|   |   |   |-- 06-UAT.md
+|   |   |   `-- 06-VERIFICATION.md
+|   |   |-- 07-frontend-framework-setup/
+|   |   |   |-- 07.1-governance-baseline/
+|   |   |   |   `-- PLAN.md
+|   |   |   |-- 07.2-governance-operational-defaults/
+|   |   |   |   `-- PLAN.md
+|   |   |   |-- 07-01-currentstate.md
+|   |   |   |-- 07-01-PLAN.md
+|   |   |   |-- 07-01-SUMMARY.md
+|   |   |   |-- 07-02-PLAN.md
+|   |   |   |-- 07-02-SUMMARY.md
+|   |   |   |-- 07-03-PLAN.md
+|   |   |   |-- 07-03-SUMMARY.md
+|   |   |   |-- 07-CONTEXT.md
+|   |   |   |-- 07-DISCOVERY.md
+|   |   |   |-- 07-MODULE-BOUNDARY-MAP.md
+|   |   |   |-- 07-PLANNING-COVERAGE.md
+|   |   |   |-- 07-RESEARCH.md
+|   |   |   `-- 07-UAT.md
+|   |   |-- 08-product-resolution-engine/
+|   |   |   |-- 08-01-PLAN.md
+|   |   |   |-- 08-01-SUMMARY.md
+|   |   |   |-- 08-02-PLAN.md
+|   |   |   |-- 08-02-SUMMARY.md
+|   |   |   |-- 08-03-PLAN.md
+|   |   |   |-- 08-03-SUMMARY.md
+|   |   |   |-- 08-04-PLAN.md
+|   |   |   |-- 08-04-SUMMARY.md
+|   |   |   |-- 08-CONTEXT.md
+|   |   |   |-- 08-PLANNING-COVERAGE.md
+|   |   |   |-- 08-RESEARCH.md
+|   |   |   |-- 08-UAT.md
+|   |   |   `-- 08-VERIFICATION.md
+|   |   |-- 09-real-time-progress-tracking/
+|   |   |   |-- 09-01-PLAN.md
+|   |   |   |-- 09-01-SUMMARY.md
+|   |   |   |-- 09-02-PLAN.md
+|   |   |   |-- 09-02-SUMMARY.md
+|   |   |   |-- 09-CONTEXT.md
+|   |   |   |-- 09-PLANNING-COVERAGE.md
+|   |   |   |-- 09-RESEARCH.md
+|   |   |   `-- 09-VERIFICATION.md
+|   |   |-- 10-conversational-ai-interface/
+|   |   |   |-- 10-01-PLAN.md
+|   |   |   |-- 10-01-SUMMARY.md
+|   |   |   |-- 10-02-PLAN.md
+|   |   |   |-- 10-02-SUMMARY.md
+|   |   |   |-- 10-03-PLAN.md
+|   |   |   |-- 10-03-SUMMARY.md
+|   |   |   |-- 10-04-PLAN.md
+|   |   |   |-- 10-04-SUMMARY.md
+|   |   |   |-- 10-CONTEXT.md
+|   |   |   |-- 10-PLANNING-COVERAGE.md
+|   |   |   |-- 10-RESEARCH.md
+|   |   |   `-- 10-VERIFICATION.md
+|   |   |-- 11-product-search-discovery/
+|   |   |   |-- 11-01-PLAN.md
+|   |   |   |-- 11-01-SUMMARY.md
+|   |   |   |-- 11-02-PLAN.md
+|   |   |   |-- 11-02-SUMMARY.md
+|   |   |   |-- 11-03-PLAN.md
+|   |   |   |-- 11-03-SUMMARY.md
+|   |   |   |-- 11-CONTEXT.md
+|   |   |   |-- 11-PLANNING-COVERAGE.md
+|   |   |   |-- 11-RESEARCH.md
+|   |   |   |-- 11-VERIFICATION.md
+|   |   |   `-- GOV_REL_GLOSSARY.md
+|   |   |-- 12-tier-system-architecture/
+|   |   |   |-- 12-01-PLAN.md
+|   |   |   |-- 12-01-SUMMARY.md
+|   |   |   |-- 12-02-PLAN.md
+|   |   |   |-- 12-02-SUMMARY.md
+|   |   |   |-- 12-03-PLAN.md
+|   |   |   |-- 12-03-SUMMARY.md
+|   |   |   |-- 12-CONTEXT.md
+|   |   |   |-- 12-PLANNING-COVERAGE.md
+|   |   |   |-- 12-PRE-CONTEXT-SCOPE.md
+|   |   |   |-- 12-RESEARCH.md
+|   |   |   `-- 12-VERIFICATION.md
+|   |   |-- 13-integration-hardening-deployment/
+|   |   |   |-- 13-01-PLAN.md
+|   |   |   |-- 13-01-SUMMARY.md
+|   |   |   |-- 13-02-PLAN.md
+|   |   |   |-- 13-02-SUMMARY.md
+|   |   |   |-- 13-03-PLAN.md
+|   |   |   |-- 13-03-SUMMARY.md
+|   |   |   |-- 13-04-PLAN.md
+|   |   |   |-- 13-04-SUMMARY.md
+|   |   |   |-- 13-CONTEXT.md
+|   |   |   |-- 13-PLANNING-COVERAGE.md
+|   |   |   |-- 13-PRE-CONTEXT-SCOPE.md
+|   |   |   |-- 13-RESEARCH-core.md
+|   |   |   |-- 13-RESEARCH-deep.md
+|   |   |   |-- 13-RESEARCH.md
+|   |   |   `-- 13-VERIFICATION.md
+|   |   |-- 13.1-product-data-enrichment-protocol-v2-integration/
+|   |   |   |-- 13.1-01-PLAN.md
+|   |   |   |-- 13.1-01-SUMMARY.md
+|   |   |   |-- 13.1-02-PLAN.md
+|   |   |   |-- 13.1-02-SUMMARY.md
+|   |   |   |-- 13.1-03-PLAN.md
+|   |   |   |-- 13.1-03-SUMMARY.md
+|   |   |   |-- 13.1-04-PLAN.md
+|   |   |   |-- 13.1-04-SUMMARY.md
+|   |   |   |-- 13.1-CONTEXT.md
+|   |   |   |-- 13.1-PLANNING-COVERAGE.md
+|   |   |   |-- 13.1-PRE-CONTEXT-SCOPE.md
+|   |   |   |-- 13.1-RESEARCH-core.md
+|   |   |   |-- 13.1-RESEARCH-deep.md
+|   |   |   |-- 13.1-RESEARCH.md
+|   |   |   `-- 13.1-VERIFICATION.md
+|   |   |-- 13.2-oracle-framework-reuse/
+|   |   |   |-- 13.2-01-PLAN.md
+|   |   |   |-- 13.2-01-SUMMARY.md
+|   |   |   |-- 13.2-02-PLAN.md
+|   |   |   |-- 13.2-02-SUMMARY.md
+|   |   |   |-- 13.2-03-PLAN.md
+|   |   |   |-- 13.2-03-SUMMARY.md
+|   |   |   |-- 13.2-04-PLAN.md
+|   |   |   |-- 13.2-04-SUMMARY.md
+|   |   |   |-- 13.2-05-PLAN.md
+|   |   |   |-- 13.2-05-SUMMARY.md
+|   |   |   |-- 13.2-06-PLAN.md
+|   |   |   |-- 13.2-06-SUMMARY.md
+|   |   |   |-- 13.2-07-PLAN.md
+|   |   |   |-- 13.2-07-SUMMARY.md
+|   |   |   |-- 13.2-PLANNING-COVERAGE.md
+|   |   |   |-- 13.2-PRE-CONTEXT-SCOPE.md
+|   |   |   |-- 13.2-VERIFICATION.md
+|   |   |   `-- 13.2-VERIFICATION.md.backup
+|   |   |-- 14-continuous-optimization-learning/
+|   |   |   |-- 14-01-PLAN.md
+|   |   |   |-- 14-01-SUMMARY.md
+|   |   |   |-- 14-02-PLAN.md
+|   |   |   |-- 14-02-SUMMARY.md
+|   |   |   |-- 14-03-PLAN.md
+|   |   |   |-- 14-03-SUMMARY.md
+|   |   |   |-- 14-04-PLAN.md
+|   |   |   |-- 14-04-SUMMARY.md
+|   |   |   |-- 14-05-PLAN.md
+|   |   |   |-- 14-05-SUMMARY.md
+|   |   |   |-- 14-06-PLAN.md
+|   |   |   |-- 14-06-SUMMARY.md
+|   |   |   |-- 14-07-PLAN.md
+|   |   |   |-- 14-07-SUMMARY.md
+|   |   |   |-- 14-08-PLAN.md
+|   |   |   |-- 14-08-SUMMARY.md
+|   |   |   |-- 14-CONTEXT.md
+|   |   |   |-- 14-DISCUSSION-STATE.md
+|   |   |   |-- 14-STATE-AFTER.md
+|   |   |   `-- README.md
+|   |   |-- 14.1-rag-enhancement/
+|   |   |   |-- 14.1-01-PLAN.md
+|   |   |   |-- 14.1-01-SUMMARY.md
+|   |   |   |-- 14.1-02-PLAN.md
+|   |   |   |-- 14.1-02-SUMMARY.md
+|   |   |   |-- 14.1-03-PLAN.md
+|   |   |   |-- 14.1-03-SUMMARY.md
+|   |   |   |-- 14.1-04-PLAN.md
+|   |   |   |-- 14.1-04-SUMMARY.md
+|   |   |   |-- 14.1-05-PLAN.md
+|   |   |   |-- 14.1-05-SUMMARY.md
+|   |   |   |-- 14.1-06-PLAN.md
+|   |   |   |-- 14.1-06-SUMMARY.md
+|   |   |   |-- 14.1-CROSS-REFERENCE.md
+|   |   |   |-- 14.1-EXECUTION-VALIDATION.md
+|   |   |   |-- 14.1-PLAN-VALIDATION.md
+|   |   |   |-- 14.1-PLAN.md
+|   |   |   |-- 14.1-RESEARCH.md
+|   |   |   `-- 14.1-SUMMARY.md
+|   |   |-- 14.2-tool-calling-v2/
+|   |   |   |-- 14.2-01-PLAN.md
+|   |   |   |-- 14.2-01-SUMMARY.md
+|   |   |   |-- 14.2-02-PLAN.md
+|   |   |   |-- 14.2-02-SUMMARY.md
+|   |   |   |-- 14.2-03-PLAN.md
+|   |   |   |-- 14.2-03-SUMMARY.md
+|   |   |   |-- 14.2-04-PLAN.md
+|   |   |   |-- 14.2-04-SUMMARY.md
+|   |   |   |-- 14.2-05-PLAN.md
+|   |   |   |-- 14.2-05-SUMMARY.md
+|   |   |   |-- 14.2-06-PLAN.md
+|   |   |   |-- 14.2-06-SUMMARY.md
+|   |   |   |-- 14.2-07-PLAN.md
+|   |   |   |-- 14.2-07-SUMMARY.md
+|   |   |   |-- 14.2-PLAN.md
+|   |   |   |-- 14.2-RESEARCH.md
+|   |   |   |-- PLANNING-SUMMARY.md
+|   |   |   `-- README.md
+|   |   |-- 14.3-graph-availability-sync/
+|   |   |   |-- 14.3-01-PLAN.md
+|   |   |   |-- 14.3-01-SUMMARY.md
+|   |   |   |-- 14.3-02-PLAN.md
+|   |   |   |-- 14.3-02-SUMMARY.md
+|   |   |   |-- 14.3-03-PLAN.md
+|   |   |   |-- 14.3-03-SUMMARY.md
+|   |   |   |-- 14.3-04-PLAN.md
+|   |   |   |-- 14.3-04-SUMMARY.md
+|   |   |   |-- 14.3-05-PLAN.md
+|   |   |   |-- 14.3-05-SUMMARY.md
+|   |   |   |-- 14.3-06-PLAN.md
+|   |   |   |-- 14.3-06-SUMMARY.md
+|   |   |   |-- 14.3-07-PLAN.md
+|   |   |   |-- 14.3-07-SUMMARY.md
+|   |   |   |-- 14.3-CONTEXT.md
+|   |   |   |-- 14.3-RESEARCH.md
+|   |   |   |-- 14.3-VERIFICATION-GATE.md
+|   |   |   `-- README.md
+|   |   `-- 15-self-healing-dynamic-scripting/
+|   |       |-- 15-01-03-VERIFICATION-GATE.md
+|   |       |-- 15-01-PLAN.md
+|   |       |-- 15-01-SUMMARY.md
+|   |       |-- 15-02-PLAN.md
+|   |       |-- 15-02-SUMMARY.md
+|   |       |-- 15-03-PLAN.md
+|   |       |-- 15-03-SUMMARY.md
+|   |       |-- 15-04-08-VERIFICATION-GATE.md
+|   |       |-- 15-04-PLAN.md
+|   |       |-- 15-04-SUMMARY.md
+|   |       |-- 15-05-PLAN.md
+|   |       |-- 15-05-SUMMARY.md
+|   |       |-- 15-06-PLAN.md
+|   |       |-- 15-06-SUMMARY.md
+|   |       |-- 15-07-PLAN.md
+|   |       |-- 15-07-SUMMARY.md
+|   |       |-- 15-08-PLAN.md
+|   |       |-- 15-08-SUMMARY.md
+|   |       |-- 15-09-PLAN.md
+|   |       |-- 15-09-SUMMARY.md
+|   |       |-- 15-10-PLAN.md
+|   |       |-- 15-10-SUMMARY.md
+|   |       |-- 15-11a-PLAN.md
+|   |       |-- 15-11a-SUMMARY.md
+|   |       |-- 15-11b-PLAN.md
+|   |       |-- 15-11b-SUMMARY.md
+|   |       |-- 15-ARCHITECTURE-LOCKED.md
+|   |       |-- 15-CONTEXT.md
+|   |       |-- 15-PLAN.md
+|   |       |-- 15-PRE-CONTEXT-SCOPE.md
+|   |       |-- 15-RESEARCH.md
+|   |       |-- 15-UAT.md
+|   |       |-- changes.md
+|   |       |-- health-daemon-implementation-summary.md
+|   |       |-- RESEARCH-COMPLETION.md
+|   |       `-- research.md
+|   |-- quick/
+|   |   `-- 1-os-self-actualization/
+|   |       |-- 1-PLAN.md
+|   |       `-- 1-SUMMARY.md
+|   |-- research/
+|   |   |-- ARCHITECTURE.md
+|   |   |-- FEATURES.md
+|   |   |-- PITFALLS.md
+|   |   |-- RUVECTOR-LEARNINGS.md
+|   |   |-- STACK.md
+|   |   `-- SUMMARY.md
+|   |-- AGENTS.override.md
+|   |-- config.json
+|   |-- DIRTY_WORKTREE_REPORT.md
+|   |-- INCIDENT_LOG.md
+|   |-- KNOWLEDGE_GRAPH_ORACLE.md
+|   |-- MILESTONES.md
+|   |-- PROJECT.md
+|   |-- REQUIREMENTS.md
+|   |-- ROADMAP.md
+|   |-- STATE.md
+|   `-- TOOL_CALLING_2_INTEGRATION.md
+|-- archive/
+|   |-- 2026-directories/
+|   |   |-- cli-old-argparse/
+|   |   |   |-- bulk/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- push_images_only.py
+|   |   |   |   `-- push_metadata_only.py
+|   |   |   |-- pentart/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- pentart_manager.py
+|   |   |   |-- products/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- check_product.py
+|   |   |   |   |-- find_and_update_by_barcode.py
+|   |   |   |   |-- find_and_update_sku.py
+|   |   |   |   |-- quick_update_product.py
+|   |   |   |   |-- update_barcode_product.py
+|   |   |   |   |-- update_pentart_barcode.py
+|   |   |   |   |-- update_pentart_product.py
+|   |   |   |   |-- update_sku.py
+|   |   |   |   |-- update_sku_rest.py
+|   |   |   |   `-- update_via_rest.py
+|   |   |   |-- search/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- get_barcode.py
+|   |   |   |   |-- scrape_pentacolor_images.py
+|   |   |   |   |-- scrape_pentart_sku.py
+|   |   |   |   `-- search_barcode.py
+|   |   |   |-- vision/
+|   |   |   |   `-- generate_vision_alt_text.py
+|   |   |   |-- __init__.py
+|   |   |   |-- main.py
+|   |   |   `-- temu_exporter.py
+|   |   |-- orchestrator-quality-experiment/
+|   |   |   |-- __init__.py
+|   |   |   |-- product_quality_agent.py
+|   |   |   |-- quality_loop_ralph.py
+|   |   |   `-- trigger_quality_check.py
+|   |   |-- scripts-utility-operations/
+|   |   |   |-- add_metadata_columns.py
+|   |   |   |-- amend_handles.py
+|   |   |   |-- analyze_timing.py
+|   |   |   |-- audit_v3.py
+|   |   |   |-- auto_organize.py
+|   |   |   |-- bulk_update_pentart_shopify.py
+|   |   |   |-- clean_push_proof.py
+|   |   |   |-- cleanup_shopify_tags.py
+|   |   |   |-- cleanup_workspace.py
+|   |   |   |-- debug_ddg.py
+|   |   |   |-- debug_ean.py
+|   |   |   |-- dedupe_not_found.py
+|   |   |   |-- export_farbe_metafields.py
+|   |   |   |-- export_paperdesigns.py
+|   |   |   |-- export_shared_clusters.py
+|   |   |   |-- extract_missing_proofs.py
+|   |   |   |-- find_correct_eans.py
+|   |   |   |-- find_dupes.py
+|   |   |   |-- fix_itd_pricing.py
+|   |   |   |-- import_pentart_catalog.py
+|   |   |   |-- itd_debug.py
+|   |   |   |-- list_collections.py
+|   |   |   |-- list_vendors.py
+|   |   |   |-- not_found_finder_v4_optimized.py
+|   |   |   |-- prep_all_itd_prices.py
+|   |   |   |-- prep_custom_scrape.py
+|   |   |   |-- prep_data_for_push.py
+|   |   |   |-- rebuild_push_proof.py
+|   |   |   |-- remove_dupes_push_proof.py
+|   |   |   |-- review_shared_alt.py
+|   |   |   |-- seo_plan_v1.py
+|   |   |   |-- sync_to_proof.py
+|   |   |   |-- system_organizer.py
+|   |   |   |-- test_app.py
+|   |   |   |-- test_dynamic_scraper.py
+|   |   |   |-- update_metadata.py
+|   |   |   |-- variant_image_sync.py
+|   |   |   |-- verify_push_proof_final.py
+|   |   |   `-- verify_shopify_updates.py
+|   |   |-- test_data-original/
+|   |   |   |-- README.md
+|   |   |   |-- sample_existing_products.csv
+|   |   |   |-- sample_mixed_products.csv
+|   |   |   `-- sample_new_products.csv
+|   |   `-- vision_ai-old-structure/
+|   |       |-- __init__.py
+|   |       |-- cache.py
+|   |       |-- client.py
+|   |       |-- generator.py
+|   |       |-- prompts.py
+|   |       |-- stats.py
+|   |       `-- test.py
+|   |-- 2026-scripts/
+|   |   |-- analysis/
+|   |   |   |-- analyze_deleted_images.py
+|   |   |   |-- analyze_reispapier_vendors.py
+|   |   |   |-- find_missing_products.py
+|   |   |   |-- find_products_by_sku.py
+|   |   |   |-- find_remaining_products.py
+|   |   |   |-- list_all_products.py
+|   |   |   |-- search_broad.py
+|   |   |   `-- search_by_title.py
+|   |   |-- apply/
+|   |   |   |-- apply_all_galaxy_flakes_sop.py
+|   |   |   |-- apply_saturn_green.py
+|   |   |   `-- apply_saturn_green_with_filename.py
+|   |   |-- debug/
+|   |   |   |-- debug_aistcraft.js
+|   |   |   |-- debug_itd.js
+|   |   |   |-- debug_pentart.js
+|   |   |   `-- debug_single_vendor.js
+|   |   |-- dry-run/
+|   |   |   |-- dry_run_pluto_yellow.py
+|   |   |   |-- dry_run_restore_all_images.py
+|   |   |   |-- dry_run_restore_shared_images.py
+|   |   |   `-- dry_run_saturn_green.py
+|   |   |-- fix/
+|   |   |   |-- auto_fix_images.py
+|   |   |   |-- fix_and_add_images.py
+|   |   |   |-- fix_pentart_products.py
+|   |   |   `-- fix_pentart_rest.py
+|   |   |-- misc/
+|   |   |   |-- add_pentart_products.py
+|   |   |   |-- catalog_paperdesigns.py
+|   |   |   |-- complete_pentart_products.py
+|   |   |   |-- download_galaxy_flakes_images.py
+|   |   |   |-- generate_square_versions.py
+|   |   |   |-- get_test_skus.py
+|   |   |   |-- infer_paperdesigns_urls.py
+|   |   |   |-- inspect_pentacolor.py
+|   |   |   |-- preview_galaxy_flakes_updates.py
+|   |   |   |-- process_products_by_id.py
+|   |   |   |-- quick_image_test.py
+|   |   |   |-- recreate_pentart_products.py
+|   |   |   |-- replace_juno_rose_primary.py
+|   |   |   |-- replace_primary_image_safe.py
+|   |   |   |-- restore_shared_images_to_all_products.py
+|   |   |   |-- scrape_missing_products.js
+|   |   |   |-- set_inventory_final.py
+|   |   |   |-- set_inventory_levels.py
+|   |   |   |-- universal_vendor_scraper.js
+|   |   |   |-- universal_vendor_scraper_v2.js
+|   |   |   |-- update_saturn_green_final.py
+|   |   |   |-- update_three_products.py
+|   |   |   |-- upload_scraped_images.py
+|   |   |   |-- verify_image_types_with_vision.py
+|   |   |   `-- verify_uploaded_images.py
+|   |   |-- scrape/
+|   |   |   |-- scrape_and_upload_images.py
+|   |   |   |-- scrape_missing.js
+|   |   |   |-- scrape_paperdesigns_missing.py
+|   |   |   |-- scrape_single_paperdesign.py
+|   |   |   |-- scrape_three_images.py
+|   |   |   `-- scrape_views_0009_direct.py
+|   |   |-- test-scripts/
+|   |   |   |-- test_pentart_scraper.py
+|   |   |   |-- test_product_creation.py
+|   |   |   `-- test_universal_scraper.js
+|   |   |-- tool-output/
+|   |   |   |-- deadcode_output.txt
+|   |   |   |-- safety_audit.sql
+|   |   |   `-- vulture_output.txt
+|   |   |-- DEAD_CODE_REPORT.md
+|   |   `-- MANIFEST.md
+|   `-- v4_progress/
+|       |-- test_results_v4_dryrun_progress_20260126_181321.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181400.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181438.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181532.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181617.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181703.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181742.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181814.csv
+|       |-- test_results_v4_dryrun_progress_20260126_181847.csv
+|       `-- test_results_v4_dryrun_progress_20260126_181923.csv
+|-- config/
+|   |-- vendors/
+|   |   `-- _template.yaml
+|   |-- image_processing_rules.yaml
+|   |-- product_quality_rules.yaml
+|   `-- vendor_configs.yaml
+|-- docs/
+|   |-- guides/
+|   |   |-- CRITICAL_SAFEGUARDS.md
+|   |   |-- DOCKER_QUICKSTART.md
+|   |   |-- DOCKER_SECRETS.md
+|   |   |-- ORCHESTRATOR_INTEGRATION_EXAMPLE.md
+|   |   |-- ORCHESTRATOR_QUICK_START.md
+|   |   |-- PRODUCT_CREATION_GUIDE.md
+|   |   |-- QUICK_START.md
+|   |   |-- SEO_QUICK_START.md
+|   |   `-- SEO_SKILL_GUIDE.md
+|   |-- implementation/
+|   |   |-- IMPLEMENTATION_SUMMARY.md
+|   |   |-- PENTART_IMPLEMENTATION.md
+|   |   `-- PRODUCT_QUALITY_ORCHESTRATOR.md
+|   |-- legacy/
+|   |   |-- IMPLEMENTATION_SUMMARY.md
+|   |   |-- PENTART_PRODUCTS_SUMMARY.md
+|   |   |-- phase1-CONTEXT.md
+|   |   |-- phase1-PLAN.md
+|   |   `-- SolutionContextProfile.md
+|   |-- ops/
+|   |   `-- graph-availability-runbook.md
+|   |-- phase-reports/
+|   |   |-- FINAL_SUMMARY_PHASE_2.md
+|   |   |-- PHASE_2_COMPLETE.md
+|   |   `-- TASK_1_VENDOR_CONFIG_SUMMARY.md
+|   |-- reference/
+|   |   |-- FRAMEWORK_QUICK_REFERENCE.md
+|   |   |-- hybrid_naming_example.md
+|   |   |-- README_VISION_AI.md
+|   |   `-- VERIFICATION_CHECKLIST.md
+|   |-- requirements/
+|   |   `-- PRODUCT_REQUIREMENTS_DOCUMENT.md
+|   |-- setup/
+|   |   |-- README_APP.md
+|   |   `-- SETUP.md
+|   |-- tasks/
+|   |   |-- orchestrator_setup_tasks.md
+|   |   |-- SVSE_SESSION_SUMMARY.md
+|   |   `-- tag_cleanup_context.md
+|   |-- CRITICAL_BUG_FIX.md
+|   |-- DIRECTORY_STRUCTURE.md
+|   |-- galaxy_flakes_image_plan_summary.md
+|   |-- health-daemon-system.md
+|   |-- IMAGE_FINDING_SYSTEM.md
+|   |-- IMAGE_PROCESSING_FRAMEWORK.md
+|   |-- IMAGE_VERIFICATION_SYSTEM.md
+|   |-- INDEX.md
+|   |-- investigation-notes.md
+|   |-- MASTER_MAP.md
+|   |-- NEXT_PHASE_PLAN.md
+|   |-- PAYLOAD_SCHEMA.md
+|   |-- pretooluse-hook-system.md
+|   |-- PROJECT_SUMMARY.md
+|   |-- QA_CHECKLIST.md
+|   |-- RALPH_WIGGUM_INTEGRATION.md
+|   |-- README.md
+|   `-- SCRAPER_STRATEGY.md
+|-- frontend/
+|   |-- .design/
+|   |   `-- design-context.md
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- (app)/
+|   |   |   |   |-- chat/
+|   |   |   |   |   |-- page.test.tsx
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- dashboard/
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- enrichment/
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- jobs/
+|   |   |   |   |   |-- [id]/
+|   |   |   |   |   |   |-- page.test.tsx
+|   |   |   |   |   |   `-- page.tsx
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- onboarding/
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- search/
+|   |   |   |   |   |-- page.test.tsx
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   |-- settings/
+|   |   |   |   |   `-- page.tsx
+|   |   |   |   `-- layout.tsx
+|   |   |   |-- (auth)/
+|   |   |   |   `-- auth/
+|   |   |   |       |-- login/
+|   |   |   |       |   `-- page.tsx
+|   |   |   |       `-- verify/
+|   |   |   |           `-- page.tsx
+|   |   |   |-- approvals/
+|   |   |   |   `-- page.tsx
+|   |   |   |-- dashboard.contract.test.ts
+|   |   |   |-- globals.css
+|   |   |   |-- layout.tsx
+|   |   |   |-- page.tsx
+|   |   |   |-- routing.contract.test.ts
+|   |   |   `-- routing.guard.integration.test.ts
+|   |   |-- features/
+|   |   |   |-- approvals/
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- ApprovalQueue.css
+|   |   |   |   |   |-- ApprovalQueue.test.tsx
+|   |   |   |   |   `-- ApprovalQueue.tsx
+|   |   |   |   `-- pages/
+|   |   |   |       `-- ApprovalsPage.tsx
+|   |   |   |-- chat/
+|   |   |   |   |-- api/
+|   |   |   |   |   `-- chat-api.ts
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- ActionCard.test.tsx
+|   |   |   |   |   |-- ActionCard.tsx
+|   |   |   |   |   |-- BulkRunPanel.tsx
+|   |   |   |   |   |-- ChatWorkspace.test.tsx
+|   |   |   |   |   |-- ChatWorkspace.tsx
+|   |   |   |   |   |-- DelegationTracePanel.tsx
+|   |   |   |   |   `-- MessageBlockRenderer.tsx
+|   |   |   |   `-- hooks/
+|   |   |   |       |-- useChatSession.ts
+|   |   |   |       |-- useChatStream.test.ts
+|   |   |   |       `-- useChatStream.ts
+|   |   |   |-- enrichment/
+|   |   |   |   |-- api/
+|   |   |   |   |   `-- enrichment-api.ts
+|   |   |   |   `-- components/
+|   |   |   |       |-- EnrichmentConflictPanel.tsx
+|   |   |   |       |-- EnrichmentReviewTable.test.tsx
+|   |   |   |       |-- EnrichmentReviewTable.tsx
+|   |   |   |       |-- EnrichmentRunConfigurator.tsx
+|   |   |   |       |-- EnrichmentWorkspace.test.tsx
+|   |   |   |       `-- EnrichmentWorkspace.tsx
+|   |   |   |-- jobs/
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- GlobalJobTracker.tsx
+|   |   |   |   |   |-- JobsWorkspace.tsx
+|   |   |   |   |   |-- JobTerminalNotifications.test.ts
+|   |   |   |   |   `-- JobTerminalNotifications.tsx
+|   |   |   |   |-- hooks/
+|   |   |   |   |   |-- useJobDetailObserver.test.ts
+|   |   |   |   |   |-- useJobDetailObserver.ts
+|   |   |   |   |   |-- useJobListStateFromUrl.test.ts
+|   |   |   |   |   |-- useJobListStateFromUrl.ts
+|   |   |   |   |   |-- useJobRehydrate.test.ts
+|   |   |   |   |   `-- useJobRehydrate.ts
+|   |   |   |   `-- observer/
+|   |   |   |       |-- job-observer.ts
+|   |   |   |       |-- transport-ladder.test.ts
+|   |   |   |       `-- transport-ladder.ts
+|   |   |   |-- onboarding/
+|   |   |   |   |-- api/
+|   |   |   |   |   |-- onboarding-mutations.test.ts
+|   |   |   |   |   `-- onboarding-mutations.ts
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- OnboardingWizard.test.tsx
+|   |   |   |   |   `-- OnboardingWizard.tsx
+|   |   |   |   `-- state/
+|   |   |   |       |-- onboarding-machine.test.ts
+|   |   |   |       `-- onboarding-machine.ts
+|   |   |   |-- resolution/
+|   |   |   |   |-- api/
+|   |   |   |   |   `-- resolution-api.ts
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- ActivityPanels.tsx
+|   |   |   |   |   |-- CollaborationBadge.tsx
+|   |   |   |   |   |-- DryRunReview.tsx
+|   |   |   |   |   |-- FieldChangeRow.tsx
+|   |   |   |   |   |-- ProductChangeCard.tsx
+|   |   |   |   |   `-- TechnicalDetailsToggle.tsx
+|   |   |   |   `-- state/
+|   |   |   |       `-- review-store.ts
+|   |   |   |-- search/
+|   |   |   |   |-- api/
+|   |   |   |   |   `-- search-api.ts
+|   |   |   |   |-- components/
+|   |   |   |   |   |-- ApprovalBlockCard.tsx
+|   |   |   |   |   |-- BulkActionBuilder.test.tsx
+|   |   |   |   |   |-- BulkActionBuilder.tsx
+|   |   |   |   |   |-- ProductDetailPanel.tsx
+|   |   |   |   |   |-- ProductDiffPanel.tsx
+|   |   |   |   |   |-- SearchResultGrid.tsx
+|   |   |   |   |   `-- SearchWorkspace.tsx
+|   |   |   |   `-- hooks/
+|   |   |   |       |-- useBulkStaging.ts
+|   |   |   |       `-- useSearchWorkspace.ts
+|   |   |   |-- settings/
+|   |   |   |   `-- components/
+|   |   |   |       |-- RuleSuggestionsInbox.tsx
+|   |   |   |       `-- StrategyQuiz.tsx
+|   |   |   |-- index.ts
+|   |   |   |-- manifest.contract.test.ts
+|   |   |   `-- manifest.ts
+|   |   |-- lib/
+|   |   |   |-- api/
+|   |   |   |   |-- client.ts
+|   |   |   |   |-- problem-details.test.ts
+|   |   |   |   `-- problem-details.ts
+|   |   |   |-- auth/
+|   |   |   |   |-- guards.test.ts
+|   |   |   |   |-- guards.ts
+|   |   |   |   `-- session-flags.ts
+|   |   |   `-- query/
+|   |   |       |-- keys.test.ts
+|   |   |       `-- keys.ts
+|   |   |-- shared/
+|   |   |   |-- contracts/
+|   |   |   |   |-- chat.ts
+|   |   |   |   |-- index.ts
+|   |   |   |   `-- resolution.ts
+|   |   |   `-- errors/
+|   |   |       `-- error-presenter.ts
+|   |   |-- shell/
+|   |   |   |-- components/
+|   |   |   |   |-- AppShell.tsx
+|   |   |   |   |-- ChatSurface.tsx
+|   |   |   |   |-- GlobalPendingIndicator.tsx
+|   |   |   |   |-- NotificationStack.tsx
+|   |   |   |   `-- Sidebar.tsx
+|   |   |   |-- state/
+|   |   |   |   `-- pending-store.ts
+|   |   |   |-- providers.tsx
+|   |   |   `-- responsive-layout.test.ts
+|   |   `-- state/
+|   |       |-- drafts-store.test.ts
+|   |       |-- drafts-store.ts
+|   |       |-- ui-prefs-store.test.ts
+|   |       `-- ui-prefs-store.ts
+|   |-- tests/
+|   |   `-- frontend/
+|   |       |-- resolution/
+|   |       |   `-- review.contract.test.tsx
+|   |       `-- settings/
+|   |           `-- strategy-quiz.contract.test.tsx
+|   |-- .codex_tmp.chat-diag.spec.ts
+|   |-- .codex_tmp.enrichment-diag.spec.ts
+|   |-- .codex_tmp.enrichment-submit-trace.spec.ts
+|   |-- .codex_tmp.live-debug.spec.ts
+|   |-- .codex_tmp.oauth-status.spec.ts
+|   |-- .codex_tmp.playwright.chat.config.ts
+|   |-- .codex_tmp.playwright.enrichment.config.ts
+|   |-- .codex_tmp.playwright.live.config.ts
+|   |-- .codex_tmp.playwright.oauth.config.ts
+|   |-- eslint.config.mjs
+|   |-- next-env.d.ts
+|   |-- next.config.ts
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- README.md
+|   |-- tsconfig.json
+|   |-- vitest.config.ts
+|   `-- vitest.setup.ts
+|-- migrations/
+|   |-- versions/
+|   |   |-- 3c9b2f7d5a1e_add_auth_fields_and_oauth_attempts.py
+|   |   |-- 4d8f6b9c2e1a_add_user_api_version_fields.py
+|   |   |-- a7b8c9d0e1f2_phase11_product_history_and_staging.py
+|   |   |-- a9f3c7d5e1b2_phase13_runtime_policy_and_idempotency.py
+|   |   |-- b2f4c6d8e0a1_phase13_governance_recovery.py
+|   |   |-- b7d5c4a9e8f1_phase6_ingest_chunks_audit_checkpoints.py
+|   |   |-- c1d9e8f7a6b5_phase8_resolution_foundation.py
+|   |   |-- c4d5e6f7a8b9_phase13_deploy_observability.py
+|   |   |-- d4e5f6a7b8c9_phase12_tier_routing_and_profiles.py
+|   |   |-- e5f6a7b8c9d0_phase13_instrumentation_foundation.py
+|   |   |-- e6eec7532bd6_initial_schema_users_stores_vendors_.py
+|   |   |-- f0a1b2c3d4e5_phase10_chat_foundation.py
+|   |   |-- f1a2b3c4d5e6_phase11_snapshot_lifecycle.py
+|   |   |-- f2b3c4d5e6f7_phase13_1_enrichment_capability_policy.py
+|   |   |-- g14_2_01_tool_input_examples.py
+|   |   |-- g14_2_03_schema_json.py
+|   |   |-- p15_01_sandbox_runs.py
+|   |   `-- p15_02_remedy_template_cache.py
+|   |-- alembic.ini
+|   |-- env.py
+|   |-- README
+|   `-- script.py.mako
+|-- nginx/
+|   `-- nginx.conf
+|-- ops/
+|   |-- governance/
+|   |   `-- roles/
+|   |       |-- builder.md
+|   |       |-- context-curator.md
+|   |       |-- integrity-warden.md
+|   |       |-- phase-manager.md
+|   |       |-- README.md
+|   |       |-- reviewer.md
+|   |       `-- structure-guardian.md
+|   `-- STRUCTURE_SPEC.md
+|-- reports/
+|   |-- 07/
+|   |   |-- 07.1-governance-baseline-dry-run/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 07.2-governance-operational-defaults/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 11/
+|   |   |-- 11-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 11-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 11-03/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 12/
+|   |   |-- 12-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 12-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 12-03/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 13/
+|   |   |-- 13-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 13-04/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 13.1/
+|   |   |-- 13.1-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13.1-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13.1-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 13.1-04/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 13.2/
+|   |   |-- 13.2-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13.2-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13.2-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 13.2-04/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 13.2-05/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 14.2/
+|   |   |-- 14.2-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.2-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.2-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.2-04/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.2-05/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.2-06/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 14.2-07/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 14.3/
+|   |   |-- 14.3-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.3-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.3-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.3-04/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.3-05/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 14.3-06/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 14.3-07/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- 15/
+|   |   |-- 15-01/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-02/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-03/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-04/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-05/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-06/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-07/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-08/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-09/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-10/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   |-- 15-11a/
+|   |   |   |-- integrity-audit.md
+|   |   |   |-- review.md
+|   |   |   |-- self-check.md
+|   |   |   `-- structure-audit.md
+|   |   `-- 15-11b/
+|   |       |-- integrity-audit.md
+|   |       |-- review.md
+|   |       |-- self-check.md
+|   |       `-- structure-audit.md
+|   |-- meta/
+|   |   |-- governance-baseline-implementation-report-2026-02-12.md
+|   |   |-- governance-validation-runbook-2026-02-12.md
+|   |   |-- journey-synthesis-13-15.md
+|   |   `-- journey-synthesis-template.md
+|   |-- templates/
+|   |   |-- integrity-audit.template.md
+|   |   |-- review.template.md
+|   |   |-- self-check.template.md
+|   |   `-- structure-audit.template.md
+|   `-- AGENTS.override.md
+|-- scripts/
+|   |-- checkpoints/
+|   |   `-- log_approval.py
+|   |-- daemons/
+|   |   |-- health_monitor.py
+|   |   |-- README.md
+|   |   |-- start_health_monitor.sh
+|   |   |-- status_health_monitor.sh
+|   |   `-- stop_health_monitor.sh
+|   |-- governance/
+|   |   |-- check_harness_slas.py
+|   |   |-- ensure_neo4j_runtime.py
+|   |   |-- graph_availability_gate.py
+|   |   |-- graph_gate.py
+|   |   |-- health_gate.py
+|   |   |-- phase13_1_enrichment_gate.py
+|   |   |-- phase13_canary_gate.py
+|   |   |-- README.md
+|   |   |-- risk_tier_gate.py
+|   |   |-- risk_tier_gate_enforce.py
+|   |   |-- sandbox_seccomp.json
+|   |   |-- sha_gate.py
+|   |   `-- validate_governance.py
+|   |-- graph/
+|   |   |-- analyze_performance.py
+|   |   |-- apply_optimizations.py
+|   |   |-- auto_apply_infrastructure.py
+|   |   |-- bootstrap_graph_backend.py
+|   |   |-- graph_status.py
+|   |   |-- init_codebase_schema.py
+|   |   |-- init_tool_search_index.py
+|   |   |-- load_session_context.py
+|   |   |-- orchestrate_healers.py
+|   |   |-- pretool_gate.py
+|   |   |-- promote_to_template.py
+|   |   |-- run_consistency_check.py
+|   |   |-- seed_memory_nodes.py
+|   |   |-- sentry_auto_heal.py
+|   |   |-- start_mcp_server.sh
+|   |   |-- sync_codebase.py
+|   |   |-- sync_to_neo4j.py
+|   |   `-- validate_remedy_efficacy.py
+|   |-- harness/
+|   |   `-- ui/
+|   |       |-- evidence_index.py
+|   |       `-- run_e2e.sh
+|   |-- hooks/
+|   |   |-- antigravity_notify.py
+|   |   |-- antigravity_watchdog.py
+|   |   `-- pre-commit-graph-sync.py
+|   |-- infra/
+|   |   `-- redis_health_fixer.py
+|   |-- observability/
+|   |   |-- ensure_sentry_worker.py
+|   |   |-- sentry_issue_puller.py
+|   |   `-- test_sentry_flow.py
+|   |-- backup_db.sh
+|   |-- debug_driver_params.py
+|   |-- debug_neo4j_drivers.py
+|   |-- import_pentart.py
+|   |-- migrate_metrics_to_graph.py
+|   |-- restore_db.sh
+|   |-- test_sandbox.py
+|   `-- verify_phase_14_2_comprehensive.py
+|-- secrets/
+|   `-- .gitkeep
+|-- seo/
+|   |-- __init__.py
+|   |-- CHANGELOG.md
+|   |-- generate_seo_quick.py
+|   |-- IMPLEMENTATION.md
+|   |-- QUICKSTART.md
+|   |-- README.md
+|   |-- run_seo_generator.bat
+|   |-- run_seo_generator.sh
+|   |-- seo_generator.py
+|   |-- seo_prompts.py
+|   `-- seo_validator.py
+|-- solutionsos/
+|   |-- compound-engineering-os-policy.md
+|   |-- gsd-plan-execution.md
+|   `-- os-self-actualization.md
+|-- src/
+|   |-- api/
+|   |   |-- core/
+|   |   |   |-- __init__.py
+|   |   |   |-- errors.py
+|   |   |   |-- pagination.py
+|   |   |   |-- rate_limit.py
+|   |   |   |-- sse.py
+|   |   |   `-- versioning.py
+|   |   |-- jobs/
+|   |   |   |-- __init__.py
+|   |   |   |-- events.py
+|   |   |   `-- schemas.py
+|   |   |-- v1/
+|   |   |   |-- chat/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- approvals.py
+|   |   |   |   |-- bulk.py
+|   |   |   |   |-- orchestrator.py
+|   |   |   |   |-- routes.py
+|   |   |   |   `-- schemas.py
+|   |   |   |-- jobs/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- routes.py
+|   |   |   |   `-- schemas.py
+|   |   |   |-- ops/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- routes.py
+|   |   |   |-- products/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- routes.py
+|   |   |   |   |-- schemas.py
+|   |   |   |   |-- search_query.py
+|   |   |   |   `-- staging.py
+|   |   |   |-- resolution/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- routes.py
+|   |   |   |   `-- schemas.py
+|   |   |   |-- vendors/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- routes.py
+|   |   |   |   `-- schemas.py
+|   |   |   |-- versioning/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- routes.py
+|   |   |   |   `-- schemas.py
+|   |   |   |-- __init__.py
+|   |   |   `-- approvals.py
+|   |   |-- __init__.py
+|   |   `-- app.py
+|   |-- assistant/
+|   |   |-- deployment/
+|   |   |   |-- __init__.py
+|   |   |   |-- canary_guard.py
+|   |   |   |-- observability.py
+|   |   |   |-- provider_router.py
+|   |   |   `-- redaction.py
+|   |   |-- governance/
+|   |   |   |-- __init__.py
+|   |   |   |-- field_policy.py
+|   |   |   |-- graph_oracle_adapter.py
+|   |   |   |-- kill_switch.py
+|   |   |   |-- mutation_guard.py
+|   |   |   `-- verification_oracle.py
+|   |   |-- instrumentation/
+|   |   |   |-- __init__.py
+|   |   |   |-- export.py
+|   |   |   `-- signals.py
+|   |   |-- reliability/
+|   |   |   |-- __init__.py
+|   |   |   |-- breakers.py
+|   |   |   |-- idempotency.py
+|   |   |   |-- policy_store.py
+|   |   |   `-- retry_matrix.py
+|   |   |-- __init__.py
+|   |   |-- delegation.py
+|   |   |-- memory_retrieval.py
+|   |   |-- policy_resolver.py
+|   |   |-- runtime_tier1.py
+|   |   |-- runtime_tier2.py
+|   |   |-- runtime_tier3.py
+|   |   |-- session_primer.py
+|   |   `-- tool_projection.py
+|   |-- auth/
+|   |   |-- __init__.py
+|   |   |-- decorators.py
+|   |   |-- email_sender.py
+|   |   |-- email_verification.py
+|   |   |-- login.py
+|   |   `-- oauth.py
+|   |-- billing/
+|   |   |-- __init__.py
+|   |   |-- checkout.py
+|   |   |-- routes.py
+|   |   |-- stripe_client.py
+|   |   |-- subscription.py
+|   |   `-- webhooks.py
+|   |-- cli/
+|   |   |-- commands/
+|   |   |   |-- __init__.py
+|   |   |   |-- products.py
+|   |   |   `-- search.py
+|   |   |-- __init__.py
+|   |   |-- approvals.py
+|   |   `-- main.py
+|   |-- config/
+|   |   |-- __init__.py
+|   |   |-- email_config.py
+|   |   |-- logging_config.py
+|   |   |-- sentry_config.py
+|   |   `-- session_config.py
+|   |-- core/
+|   |   |-- chat/
+|   |   |   |-- handlers/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- generic.py
+|   |   |   |   |-- product.py
+|   |   |   |   `-- vendor.py
+|   |   |   |-- __init__.py
+|   |   |   `-- router.py
+|   |   |-- config/
+|   |   |   |-- __init__.py
+|   |   |   |-- generator.py
+|   |   |   |-- loader.py
+|   |   |   |-- store_profile_schema.py
+|   |   |   |-- vendor_schema.py
+|   |   |   `-- verifier.py
+|   |   |-- discovery/
+|   |   |   |-- __init__.py
+|   |   |   |-- ai_inference.py
+|   |   |   |-- catalog_extractor.py
+|   |   |   |-- firecrawl_client.py
+|   |   |   |-- gsd_populator.py
+|   |   |   |-- local_classifier.py
+|   |   |   |-- local_patterns.py
+|   |   |   |-- niche_validator.py
+|   |   |   |-- pipeline.py
+|   |   |   |-- site_recon.py
+|   |   |   |-- sku_validator.py
+|   |   |   |-- store_analyzer.py
+|   |   |   `-- web_search.py
+|   |   |-- enrichment/
+|   |   |   |-- embeddings/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- generator.py
+|   |   |   |-- extractors/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- attributes.py
+|   |   |   |-- families/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- grouper.py
+|   |   |   |-- generators/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- descriptions.py
+|   |   |   |   `-- seo.py
+|   |   |   |-- oracles/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- content_oracle.py
+|   |   |   |   |-- policy_oracle.py
+|   |   |   |   `-- visual_oracle.py
+|   |   |   |-- quality/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- scorer.py
+|   |   |   |-- templating/
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- engine.py
+|   |   |   |-- __init__.py
+|   |   |   |-- benchmarks.py
+|   |   |   |-- capability_audit.py
+|   |   |   |-- color_learning.py
+|   |   |   |-- config.py
+|   |   |   |-- contracts.py
+|   |   |   |-- eligibility.py
+|   |   |   |-- evaluation.py
+|   |   |   |-- idempotency.py
+|   |   |   |-- INTEGRATION.md
+|   |   |   |-- oracle_contract.py
+|   |   |   |-- pipeline.py
+|   |   |   |-- profiles.py
+|   |   |   |-- provenance.py
+|   |   |   |-- README.md
+|   |   |   |-- retries.py
+|   |   |   |-- retrieval_payload.py
+|   |   |   |-- vendor_integration.py
+|   |   |   `-- write_plan.py
+|   |   |-- scraping/
+|   |   |   |-- strategies/
+|   |   |   |   |-- __init__.py
+|   |   |   |   |-- base.py
+|   |   |   |   |-- playwright_strategy.py
+|   |   |   |   `-- requests_strategy.py
+|   |   |   |-- __init__.py
+|   |   |   |-- adaptive.py
+|   |   |   |-- engine.py
+|   |   |   `-- metrics.py
+|   |   |-- __init__.py
+|   |   |-- codebase_entities.py
+|   |   |-- codebase_schema.py
+|   |   |-- diff_engine.py
+|   |   |-- embeddings.py
+|   |   |-- encryption.py
+|   |   |-- graphiti_client.py
+|   |   |-- hs_code_resolver.py
+|   |   |-- hybrid_image_naming.py
+|   |   |-- image_framework.py
+|   |   |-- image_scraper.py
+|   |   |-- image_verifier.py
+|   |   |-- llm_client.py
+|   |   |-- memory_loader.py
+|   |   |-- paths.py
+|   |   |-- pipeline.py
+|   |   |-- product_analyzer.py
+|   |   |-- quality_assessor.py
+|   |   |-- scrape_engine.py
+|   |   |-- secrets.py
+|   |   |-- sentry_client.py
+|   |   |-- seo_engine.py
+|   |   |-- shopify_apply.py
+|   |   |-- shopify_resolver.py
+|   |   |-- summary_generator.py
+|   |   |-- synthex_entities.py
+|   |   |-- vendor_config.py
+|   |   |-- vision_cache.py
+|   |   |-- vision_client.py
+|   |   |-- vision_engine.py
+|   |   `-- vision_prompts.py
+|   |-- graph/
+|   |   |-- remediators/
+|   |   |   |-- aura_remediator.py
+|   |   |   |-- bash_agent.py
+|   |   |   |-- code_remediator.py
+|   |   |   |-- docker_remediator.py
+|   |   |   |-- git_staleness_guard.py
+|   |   |   |-- llm_remediator.py
+|   |   |   |-- optimizer_remediator.py
+|   |   |   |-- redis_remediator.py
+|   |   |   |-- snapshot_remediator.py
+|   |   |   `-- sync_remediator.py
+|   |   |-- ab_test_validator.py
+|   |   |-- backend_resolver.py
+|   |   |-- batch_handlers.py
+|   |   |-- bottleneck_detector.py
+|   |   |-- codebase_scanner.py
+|   |   |-- commit_parser.py
+|   |   |-- consistency_daemon.py
+|   |   |-- convention_checker.py
+|   |   |-- file_parser.py
+|   |   |-- fix_generator.py
+|   |   |-- incremental_sync.py
+|   |   |-- infra_probe.py
+|   |   |-- intent_capture.py
+|   |   |-- local_graph_store.py
+|   |   |-- mcp_response_metadata.py
+|   |   |-- mcp_server.py
+|   |   |-- orchestrate_healers.py
+|   |   |-- performance_profiler.py
+|   |   |-- planning_linker.py
+|   |   |-- query_interface.py
+|   |   |-- query_templates.py
+|   |   |-- refactor_guard.py
+|   |   |-- remediation_registry.py
+|   |   |-- research_tools.py
+|   |   |-- root_cause_classifier.py
+|   |   |-- runtime_optimizer.py
+|   |   |-- sandbox_docker.py
+|   |   |-- sandbox_gates.py
+|   |   |-- sandbox_persistence.py
+|   |   |-- sandbox_types.py
+|   |   |-- sandbox_verifier.py
+|   |   |-- sandbox_workspace.py
+|   |   |-- search_expand_bridge.py
+|   |   |-- semantic_cache.py
+|   |   |-- sentry_feedback_loop.py
+|   |   |-- sentry_ingestor.py
+|   |   |-- similarity_detector.py
+|   |   |-- sync_status.py
+|   |   |-- telemetry_dashboard.py
+|   |   |-- template_extractor.py
+|   |   `-- universal_fixer.py
+|   |-- integrations/
+|   |   `-- perplexity_client.py
+|   |-- jobs/
+|   |   |-- __init__.py
+|   |   |-- cancellation.py
+|   |   |-- checkpoints.py
+|   |   |-- dispatcher.py
+|   |   |-- finalizer.py
+|   |   |-- graphiti_ingestor.py
+|   |   |-- metrics.py
+|   |   |-- orchestrator.py
+|   |   |-- progress.py
+|   |   `-- queueing.py
+|   |-- models/
+|   |   |-- __init__.py
+|   |   |-- assistant_delegation_event.py
+|   |   |-- assistant_deployment_policy.py
+|   |   |-- assistant_execution_ledger.py
+|   |   |-- assistant_field_policy.py
+|   |   |-- assistant_kill_switch.py
+|   |   |-- assistant_memory_embedding.py
+|   |   |-- assistant_memory_fact.py
+|   |   |-- assistant_preference_signal.py
+|   |   |-- assistant_profile.py
+|   |   |-- assistant_provider_route_event.py
+|   |   |-- assistant_route_event.py
+|   |   |-- assistant_runtime_policy.py
+|   |   |-- assistant_tenant_tool_policy.py
+|   |   |-- assistant_tool_registry.py
+|   |   |-- assistant_verification_event.py
+|   |   |-- assistant_verification_signal.py
+|   |   |-- audit_checkpoint.py
+|   |   |-- chat_action.py
+|   |   |-- chat_message.py
+|   |   |-- chat_session.py
+|   |   |-- ingest_chunk.py
+|   |   |-- job.py
+|   |   |-- oauth_attempt.py
+|   |   |-- pending_approvals.py
+|   |   |-- product.py
+|   |   |-- product_change_event.py
+|   |   |-- product_enrichment_item.py
+|   |   |-- product_enrichment_run.py
+|   |   |-- recovery_log.py
+|   |   |-- remedy_templates.py
+|   |   |-- resolution_batch.py
+|   |   |-- resolution_rule.py
+|   |   |-- resolution_snapshot.py
+|   |   |-- sandbox_runs.py
+|   |   |-- shopify.py
+|   |   |-- user.py
+|   |   |-- vendor.py
+|   |   `-- vendor_field_mapping.py
+|   |-- resolution/
+|   |   |-- adapters/
+|   |   |   |-- __init__.py
+|   |   |   |-- shopify_adapter.py
+|   |   |   |-- supplier_adapter.py
+|   |   |   `-- web_adapter.py
+|   |   |-- __init__.py
+|   |   |-- apply_engine.py
+|   |   |-- audit_export.py
+|   |   |-- contracts.py
+|   |   |-- dry_run_compiler.py
+|   |   |-- lineage.py
+|   |   |-- locks.py
+|   |   |-- media_ingest.py
+|   |   |-- normalize.py
+|   |   |-- policy.py
+|   |   |-- preflight.py
+|   |   |-- progress_contract.py
+|   |   |-- scoring.py
+|   |   |-- shopify_graphql.py
+|   |   |-- snapshot_lifecycle.py
+|   |   |-- structural.py
+|   |   `-- throttle.py
+|   |-- tasks/
+|   |   |-- __init__.py
+|   |   |-- assistant_runtime.py
+|   |   |-- audits.py
+|   |   |-- chat_bulk.py
+|   |   |-- control.py
+|   |   |-- enrichment.py
+|   |   |-- graphiti_sync.py
+|   |   |-- ingest.py
+|   |   |-- resolution_apply.py
+|   |   `-- scrape_jobs.py
+|   |-- utils/
+|   |   `-- sku_ean_validator.py
+|   |-- __init__.py
+|   |-- ai_bot_server.py
+|   |-- app.py
+|   |-- app_factory.py
+|   |-- bot_server.py
+|   |-- celery_app.py
+|   `-- database.py
+|-- tests/
+|   |-- api/
+|   |   |-- __init__.py
+|   |   |-- conftest.py
+|   |   |-- test_apply_progress_contract.py
+|   |   |-- test_approvals_api.py
+|   |   |-- test_assistant_profile_contract.py
+|   |   |-- test_audit_export_contract.py
+|   |   |-- test_chat_bulk_workflow.py
+|   |   |-- test_chat_contract.py
+|   |   |-- test_chat_delegation_contract.py
+|   |   |-- test_chat_memory_retrieval_contract.py
+|   |   |-- test_chat_routing_contract.py
+|   |   |-- test_chat_single_sku_workflow.py
+|   |   |-- test_chat_stream.py
+|   |   |-- test_chat_tier_runtime_contract.py
+|   |   |-- test_core.py
+|   |   |-- test_endpoints.py
+|   |   |-- test_enrichment_audit_export_contract.py
+|   |   |-- test_enrichment_capability_audit_contract.py
+|   |   |-- test_enrichment_dry_run_contract.py
+|   |   |-- test_enrichment_field_policy_contract.py
+|   |   |-- test_fallback_stage_telemetry_contract.py
+|   |   |-- test_field_policy_threshold_contract.py
+|   |   |-- test_graph_oracle_adapter_contract.py
+|   |   |-- test_idempotency_terminal_states_contract.py
+|   |   |-- test_instrumentation_export_contract.py
+|   |   |-- test_jobs_progress_contract.py
+|   |   |-- test_jobs_retry.py
+|   |   |-- test_jobs_stream_status_contract.py
+|   |   |-- test_kill_switch_contract.py
+|   |   |-- test_observability_correlation_contract.py
+|   |   |-- test_oracle_signal_join_contract.py
+|   |   |-- test_preference_signal_contract.py
+|   |   |-- test_products_bulk_staging_contract.py
+|   |   |-- test_products_history_diff_contract.py
+|   |   |-- test_products_search_contract.py
+|   |   |-- test_provider_fallback_contract.py
+|   |   |-- test_recovery_logs.py
+|   |   |-- test_redaction_retention_contract.py
+|   |   |-- test_reliability_policy_contract.py
+|   |   |-- test_resolution_dry_run.py
+|   |   |-- test_resolution_rules.py
+|   |   |-- test_snapshot_chain_contract.py
+|   |   |-- test_tenant_rls_readiness_contract.py
+|   |   |-- test_tool_projection_contract.py
+|   |   |-- test_verification_oracle_contract.py
+|   |   `-- test_versioning.py
+|   |-- assistant/
+|   |   `-- test_session_primer.py
+|   |-- cli/
+|   |   |-- __init__.py
+|   |   `-- test_commands.py
+|   |-- core/
+|   |   |-- test_graphiti_client_contract.py
+|   |   `-- test_synthex_entities.py
+|   |-- daemons/
+|   |   |-- benchmark_health_gate.py
+|   |   `-- test_health_monitor.py
+|   |-- e2e/
+|   |   |-- chat.e2e.ts
+|   |   |-- enrichment.e2e.ts
+|   |   `-- job-progress.e2e.ts
+|   |-- graph/
+|   |   |-- test_bash_agent.py
+|   |   |-- test_batch_tools.py
+|   |   |-- test_compact_output.py
+|   |   |-- test_deferred_loading.py
+|   |   |-- test_fix_generation.py
+|   |   |-- test_mcp_tool_examples.py
+|   |   |-- test_performance_profiling.py
+|   |   |-- test_root_cause_classifier.py
+|   |   |-- test_runtime_optimizer.py
+|   |   |-- test_sandbox_verifier.py
+|   |   |-- test_sentry_feedback.py
+|   |   |-- test_sentry_integration.py
+|   |   |-- test_template_extraction.py
+|   |   `-- test_tool_search.py
+|   |-- integration/
+|   |   |-- __init__.py
+|   |   |-- test_enrichment_color_finish_accuracy.py
+|   |   |-- test_enrichment_pipeline.py
+|   |   |-- test_enrichment_retrieval_readiness.py
+|   |   |-- test_enrichment_semantic_uplift_smoke.py
+|   |   |-- test_gemini_verify.py
+|   |   |-- test_graph_resilience.py
+|   |   |-- test_image_improvements.py
+|   |   |-- test_pentart_search.py
+|   |   |-- test_planning_linker.py
+|   |   `-- test_vendor_yaml_integration.py
+|   |-- integrations/
+|   |   `-- test_research_fallback.py
+|   |-- jobs/
+|   |   |-- __init__.py
+|   |   |-- test_assistant_tier_queue_routing.py
+|   |   |-- test_canary_rollback_contract.py
+|   |   |-- test_cancellation.py
+|   |   |-- test_chat_bulk_chunking.py
+|   |   |-- test_chat_bulk_fairness.py
+|   |   |-- test_deferred_verification_flow.py
+|   |   |-- test_dispatcher.py
+|   |   |-- test_enrichment_batch_queue_contract.py
+|   |   |-- test_finalizer.py
+|   |   |-- test_ingest_chunk_flow.py
+|   |   |-- test_non_blocking_api_flow.py
+|   |   |-- test_observability_metrics.py
+|   |   |-- test_phase6_requirements.py
+|   |   |-- test_priority_under_load.py
+|   |   |-- test_progress_payload.py
+|   |   |-- test_queue_routing.py
+|   |   |-- test_restart_persistence.py
+|   |   |-- test_retention_cleanup.py
+|   |   |-- test_scraper_service_routing.py
+|   |   |-- test_tier3_queue_ttl_deadletter_contract.py
+|   |   `-- test_tier_queue_qos_contract.py
+|   |-- resolution/
+|   |   |-- test_apply_engine.py
+|   |   |-- test_media_ingest.py
+|   |   |-- test_policy.py
+|   |   |-- test_preflight.py
+|   |   |-- test_resolution_pipeline.py
+|   |   `-- test_snapshot_lifecycle.py
+|   |-- tasks/
+|   |   |-- test_batch_emission.py
+|   |   `-- test_graphiti_sync_contract.py
+|   |-- unit/
+|   |   |-- __init__.py
+|   |   |-- test_adaptive_scraping.py
+|   |   |-- test_ai_descriptions.py
+|   |   |-- test_ai_inference.py
+|   |   |-- test_antigravity_notify.py
+|   |   |-- test_antigravity_watchdog.py
+|   |   |-- test_attribute_extraction.py
+|   |   |-- test_chat_router.py
+|   |   |-- test_color_learning.py
+|   |   |-- test_config_generator.py
+|   |   |-- test_convention_checker.py
+|   |   |-- test_embeddings.py
+|   |   |-- test_enrichment_eligibility_matrix.py
+|   |   |-- test_enrichment_oracle_contract.py
+|   |   |-- test_enrichment_profile_contract.py
+|   |   |-- test_enrichment_retry_idempotency.py
+|   |   |-- test_firecrawl.py
+|   |   |-- test_image_framework.py
+|   |   |-- test_local_graph_store.py
+|   |   |-- test_local_patterns.py
+|   |   |-- test_mcp_server_contract.py
+|   |   |-- test_product_families.py
+|   |   |-- test_query_interface.py
+|   |   |-- test_query_templates.py
+|   |   |-- test_refactor_guard.py
+|   |   |-- test_scraping_engine.py
+|   |   |-- test_search_expand_bridge.py
+|   |   |-- test_semantic_cache.py
+|   |   |-- test_site_recon.py
+|   |   |-- test_store_analyzer.py
+|   |   |-- test_vendor_schema.py
+|   |   |-- test_wave_sync.py
+|   |   `-- test_web_search.py
+|   |-- __init__.py
+|   `-- conftest.py
+|-- utils/
+|   |-- __init__.py
+|   |-- add_product_image.py
+|   |-- approve_seo_csv.py
+|   |-- assign_collections.py
+|   |-- categorize_product.py
+|   |-- create_shopify_redirect.py
+|   |-- display_seo_comparison.py
+|   |-- enrich_product_logistics.py
+|   |-- find_product_image.py
+|   |-- fix_product_handles.py
+|   |-- generate_product_tags.py
+|   `-- pentart_db.py
+|-- Vektal/
+|   |-- .obsidian/
+|   |   |-- app.json
+|   |   |-- appearance.json
+|   |   |-- core-plugins.json
+|   |   |-- graph.json
+|   |   `-- workspace.json
+|   `-- Welcome.md
+|-- web/
+|   |-- app.js
+|   |-- auth_required.html
+|   |-- index.html
+|   `-- job_detail.html
+|-- .env.example
+|-- .gitattributes
+|-- .gitignore
+|-- .pre-commit-config.yaml
+|-- .rules
+|-- .verb.md
+|-- AGENTS.md
+|-- ARCHITECTURE.md
+|-- CLAUDE.md
+|-- claudesplan.md
+|-- demo_framework.py
+|-- docker-compose.secrets.yml
+|-- docker-compose.yml
+|-- Dockerfile.backend
+|-- FAILURE_JOURNEY.md
+|-- GEMINI.md
+|-- gunicorn_config.py
+|-- HARNESS_GAPS.md
+|-- LEARNINGS.md
+|-- npm-badge-png.md
+|-- playwright.config.ts
+|-- pyproject.toml
+|-- README.md
+|-- requirements.txt
+|-- risk-policy.json
+`-- STANDARDS.md
 ```
-
