@@ -1,4 +1,16 @@
 {
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .gemini/hooks/start-health-daemon.py"
+          }
+        ]
+      }
+    ]
+  },
   "mcpServers": {
     "perplexity": {
       "command": "perplexity-mcp.cmd",

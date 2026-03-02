@@ -63,14 +63,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: Integration Hardening & Deployment** `[developer-facing]` - Production readiness and external API robustness
 - [x] **Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)** `[user-facing]` - Canonical enrichment v2 as integrated platform feature
 - [x] **Phase 13.2: Oracle Framework Reuse (INSERTED)** `[developer-facing]` - Shared verifier/oracle adapters for cross-phase use
-
-### Active/Planned Phases
-
 - [x] **Phase 14: Codebase Knowledge Graph & Continual Learning** `[developer-facing]` - Knowledge graph of code structure for AI-assisted development
 - [x] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
 - [x] **Phase 14.2: Tool Calling 2.0 Integration (INSERTED)** `[developer-facing]` - Optimize MCP/tool call semantics (batching, deferred loading, schema examples)
-- [ ] **Phase 14.3: Graph Availability + Sync Reliability (INSERTED)** `[developer-facing]` - Guarantee Aura-first graph availability with local Neo4j and snapshot fallback
-- [ ] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
+- [x] **Phase 14.3: Graph Availability + Sync Reliability (INSERTED)** `[developer-facing]` - Guarantee Aura-first graph availability with local Neo4j and snapshot fallback
+- [x] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
 
 ### Future Phases
 
@@ -114,8 +111,6 @@ Plans:
 - [x] 01.1-01-PLAN.md - Organize 42 loose files (CSV, JSON, docs, scripts) (Wave 1)
 - [x] 01.1-02-PLAN.md - Investigate and organize 13 questionable directories (Wave 2)
 - [x] 01.1-03-PLAN.md - Create documentation index and verify complete cleanup (Wave 3)
-
-**Insertion Reason**: Phase 1 archived scripts but left 42 loose files and 13 questionable directories unorganized in root. User feedback: "Only addressed 20 files but there are 70 ITEMS in root." Must handle ALL items before Docker phase.
 
 ### Phase 2: Docker Infrastructure Foundation
 **Goal**: Establish containerized service architecture with development workflow and production-ready configuration
@@ -165,17 +160,6 @@ Plans:
 - [x] 02.1-10-PLAN.md - Firecrawl integration and GSD auto-population (Wave 5, Gap Closure)
 - [x] 02.1-11-PLAN.md - Metrics tracking and adaptive learning (Wave 5, Gap Closure)
 
-**Insertion Reason**: Current `image_scraper.py` lacks strict SKU matching, causing incorrect product images. User created `/quickcleanup` workaround with proven patterns (247/381 success rate, 65%). These patterns should be standard, not one-off. System must support ANY vendor, not just the 5 currently hardcoded. Firecrawl discovery (manual in quickcleanup) should be automated. Database schema (Phase 3) should be designed WITH validated scrape tracking from day 1.
-
-**Key Innovation**: Adaptive intelligence - Full Shopify scrape at signup extracts niche, vendors, SKU patterns automatically (when catalog >=50 products). For new/small stores, questionnaire becomes primary source of truth. System learns and adapts as catalog grows.
-
-**Context Document**: See `.planning/phases/02.1-universal-vendor-scraping-engine/02.1-CONTEXT.md` for detailed vision, architectural decisions, and open questions captured from user discussion.
-
-**Gap Closure Plans (Wave 5)**: Three verification gaps addressed:
-- Plan 09: Site reconnaissance that discovers selectors from actual pages (Gap 1: Site Structure Learning)
-- Plan 10: Firecrawl API integration with GSD mappings auto-population (Gap 2: Firecrawl Integration)
-- Plan 11: Success rate metrics and adaptive retry learning (Gap 3: Success Rate Measurement + Dynamic Improvement)
-
 ### Phase 2.2: Product Enrichment Pipeline (INSERTED)
 **Goal**: AI-powered product enrichment with description generation, attribute extraction, quality scoring, and embedding generation
 **Depends on**: Phase 2.1
@@ -201,17 +185,6 @@ Plans:
 - [x] 02.2-05-PLAN.md - EnrichmentPipeline orchestrator and Jinja2 templating (Wave 2)
 - [x] 02.2-06-PLAN.md - Vendor YAML enrichment integration (Wave 2)
 
-**Insertion Reason**: Product enrichment is critical before database design (Phase 3). The `/side-project` folder contains a mature 7-step enrichment pipeline that should be integrated. Vendor YAML now includes enrichment config (sections 12-22). Embeddings needed for semantic search in Phase 11. Keeps Phase 2.1 focused on discovery/scraping.
-
-**Source Integration**: Integrates patterns from `/side-project/src/data_pipeline/` including:
-- OpenRouter integration (75-95% cheaper than direct API)
-- sentence-transformers for embeddings
-- German-first extraction patterns
-- Quality scoring (0-100)
-- Variant/family grouping
-
-**Context Document**: See `.planning/phases/02.2-product-enrichment-pipeline/02.2-CONTEXT.md` (to be created during discuss phase).
-
 ### Phase 3: Database Migration (SQLite to PostgreSQL)
 **Goal**: Set up production PostgreSQL database with fresh schema designed from v1.0 requirements, Flask-SQLAlchemy ORM, and disaster recovery capability
 **Depends on**: Phase 2.2
@@ -230,10 +203,6 @@ Plans:
 - [x] 03-03-PLAN.md - Flask-Migrate, migrations, backup/restore, encryption (Wave 1)
 - [x] 03-04-PLAN.md - Pentart import script & auto-migrations (Wave 1)
 - [x] 03-05-PLAN.md - app.py SQLAlchemy refactor & Job CRUD operations (Wave 1)
-
-**Context Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-CONTEXT.md` for implementation decisions and deferred items.
-
-**Research Document**: See `.planning/phases/03-database-migration-sqlite-to-postgresql/03-RESEARCH.md` for standard stack (Flask-SQLAlchemy, Flask-Migrate, psycopg3), architecture patterns, and backup strategy.
 
 ### Phase 4: Authentication & User Management
 **Goal**: Implement complete user authentication system for standalone SaaS with Stripe billing, Redis sessions, and Shopify OAuth integration
@@ -255,10 +224,6 @@ Plans:
 - [x] 04-05-PLAN.md - Stripe webhooks, subscription management (Wave 3)
 - [x] 04-06-PLAN.md - Shopify OAuth refactor with retry logic and blueprint integration (Wave 4)
 
-**Context Document**: See `.planning/phases/04-authentication-user-management/04-CONTEXT.md` for standalone SaaS architecture decisions, registration flow, and tier system design.
-
-**Research Document**: See `.planning/phases/04-authentication-user-management/04-RESEARCH.md` for Flask-Login + Flask-Session stack, OAuth 2.1 with PKCE, and Stripe patterns.
-
 ### Phase 5: Backend API Design
 **Goal**: Define RESTful API structure with validation, documentation, and real-time capabilities
 **Depends on**: Phase 4
@@ -278,10 +243,6 @@ Plans:
 - [x] 05-04-PLAN.md - Domain blueprints (products, jobs, vendors)
 - [x] 05-04-01-PLAN.md - Per-user API versioning and migration lifecycle
 - [x] 05-05-PLAN.md - End-to-end verification and API test completion
-
-**Summary Documents**:
-- `.planning/phases/05-backend-api-design/05-SUMMARY.md`
-- `.planning/phases/05-backend-api-design/05-05-SUMMARY.md`
 
 ### Phase 6: Job Processing Infrastructure (Celery)
 **Goal**: Implement async job processing with monitoring and parallel execution capabilities
@@ -427,278 +388,101 @@ Plans:
 - [x] 13-04: Preference and verification instrumentation foundation
 
 ### Phase 13.1: Product Data Enrichment Protocol v2 Integration (INSERTED)
-
-**Goal:** Integrate a comprehensive enrichment protocol v2 as a first-class platform capability, combining best parts of Phase 2.2 and side-project behavior into one canonical, governed runtime path
-**Depends on:** Phase 13
-**Requirements:** ENRICHV2-01, ENRICHV2-02, ENRICHV2-03, ENRICHV2-04, ENRICHV2-05, ENRICHV2-06, ENRICHV2-07, ENRICHV2-08, ENRICHV2-09, ENRICHV2-10
-**Success Criteria** (what must be TRUE):
-  1. Enrichment is exposed as a selectable product capability within platform surfaces, not as an isolated script flow.
-  2. One canonical enrichment protocol replaces duplicated parallel paths across legacy 2.2 and side-project variants.
-  3. Enrichment contracts are wired to API/jobs/PostgreSQL and tracked through governance artifacts.
-  4. Throughput and quality are measurable and improved over latest historical run artifacts.
-  5. Default dependency/runtime path avoids repeated heavyweight ML runtime downloads unless explicitly enabled.
+**Goal:** Integrate a comprehensive enrichment protocol v2 as a first-class platform capability
 **Plans:** 4 plans in 4 waves
 
 Plans:
-- [x] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation (Wave 1)
-- [x] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration, and idempotent retries (Wave 2)
-- [x] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX (Wave 3)
-- [x] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure (Wave 4)
+- [x] 13.1-01-PLAN.md - Capability audit, policy contracts, and governed write-plan foundation
+- [x] 13.1-02-PLAN.md - Enrichment core profiles, eligibility matrix, Oracle arbitration
+- [x] 13.1-03-PLAN.md - API/job lifecycle integration and dedicated enrichment workspace UX
+- [x] 13.1-04-PLAN.md - Benchmark gates, audit export/retention, and cutover verification closure
 
 ### Phase 13.2: Oracle Framework Reuse (INSERTED)
-
-**Goal:** Establish one reusable Oracle framework for content, visual, execution, and policy verification that can be consumed by multiple phases and runtime surfaces.
-**Depends on:** Phase 13, Phase 13.1
-**Requirements:** GRAPH-01 (Neo4j + Graphiti integration), GRAPH-02 (Episode ingestion), GRAPH-03 (Graph Oracle adapter), GRAPH-04 (Memory retrieval upgrade), GRAPH-05 (CI governance gate)
-**Success Criteria** (what must be TRUE):
-  1. A single Oracle contract is defined and reused across adapters (`decision`, `confidence`, `reason_codes`, `evidence_refs`, `requires_user_action`).
-  2. Oracle adapters are split by purpose (execution/content/visual/policy) without duplicated orchestration logic.
-  3. Existing and upcoming phases can call the Oracle framework through stable interfaces instead of bespoke verifier implementations.
-  4. Telemetry, idempotency, and retry behavior are unified for Oracle-triggered paths.
-  5. Phase 13.1 and later phases have explicit integration guidance to adopt Oracle reuse.
+**Goal:** Establish one reusable Oracle framework for content, visual, execution, and policy verification
 **Plans:** 7 plans in 5 waves
 
 Plans:
-- [x] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types (Wave 1)
-- [x] 13.2-02-PLAN.md - Episode Ingestion Pipeline (Wave 2)
-- [x] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade (Wave 2)
-- [x] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests (Wave 3)
-- [x] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec (Wave 4)
-- [x] 13.2-06-PLAN.md - Unify Oracle Contract (Gap Closure) (Wave 5)
-- [x] 13.2-07-PLAN.md - Create Governance Reports (Gap Closure) (Wave 5)
+- [x] 13.2-01-PLAN.md - Infrastructure + Client + Entity Types
+- [x] 13.2-02-PLAN.md - Episode Ingestion Pipeline
+- [x] 13.2-03-PLAN.md - Graph Oracle Adapter + Memory Retrieval Upgrade
+- [x] 13.2-04-PLAN.md - CI Governance Gate + Contract Tests
+- [x] 13.2-05-PLAN.md - Phase Closure + Forward Integration Spec
+- [x] 13.2-06-PLAN.md - Unify Oracle Contract (Gap Closure)
+- [x] 13.2-07-PLAN.md - Create Governance Reports (Gap Closure)
 
-**Gap Closure Plans (Wave 5)**: Two verification gaps addressed:
-- Plan 06: Unify OracleDecision and OracleSignal into single contract with harmonized decision types (Gap 1: Contract Unification)
-- Plan 07: Create 20 governance reports retroactively for plans 01-05 (Gap 2: Governance Reports Missing)
-
-### Phase 14: Codebase Knowledge Graph & Continual Learning `[developer-facing]`
-**Goal**: Build self-learning codebase knowledge graph that makes all project context immediately visible to LLMs and developers, eliminating massive token consumption
-**Depends on**: Phase 13.2 (Oracle Framework - provides Neo4j infrastructure)
-**Requirements**: GRAPH-01 (Codebase entities), GRAPH-02 (Vector embeddings), GRAPH-03 (Automatic updates), GRAPH-04 (Query interface), GRAPH-05 (Similarity detection)
-**Success Criteria** (what must be TRUE):
-  1. Every file in codebase is a node in the graph with relationships captured
-  2. Semantic similarity works (vector search finds related code without explicit links)
-  3. Planning docs are central hubs (most-referenced nodes in graph)
-  4. Graph updates automatically (git hook + daemon operational)
-  5. LLMs can query efficiently (<100ms templates, <2s natural language)
-  6. Similarity detection accurate (identifies 95%+ duplicates, 80-95% parameterizable variants, 60-80% shared utilities)
-  7. Context visible without token cost (10x reduction in tokens needed to understand codebase)
-  8. Refactoring opportunities detected and flagged for Phase 15 execution
+### Phase 14: Codebase Knowledge Graph & Continual Learning
+**Goal**: Build self-learning codebase knowledge graph for AI-assisted development
 **Plans**: 8 plans in 4 waves
 
 Plans:
-- [ ] 14-01: Extend Neo4j schema for codebase entities (File, Module, Class, Function, PlanningDoc)
-- [ ] 14-02: Vector embedding pipeline (hierarchical summaries, Neo4j vector index)
-- [ ] 14-03: Full codebase scanner + manual sync command
-- [ ] 14-04: Planning docs as central nodes (auto-linking + natural references)
-- [ ] 14-05: Git pre-commit hook integration (primary trigger)
-- [ ] 14-06: Periodic consistency daemon (fallback/repair)
-- [ ] 14-07: LLM instruction framework (intent capture for AI-generated code)
-- [ ] 14-08: Query interface for LLMs (templates + natural language fallback)
+- [x] 14-01: Extend Neo4j schema for codebase entities
+- [x] 14-02: Vector embedding pipeline (hierarchical summaries)
+- [x] 14-03: Full codebase scanner + manual sync command
+- [x] 14-04: Planning docs as central nodes
+- [x] 14-05: Git pre-commit hook integration
+- [x] 14-06: Periodic consistency daemon
+- [x] 14-07: LLM instruction framework
+- [x] 14-08: Query interface for LLMs
 
-**Context**: See `.planning/phases/14-continuous-optimization-learning/14-CONTEXT.md`
-
-### Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED) `[developer-facing]`
-**Goal**: Upgrade the Phase 14 knowledge graph from passive indexing into an active dual-layer reasoning engine with MCP tool access, memory engineering, semantic caching, and bounded search-then-expand retrieval.
-**Depends on**: Phase 14 (Codebase Knowledge Graph - provides Neo4j schema, scanner, embeddings, and query templates)
-**Requirements**: RAG-01, RAG-02, RAG-03, RAG-04, RAG-05, RAG-06, RAG-07, RAG-08
-**Success Criteria** (what must be TRUE):
-  1. Claude Code can query the knowledge graph through MCP tools (`query_graph`, `get_dependencies`, `retrieve_intent`).
-  2. Decision, Convention, and BugRootCause memory entities exist with EXPLAINS, RESOLVED_BY, and SUPERCEDES relationships.
-  3. Search-then-Expand retrieval runs in two phases with enforced limits (max initial nodes 5, traversal depth 2, token budget 8192).
-  4. Semantic cache serves near-identical queries (cosine >= 0.92) and improves hit latency materially.
-  5. Session initialization pulls top Convention nodes automatically for architectural context.
-  6. Null graph responses fall back to filesystem search and emit discrepancy tracking signals.
+### Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)
+**Goal**: Upgrade to an active dual-layer reasoning engine with MCP tool access
 **Plans**: 6 plans in 3 waves
 
 Plans:
-- [x] 14.1-01-PLAN.md - Memory entity types and relationships (Wave 1)
-- [x] 14.1-02-PLAN.md - Reasoning provenance and discrepancy tracking (Wave 1)
-- [x] 14.1-03-PLAN.md - Search-then-Expand bridge (Wave 2)
-- [x] 14.1-04-PLAN.md - Semantic cache layer (Wave 2)
-- [x] 14.1-05-PLAN.md - MCP tool server (Wave 3)
-- [x] 14.1-06-PLAN.md - Session lifecycle hooks and convention guardrails (Wave 3)
+- [x] 14.1-01-PLAN.md - Memory entity types and relationships
+- [x] 14.1-02-PLAN.md - Reasoning provenance and discrepancy tracking
+- [x] 14.1-03-PLAN.md - Search-then-Expand bridge
+- [x] 14.1-04-PLAN.md - Semantic cache layer
+- [x] 14.1-05-PLAN.md - MCP tool server
+- [x] 14.1-06-PLAN.md - Session lifecycle hooks and convention guardrails
 
-**Context**: See `.planning/phases/14.1-rag-enhancement/14.1-PLAN.md` and `.planning/phases/14.1-rag-enhancement/14.1-CROSS-REFERENCE.md`
-
-**Insertion Reason**: Phase 14 established graph/vector foundations, but the YAML blueprint gap analysis shows the majority of agentic retrieval features are still missing. Phase 14.1 closes these gaps before Phase 15 self-healing execution.
-
-### Phase 14.2: Tool Calling 2.0 Integration (INSERTED) `[developer-facing]`
-**Goal**: Optimize how graph and assistant tools are invoked (batching, deferred loading, input examples, compact output) to reduce token overhead and improve tool-call correctness.
-**Depends on**: Phase 14.1 (Neo4j-Vector-Hybrid-RAG Enhancement)
-**Requirements**: TOOL-20-01, TOOL-20-02, TOOL-20-03, TOOL-20-04, TOOL-20-05, TOOL-20-06
-**Success Criteria** (what must be TRUE):
-  1. MCP schemas include practical input examples for tool-call accuracy.
-  2. Tool discovery can be graph-driven (`search_tools`) and support deferred loading.
-  3. Batch query/dependency operations run in single MCP interactions where applicable.
-  4. Compact output mode lowers token footprint for retrieval-heavy flows.
-  5. Tool schema registry and sync behavior remain auditable and test-covered.
-  6. Existing graph retrieval behavior remains backward compatible.
-**Plans**: 6 plans in 4 waves
-
-Plans:
-- [x] 14.2-01-PLAN.md - Input examples on tool schemas (Wave 1)
-- [x] 14.2-02-PLAN.md - Tool nodes + `search_tools` in Neo4j (Wave 2)
-- [x] 14.2-03-PLAN.md - Deferred loading + schema persistence (Wave 2)
-- [x] 14.2-04-PLAN.md - `batch_query` + `batch_dependencies` tools (Wave 3)
-- [x] 14.2-05-PLAN.md - Compact output optimization path (Wave 3)
-- [x] 14.2-06-PLAN.md - Batch episode emission in sync pipeline (Wave 4)
-- [x] 14.2-07-PLAN.md - External Research Tools Integration (Firecrawl + Perplexity) (Wave 4)
-- [x] 14.2-07-PLAN.md - External Research Tools Integration (Firecrawl + Perplexity)
-
-**Context**: See `.planning/phases/14.2-tool-calling-v2/README.md` and `.planning/phases/14.2-tool-calling-v2/14.2-PLAN.md`
-
-### Phase 14.3: Graph Availability + Sync Reliability (INSERTED) `[developer-facing]`
-**Goal**: Guarantee graph context availability in all sessions via Aura-first routing, automatic local Neo4j fallback, and snapshot query fallback with explicit freshness metadata.
-**Depends on**: Phase 14.2 (Tool Calling 2.0 Integration)
-**Requirements**: AVAIL-01, AVAIL-02, AVAIL-03, AVAIL-04, AVAIL-05, AVAIL-06
-**Success Criteria** (what must be TRUE):
-  1. Graph reads succeed through one of three backends: `aura`, `local_neo4j`, or `local_snapshot`.
-  2. Session bootstrap auto-selects backend and records runtime status.
-  3. Aura outage triggers automatic local Neo4j startup attempt before snapshot fallback.
-  4. MCP outputs include `backend_source` and sync freshness indicators.
-  5. Sync mode (`auto` vs `manual`) and last successful sync are queryable through a status command.
-  6. Governance gate reports binary `GREEN`/`RED` readiness for graph availability.
-  7. Sentry issue ingestion produces normalized, deduplicated remediation signals without blocking bootstrap.
+### Phase 14.2: Tool Calling 2.0 Integration (INSERTED)
+**Goal**: Optimize MCP tool invocation (batching, deferred loading, compact output)
 **Plans**: 7 plans in 4 waves
 
 Plans:
-- [ ] 14.3-01-PLAN.md - Backend resolver contract + runtime manifest (Wave 1)
-- [ ] 14.3-02-PLAN.md - Shared bootstrap command + local Neo4j auto-start (Wave 1)
-- [ ] 14.3-03-PLAN.md - Sync status contract + metadata updates (Wave 2)
-- [ ] 14.3-04-PLAN.md - PreTool/session integration across local agent entry points (Wave 2)
-- [ ] 14.3-05-PLAN.md - MCP response metadata + degraded-mode guardrails (Wave 3)
-- [ ] 14.3-06-PLAN.md - Governance availability gate + integration tests (Wave 3)
-- [ ] 14.3-07-PLAN.md - Sentry issue ingestion + autonomous triage normalization (Wave 4)
+- [x] 14.2-01-PLAN.md - Input examples on tool schemas
+- [x] 14.2-02-PLAN.md - Tool nodes + search_tools in Neo4j
+- [x] 14.2-03-PLAN.md - Deferred loading + schema persistence
+- [x] 14.2-04-PLAN.md - batch_query + batch_dependencies tools
+- [x] 14.2-05-PLAN.md - Compact output optimization path
+- [x] 14.2-06-PLAN.md - Batch episode emission in sync pipeline
+- [x] 14.2-07-PLAN.md - External Research Tools Integration (Firecrawl + Perplexity)
 
-**Context**: See `.planning/phases/14.3-graph-availability-sync/README.md` and `.planning/phases/14.3-graph-availability-sync/14.3-PLAN.md`
+### Phase 14.3: Graph Availability + Sync Reliability (INSERTED)
+**Goal**: Guarantee graph context availability with multi-tier fallback
+**Plans**: 7 plans in 4 waves
 
+Plans:
+- [x] 14.3-01-PLAN.md - Backend resolver contract + runtime manifest
+- [x] 14.3-02-PLAN.md - Shared bootstrap command + local Neo4j auto-start
+- [x] 14.3-03-PLAN.md - Sync status contract + metadata updates
+- [x] 14.3-04-PLAN.md - PreTool/session integration
+- [x] 14.3-05-PLAN.md - MCP response metadata + degraded-mode guardrails
+- [x] 14.3-06-PLAN.md - Governance availability gate + integration tests
+- [x] 14.3-07-PLAN.md - Sentry issue ingestion + triage normalization
 
-### Phase 15: Self-Healing & Runtime Optimization `[developer-facing]`
-**Goal**: Autonomous refactoring, performance optimization, and self-healing using Phase 14's knowledge graph for intelligent decisions
-**Depends on**: Phase 14.3 (Graph Availability + Sync Reliability - provides NullClaw architecture)
-**Requirements**: HEAL-01 (Autonomous refactoring), HEAL-02 (Self-healing), OPTIMIZE-01 (Performance), OPTIMIZE-02 (Cost reduction), OPTIMIZE-03 (Predictive intelligence)
-**Success Criteria** (what must be TRUE):
-  1. Sandbox passes all 6 gates before production apply (syntax, type, unit, contract, governance, rollback)
-  2. 95%+ of transient infrastructure issues self-heal (Redis, Docker, connections)
-  3. Performance optimizations proven via metrics (cost, latency, error rate)
-  4. Learnings loop: Templates grow from LLM successes (2+ applications → template)
-  5. Session context: Git commits + phase + remedies auto-loaded as compressed YAML
-  6. Approval queue: Changes <0.9 confidence require human review
-  7. Sentry-driven triage: Issues normalized and routed to classifier <5min
-  8. Validated remedies: Only proven fixes (via Sentry feedback) promoted to memory
-**Plans**: 12 plans in 6 waves (Architecture locked: 15-ARCHITECTURE-LOCKED.md)
+### Phase 15: Self-Healing & Runtime Optimization
+**Goal**: Autonomous refactoring and performance optimization using Knowledge Graph
+**Plans**: 12 plans in 6 waves
 
-**Phase 15.0: Foundation (Read-Only Mode) - Wave 1**
-- [ ] 15-01-PLAN.md — Universal Sandbox with 6-gate verification
-
-**Phase 15.0: Foundation (Read-Only Mode) - Wave 2**
-- [ ] 15-02-PLAN.md — Session Context & Memory Architecture (lazy-load YAML)
-
-**Phase 15.0: Foundation (Read-Only Mode) - Wave 3**
-- [ ] 15-03-PLAN.md — Root-Cause Classifier (LLM + Graph)
-
-**Phase 15.1: Detection & Learning (Still Read-Only) - Wave 4**
-- [ ] 15-04-PLAN.md — Autonomous Fix Generation (Templates + LLM)
-- [ ] 15-05-PLAN.md — Learnings Loop (Template extraction)
-- [ ] 15-06-PLAN.md — Sentry Integration Verification
-
-**Phase 15.2: Controlled Autonomy (Infrastructure Auto-Apply) - Wave 4**
-- [ ] 15-07-PLAN.md — Infrastructure Bash Agent
-- [ ] 15-08-PLAN.md — Performance Profiling & Bottleneck Detection
-
-**Phase 15.3: Full Autonomy (Code Auto-Apply) - Wave 5**
-- [ ] 15-09-PLAN.md — Runtime Optimization Engine
-- [ ] 15-10-PLAN.md — Sentry Feedback Closure
-
-**Phase 15.3: Full Autonomy (Code Auto-Apply) - Wave 5-6**
-- [ ] 15-11a-PLAN.md — Approval Queue Backend (Model + API)
-- [ ] 15-11b-PLAN.md — Approval Queue Frontend (CLI + Web UI)
-- [ ] 15-10-PLAN.md — Sentry Feedback Closure
-- [ ] 15-11-PLAN.md — Autonomous Approval Queue
-
-**Context**: See `.planning/phases/15-self-healing-dynamic-scripting/15-ARCHITECTURE-LOCKED.md`
-
----
-
-## Future Phases
-
-### Future Phase: Production Refinement & Integration Cleanup `[user-facing]`
-**Goal**: Make existing user-facing features production-ready by fixing frontend integration, edge cases, and polish issues
-**Depends on**: Phase 15
-**Scope**: Fix broken frontend integrations, API edge cases, error handling gaps, UI polish, and cross-browser compatibility
-
-**Motivation**: Backend features work but frontend integration is fragile. Users see errors when trying to use features. Need cleanup phase similar to Phase 1-2 but for production readiness rather than codebase organization.
-
-**What needs fixing:**
-- Frontend components that don't work with backend APIs
-- Missing error states and loading states
-- Edge cases in user workflows
-- Cross-browser compatibility issues
-- Mobile responsiveness gaps
-- Accessibility improvements
-- Performance optimization for user-facing features
-
-**Success Criteria:**
-- All existing features work reliably in production
-- Users can complete workflows without errors
-- Frontend integrates cleanly with backend APIs
-- Error messages are clear and actionable
-- Features work across browsers and devices
-
-**Plans**: TBD (will be defined after Phase 15 completes)
-
----
-
-### Future Phase: User Data Knowledge Graph & Semantic Search `[user-facing]`
-**Goal**: Apply Phase 14's knowledge graph technology to user's product/vendor data for intelligent features
-**Depends on**: Future Phase (Production Refinement)
-**Scope**: Vector embeddings of enriched products, semantic search, duplicate detection, smart recommendations
-
-**Motivation**: Phase 14 builds knowledge graph infrastructure for CODE. This phase applies the same technology to user's DATA - their products, vendors, collections, orders.
-
-**What users see (features):**
-- 🔍 Semantic search: "Find red acrylic paint" → finds products even if not tagged "red"
-- ⚠️ Duplicate detection: "These 5 products might be duplicates" → intelligent clustering
-- 💡 Smart recommendations: "Suggested collection: Vintage Paper Crafts" → related products auto-grouped
-- 📊 Data quality score: "Your catalog is 85% complete" → graph-based completeness analysis
-
-**What users DON'T see (backend):**
-- Neo4j graph database
-- Vector embeddings
-- Cypher queries
-- Graph nodes and edges
-
-**Key difference from Phase 14:**
-- **Phase 14**: Knowledge graph of CODE (for developers/AI)
-- **This phase**: Knowledge graph of USER DATA (for end users)
-
-**Technical approach:**
-- Reuse Neo4j infrastructure from Phase 14
-- Product nodes with vector embeddings (enriched data FIRST, then embed)
-- Vendor relationship edges
-- Collection grouping logic
-- Semantic similarity search API
-- Duplicate detection algorithms
-
-**Success Criteria:**
-- All enriched products have vector embeddings
-- Semantic search works (finds products by meaning, not just keywords)
-- Duplicate detection accuracy >90%
-- Smart recommendations relevant to user's catalog
-- Graph queries respond in <500ms
-- Users report "search feels smarter"
-
-**Plans**: TBD (will be defined after Production Refinement completes)
-
-**Note**: Embeddings happen AFTER enrichment (Phase 13.1). Flow is: Raw product → Enrich (AI + extraction) → Embed → Search/similarity features.
+Plans:
+- [x] 15-01-PLAN.md - Universal Sandbox with 6-gate verification
+- [x] 15-02-PLAN.md - Session Context & Memory Architecture
+- [x] 15-03-PLAN.md - Root-Cause Classifier (LLM + Graph)
+- [x] 15-04-PLAN.md - Autonomous Fix Generation (Templates + LLM)
+- [x] 15-05-PLAN.md - Learnings Loop (Template extraction)
+- [x] 15-06-PLAN.md - Sentry Integration Verification
+- [x] 15-07-PLAN.md - Infrastructure Bash Agent
+- [x] 15-08-PLAN.md - Performance Profiling & Bottleneck Detection
+- [x] 15-09-PLAN.md - Runtime Optimization Engine
+- [x] 15-10-PLAN.md - Sentry Feedback Closure
+- [x] 15-11a-PLAN.md - Approval Queue Backend (Model + API)
+- [x] 15-11b-PLAN.md - Approval Queue Frontend (CLI + Web UI)
 
 ---
 
 ## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 14 -> 14.1 -> 14.2 -> 14.3 -> 15
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -718,10 +502,10 @@ Phases execute in numeric order: 1 -> 1.1 -> 2 -> 2.1 -> 2.2 -> 3 -> ... -> 13 -
 | 11. Product Search & Discovery | 3/3 | Complete | 2026-02-15 |
 | 12. Tier System Architecture | 3/3 | Complete | 2026-02-15 |
 | 13. Integration Hardening & Deployment | 4/4 | Complete | 2026-02-16 |
-| 13.1. Product Data Enrichment Protocol v2 Integration | 4/4 | Complete | 2026-02-16 |
+| 13.1. Product Data Enrichment Protocol v2 | 4/4 | Complete | 2026-02-16 |
 | 13.2. Oracle Framework Reuse | 7/7 | Complete | 2026-02-19 |
-| 14. Codebase Knowledge Graph & Continual Learning | 8/8 | Complete | 2026-02-20 |
-| 14.1. Neo4j-Vector-Hybrid-RAG Enhancement | 6/6 | Complete | 2026-02-23 |
-| 14.2. Tool Calling 2.0 Integration | 0/6 | Not started | - |
-| 14.3. Graph Availability + Sync Reliability | 0/6 | Not started | - |
-| 15. Self-Healing & Runtime Optimization | 0/4 | Not started | - |
+| 14. Codebase Knowledge Graph | 8/8 | Complete | 2026-02-20 |
+| 14.1. Hybrid-RAG Enhancement | 6/6 | Complete | 2026-02-23 |
+| 14.2. Tool Calling 2.0 | 7/7 | Complete | 2026-02-26 |
+| 14.3. Graph Availability + Sync | 7/7 | Complete | 2026-03-01 |
+| 15. Self-Healing & Optimization | 12/12 | Complete | 2026-03-02 |

@@ -1,9 +1,9 @@
 ---
 status: complete
 phase: 15-self-healing-dynamic-scripting
-source: [15-01-SUMMARY.md, 15-02-SUMMARY.md, 15-03-SUMMARY.md, 15-04-SUMMARY.md, 15-05-SUMMARY.md, 15-06-SUMMARY.md, 15-07-SUMMARY.md, 15-08-SUMMARY.md, 15-09-SUMMARY.md, 15-10-SUMMARY.md, 15-11a-SUMMARY.md]
+source: [15-01-SUMMARY.md, 15-02-SUMMARY.md, 15-03-SUMMARY.md, 15-04-SUMMARY.md, 15-05-SUMMARY.md, 15-06-SUMMARY.md, 15-07-SUMMARY.md, 15-08-SUMMARY.md, 15-09-SUMMARY.md, 15-10-SUMMARY.md, 15-11a-SUMMARY.md, 15-11b-SUMMARY.md]
 started: 2026-03-02T12:00:00Z
-updated: 2026-03-02T13:30:00Z
+updated: 2026-03-02T22:55:00Z
 ---
 
 ## Current Test
@@ -120,10 +120,14 @@ result: pass
 expected: `POST /api/v1/approvals/<id>/reject` with a resolution_note should mark the fix as rejected and prevent its application. The rejection reason should be stored for learning.
 result: pass
 
+### 28. Approval queue frontend supports load/approve/reject flows
+expected: `ApprovalQueue` should load from `/api/v1/approvals/`, approve/reject via API endpoints, and remove resolved items from the queue while showing empty-state correctly.
+result: pass
+
 ## Summary
 
-total: 27
-passed: 27
+total: 28
+passed: 28
 issues: 0
 pending: 0
 skipped: 0
@@ -147,7 +151,8 @@ All Phase 15 automated tests passed successfully:
 - `test_runtime_optimizer.py`: 5 passed
 - `test_sentry_feedback.py`: 3 passed
 - `test_approvals_api.py`: 4 passed
+- `ApprovalQueue.test.tsx`: 4 passed
 
-**Total: 62 automated tests passed, 0 failed**
+**Total: 66 automated tests passed, 0 failed**
 
 Phase 15 Self-Healing & Runtime Optimization is fully implemented and operational.

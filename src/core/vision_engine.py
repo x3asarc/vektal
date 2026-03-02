@@ -11,10 +11,7 @@ from src.core.vendor_config import get_vendor_manager
 from src.core.image_scraper import clean_product_name, validate_alt_text
 
 # Import hybrid naming functions
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from hybrid_image_naming import generate_hybrid_filename, generate_hybrid_alt_text
+from src.core.hybrid_image_naming import generate_hybrid_filename, generate_hybrid_alt_text
 
 logger = logging.getLogger(__name__)
 
