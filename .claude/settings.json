@@ -5,6 +5,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python .claude/hooks/start-health-daemon.py"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/gsd-check-update.js"
           },
           {
@@ -22,8 +26,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python scripts/governance/ensure_neo4j_runtime.py",
-            "blockOnFailure": true
+            "command": "python scripts/governance/health_gate.py",
+            "blockOnFailure": false
           },
           {
             "type": "command",
