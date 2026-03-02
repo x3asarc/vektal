@@ -576,28 +576,39 @@ Plans:
 
 ### Phase 15: Self-Healing & Runtime Optimization `[developer-facing]`
 **Goal**: Autonomous refactoring, performance optimization, and self-healing using Phase 14's knowledge graph for intelligent decisions
-**Depends on**: Phase 14 (Codebase Knowledge Graph - provides structure understanding)
+**Depends on**: Phase 14.3 (Graph Availability + Sync Reliability - provides NullClaw architecture)
 **Requirements**: HEAL-01 (Autonomous refactoring), HEAL-02 (Self-healing), OPTIMIZE-01 (Performance), OPTIMIZE-02 (Cost reduction), OPTIMIZE-03 (Predictive intelligence)
 **Success Criteria** (what must be TRUE):
-  1. Autonomous refactoring executes with 6-gate verification (metrics, sandbox, tests, contracts, governance, rollback plan)
-  2. Self-healing fixes 95% of transient issues without human intervention
-  3. Performance optimization measurably improves (P95 latency -30% per quarter, cost per operation -20% per quarter)
-  4. Predictive intelligence reduces perceived latency 50% through prefetching
-  5. System detects and adapts to vendor site changes within 1 hour
-  6. Week-over-week telemetry shows consistent improvement in latency/cost/error rates
-  7. Correlation between structural changes (Phase 14) and runtime failures (Phase 13.2) enables root cause detection
-  8. A/B testing validates optimizations before broad rollout
-  9. Sentry incidents are closed-loop validated (issue state after remediation) before remedies are promoted into autonomous prompt memory
-**Plans**: TBD
+  1. Sandbox passes all 6 gates before production apply (syntax, type, unit, contract, governance, rollback)
+  2. 95%+ of transient infrastructure issues self-heal (Redis, Docker, connections)
+  3. Performance optimizations proven via metrics (cost, latency, error rate)
+  4. Learnings loop: Templates grow from LLM successes (2+ applications → template)
+  5. Session context: Git commits + phase + remedies auto-loaded as compressed YAML
+  6. Approval queue: Changes <0.9 confidence require human review
+  7. Sentry-driven triage: Issues normalized and routed to classifier <5min
+  8. Validated remedies: Only proven fixes (via Sentry feedback) promoted to memory
+**Plans**: 11 plans in 5 waves (Architecture locked: 15-ARCHITECTURE-LOCKED.md)
 
-Plans:
-- [ ] 15-01: Autonomous refactoring execution (consumes Phase 14 similarity detection)
-- [ ] 15-02: Performance profiling and optimization agents (cache, query, cost)
-- [ ] 15-03: Self-healing workflows (vendor site monitoring, transient failure recovery)
-- [ ] 15-04: Predictive intelligence and A/B testing framework
-- [ ] 15-05: Sentry-driven issue triage, remediation closure validation, and memory promotion guardrails
+**Phase 15.0: Foundation (Read-Only Mode)**
+- [ ] 15-01-PLAN.md — Universal Sandbox with 6-gate verification
+- [ ] 15-02-PLAN.md — Session Context & Memory Architecture (lazy-load YAML)
+- [ ] 15-03-PLAN.md — Root-Cause Classifier (LLM + Graph)
 
-**Context**: See `.planning/phases/15-self-healing-dynamic-scripting/15-CONTEXT.md`
+**Phase 15.1: Detection & Learning (Still Read-Only)**
+- [ ] 15-04-PLAN.md — Autonomous Fix Generation (Templates + LLM)
+- [ ] 15-05-PLAN.md — Learnings Loop (Template extraction)
+- [ ] 15-06-PLAN.md — Sentry Integration Verification
+
+**Phase 15.2: Controlled Autonomy (Infrastructure Auto-Apply)**
+- [ ] 15-07-PLAN.md — Infrastructure Bash Agent
+- [ ] 15-08-PLAN.md — Performance Profiling & Bottleneck Detection
+
+**Phase 15.3: Full Autonomy (Code Auto-Apply)**
+- [ ] 15-09-PLAN.md — Runtime Optimization Engine
+- [ ] 15-10-PLAN.md — Sentry Feedback Closure
+- [ ] 15-11-PLAN.md — Autonomous Approval Queue
+
+**Context**: See `.planning/phases/15-self-healing-dynamic-scripting/15-ARCHITECTURE-LOCKED.md`
 
 ---
 
