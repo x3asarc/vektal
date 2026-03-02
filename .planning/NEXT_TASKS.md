@@ -27,7 +27,37 @@ Last updated: 2026-03-03
 
 ---
 
-## Priority 2: Implement Memory System with Hooks
+## Priority 2: Deploy to Dokploy for E2E Testing
+
+**Status**: Ready to configure
+
+**What's needed**:
+- Configure Dokploy deployment with frontend
+- Deploy complete stack: backend, frontend, Neo4j, Redis, Celery
+- Test from user perspective (real browser, real workflows)
+- Verify all integrations:
+  - ✅ Sentry catching real production errors
+  - ✅ Neo4j/Graphiti providing code context for classification
+  - ✅ Health monitoring detecting issues
+  - ✅ Remediation system auto-healing problems
+  - ✅ Frontend approval queue for HITL decisions
+
+**Why this matters**:
+- **Sentry + Graphiti = Smart Issue Resolution**
+  - Sentry: Catches runtime errors with stack traces
+  - Graphiti: Provides code relationship context
+  - Combined: Classification knows "what broke" AND "why it broke"
+  - Example: Sentry says "ConnectionRefusedError" → Graphiti knows it's related to Neo4j → Routes to correct remediator
+
+**Impact**: Validate entire self-healing system works in production conditions
+
+**Total effort**: ~2 hours (Dokploy config + deployment)
+
+**When to do**: After routing completion OR in parallel
+
+---
+
+## Priority 3: Implement Memory System with Hooks
 
 **Plan**: `.planning/memory-system-design.md`
 
@@ -43,7 +73,7 @@ Last updated: 2026-03-03
 
 **Total effort**: ~3 hours
 
-**When to do**: After routing completion
+**When to do**: After deployment verification
 
 ---
 
