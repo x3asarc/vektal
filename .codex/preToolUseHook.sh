@@ -13,7 +13,8 @@ elif [ -t 1 ]; then
   printf '\033]0;%s\007' "Codex [$WINDOW_HINT]" || true
 fi
 
-python scripts/graph/pretool_gate.py
+# Phase 15 health gate: fast cache-based checks (1-2ms vs 2-5s blocking)
+python scripts/governance/health_gate.py || true
 python scripts/hooks/antigravity_watchdog.py --spawn --provider codex >/dev/null 2>&1 || true
 python scripts/hooks/antigravity_notify.py --provider codex --source heartbeat --heartbeat --window-hint "$WINDOW_HINT" >/dev/null 2>&1 || true
 

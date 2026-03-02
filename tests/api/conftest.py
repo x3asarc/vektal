@@ -20,33 +20,44 @@ def _resolve_test_database_url() -> str:
     2) DATABASE_URL (host normalized from docker service name to localhost)
     3) Build from DB_* environment variables
     """
+    db_user = os.getenv('DB_USER', 'admin')
+    db_password = os.getenv('DB_PASSWORD', '')
+    db_name = os.getenv('DB_NAME', 'shopify_platform')
+    db_port = os.getenv('POSTGRES_PORT', '5432')
+
     raw_url = os.getenv('TEST_DATABASE_URL') or os.getenv('DATABASE_URL')
 
     if raw_url:
+        # Interpolate variables if they exist in the string (load_dotenv might skip them)
+        raw_url = raw_url.replace('${DB_USER}', db_user)
+        raw_url = raw_url.replace('${DB_PASSWORD}', db_password)
+        raw_url = raw_url.replace('${DB_NAME}', db_name)
+
         if raw_url.startswith('postgresql://'):
             raw_url = raw_url.replace('postgresql://', 'postgresql+psycopg://', 1)
 
         parsed = urlsplit(raw_url)
+        # Normalize host: if it's 'db' (docker service name), use 'localhost' for local runner
         host = parsed.hostname or 'localhost'
         if host == 'db':
             host = 'localhost'
 
+        # Build netloc manually to ensure we use localhost
         auth = ''
         if parsed.username:
             auth = parsed.username
-            if parsed.password:
-                auth += f":{parsed.password}"
+            password = parsed.password or ''
+            if password:
+                auth += f":{password}"
             auth += '@'
 
-        hostport = f"{host}:{parsed.port}" if parsed.port else host
-        netloc = f"{auth}{hostport}"
-        return urlunsplit((parsed.scheme, netloc, parsed.path, parsed.query, parsed.fragment))
+        port = parsed.port or db_port
+        new_netloc = f"{auth}{host}:{port}"
 
-    db_user = os.getenv('DB_USER', 'admin')
-    db_password = quote_plus(os.getenv('DB_PASSWORD', ''))
-    db_name = os.getenv('DB_NAME', 'shopify_platform')
-    db_port = os.getenv('POSTGRES_PORT', '5432')
-    return f'postgresql+psycopg://{db_user}:{db_password}@localhost:{db_port}/{db_name}'
+        return urlunsplit((parsed.scheme, new_netloc, parsed.path, parsed.query, parsed.fragment))
+
+    quoted_password = quote_plus(db_password)
+    return f'postgresql+psycopg://{db_user}:{quoted_password}@localhost:{db_port}/{db_name}'
 
 
 def _resolve_redis_url() -> str:

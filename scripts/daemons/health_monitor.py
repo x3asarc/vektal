@@ -232,13 +232,20 @@ def _trigger_snapshot_fallback() -> None:
 async def check_sentry() -> Dict[str, Any]:
     """Poll Sentry API for unresolved issues (limit 5)."""
     auth_token = os.getenv("SENTRY_AUTH_TOKEN")
-    org_slug = os.getenv("SENTRY_ORG_SLUG", "shopify-scraping-script")
-    project_slug = os.getenv("SENTRY_PROJECT_SLUG", "shopify-scraping-script")
+    org_slug = os.getenv("SENTRY_ORG_SLUG")
+    project_slug = os.getenv("SENTRY_PROJECT_SLUG")
 
-    if not auth_token:
-        logger.debug("[HealthMonitor] SENTRY_AUTH_TOKEN not set; skipping Sentry check.")
+    if not auth_token or not org_slug or not project_slug:
+        missing = []
+        if not auth_token:
+            missing.append("SENTRY_AUTH_TOKEN")
+        if not org_slug:
+            missing.append("SENTRY_ORG_SLUG")
+        if not project_slug:
+            missing.append("SENTRY_PROJECT_SLUG")
+        logger.debug("[HealthMonitor] Sentry not configured (%s); skipping check.", ", ".join(missing))
         return {
-            "status": "healthy",
+            "status": "not_configured",
             "issue_count": 0,
             "last_check": datetime.now(timezone.utc).isoformat(),
             "auto_heal_running": False,

@@ -1,6 +1,6 @@
 # MASTER_MAP
 
-Last batch update: 2026-02-23
+Last batch update: 2026-03-02
 Owner: ContextCurator
 
 ## TOC
@@ -151,7 +151,7 @@ Owner: ContextCurator
    - `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`
 5. Canonical trackers:
    - `.planning/ROADMAP.md` (Phase 14.1 marked complete `6/6`)
-   - `.planning/STATE.md` (current atomic task: Phase 14.1 phase-close verification + Phase 15 readiness)
+   - `.planning/STATE.md` (current atomic task: Phase 15 closure evidence sync)
 6. Governance closure evidence:
    - `reports/07/07.2-governance-operational-defaults/self-check.md`
    - `reports/07/07.2-governance-operational-defaults/review.md`
@@ -258,4 +258,5 @@ Owner: ContextCurator
 
 ## Journey Synthesis Links
 1. Template: `reports/meta/journey-synthesis-template.md`
-2. Next required synthesis: end of current 3-phase window.
+2. Latest synthesis: `reports/meta/journey-synthesis-13-15.md`
+3. Next required synthesis: end of the next 3-phase window.
