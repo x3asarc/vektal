@@ -587,24 +587,33 @@ Plans:
   6. Approval queue: Changes <0.9 confidence require human review
   7. Sentry-driven triage: Issues normalized and routed to classifier <5min
   8. Validated remedies: Only proven fixes (via Sentry feedback) promoted to memory
-**Plans**: 11 plans in 5 waves (Architecture locked: 15-ARCHITECTURE-LOCKED.md)
+**Plans**: 12 plans in 6 waves (Architecture locked: 15-ARCHITECTURE-LOCKED.md)
 
-**Phase 15.0: Foundation (Read-Only Mode)**
+**Phase 15.0: Foundation (Read-Only Mode) - Wave 1**
 - [ ] 15-01-PLAN.md — Universal Sandbox with 6-gate verification
+
+**Phase 15.0: Foundation (Read-Only Mode) - Wave 2**
 - [ ] 15-02-PLAN.md — Session Context & Memory Architecture (lazy-load YAML)
+
+**Phase 15.0: Foundation (Read-Only Mode) - Wave 3**
 - [ ] 15-03-PLAN.md — Root-Cause Classifier (LLM + Graph)
 
-**Phase 15.1: Detection & Learning (Still Read-Only)**
+**Phase 15.1: Detection & Learning (Still Read-Only) - Wave 4**
 - [ ] 15-04-PLAN.md — Autonomous Fix Generation (Templates + LLM)
 - [ ] 15-05-PLAN.md — Learnings Loop (Template extraction)
 - [ ] 15-06-PLAN.md — Sentry Integration Verification
 
-**Phase 15.2: Controlled Autonomy (Infrastructure Auto-Apply)**
+**Phase 15.2: Controlled Autonomy (Infrastructure Auto-Apply) - Wave 4**
 - [ ] 15-07-PLAN.md — Infrastructure Bash Agent
 - [ ] 15-08-PLAN.md — Performance Profiling & Bottleneck Detection
 
-**Phase 15.3: Full Autonomy (Code Auto-Apply)**
+**Phase 15.3: Full Autonomy (Code Auto-Apply) - Wave 5**
 - [ ] 15-09-PLAN.md — Runtime Optimization Engine
+- [ ] 15-10-PLAN.md — Sentry Feedback Closure
+
+**Phase 15.3: Full Autonomy (Code Auto-Apply) - Wave 5-6**
+- [ ] 15-11a-PLAN.md — Approval Queue Backend (Model + API)
+- [ ] 15-11b-PLAN.md — Approval Queue Frontend (CLI + Web UI)
 - [ ] 15-10-PLAN.md — Sentry Feedback Closure
 - [ ] 15-11-PLAN.md — Autonomous Approval Queue
 
