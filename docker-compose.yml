@@ -83,6 +83,13 @@ services:
       - NEO4J_USER=${NEO4J_USER}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
       - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
+      # Sentry observability (Phase 15)
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_RELEASE=${SENTRY_RELEASE}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - SENTRY_ORG_SLUG=${SENTRY_ORG_SLUG}
+      - SENTRY_PROJECT_SLUG=${SENTRY_PROJECT_SLUG}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5).read()"]
       interval: 10s
