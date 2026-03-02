@@ -380,8 +380,14 @@ pool_size = clamp(pool_size, min=3, max=20)
     - Correlates remediation → issue state
     - Validates fixes actually worked
 
-11. **15-11:** Autonomous Approval Queue
-    - PR-like system for confidence <0.9
+11. **15-11a:** Approval Queue Backend (Model + API)
+    - PostgreSQL persistence for approvals
+    - REST API for CRUD operations
+    - 72h expiry with configurable TTL
+
+12. **15-11b:** Approval Queue Interfaces (CLI + Web UI)
+    - CLI commands (list, approve, reject, diff)
+    - Web UI with real-time updates
     - Persists across conversations
 
 **Rationale:**

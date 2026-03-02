@@ -2,13 +2,13 @@
 phase: 15-self-healing-dynamic-scripting
 plan: 11b
 type: execute
-wave: 6
+wave: 5
 depends_on: ["15-11a"]
 files_modified:
   - src/cli/approvals.py
   - frontend/src/features/approvals/components/ApprovalQueue.tsx
   - frontend/src/features/approvals/pages/ApprovalsPage.tsx
-autonomous: false  # Requires human verification of UI
+autonomous: false  # Contains checkpoint task
 
 must_haves:
   truths:
@@ -262,8 +262,26 @@ npm --prefix frontend run test -- ApprovalQueue
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>Approval queue accessible via CLI and web UI</what-built>
-  <how-to-verify>
+  <name>Human verification checkpoint: Validate approval queue UI accessibility</name>
+  <action>
+Present approval queue interfaces for human review:
+
+1. CLI implementation complete:
+   - list, approve, reject, diff commands
+   - Direct database queries to pending_approvals
+   - User-friendly output with age, confidence, blast radius
+
+2. Web UI implementation complete:
+   - ApprovalQueue component with real-time updates
+   - Approve/reject actions with REST API integration
+   - Metrics display (confidence, files, LOC)
+   - Empty state handling
+
+3. Both interfaces connected to same approval backend (15-11a API)
+  </action>
+  <verify>
+Confirm the following:
+
 1. Create test approval:
    ```bash
    python -c "
@@ -295,9 +313,14 @@ npm --prefix frontend run test -- ApprovalQueue
 
 5. Verify removed from queue in both CLI and UI
 
-Expected: Approval visible in both interfaces, approve/reject works from both
-  </how-to-verify>
-  <resume-signal>Type "approved" when verified, or describe issues</resume-signal>
+Expected: Approval visible in both interfaces, approve/reject works from both, no UI/UX issues
+  </verify>
+  <done>Human confirms approval queue works correctly in both CLI and web UI with no usability issues</done>
+  <files>
+    - src/cli/approvals.py
+    - frontend/src/features/approvals/components/ApprovalQueue.tsx
+    - scripts/checkpoints/log_approval.py
+  </files>
 </task>
 
 </tasks>
