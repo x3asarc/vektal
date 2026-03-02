@@ -43,11 +43,10 @@
 4. Post-mortem must be logged in `.planning/STATE.md` within 48 hours.
 
 ## KISS limits
-1. Target per file: `150-400 LOC`.
-2. Warning threshold: `>500 LOC` requires split evaluation.
-3. Exception threshold: `>800 LOC` requires architecture note and manual approval.
-4. Architecture note must include root cause, impact, risk, and refactoring plan.
-5. Any file at `>=800 LOC` must be decomposed into at least two modules in the following phase.
+1. No minimum LOC requirement applies to implementation files.
+2. Hard threshold: any source file `>500 LOC` is a blocking violation.
+3. Any file `>500 LOC` must be refactored into at least two modules before the task/phase can be closed.
+4. Verification gates must not fail or pass based on minimum LOC targets.
 
 ## Artifact contract
 1. Canonical phase state: `.planning/ROADMAP.md`.

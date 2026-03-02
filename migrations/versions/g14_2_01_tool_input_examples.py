@@ -41,14 +41,13 @@ def upgrade() -> None:
 
     for tool_id, examples in examples_map.items():
         examples_json = json.dumps(examples)
-        # Using raw SQL for jsonb merge to avoid overwriting existing metadata_json keys
+        # Using raw SQL for json merge to avoid overwriting existing metadata_json keys
         op.execute(f"""
             UPDATE assistant_tool_registry
-            SET metadata_json = COALESCE(metadata_json, '{{}}'::jsonb) || 
-                               jsonb_build_object('input_examples', '{examples_json}'::jsonb)
+            SET metadata_json = COALESCE(metadata_json, '{{}}'::json) ||
+                               jsonb_build_object('input_examples', '{examples_json}'::json)
             WHERE tool_id = '{tool_id}'
         """)
-
 def downgrade() -> None:
     # Remove input_examples from metadata_json
     op.execute("""

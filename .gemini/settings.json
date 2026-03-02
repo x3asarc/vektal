@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "perplexity": {
+      "command": "perplexity-mcp.cmd",
+      "args": [
+        "--cwd",
+        "."
+      ]
+    },
+    "synthex-knowledge-graph": {
+      "command": "./venv/Scripts/python.exe",
+      "args": [
+        "src/graph/mcp_server.py"
+      ]
+    },
+    "context7": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {
+        "CONTEXT7_API_KEY": "ctx7sk-bba2f529-0b7f-412a-b9d8-fbcd99113539"
+      },
+      "trust": true
+    }
+  }
+}

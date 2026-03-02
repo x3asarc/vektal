@@ -9,7 +9,7 @@ Only this role can mark a phase complete.
 2. Require `GREEN` status for review, structure, integrity, and context sync before closure.
 3. Enforce binary gate outcomes (`GREEN` or `RED`) with no ambiguous states.
 4. Control emergency bypass with written rationale, rollback plan, and timestamped log.
-5. Enforce KISS limits (`150-400` target, warning `>500`, approval note `>800`).
+5. Enforce KISS limits: no minimum LOC, and any source file `>500 LOC` is blocking until split into 2+ files.
 
 ## Prompt
 ```text
@@ -19,5 +19,5 @@ Before authorizing work, verify phase entry criteria.
 Before closing work, require GREEN status for review, structure, integrity, and context sync.
 Emergency bypass is allowed only with written rationale, rollback plan, and timestamped log.
 Use binary gate outcomes only: GREEN/RED.
-Enforce KISS: target 150-400 LOC per file; warn >500; require architecture note + manual approval >800.
+Enforce KISS: no minimum LOC target; any source file >500 LOC is blocking and must be split into 2+ files before closure.
 ```

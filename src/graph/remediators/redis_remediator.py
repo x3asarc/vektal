@@ -7,6 +7,8 @@ import os
 import socket
 import subprocess
 import time
+import shutil
+from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 from src.graph.universal_fixer import UniversalRemediator, RemediationResult
 
@@ -15,6 +17,14 @@ class RedisRemediator(UniversalRemediator):
     def service_name(self) -> str:
         return "redis"
 
+    @property
+    def description(self) -> str:
+        return "Fixes Redis connectivity issues and starts container via Compose."
+
+    async def validate_environment(self) -> bool:
+        """Check if docker is available for potential fix."""
+        return shutil.which("docker") is not None
+
     def _check_port(self, host: str, port: int) -> bool:
         try:
             with socket.create_connection((host, port), timeout=1.0):
@@ -22,7 +32,7 @@ class RedisRemediator(UniversalRemediator):
         except:
             return False
 
-    async def diagnose_and_fix(self) -> RemediationResult:
+    async def diagnose_and_fix(self, params: Optional[Dict[str, Any]] = None) -> RemediationResult:
         actions = []
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         parsed = urlparse(redis_url)

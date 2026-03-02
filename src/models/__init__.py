@@ -73,6 +73,9 @@ from src.models.assistant_deployment_policy import AssistantDeploymentPolicy
 from src.models.assistant_provider_route_event import AssistantProviderRouteEvent
 from src.models.assistant_preference_signal import AssistantPreferenceSignal
 from src.models.assistant_verification_signal import AssistantVerificationSignal
+from src.models.sandbox_runs import SandboxRun, SandboxVerdict
+from src.models.remedy_templates import RemedyTemplate
+from src.models.pending_approvals import PendingApproval, ApprovalStatus, ApprovalPriority
 
 
 __all__ = [
@@ -131,4 +134,10 @@ __all__ = [
     'AssistantProviderRouteEvent',
     'AssistantPreferenceSignal',
     'AssistantVerificationSignal',
+    'SandboxRun',
+    'SandboxVerdict',
+    'RemedyTemplate',
+    'PendingApproval',
+    'ApprovalStatus',
+    'ApprovalPriority',
 ]

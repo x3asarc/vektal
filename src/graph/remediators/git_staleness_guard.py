@@ -8,6 +8,7 @@ import json
 import os
 import time
 from pathlib import Path
+from typing import Optional
 from src.graph.universal_fixer import UniversalRemediator, RemediationResult
 
 class GitStalenessGuard(UniversalRemediator):

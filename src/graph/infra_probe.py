@@ -1,74 +1,103 @@
 """
-Infrastructure probing and active remediation for Phase 14.3.
-Provides lightweight heartbeats and triggers autonomous fixes.
+Infrastructure Probes and Remediation (Phase 14.3).
+Lightweight TCP/HTTP heartbeats to detect 'PAUSED' vs 'UNREACHABLE' states,
+with integrated autonomous remediation via the Registry.
 """
 
-import socket
-import logging
 import os
-import time
-from typing import Dict, Any, Optional, Tuple
-from urllib.parse import urlparse
-from src.graph.universal_fixer import NanoFixerLoop, RemediationResult
+import asyncio
+import logging
+import socket
+import httpx
+from typing import Optional, List, Dict, Any
 from src.graph.remediation_registry import registry
+from src.graph.universal_fixer import NanoFixerLoop, RemediationResult
 
 logger = logging.getLogger(__name__)
 
-# Auto-discover tools from the heap
-registry.auto_discover()
-fixer_loop = NanoFixerLoop(registry)
+async def probe_aura() -> bool:
+    """
+    Probes Neo4j Aura Cloud health using Query API v2 (HTTP).
+    Researched to be faster than Bolt for 'PAUSED' detection.
+    """
+    hostname = os.getenv("NEO4J_AURA_HOSTNAME")
+    user = os.getenv("NEO4J_USER")
+    password = os.getenv("NEO4J_PASSWORD")
 
-class InfraStatus:
-    def __init__(self, service: str, reachable: bool, latency_ms: float = 0.0, error: Optional[str] = None):
-        self.service = service
-        self.reachable = reachable
-        self.latency_ms = latency_ms
-        self.error = error
+    if not all([hostname, user, password]):
+        logger.warning("[Probe] Aura credentials missing. Skipping Aura probe.")
+        return False
 
-def probe_tcp(host: str, port: int, timeout: float = 1.0) -> InfraStatus:
-    """Lightweight TCP port probe."""
-    start = time.time()
+    url = f"https://{hostname}/db/neo4j/query/v2"
+    auth = (user, password)
+    payload = {"statement": "RETURN 1", "parameters": {}}
+    
+    async with httpx.AsyncClient(timeout=2.0) as client:
+        try:
+            resp = await client.post(url, auth=auth, json=payload)
+            if resp.status_code == 200:
+                logger.info("[Probe] Aura Cloud Query API v2 OK.")
+                return True
+            else:
+                logger.warning("[Probe] Aura Cloud Query API v2 failed with status %s.", resp.status_code)
+                return False
+        except (httpx.TimeoutException, httpx.ConnectError) as e:
+            logger.warning("[Probe] Aura Cloud unreachable/timed out: %s", e)
+            return False
+
+async def probe_local_neo4j() -> bool:
+    """
+    Probes local Neo4j health using Bolt port (TCP).
+    """
+    host = os.getenv("NEO4J_LOCAL_HOST", "localhost")
+    port = int(os.getenv("NEO4J_LOCAL_PORT", 7687))
+
     try:
-        with socket.create_connection((host, port), timeout=timeout):
-            latency = (time.time() - start) * 1000
-            return InfraStatus(f"{host}:{port}", True, latency)
-    except Exception as e:
-        return InfraStatus(f"{host}:{port}", False, error=str(e))
-
-def probe_neo4j_lightweight() -> InfraStatus:
-    """Probe Neo4j (Aura or Local) without driver overhead."""
-    uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
-    parsed = urlparse(uri)
-    host = parsed.hostname or "localhost"
-    port = parsed.port or 7687
-    return probe_tcp(host, port)
-
-def probe_redis_lightweight() -> InfraStatus:
-    """Probe Redis without celery/kombu overhead."""
-    uri = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    parsed = urlparse(uri)
-    host = parsed.hostname or "localhost"
-    port = parsed.port or 6379
-    return probe_tcp(host, port)
-
-async def active_remediation_loop(service: str, params: Optional[Dict[str, Any]] = None) -> bool:
-    """
-    Unified entry point for NullClaw-style remediation.
-    Pilot of Phase 15 Self-Healing loop.
-    """
-    result = await fixer_loop.fix_service(service, params)
-    
-    if result.success:
-        logger.info(f"✅ Remediation for {service} succeeded: {result.message}")
+        # Using a low-level TCP probe for speed
+        _, writer = await asyncio.wait_for(
+            asyncio.open_connection(host, port),
+            timeout=2.0
+        )
+        writer.close()
+        await writer.wait_closed()
+        logger.info("[Probe] Local Neo4j Bolt port OK.")
         return True
+    except (asyncio.TimeoutError, ConnectionRefusedError, socket.error) as e:
+        logger.warning("[Probe] Local Neo4j unreachable: %s", e)
+        return False
+
+async def active_remediation_loop(services: Optional[List[str]] = None):
+    """
+    The 'NullClaw' active loop: Probe all services and trigger registry remediation on failure.
+    """
+    services = services or ["aura", "docker", "redis", "graph_sync", "local_snapshot"]
+    fixer = NanoFixerLoop(registry)
     
-    # Recursive logic: If a service fails, check if its common dependency (Docker) needs fixing
-    if service in ["redis", "neo4j"] and not result.success:
-        logger.warning(f"⚠️ {service} fix failed. Attempting recursive fix for Docker...")
-        docker_result = await fixer_loop.fix_service("docker", {"service": service})
-        if docker_result.success:
-            # Re-attempt original service fix after dependency is resolved
-            final_result = await fixer_loop.fix_service(service, params)
-            return final_result.success
+    logger.info("[InfraProbe] Starting active remediation loop for: %s", ", ".join(services))
+    
+    # Simple mapping of probe functions
+    probes = {
+        "aura": probe_aura,
+        "docker": probe_local_neo4j, # In this context, docker remediator is for local neo4j
+        "local_snapshot": lambda: os.path.exists(".graph/local-snapshot.json") # Simplified
+    }
+
+    for service in services:
+        probe_func = probes.get(service)
+        if probe_func:
+            is_healthy = False
+            if asyncio.iscoroutinefunction(probe_func):
+                is_healthy = await probe_func()
+            else:
+                is_healthy = probe_func()
             
-    return result.success
+            if not is_healthy:
+                logger.warning("[InfraProbe] Service '%s' failed probe. Triggering fix...", service)
+                # registry.get_tool() is called inside NanoFixerLoop.fix_service
+                result = await fixer.fix_service(service)
+                if result.success:
+                    logger.info("[InfraProbe] Remediation successful for %s: %s", service, result.message)
+                else:
+                    logger.error("[InfraProbe] Remediation failed for %s: %s", service, result.message)
+            else:
+                logger.info("[InfraProbe] Service '%s' is healthy.", service)

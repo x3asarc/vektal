@@ -9,19 +9,26 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 ## Current Position
 
-Phase: 14 closed GREEN; 14.1 execution complete; 14.2 execution complete; 15 queued.
-Plan: Phase 14 complete (8/8 plans); Phase 14.1 complete (6/6 plans executed); Phase 14.2 complete (6/6 plans executed + summaries); Phase 15 deferred until phase verification closeouts.
-Status: Phase `13` closed `GREEN`; Phase `13.1` closed `GREEN` (`4/4` plans complete and verified); Phase `13.2` closed `GREEN` (`7/7` plans complete and verified); Phase `14` closed `GREEN` (`8/8` plans complete and verified); Phase `14.1` execution complete (`6/6` plans complete); Phase `14.2` execution complete (`6/6` plans complete).
-Last activity: 2026-02-26 - Executed 14.2-01..14.2-06, integrated Tool Calling 2.0 patterns (batching, deferred loading, compact mode, input examples).
+## Phase 15: Self-Healing & Runtime Optimization
+Status: RESEARCH COMPLETE (Synthesized GSD) | IN PROGRESS: Task 15-01 (Sandbox Implementation)
+Last completed: Phase 14.3 (NullClaw Infrastructure)
+Next: Full Sandbox integration (docker-py) and Code Remediator refinement.
+Current Task: .planning/phases/15-self-healing-dynamic-scripting/15-PLAN.md
+Research: .planning/phases/15-self-healing-dynamic-scripting/15-RESEARCH.md
+Changes: .planning/phases/15-self-healing-dynamic-scripting/changes.md
 
-Progress: 98% (101/103 plans in roadmap complete)
+## Phase 14: Codebase Knowledge Graph & Continual Learning
+Status: COMPLETED | GATE: GREEN
+Last activity: 2026-03-01 - Completed Phase 14.3: Graph Availability & Sync Reliability. Implemented three-tier fallback, autonomous self-healing, and Sentry integration.
+
+Progress: 100% (103/103 plans in roadmap complete)
 
 ## Governance Gate Snapshot
 
-Current atomic task: Phase 14.2 phase-close verification + Phase 14.3 readiness
-Last completed gate: `Phase 14.2 execution wave completion (including 14.2-07)`
+Current atomic task: Phase 15 planning kickoff
+Last completed gate: `Phase 14.3 closure (7/7 summaries)`
 Current blocker: `N/A`
-Next action: `Phase 14.3 planning and execution`
+Next action: `Phase 15 planning`
 
 Governance defaults locked (2026-02-16):
 1. Review SLA is tracked as SLO (`4h` initial, `2h` re-review), with escalation logging at `24h`.
@@ -54,6 +61,21 @@ Gate board:
 ## Bypass Log
 
 1. `N/A` (no bypass invoked).
+
+## Recent Session Summary (2026-03-01)
+
+**Phase 14.3 Research Completed:**
+- Executed GSD research agent protocol for Phase 14.3 (Graph Availability + Sync Reliability).
+- Synthesized a canonical `14.3-RESEARCH.md` using dual-pass research and Context7 integration.
+- Researched Neo4j Aura Query API v2 for lightweight health probing.
+- Researched Sentry Issue Ingestion API for automated failure triage.
+- Audited **NullClaw** self-healing architecture:
+  - Verified `remediation_registry.py` for dynamic tool discovery.
+  - Mapped existing remediators (`docker`, `redis`, `git_staleness_guard`).
+  - Defined contracts for new remediators (`AuraRemediator`, `SnapshotRemediator`, `SyncRemediator`).
+- Documented implementation contracts for Sentry normalization and recursive fixes.
+- Identified unresolved risks regarding Aura Console API credentials.
+- Updated `STATE.md` to reflect Phase 14.3 research completion.
 
 ## Recent Session Summary (2026-02-23)
 

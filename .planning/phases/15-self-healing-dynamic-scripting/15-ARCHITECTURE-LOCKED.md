@@ -84,7 +84,8 @@ pending_approvals (
 **Confidence-based routing:**
 - Confidence ≥0.9: Auto-apply to production
 - Confidence <0.9: Create pending approval
-- Blast radius >5 files or >500 LOC: Always require approval
+- Blast radius >5 files: Always require approval
+- Any single source file >500 LOC: must be split into 2+ files before closure
 
 **Future:** Can add GitHub PR integration in Phase 16+
 
@@ -133,10 +134,11 @@ template:
 
 **Base Limits:**
 - Max files: 5
-- Max LOC: 500
+- Max LOC per source file: 500
 
 **Escalation:**
-- Changes >5 files OR >500 LOC: Require human approval even if sandbox GREEN
+- Changes >5 files: Require human approval even if sandbox GREEN
+- Any source file >500 LOC: blocking refactor required into 2+ files before closure
 - Rationale: Comprehensive healing capability, but safety gate for large changes
 
 **Why permissive limits:**

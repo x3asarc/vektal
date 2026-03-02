@@ -3,6 +3,9 @@
   "model_profile": "balanced",
   "commit_docs": true,
   "autonomous_cleanup_enabled": true,
+  "preToolUseHooks": [
+    "python scripts/graph/pretool_gate.py"
+  ],
   "mcp_server": {
     "deferred_loading": true,
     "base_tools": ["search_tools"],

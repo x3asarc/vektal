@@ -24,6 +24,11 @@
             "type": "command",
             "command": "python scripts/governance/ensure_neo4j_runtime.py",
             "blockOnFailure": true
+          },
+          {
+            "type": "command",
+            "command": "python scripts/hooks/antigravity_notify.py --provider claude --source pre_tool_use --heartbeat --window-hint claude",
+            "blockOnFailure": false
           }
         ]
       },

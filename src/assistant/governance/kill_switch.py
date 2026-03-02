@@ -111,3 +111,57 @@ def assert_mutation_allowed(*, store_id: int | None, action_name: str) -> KillSw
         raise KillSwitchBlockedError(decision=decision, action_name=action_name)
     return decision
 
+
+def check_kill_switch(action_name: str, store_id: int | None = None) -> bool:
+    """
+    Check if a specific action is allowed by kill-switch.
+    Returns True if ALLOWED (not blocked), False if BLOCKED.
+    """
+    decision = get_kill_switch_decision(store_id=store_id)
+    if decision.is_blocked:
+        # Check if metadata or reason specifically mentions this action or if it's global
+        # For simplicity, if a global/tenant switch is active, we block all mutations
+        return False
+    return True
+
+
+def set_kill_switch(action_name: str, enabled: bool, store_id: int | None = None, reason: str = "Automated switch"):
+    """
+    Enable or disable a kill-switch (Phase 15 control).
+    Implementation for Plan 15.2 auto-apply control.
+    """
+    from src.models import db, AssistantKillSwitch
+    
+    # Check for existing
+    existing = AssistantKillSwitch.query.filter_by(
+        scope_kind="global" if store_id is None else "tenant",
+        store_id=store_id,
+        reason=f"Auto-apply: {action_name}"
+    ).first()
+
+    if not enabled:
+        # We want to DISABLE the action (meaning ENABLE the kill-switch)
+        if not existing:
+            new_switch = AssistantKillSwitch(
+                scope_kind="global" if store_id is None else "tenant",
+                store_id=store_id,
+                is_enabled=True,
+                reason=f"Auto-apply: {action_name}",
+                effective_at=datetime.now(timezone.utc),
+                mode="block_all"
+            )
+            db.session.add(new_switch)
+    else:
+        # We want to ENABLE the action (meaning DISABLE/DELETE the kill-switch)
+        if existing:
+            db.session.delete(existing)
+            
+    db.session.commit()
+
+
+def get_kill_switch_status(action_name: str, store_id: int | None = None) -> bool:
+    """
+    Get status of an action (True if ENABLED/ALLOWED).
+    """
+    return check_kill_switch(action_name, store_id=store_id)
+

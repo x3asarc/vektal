@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 from src.graph.convention_checker import check_against_conventions, load_default_conventions
 from src.graph.query_interface import query_graph
 from src.graph.query_templates import execute_template
-from src.graph.batch_handlers import batch_query_handler, batch_dependencies_handler
+from src.graph.mcp_response_metadata import enrich_response
 
 logger = logging.getLogger(__name__)
 
@@ -487,50 +487,55 @@ def _search_tools_handler(query: str, tier: int | None = None, top_k: int = 3) -
 
 async def dispatch_tool_call(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
     """Dispatch MCP tool call to appropriate handler."""
+    result = None
     if name == "query_graph":
-        return query_graph_tool(
+        result = query_graph_tool(
             query=arguments["query"],
             compact_output=arguments.get("compact_output", False),
         )
-    if name == "get_dependencies":
-        return get_dependencies_tool(
+    elif name == "get_dependencies":
+        result = get_dependencies_tool(
             file_path=arguments["file_path"],
             direction=arguments.get("direction", "both"),
             depth=arguments.get("depth", 1),
         )
-    if name == "retrieve_intent":
-        return retrieve_intent_tool(arguments["query"])
-    if name == "search_tools":
-        return _search_tools_handler(
+    elif name == "retrieve_intent":
+        result = retrieve_intent_tool(arguments["query"])
+    elif name == "search_tools":
+        result = _search_tools_handler(
             query=arguments["query"],
             tier=arguments.get("tier"),
             top_k=arguments.get("top_k", 3),
         )
-    if name == "batch_query":
-        return await batch_query_handler(
+    elif name == "batch_query":
+        result = await batch_query_handler(
             queries=arguments["queries"],
             aggregate_mode=arguments.get("aggregate_mode", "separate"),
         )
-    if name == "batch_dependencies":
-        return await batch_dependencies_handler(
+    elif name == "batch_dependencies":
+        result = await batch_dependencies_handler(
             file_paths=arguments["file_paths"],
             direction=arguments.get("direction", "both"),
             depth=arguments.get("depth", 1),
         )
-    if name == "research_vendor":
+    elif name == "research_vendor":
         from src.graph.research_tools import research_vendor
 
-        return await research_vendor(
+        result = await research_vendor(
             vendor_name=arguments["vendor_name"],
             query=arguments["query"],
         )
-    if name == "search_documentation":
+    elif name == "search_documentation":
         from src.graph.research_tools import search_documentation
 
-        return await search_documentation(
+        result = await search_documentation(
             topic=arguments["topic"],
             library=arguments.get("library"),
         )
+    
+    if result is not None:
+        return enrich_response(result)
+        
     raise ValueError(f"Unknown tool: {name}")
     
 async def run_server() -> None:

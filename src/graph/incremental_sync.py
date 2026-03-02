@@ -40,7 +40,8 @@ from src.graph.file_parser import (
 from src.graph.commit_parser import parse_commit_message, CommitInfo
 from src.graph.planning_linker import link_commit_to_plan, detect_natural_references, resolve_plan_path
 from src.core.graphiti_client import get_graphiti_client
-from src.graph.semantic_cache import get_semantic_cache
+from src.graph.sync_status import update_sync_status
+from src.assistant.governance.mutation_guard import check_mutation_allowed
 
 logger = logging.getLogger(__name__)
 
@@ -112,20 +113,25 @@ def get_file_status(file_path: str) -> str:
         return "unknown"
 
 
-def sync_changed_files(changed_files: List[str], commit_message: str) -> IncrementalSyncResult:
+def sync_changed_files(
+    changed_files: List[str], 
+    commit_message: str,
+    sync_mode: str = "auto",
+    last_source: str = "git_hook"
+) -> IncrementalSyncResult:
     """
     Sync changed files with the knowledge graph.
-    
-    Args:
-        changed_files: List of file paths to process.
-        commit_message: The commit message for auto-linking.
-        
-    Returns:
-        IncrementalSyncResult with stats and errors.
     """
     start_time = time.time()
     result = IncrementalSyncResult()
     
+    # 0. Mutation Guard
+    allowed, reason = check_mutation_allowed()
+    if not allowed:
+        logger.warning(f"Sync blocked: {reason}")
+        result.errors.append(reason)
+        return result
+
     # Check graph availability
     client = get_graphiti_client()
     # Note: We continue even if client is None for this exercise, but in production we'd fail-open
@@ -182,6 +188,16 @@ def sync_changed_files(changed_files: List[str], commit_message: str) -> Increme
     except Exception as e:
         logger.error(f"Error syncing tool nodes: {e}")
         result.errors.append(f"tool_sync: {e}")
+        
+    # Update sync status
+    update_sync_status(
+        sync_mode=sync_mode,
+        last_source=last_source,
+        success=len(result.errors) == 0,
+        error="; ".join(result.errors) if result.errors else None,
+        files_processed=result.files_processed,
+        entities_updated=result.entities_updated
+    )
         
     return result
 

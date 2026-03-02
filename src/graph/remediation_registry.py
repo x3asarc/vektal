@@ -6,7 +6,7 @@ A centralized 'heap' of tools that the Universal Fixer can pull from.
 import logging
 import os
 import importlib.util
-from typing import Dict, Any, List, Type
+from typing import Dict, Any, List, Type, Optional
 from src.graph.universal_fixer import UniversalRemediator
 
 logger = logging.getLogger(__name__)
@@ -38,15 +38,12 @@ class RemediationRegistry:
             return
 
         for filename in os.listdir(self.tool_dir):
-            if filename.endswith("_remediator.py") and not filename.startswith("__"):
-                module_name = filename[:-3]
-                path = os.path.join(self.tool_dir, filename)
+            if filename.endswith(".py") and not filename.startswith("__"):
+                module_name = f"src.graph.remediators.{filename[:-3]}"
                 
-                # Dynamic Import
-                spec = importlib.util.spec_from_file_location(module_name, path)
-                if spec and spec.loader:
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
+                try:
+                    # Dynamic Import
+                    module = importlib.import_module(module_name)
                     
                     # Look for classes that implement UniversalRemediator
                     for attr_name in dir(module):
@@ -56,6 +53,9 @@ class RemediationRegistry:
                             attr is not UniversalRemediator):
                             instance = attr()
                             self.register(instance)
+                except Exception as e:
+                    logger.error(f"Failed to load remediator module {module_name}: {e}")
 
 # Singleton registry
 registry = RemediationRegistry()
+registry.auto_discover()

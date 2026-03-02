@@ -28,7 +28,7 @@
 2. Security posture and dependency safety.
 3. Deterministic test/tracing evidence.
 4. Maintainability and complexity.
-5. KISS compliance (`150-400` target, warning `>500`, exception `>800`).
+5. KISS compliance (no minimum LOC; any source file `>500 LOC` is blocking and must be split into at least two files).
 6. Structure and naming compliance with `ops/STRUCTURE_SPEC.md`.
 
 ## Evidence format
@@ -39,4 +39,3 @@ Use one line per finding:
 1. ContextCurator publishes journey synthesis every three phases.
 2. Reviewer updates this file with accepted preventive rules.
 3. Rejected rules must include explicit rationale in synthesis report.
-
