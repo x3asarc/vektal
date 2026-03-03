@@ -2,6 +2,7 @@ import os
 import requests
 import logging
 from typing import Dict, Any, Optional
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,26 @@ class SentryClient:
         self.api_key = api_key or os.getenv("SENTRY_AUTH_TOKEN")
         self.org_slug = organization_slug or os.getenv("SENTRY_ORG_SLUG")
         self.project_slug = project_slug or os.getenv("SENTRY_PROJECT_SLUG")
-        self.base_url = "https://sentry.io/api/0"
+        self.base_url = self._resolve_base_url()
+
+    @staticmethod
+    def _resolve_base_url() -> str:
+        override = (os.getenv("SENTRY_API_BASE_URL") or "").strip()
+        if override:
+            return override.rstrip("/")
+
+        dsn = (os.getenv("SENTRY_DSN") or os.getenv("SENTRY_WORKERS_DSN") or "").strip()
+        if not dsn:
+            return "https://sentry.io/api/0"
+
+        parsed = urlparse(dsn)
+        host = (parsed.netloc or "").split("@")[-1]
+        parts = host.split(".")
+        if len(parts) >= 4 and parts[1] == "ingest":
+            # o123.ingest.de.sentry.io -> de.sentry.io
+            return f"https://{'.'.join(parts[2:])}/api/0"
+
+        return "https://sentry.io/api/0"
 
     def get_issue(self, issue_id: str) -> Dict[str, Any]:
         """

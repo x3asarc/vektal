@@ -7,8 +7,12 @@ from types import SimpleNamespace
 
 try:
     from celery import Celery
+    from celery.signals import task_failure, task_success
     from kombu import Queue
 except ModuleNotFoundError:  # pragma: no cover - fallback for minimal test environments
+    task_failure = None
+    task_success = None
+
     class Queue:  # type: ignore[override]
         def __init__(self, name: str):
             self.name = name
@@ -76,6 +80,11 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for minimal test envi
             return None
 
 from src.jobs.queueing import ALL_QUEUES, TASK_ROUTES
+from src.config.sentry_config import configure_sentry
+from src.core.sentry_metrics import count as sentry_count
+
+# Worker process should report to the workers Sentry project DSN.
+configure_sentry(runtime="workers")
 
 app = Celery("shopify_platform")
 
@@ -153,3 +162,22 @@ def debug_task(self):
 
 
 app.autodiscover_tasks(["src.tasks"])
+
+
+if task_success is not None:
+    @task_success.connect
+    def _on_task_success(sender=None, result=None, **_kwargs):
+        task_name = getattr(sender, "name", "unknown")
+        sentry_count("workers.task.success", 1, tags={"task": task_name})
+
+
+if task_failure is not None:
+    @task_failure.connect
+    def _on_task_failure(sender=None, exception=None, **_kwargs):
+        task_name = getattr(sender, "name", "unknown")
+        error_type = type(exception).__name__ if exception is not None else "unknown"
+        sentry_count(
+            "workers.task.failure",
+            1,
+            tags={"task": task_name, "error_type": error_type},
+        )

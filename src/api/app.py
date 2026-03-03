@@ -25,6 +25,8 @@ from flask_compress import Compress
 from src.api.core.errors import register_error_handlers
 from src.api.core.rate_limit import create_limiter
 from src.config.sentry_config import configure_sentry
+from src.core.sentry_metrics import count as sentry_count
+from src.core.sentry_metrics import gauge as sentry_gauge
 from src.models import db
 
 
@@ -214,6 +216,13 @@ def create_openapi_app(config_object=None):
     from src.api import register_v1_blueprints
     register_v1_blueprints(app)
 
+    # Initialize CORS
+    from flask_cors import CORS
+    cors_origins = app.config.get("CORS_ORIGINS", "*")
+    if isinstance(cors_origins, str) and "," in cors_origins:
+        cors_origins = [origin.strip() for origin in cors_origins.split(",")]
+    CORS(app, origins=cors_origins, supports_credentials=True)
+
     # Override OpenAPI JSON output to include all registered Flask Blueprint routes.
     if "openapi.doc_url" in app.view_functions:
         def runtime_openapi_json():
@@ -225,8 +234,12 @@ def create_openapi_app(config_object=None):
         """Health check endpoint with database connectivity check."""
         try:
             db.session.execute(db.text('SELECT 1'))
+            sentry_count("api.health.check", 1, tags={"status": "ok"})
+            sentry_gauge("api.health.status", 1)
             return {'status': 'ok', 'database': 'connected'}, 200
         except Exception as e:
+            sentry_count("api.health.check", 1, tags={"status": "error"})
+            sentry_gauge("api.health.status", 0)
             return {'status': 'error', 'database': 'disconnected', 'error': str(e)}, 500
 
     return app
