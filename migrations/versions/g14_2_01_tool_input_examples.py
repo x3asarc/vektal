@@ -41,17 +41,29 @@ def upgrade() -> None:
 
     for tool_id, examples in examples_map.items():
         examples_json = json.dumps(examples)
-        # Using raw SQL for json merge to avoid overwriting existing metadata_json keys
-        op.execute(f"""
-            UPDATE assistant_tool_registry
-            SET metadata_json = COALESCE(metadata_json, '{{}}'::json) ||
-                               jsonb_build_object('input_examples', '{examples_json}'::json)
-            WHERE tool_id = '{tool_id}'
-        """)
+        # metadata_json is json (not jsonb), so cast to jsonb for merge ops then cast back.
+        op.execute(
+            sa.text(
+                """
+                UPDATE assistant_tool_registry
+                SET metadata_json = (
+                    COALESCE(metadata_json::jsonb, '{}'::jsonb) ||
+                    jsonb_build_object('input_examples', CAST(:examples_json AS jsonb))
+                )::json
+                WHERE tool_id = :tool_id
+                """
+            ).bindparams(tool_id=tool_id, examples_json=examples_json)
+        )
 def downgrade() -> None:
     # Remove input_examples from metadata_json
-    op.execute("""
-        UPDATE assistant_tool_registry
-        SET metadata_json = metadata_json - 'input_examples'
-        WHERE metadata_json ? 'input_examples'
-    """)
+    op.execute(
+        sa.text(
+            """
+            UPDATE assistant_tool_registry
+            SET metadata_json = (
+                COALESCE(metadata_json::jsonb, '{}'::jsonb) - 'input_examples'
+            )::json
+            WHERE COALESCE(metadata_json::jsonb, '{}'::jsonb) ? 'input_examples'
+            """
+        )
+    )

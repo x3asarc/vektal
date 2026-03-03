@@ -16,6 +16,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
+from urllib.parse import urlparse
 
 import httpx
 from dotenv import load_dotenv
@@ -137,11 +138,37 @@ def normalize_issue(issue: Dict[str, Any]) -> FailureEvent:
     )
 
 
+def _resolve_sentry_project() -> tuple[str, str]:
+    """
+    Resolve Sentry org/project locator.
+
+    Priority:
+    1) explicit SENTRY_ORG_SLUG + SENTRY_PROJECT_SLUG
+    2) numeric org/project parsed from SENTRY_DSN (o<org_id> + /<project_id>)
+    3) legacy default slugs
+    """
+    org_slug = (os.getenv("SENTRY_ORG_SLUG") or "").strip()
+    project_slug = (os.getenv("SENTRY_PROJECT_SLUG") or "").strip()
+    if org_slug and project_slug:
+        return org_slug, project_slug
+
+    dsn = (os.getenv("SENTRY_DSN") or "").strip()
+    if dsn:
+        parsed = urlparse(dsn)
+        # Example host: o4510917867929600.ingest.de.sentry.io
+        org_match = re.search(r"o(\d+)\.", parsed.netloc or "")
+        # Example path: /4510917894930512
+        project_id = (parsed.path or "/").strip("/").split("/")[0]
+        if org_match and project_id.isdigit():
+            return org_match.group(1), project_id
+
+    return "shopify-scraping-script", "shopify-scraping-script"
+
+
 async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
     """Poll Sentry API for unresolved error issues with cursor pagination."""
     auth_token = os.getenv("SENTRY_AUTH_TOKEN")
-    org_slug = os.getenv("SENTRY_ORG_SLUG", "shopify-scraping-script")
-    project_slug = os.getenv("SENTRY_PROJECT_SLUG", "shopify-scraping-script")
+    org_slug, project_slug = _resolve_sentry_project()
 
     if manual:
         logger.info("[SentryPuller] Manual mode enabled; using mock failure data.")
@@ -170,6 +197,8 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
     base_url = f"https://sentry.io/api/0/projects/{org_slug}/{project_slug}/issues/"
     headers = {"Authorization": f"Bearer {auth_token}"}
     base_params = {"query": "is:unresolved level:error", "limit": 25}
+
+    logger.info("[SentryPuller] Polling project %s/%s", org_slug, project_slug)
 
     cursor = _load_cursor()
     events: List[FailureEvent] = []
