@@ -4,6 +4,9 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 from src.celery_app import app
+from src.core.sentry_metrics import count as sentry_count
+from src.core.sentry_metrics import distribution as sentry_distribution
+from src.core.sentry_metrics import gauge as sentry_gauge
 from src.jobs.cancellation import request_cancellation
 from src.jobs.finalizer import finalize_job as run_finalizer
 from src.models import Job, JobStatus, db
@@ -65,3 +68,21 @@ def cleanup_old_jobs(retention_days: int = 30, dry_run: bool = True) -> dict:
         "deleted_count": deleted,
     }
 
+
+@app.task(name="src.tasks.control.sentry_metrics_smoke")
+def sentry_metrics_smoke(source: str = "ops_api", correlation_id: str | None = None) -> dict:
+    """Emit a deterministic set of worker-side Sentry metrics for smoke validation."""
+    tags = {"source": source}
+    sentry_count("workers.sentry.smoke.count", 1, tags=tags)
+    sentry_gauge("workers.sentry.smoke.gauge", 42, tags=tags)
+    sentry_distribution("workers.sentry.smoke.distribution", 187.5, tags=tags)
+    return {
+        "status": "ok",
+        "source": source,
+        "correlation_id": correlation_id,
+        "metrics": [
+            "workers.sentry.smoke.count",
+            "workers.sentry.smoke.gauge",
+            "workers.sentry.smoke.distribution",
+        ],
+    }

@@ -20,6 +20,8 @@ from src.assistant.deployment import (
 )
 from src.assistant.instrumentation import export_instrumentation_dataset
 from src.assistant.instrumentation.export import export_enrichment_lineage_dataset
+from src.core.sentry_metrics import count as sentry_count
+from src.core.sentry_metrics import gauge as sentry_gauge
 
 
 class SLIRequest(BaseModel):
@@ -61,6 +63,11 @@ class EnrichmentAuditExportRequest(BaseModel):
     include_blocked: bool = True
     include_protected: bool = True
     limit: int = Field(default=500, ge=1, le=2000)
+
+
+class SentryMetricsSmokeRequest(BaseModel):
+    source: str = Field(default="ops_api", min_length=1, max_length=64)
+    queue: str = Field(default="control", pattern=r"^[a-z0-9._-]+$")
 
 
 def _resolve_store_scope(requested_store_id: int | None) -> int | None:
@@ -189,3 +196,33 @@ def export_enrichment_audit():
         limit=body.limit,
     )
     return payload, 200
+
+
+@ops_bp.route("/sentry-metrics-smoke", methods=["POST"])
+@login_required
+def trigger_sentry_metrics_smoke():
+    try:
+        body = SentryMetricsSmokeRequest(**(request.get_json(silent=True) or {}))
+    except ValidationError as exc:
+        return ProblemDetails.validation_error(exc)
+
+    correlation_id = resolve_correlation_id(provided=request.headers.get("X-Correlation-Id"))
+    sentry_count("api.sentry.smoke.request", 1, tags={"source": body.source})
+    sentry_gauge("api.sentry.smoke.request_status", 1, tags={"source": body.source})
+
+    from src.celery_app import app as celery_app
+
+    task = celery_app.send_task(
+        "src.tasks.control.sentry_metrics_smoke",
+        kwargs={
+            "source": body.source,
+            "correlation_id": correlation_id,
+        },
+        queue=body.queue,
+    )
+    return {
+        "status": "queued",
+        "task_id": task.id,
+        "queue": body.queue,
+        "correlation_id": correlation_id,
+    }, 202
