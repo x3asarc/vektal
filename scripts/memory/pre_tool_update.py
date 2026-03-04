@@ -122,12 +122,12 @@ def record_pre_tool_event(
     payload = _load_payload(raw_input)
     command = _extract_command(payload)
 
+    # GRAPH-FIRST: Auto-query Neo4j/Graphiti knowledge graph before every tool use
+    # This ensures graph context is ALWAYS retrieved automatically
     broker_bundle = assemble_context(
         query=command or "pre_tool_command",
-        graph_fetcher=lambda _query, _limit: [],
-        snapshot_fetcher=lambda _query, _limit: [],
-        docs_limit=0,
-        top_k=1,
+        top_k=5,  # Increased from 1 for better context coverage
+        target_tokens=1000,  # Reasonable token budget for hook context
     )
 
     session_id = f"session-{_to_safe_id(provider)}-{_to_safe_id(session_key)}"

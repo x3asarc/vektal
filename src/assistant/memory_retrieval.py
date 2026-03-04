@@ -305,26 +305,46 @@ def _blend_results(
 
 def _query_graph_memories(query: str, store_id: str, limit: int) -> List[MemoryResult]:
     """
-    Query graph for relevant episode memories.
+    Query Neo4j/Graphiti knowledge graph for relevant code/episode memories.
 
+    Uses graph-first context retrieval to find semantically relevant content.
     Returns empty list on error (fail-open).
     """
     try:
-        # Lazy import to avoid circular dependency
-        from src.assistant.governance.graph_oracle_adapter import query_graph_evidence
+        # Import graph-first context broker
+        from src.assistant.context_broker import get_context
 
-        # Query graph for relevant evidence
-        # Note: This is a placeholder - actual implementation would query
-        # graph episodes directly rather than using oracle adapter
         logger.debug(f"Graph memory query for: {query}")
 
-        # Placeholder - would query Graphiti for relevant episodes
-        return []
+        # Query Neo4j/Graphiti knowledge graph automatically
+        bundle = get_context(query, top_k=limit, max_tokens=1000)
 
-    except ImportError:
-        logger.debug("Graph oracle adapter not available")
+        # Convert graph snippets to MemoryResult format
+        results: List[MemoryResult] = []
+        for idx, snippet in enumerate(bundle.snippets):
+            # Extract file path if present in snippet
+            file_path = snippet.split(']')[0].replace('[', '') if snippet.startswith('[') else None
+
+            results.append(MemoryResult(
+                content=snippet,
+                relevance_score=1.0 if bundle.telemetry['graph_used'] else 0.3,
+                source='graph',
+                metadata={
+                    'graph_used': bundle.telemetry['graph_used'],
+                    'fallback_reason': bundle.telemetry.get('fallback_reason'),
+                    'file_path': file_path,
+                    'provenance': bundle.provenance[idx] if idx < len(bundle.provenance) else {},
+                    'latency_ms': bundle.telemetry.get('latency_ms', 0),
+                }
+            ))
+
+        logger.debug(f"Graph memory query returned {len(results)} results (graph_used={bundle.telemetry['graph_used']})")
+        return results
+
+    except ImportError as e:
+        logger.debug(f"Graph context broker not available: {e}")
         return []
     except Exception as e:
-        logger.warning(f"Graph memory query failed: {e}")
+        logger.warning(f"Graph memory query failed: {e}", exc_info=True)
         return []
 

@@ -42,7 +42,9 @@ def test_lifecycle_event_coverage(monkeypatch):
             raw_input='{"tool_input":{"command":"git status"}}',
         )
         assert result["event_write"]["ok"] is True
-        assert result["write_duration_ms"] < 500
+        # Updated timeout: hook now queries Neo4j/Graphiti graph (was disabled before)
+        # Graph queries + embeddings model loading can take up to 5 seconds on first run
+        assert result["write_duration_ms"] < 5000
 
         monkeypatch.setattr(sys, "argv", ["session_end.py", "--task", "hook-task", "--status", "ok"])
         assert session_end.main() == 0
