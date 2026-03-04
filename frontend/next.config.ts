@@ -5,6 +5,7 @@ const apiProxyOrigin = (process.env.NEXT_PRIVATE_API_PROXY_ORIGIN ?? "http://loc
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: 'standalone', // Required for Docker production builds
   turbopack: {
     root: process.cwd(),
   },
