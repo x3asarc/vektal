@@ -9,6 +9,10 @@
           },
           {
             "type": "command",
+            "command": "python scripts/memory/session_start.py"
+          },
+          {
+            "type": "command",
             "command": "node .claude/hooks/gsd-check-update.js"
           },
           {
@@ -27,6 +31,11 @@
           {
             "type": "command",
             "command": "python scripts/governance/health_gate.py",
+            "blockOnFailure": false
+          },
+          {
+            "type": "command",
+            "command": "python scripts/memory/pre_tool_update.py --provider claude --session-key claude-pretool --window-hint claude",
             "blockOnFailure": false
           },
           {

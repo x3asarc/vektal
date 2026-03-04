@@ -8,6 +8,7 @@ export default tseslint.config(
       ".next/**",
       "node_modules/**",
       "coverage/**",
+      ".codex_tmp.*",
       "eslint.config.mjs",
     ],
   },
@@ -17,7 +18,8 @@ export default tseslint.config(
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       parserOptions: {
-        project: "./tsconfig.json",
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     plugins: {

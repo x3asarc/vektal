@@ -6,6 +6,10 @@
           {
             "type": "command",
             "command": "python .codex/hooks/start-health-daemon.py"
+          },
+          {
+            "type": "command",
+            "command": "python scripts/memory/session_start.py"
           }
         ]
       }

@@ -7,9 +7,29 @@ Phase 13.2 - Oracle Framework Reuse
 """
 
 import os
+import json
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch, MagicMock, mock_open
 import asyncio
+import src.core.graphiti_client
+
+
+@pytest.fixture(autouse=True)
+def reset_graphiti_singleton():
+    """Reset the Graphiti client singleton before each test."""
+    original_client = src.core.graphiti_client._graphiti_client
+    original_import_failed = src.core.graphiti_client._import_failed
+    original_unavailable_until = src.core.graphiti_client._graph_unavailable_until
+    
+    src.core.graphiti_client._graphiti_client = None
+    src.core.graphiti_client._import_failed = False
+    src.core.graphiti_client._graph_unavailable_until = 0.0
+    
+    yield
+    
+    src.core.graphiti_client._graphiti_client = original_client
+    src.core.graphiti_client._import_failed = original_import_failed
+    src.core.graphiti_client._graph_unavailable_until = original_unavailable_until
 
 
 # ===========================================
@@ -180,37 +200,24 @@ def test_client_reads_neo4j_uri_from_env(monkeypatch):
     monkeypatch.setenv('NEO4J_USER', 'test_user')
     monkeypatch.setenv('NEO4J_PASSWORD', 'test_password')
 
-    # Import module first
-    import src.core.graphiti_client
+    # Mock Graphiti class and connectivity probe
+    with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti, \
+         patch('src.core.graphiti_client._find_reachable_neo4j_uri') as mock_probe:
+        
+        mock_probe.return_value = 'bolt://custom-host:7687'
+        mock_instance = MagicMock()
+        mock_graphiti.return_value = mock_instance
 
-    # Save original state
-    original_client = src.core.graphiti_client._graphiti_client
-    original_import_failed = src.core.graphiti_client._import_failed
+        from src.core.graphiti_client import get_graphiti_client
 
-    try:
-        # Reset singleton and import flag
-        src.core.graphiti_client._graphiti_client = None
-        src.core.graphiti_client._import_failed = False
+        client = get_graphiti_client()
 
-        # Mock Graphiti class
-        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
-            mock_instance = MagicMock()
-            mock_graphiti.return_value = mock_instance
-
-            from src.core.graphiti_client import get_graphiti_client
-
-            client = get_graphiti_client()
-
-            # Verify Graphiti was called with correct URI
-            mock_graphiti.assert_called_once_with(
-                uri='bolt://custom-host:7687',
-                user='test_user',
-                password='test_password'
-            )
-    finally:
-        # Restore original state
-        src.core.graphiti_client._graphiti_client = original_client
-        src.core.graphiti_client._import_failed = original_import_failed
+        # Verify Graphiti was called with correct URI
+        mock_graphiti.assert_called_once_with(
+            uri='bolt://custom-host:7687',
+            user='test_user',
+            password='test_password'
+        )
 
 
 def test_client_reads_neo4j_credentials_from_env(monkeypatch):
@@ -222,37 +229,24 @@ def test_client_reads_neo4j_credentials_from_env(monkeypatch):
     monkeypatch.setenv('NEO4J_USER', 'custom_user')
     monkeypatch.setenv('NEO4J_PASSWORD', 'custom_password')
 
-    # Import module first
-    import src.core.graphiti_client
+    # Mock Graphiti class and connectivity probe
+    with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti, \
+         patch('src.core.graphiti_client._find_reachable_neo4j_uri') as mock_probe:
+        
+        mock_probe.return_value = 'bolt://localhost:7687'
+        mock_instance = MagicMock()
+        mock_graphiti.return_value = mock_instance
 
-    # Save original state
-    original_client = src.core.graphiti_client._graphiti_client
-    original_import_failed = src.core.graphiti_client._import_failed
+        from src.core.graphiti_client import get_graphiti_client
 
-    try:
-        # Reset singleton and import flag
-        src.core.graphiti_client._graphiti_client = None
-        src.core.graphiti_client._import_failed = False
+        client = get_graphiti_client()
 
-        # Mock Graphiti class
-        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
-            mock_instance = MagicMock()
-            mock_graphiti.return_value = mock_instance
-
-            from src.core.graphiti_client import get_graphiti_client
-
-            client = get_graphiti_client()
-
-            # Verify Graphiti was called with correct credentials
-            mock_graphiti.assert_called_once_with(
-                uri='bolt://localhost:7687',
-                user='custom_user',
-                password='custom_password'
-            )
-    finally:
-        # Restore original state
-        src.core.graphiti_client._graphiti_client = original_client
-        src.core.graphiti_client._import_failed = original_import_failed
+        # Verify Graphiti was called with correct credentials
+        mock_graphiti.assert_called_once_with(
+            uri='bolt://localhost:7687',
+            user='custom_user',
+            password='custom_password'
+        )
 
 
 def test_client_bridges_openrouter_env_to_openai(monkeypatch):
@@ -268,33 +262,24 @@ def test_client_bridges_openrouter_env_to_openai(monkeypatch):
     monkeypatch.setenv('OPENROUTER_API_KEY', 'or_test_key')
     monkeypatch.setenv('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1')
 
-    import src.core.graphiti_client
+    with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti, \
+         patch('src.core.graphiti_client._find_reachable_neo4j_uri') as mock_probe:
+        
+        mock_probe.return_value = 'bolt://localhost:7687'
+        mock_instance = MagicMock()
+        mock_graphiti.return_value = mock_instance
 
-    original_client = src.core.graphiti_client._graphiti_client
-    original_import_failed = src.core.graphiti_client._import_failed
+        from src.core.graphiti_client import get_graphiti_client
 
-    try:
-        src.core.graphiti_client._graphiti_client = None
-        src.core.graphiti_client._import_failed = False
-
-        with patch.object(src.core.graphiti_client, 'Graphiti') as mock_graphiti:
-            mock_instance = MagicMock()
-            mock_graphiti.return_value = mock_instance
-
-            from src.core.graphiti_client import get_graphiti_client
-
-            client = get_graphiti_client()
-            assert client is mock_instance
-            assert os.environ.get('OPENAI_API_KEY') == 'or_test_key'
-            assert os.environ.get('OPENAI_BASE_URL') == 'https://openrouter.ai/api/v1'
-            mock_graphiti.assert_called_once_with(
-                uri='bolt://localhost:7687',
-                user='neo4j',
-                password='test_password'
-            )
-    finally:
-        src.core.graphiti_client._graphiti_client = original_client
-        src.core.graphiti_client._import_failed = original_import_failed
+        client = get_graphiti_client()
+        assert client is mock_instance
+        assert os.environ.get('OPENAI_API_KEY') == 'or_test_key'
+        assert os.environ.get('OPENAI_BASE_URL') == 'https://openrouter.ai/api/v1'
+        mock_graphiti.assert_called_once_with(
+            uri='bolt://localhost:7687',
+            user='neo4j',
+            password='test_password'
+        )
 
 
 # ===========================================
@@ -322,3 +307,29 @@ def test_client_handles_missing_graphiti_import_gracefully():
     finally:
         # Restore original state
         src.core.graphiti_client._import_failed = original_flag
+
+
+def test_runtime_backend_mode_reads_backend_schema():
+    """
+    Runtime mode reader supports canonical backend schema (backend/reason).
+    """
+    with patch("src.graph.backend_resolver.os.path.exists", return_value=True), patch(
+        "src.graph.backend_resolver.open",
+        mock_open(read_data=json.dumps({"backend": "local_snapshot", "reason": "snapshot pin"})),
+    ):
+        from src.core.graphiti_client import _runtime_backend_mode
+
+        assert _runtime_backend_mode() == "local_snapshot"
+
+
+def test_runtime_backend_mode_maps_local_neo4j_to_legacy_mode():
+    """
+    Runtime mode reader maps backend=local_neo4j to mode=neo4j.
+    """
+    with patch("src.graph.backend_resolver.os.path.exists", return_value=True), patch(
+        "src.graph.backend_resolver.open",
+        mock_open(read_data=json.dumps({"backend": "local_neo4j", "reason": "local graph available"})),
+    ):
+        from src.core.graphiti_client import _runtime_backend_mode
+
+        assert _runtime_backend_mode() == "neo4j"

@@ -5,10 +5,45 @@ with similar products from the catalog. Integrates with EmbeddingGenerator for
 semantic similarity search.
 """
 import os
+import time
 from typing import List, Optional
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from cachetools import TTLCache
+try:
+    from cachetools import TTLCache
+except ImportError:
+    class TTLCache:
+        """Minimal TTL cache fallback used when cachetools is unavailable."""
+
+        def __init__(self, maxsize: int, ttl: int):
+            self.maxsize = maxsize
+            self.ttl = ttl
+            self._data = {}
+            self._expires_at = {}
+
+        def _purge_expired(self) -> None:
+            now = time.time()
+            expired = [k for k, exp in self._expires_at.items() if exp <= now]
+            for key in expired:
+                self._data.pop(key, None)
+                self._expires_at.pop(key, None)
+
+        def __contains__(self, key) -> bool:
+            self._purge_expired()
+            return key in self._data
+
+        def __getitem__(self, key):
+            self._purge_expired()
+            return self._data[key]
+
+        def __setitem__(self, key, value) -> None:
+            self._purge_expired()
+            if len(self._data) >= self.maxsize and self._data:
+                oldest_key = min(self._expires_at, key=self._expires_at.get)
+                self._data.pop(oldest_key, None)
+                self._expires_at.pop(oldest_key, None)
+            self._data[key] = value
+            self._expires_at[key] = time.time() + self.ttl
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 

@@ -8,7 +8,6 @@ import json
 import logging
 import asyncio
 import time
-import subprocess
 from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass, asdict
@@ -36,6 +35,43 @@ FAILURE_CACHE_TTL = 60
 
 MANIFEST_PATH = ".graph/runtime-backend.json"
 SYNC_METADATA_PATH = ".graph/last-sync.json"
+
+_MODE_TO_BACKEND = {
+    "aura": BACKEND_ENUM.AURA,
+    "neo4j": BACKEND_ENUM.LOCAL_NEO4J,
+    "local_neo4j": BACKEND_ENUM.LOCAL_NEO4J,
+    "local_snapshot": BACKEND_ENUM.SNAPSHOT,
+    "snapshot": BACKEND_ENUM.SNAPSHOT,
+}
+
+_BACKEND_TO_MODE = {
+    BACKEND_ENUM.AURA: "aura",
+    BACKEND_ENUM.LOCAL_NEO4J: "neo4j",
+    BACKEND_ENUM.SNAPSHOT: "local_snapshot",
+}
+
+
+def _normalize_backend(raw_backend: Any) -> Optional[BACKEND_ENUM]:
+    token = str(raw_backend or "").strip().lower()
+    if not token:
+        return None
+
+    mapped = _MODE_TO_BACKEND.get(token)
+    if mapped:
+        return mapped
+
+    try:
+        return BACKEND_ENUM(token)
+    except Exception:
+        return None
+
+
+def runtime_backend_mode() -> str:
+    """Return legacy-compatible runtime mode token based on manifest state."""
+    status = read_runtime_manifest()
+    if not status:
+        return ""
+    return _BACKEND_TO_MODE.get(status.backend, "")
 
 def _is_failed_cached(key: str) -> bool:
     if key in _failure_cache:
@@ -116,8 +152,13 @@ def write_runtime_manifest(status: BackendStatus):
     """Writes status to .graph/runtime-backend.json."""
     os.makedirs(".graph", exist_ok=True)
     try:
+        payload = asdict(status)
+        payload["backend"] = status.backend.value
+        # Compatibility schema consumed by older readers/scripts.
+        payload["mode"] = _BACKEND_TO_MODE.get(status.backend, status.backend.value)
+        payload["detail"] = status.reason
         with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
-            json.dump(asdict(status), f, indent=2)
+            json.dump(payload, f, indent=2)
     except Exception as e:
         logger.error(f"Failed to write runtime manifest: {e}")
 
@@ -128,11 +169,31 @@ def read_runtime_manifest() -> Optional[BackendStatus]:
     try:
         with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
-            if "backend" in data:
-                data["backend"] = BACKEND_ENUM(data["backend"])
-            return BackendStatus(**data)
+            backend = _normalize_backend(data.get("backend"))
+            if backend is None:
+                legacy_mode = str(data.get("mode", "")).strip().lower()
+                backend = _normalize_backend(legacy_mode)
+                if backend is None:
+                    logger.warning("Runtime manifest has unknown backend/mode: backend=%s mode=%s", data.get("backend"), legacy_mode)
+                    return None
+            data["backend"] = backend
+            data["reason"] = data.get("reason") or data.get("detail") or "Runtime manifest loaded"
+            data["checked_at"] = data.get("checked_at") or datetime.now().isoformat()
+            data["is_degraded"] = bool(data.get("is_degraded", backend == BACKEND_ENUM.SNAPSHOT))
+            data["freshness_hours"] = float(data.get("freshness_hours", 0.0) or 0.0)
+            data["probe_latency_ms"] = float(data.get("probe_latency_ms", 0.0) or 0.0)
+
+            # Ignore unknown keys from mixed manifest versions.
+            return BackendStatus(
+                backend=data["backend"],
+                checked_at=data.get("checked_at", datetime.now().isoformat()),
+                reason=data.get("reason", "Runtime manifest loaded"),
+                freshness_hours=float(data.get("freshness_hours", 0.0) or 0.0),
+                is_degraded=bool(data.get("is_degraded", False)),
+                probe_latency_ms=float(data.get("probe_latency_ms", 0.0) or 0.0),
+            )
     except Exception as e:
-        logger.error(f"Failed to read runtime manifest: {e}")
+        logger.warning(f"Failed to read runtime manifest: {e}")
         return None
 
 def _calculate_staleness() -> float:

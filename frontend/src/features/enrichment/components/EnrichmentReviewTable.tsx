@@ -10,8 +10,17 @@ type EnrichmentReviewTableProps = {
 
 function renderValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "-";
-  if (typeof value === "object") return JSON.stringify(value);
-  return String(value);
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value) ?? "[unserializable]";
+    } catch {
+      return "[unserializable]";
+    }
+  }
+  return "[unsupported]";
 }
 
 export function EnrichmentReviewTable({ rows, selectedIds, onToggle }: EnrichmentReviewTableProps) {

@@ -154,9 +154,22 @@ def _warm_local_snapshot(python_exe: str) -> bool:
 
 def _write_backend_state(mode: str, detail: str) -> None:
     try:
+        backend = "aura"
+        if mode in {"neo4j", "local_neo4j"}:
+            backend = "local_neo4j"
+        elif mode in {"local_snapshot", "snapshot"}:
+            backend = "local_snapshot"
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
         STATE_PATH.write_text(
-            json.dumps({"mode": mode, "detail": detail}, indent=2),
+            json.dumps(
+                {
+                    "backend": backend,
+                    "reason": detail,
+                    "mode": mode,
+                    "detail": detail,
+                },
+                indent=2,
+            ),
             encoding="utf-8",
         )
     except Exception:

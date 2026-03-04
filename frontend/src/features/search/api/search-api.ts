@@ -58,7 +58,11 @@ export type ProductSearchResponse = {
   };
 };
 
-function appendIfPresent(params: URLSearchParams, key: string, value: unknown): void {
+function appendIfPresent(
+  params: URLSearchParams,
+  key: string,
+  value: string | number | boolean | null | undefined,
+): void {
   if (value === undefined || value === null) return;
   if (typeof value === "string" && value.trim() === "") return;
   params.set(key, String(value));

@@ -69,17 +69,20 @@ class TestHealthMonitorDaemon:
             with mock.patch.object(health_monitor, "_trigger_dependency_install"):
                 result = health_monitor.check_dependencies()
 
-        assert result["status"] == "installing"
+        # Dependency remediation is now delegated to handle_health_issues()/orchestrator.
+        assert result["status"] == "missing"
         assert len(result["missing"]) > 0
 
     @pytest.mark.asyncio
     async def test_check_sentry_no_token(self, monkeypatch):
         """Test Sentry check when no auth token configured."""
         monkeypatch.delenv("SENTRY_AUTH_TOKEN", raising=False)
+        monkeypatch.setenv("SENTRY_ORG_SLUG", "test-org")
+        monkeypatch.setenv("SENTRY_PROJECT_SLUG", "test-project")
 
         result = await health_monitor.check_sentry()
 
-        assert result["status"] == "healthy"
+        assert result["status"] == "not_configured"
         assert result["issue_count"] == 0
         assert result["auto_heal_running"] is False
 
@@ -87,6 +90,8 @@ class TestHealthMonitorDaemon:
     async def test_check_sentry_api_failure(self, monkeypatch):
         """Test Sentry check when API call fails."""
         monkeypatch.setenv("SENTRY_AUTH_TOKEN", "fake-token")
+        monkeypatch.setenv("SENTRY_ORG_SLUG", "test-org")
+        monkeypatch.setenv("SENTRY_PROJECT_SLUG", "test-project")
 
         # Mock httpx to raise exception
         async def mock_get(*args, **kwargs):

@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import logging
 import queue
+import re
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -265,12 +266,7 @@ def _generate_ai_reply(user_message: str, intent_type: str, handler_message: str
     Returns None on any failure ? callers fall back to handler_message.
     """
     import os
-    import json as _json
     import requests as _requests
-
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        return None
 
     system_prompt = (
         "You are a helpful assistant for a Shopify product management platform. "
@@ -291,41 +287,210 @@ def _generate_ai_reply(user_message: str, intent_type: str, handler_message: str
         "If the intent is 'unknown', guide the user toward useful commands."
     )
 
-    primary_model = os.getenv("OPENROUTER_TEXT_MODEL", "google/gemini-2.0-flash-001")
-    fallback_model = os.getenv("OPENROUTER_TEXT_FALLBACK_MODEL", "openai/gpt-4o-mini")
-    candidate_models = list(dict.fromkeys(model for model in [primary_model, fallback_model] if model))
+    def _extract_gemini_text(payload: dict[str, Any]) -> str | None:
+        candidates = payload.get("candidates")
+        if not isinstance(candidates, list) or not candidates:
+            return None
+        first = candidates[0]
+        if not isinstance(first, dict):
+            return None
+        content = first.get("content")
+        if not isinstance(content, dict):
+            return None
+        parts = content.get("parts")
+        if not isinstance(parts, list):
+            return None
+        collected: list[str] = []
+        for part in parts:
+            if not isinstance(part, dict):
+                continue
+            text = part.get("text")
+            if isinstance(text, str) and text.strip():
+                collected.append(text.strip())
+        return "\n".join(collected).strip() or None
 
-    try:
-        for model in candidate_models:
+    def _try_gemini() -> str | None:
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        if not gemini_key:
+            return None
+        model = os.getenv("GEMINI_TEXT_MODEL", "gemini-2.0-flash")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        try:
             resp = _requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
+                url,
                 headers={
-                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://vektal.systems",
-                    "X-Title": "Vektal Platform",
+                    "x-goog-api-key": gemini_key,
                 },
                 json={
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": context},
-                    ],
-                    "temperature": 0.7,
-                    "max_tokens": 200,
+                    "system_instruction": {"parts": [{"text": system_prompt}]},
+                    "contents": [{"role": "user", "parts": [{"text": context}]}],
+                    "generationConfig": {
+                        "temperature": 0.7,
+                        "maxOutputTokens": 220,
+                    },
                 },
                 timeout=8,
             )
             if resp.status_code == 404:
-                logger.warning("AI reply model unavailable on OpenRouter: %s", model)
-                continue
+                logger.warning("AI reply Gemini model unavailable: %s", model)
+                return None
             resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"].strip()
-        logger.warning("AI reply generation skipped: no available OpenRouter models from %s", candidate_models)
+            return _extract_gemini_text(resp.json())
+        except Exception as exc:  # noqa: BLE001
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            if status_code in (401, 403):
+                logger.warning("AI reply generation via Gemini auth failed (HTTP %s)", status_code)
+            else:
+                logger.warning("AI reply generation via Gemini failed")
+            return None
+
+    def _try_openrouter() -> str | None:
+        api_key = os.getenv("OPENROUTER_API_KEY")
+        if not api_key:
+            return None
+        primary_model = os.getenv("OPENROUTER_TEXT_MODEL", "google/gemini-2.0-flash-001")
+        fallback_model = os.getenv("OPENROUTER_TEXT_FALLBACK_MODEL", "openai/gpt-4o-mini")
+        candidate_models = list(dict.fromkeys(model for model in [primary_model, fallback_model] if model))
+        for model in candidate_models:
+            try:
+                resp = _requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "https://vektal.systems",
+                        "X-Title": "Vektal Platform",
+                    },
+                    json={
+                        "model": model,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": context},
+                        ],
+                        "temperature": 0.7,
+                        "max_tokens": 200,
+                    },
+                    timeout=8,
+                )
+                if resp.status_code == 404:
+                    logger.warning("AI reply model unavailable on OpenRouter: %s", model)
+                    continue
+                resp.raise_for_status()
+                return resp.json()["choices"][0]["message"]["content"].strip()
+            except Exception as exc:  # noqa: BLE001
+                status_code = getattr(getattr(exc, "response", None), "status_code", None)
+                if status_code in (401, 403):
+                    logger.warning(
+                        "AI reply generation via OpenRouter auth failed for model %s (HTTP %s)",
+                        model,
+                        status_code,
+                    )
+                else:
+                    logger.warning("AI reply generation via OpenRouter failed for model %s", model)
+                continue
         return None
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("AI reply generation failed: %s", exc)
+
+    # Prefer OpenRouter as primary provider (cost control + unified billing).
+    openrouter_reply = _try_openrouter()
+    if openrouter_reply:
+        return openrouter_reply
+
+    enable_gemini_fallback = os.getenv("ENABLE_GEMINI_FALLBACK", "0").strip().lower() in {"1", "true", "yes", "on"}
+    if enable_gemini_fallback:
+        return _try_gemini()
+
+    return None
+
+
+def _is_small_talk_message(raw_message: str) -> bool:
+    text = (raw_message or "").strip().lower()
+    if not text:
+        return False
+    return bool(
+        re.search(
+            r"\b(hi|hello|hey|yo|sup|what'?s up|whats up|how are you|how'?s it going|hows it going|thanks|thank you|thx|what should i give you|what should i type|what do you need|what can i provide|how should i ask|where do i start|how do i start|get started|not sure where to start|don't know where to start|dont know where to start)\b",
+            text,
+        )
+    )
+
+
+def _wants_command_scaffold(raw_message: str) -> bool:
+    text = (raw_message or "").strip().lower()
+    if not text:
+        return False
+    return bool(
+        re.search(
+            r"\b(help|commands?|options?|examples?|show me|what can you do|how can you help)\b",
+            text,
+        )
+    )
+
+
+def _build_local_conversational_reply(
+    user_message: str,
+    intent_type: str,
+    handler_message: str,
+) -> str | None:
+    text = (user_message or "").strip().lower()
+    if not text:
         return None
+
+    if re.search(r"\b(hi|hello|hey|yo|sup|what'?s up|whats up)\b", text):
+        return (
+            "Hey. I can help you manage products, vendors, and updates. "
+            "Tell me what you want to do, and I will guide you."
+        )
+    if re.search(r"\b(thanks|thank you|thx)\b", text):
+        return "You are welcome. If you want, give me a SKU and I can help you with the next step."
+    if re.search(r"\b(how are you|how'?s it going|hows it going)\b", text):
+        return (
+            "I am ready to help. You can ask me to add a product, update a SKU, "
+            "or find a vendor."
+        )
+    if re.search(
+        r"\b(what should i give you|what should i type|what do you need|what can i provide|how should i ask)\b",
+        text,
+    ):
+        return (
+            "Give me the outcome you want in plain language. "
+            "For example: add a SKU, update a SKU, or find a vendor for a SKU."
+        )
+    if re.search(
+        r"\b(where do i start|how do i start|get started|not sure where to start|don't know where to start|dont know where to start)\b",
+        text,
+    ):
+        return (
+            "Start with one simple goal. "
+            "Tell me either a SKU to add, a SKU to update, or a SKU to find a vendor for, and I will take it from there."
+        )
+
+    if intent_type == IntentType.UNKNOWN.value:
+        if handler_message:
+            return handler_message
+        return (
+            "I can help with product operations like adding SKUs, updating products, "
+            "and finding vendors. Tell me what outcome you want."
+        )
+    return None
+
+
+def _build_minimal_unknown_reply(user_message: str) -> str:
+    text = (user_message or "").strip()
+    if _is_small_talk_message(text):
+        return (
+            "Hey. I am here and ready to help. "
+            "Tell me one product goal, and I will guide you step by step."
+        )
+    if text.endswith("?"):
+        return (
+            "I can help with product tasks. "
+            "Tell me one goal, and I will guide you step by step."
+        )
+    return (
+        "I can help with product tasks like adding SKUs, updating products, and finding vendors. "
+        "Tell me the first thing you want to do."
+    )
 
 
 def _build_assistant_blocks(
@@ -342,14 +507,24 @@ def _build_assistant_blocks(
 
     primary_text = response_payload.get("message")
     intent_type = route_result.intent.type.value
+    wants_command_scaffold = _wants_command_scaffold(raw_user_message)
 
-    # When intent is UNKNOWN or no handler message was set, generate a
-    # conversational AI reply instead of showing static boilerplate.
-    _needs_ai_reply = (
-        intent_type == IntentType.UNKNOWN.value
-        or not primary_text
-    )
-    if _needs_ai_reply and raw_user_message:
+    if intent_type == IntentType.UNKNOWN.value:
+        ai_reply = None
+        if raw_user_message:
+            ai_reply = _generate_ai_reply(
+                user_message=raw_user_message,
+                intent_type=intent_type,
+                handler_message=primary_text or "",
+            )
+        primary_text = ai_reply or _build_minimal_unknown_reply(raw_user_message)
+        blocks.append(ChatBlock(type="text", text=primary_text))
+        output = [block.model_dump(exclude_none=True) for block in blocks]
+        if extra_blocks:
+            output.extend(extra_blocks)
+        return output
+
+    if not primary_text and raw_user_message:
         ai_reply = _generate_ai_reply(
             user_message=raw_user_message,
             intent_type=intent_type,
@@ -359,10 +534,17 @@ def _build_assistant_blocks(
             primary_text = ai_reply
 
     if not primary_text:
+        primary_text = _build_local_conversational_reply(
+            user_message=raw_user_message,
+            intent_type=intent_type,
+            handler_message=primary_text or "",
+        )
+
+    if not primary_text:
         primary_text = f"Intent classified as `{intent_type}`."
     blocks.append(ChatBlock(type="text", text=primary_text))
 
-    if isinstance(response_payload.get("commands"), list):
+    if wants_command_scaffold and isinstance(response_payload.get("commands"), list):
         blocks.append(
             ChatBlock(
                 type="table",
@@ -1606,4 +1788,3 @@ def stream_session(session_id: int):
             "X-Accel-Buffering": "no",
         },
     )
-

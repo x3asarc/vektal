@@ -6,6 +6,24 @@
           {
             "type": "command",
             "command": "python .gemini/hooks/start-health-daemon.py"
+          },
+          {
+            "type": "command",
+            "command": "python scripts/memory/session_start.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "filter": {
+          "tool": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/memory/pre_tool_update.py --provider gemini --session-key gemini-pretool --window-hint gemini",
+            "blockOnFailure": false
           }
         ]
       }

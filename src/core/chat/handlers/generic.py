@@ -10,6 +10,7 @@ Phase 10: Response rendered in React chat component
 
 import logging
 from pathlib import Path
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,42 @@ class GenericHandler:
 
     Generates responses from static data, no LLM or database needed.
     """
+
+    @staticmethod
+    def _build_unknown_message(raw_message: str) -> str:
+        text = (raw_message or "").strip().lower()
+        if re.search(r"\b(hi|hello|hey|yo|sup|what'?s up|whats up)\b", text):
+            return (
+                "Hey! I am here and ready to help. "
+                "Tell me what you want to do with your products, and I can guide you step by step."
+            )
+        if re.search(r"\b(thanks|thank you|thx)\b", text):
+            return "Anytime. If you want, I can help you add, update, or review products next."
+        if re.search(r"\b(who are you|what can you do|capabilities|can you help)\b", text):
+            return (
+                "I can help with product operations like adding SKUs, updating product data, "
+                "finding vendors, and checking system state."
+            )
+        if re.search(
+            r"\b(what should i give you|what should i type|what do you need|what can i provide|how should i ask)\b",
+            text,
+        ):
+            return (
+                "Tell me the outcome you want in plain language. "
+                "For example: 'add SKU R0530', 'find vendor for R0530', or 'update R0530'."
+            )
+        if re.search(
+            r"\b(where do i start|how do i start|get started|not sure where to start|don't know where to start|dont know where to start)\b",
+            text,
+        ):
+            return (
+                "Start with one specific outcome. "
+                "For example: add one SKU, update one SKU, or ask me to find a vendor for one SKU."
+            )
+        return (
+            "I did not map that to a concrete product operation yet, "
+            "but I can still help you get to the right action quickly."
+        )
 
     def handle_help(self, intent) -> dict:
         """
@@ -143,26 +180,16 @@ class GenericHandler:
         Returns:
             Structured response with guidance on supported commands
         """
+        message = self._build_unknown_message(getattr(intent, "raw_message", ""))
         return {
             "status": "unknown",
-            "message": (
-                "I can help you manage your Shopify products. "
-                "Try typing a SKU (e.g. R0530) to add or look up a product, "
-                "or type 'help' to see all available commands."
-            ),
+            "message": message,
             "suggestions": [
-                "Type a SKU directly (e.g. R0530) to add it quickly",
-                "Type 'help' to see all available commands",
-                "Use natural language: 'find vendor for R0530'",
-                "Type 'list vendors' to see configured suppliers",
-                "Type 'status' to check system health"
-            ],
-            "actions": [
-                {
-                    "type": "help",
-                    "label": "Show help",
-                    "command": "help"
-                }
+                "Add a product by SKU, e.g. R0530",
+                "Find supplier for a SKU, e.g. find vendor for R0530",
+                "Update a product, e.g. update R0530",
+                "See configured suppliers with: list vendors",
+                "Check platform state with: status",
             ]
         }
 

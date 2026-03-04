@@ -22,7 +22,8 @@ class _Eager:
         self.records = [_Record(row) for row in rows]
 
 
-def test_execute_template_sync_driver_path():
+def test_execute_template_sync_driver_path(monkeypatch):
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "false")
     class SyncDriver:
         def execute_query(self, cypher, parameters_=None):
             assert "MATCH" in cypher
@@ -39,7 +40,8 @@ def test_execute_template_sync_driver_path():
 
 
 @pytest.mark.asyncio
-async def test_execute_template_async_driver_inside_running_loop():
+async def test_execute_template_async_driver_inside_running_loop(monkeypatch):
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "false")
     class AsyncDriver:
         async def execute_query(self, cypher, parameters_=None):
             assert "MATCH" in cypher
@@ -54,7 +56,8 @@ async def test_execute_template_async_driver_inside_running_loop():
         assert rows == [{"path": "src/c.py"}]
 
 
-def test_execute_template_session_fallback_when_execute_query_unavailable():
+def test_execute_template_session_fallback_when_execute_query_unavailable(monkeypatch):
+    monkeypatch.setenv("GRAPH_ORACLE_ENABLED", "false")
     class Cursor:
         def __iter__(self):
             return iter([_Record({"path": "src/d.py"})])

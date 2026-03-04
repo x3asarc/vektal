@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 from src.graph.sentry_feedback_loop import SentryFeedbackLoop
@@ -41,24 +42,31 @@ def test_validate_success(mock_sentry, mock_run, db_session):
             
             assert len(results) == 1
             assert results[0]['status'] == 'validated'
+            mock_sentry.get_issue.assert_called_once_with("SENTRY-1")
             mock_extractor.extract_and_promote.assert_called()
 
-def test_validate_recurring(mock_sentry, mock_run, db_session):
+def test_validate_recurring(mock_sentry, mock_run, db_session, monkeypatch):
     # Setup: Issue has activity AFTER remediation
     new_activity_date = (mock_run.completed_at + timedelta(minutes=10)).isoformat()
     mock_sentry.get_issue.return_value = {
         'status': 'unresolved',
         'activity': [{'dateCreated': new_activity_date}]
     }
+    failure_journey_path = Path.cwd() / ".graph" / "test-failure-journey-feedback.md"
+    monkeypatch.setattr("src.graph.sentry_feedback_loop.FAILURE_JOURNEY_PATH", failure_journey_path)
     
     with patch("src.graph.sentry_feedback_loop.SandboxRun.query") as mock_query:
         mock_query.filter.return_value.all.return_value = [mock_run]
         
-        loop = SentryFeedbackLoop(mock_sentry)
-        results = loop.validate_pending_remediations()
+        try:
+            loop = SentryFeedbackLoop(mock_sentry)
+            results = loop.validate_pending_remediations()
+        finally:
+            failure_journey_path.unlink(missing_ok=True)
         
         assert len(results) == 1
         assert results[0]['status'] == 'failed'
+        mock_sentry.get_issue.assert_called_once_with("SENTRY-1")
         assert "issue recurring" in mock_run.rollback_notes
 
 def test_validate_pending(mock_sentry, mock_run, db_session):
@@ -76,3 +84,36 @@ def test_validate_pending(mock_sentry, mock_run, db_session):
         
         assert len(results) == 1
         assert results[0]['status'] == 'pending'
+        mock_sentry.get_issue.assert_called_once_with("SENTRY-1")
+
+
+def test_validate_pending_when_sentry_token_missing(mock_sentry, mock_run, db_session):
+    mock_sentry.get_issue.return_value = {
+        "status": "pending",
+        "activity": [],
+        "error": "SENTRY_AUTH_TOKEN missing",
+    }
+
+    with patch("src.graph.sentry_feedback_loop.SandboxRun.query") as mock_query:
+        mock_query.filter.return_value.all.return_value = [mock_run]
+
+        loop = SentryFeedbackLoop(mock_sentry)
+        results = loop.validate_pending_remediations()
+
+        assert len(results) == 1
+        assert results[0]["status"] == "pending"
+        assert "missing" in results[0]["reason"].lower()
+
+
+def test_validate_success_emits_verified_event(mock_sentry, mock_run, db_session):
+    mock_sentry.get_issue.return_value = {
+        "status": "resolved",
+        "activity": [],
+    }
+
+    with patch("src.graph.sentry_feedback_loop.SandboxRun.query") as mock_query:
+        mock_query.filter.return_value.all.return_value = [mock_run]
+        with patch("src.memory.event_log.append_event") as mock_append_event:
+            loop = SentryFeedbackLoop(mock_sentry)
+            loop.validate_pending_remediations()
+            assert mock_append_event.called

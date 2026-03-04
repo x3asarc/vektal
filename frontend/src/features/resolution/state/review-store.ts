@@ -28,8 +28,12 @@ function lockMessage(error: unknown): string {
   if (error instanceof ApiClientError) {
     if (error.normalized.status === 409) {
       const owner = error.normalized.extensions?.lock_owner;
+      const ownerText =
+        typeof owner === "string" || typeof owner === "number"
+          ? String(owner)
+          : null;
       return owner
-        ? `Batch is currently checked out by user ${String(owner)}.`
+        ? `Batch is currently checked out by user ${ownerText ?? "unknown"}.`
         : "Batch is currently checked out by another user.";
     }
     return error.normalized.detail;

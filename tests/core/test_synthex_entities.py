@@ -56,7 +56,7 @@ def test_oracle_decision_entity_has_required_fields():
     assert entity.reason_codes == []  # Default
     assert entity.evidence_refs == []  # Default
     assert entity.requires_user_action is False  # Default
-    assert isinstance(entity.created_at, datetime)
+    assert isinstance(entity.entity_created_at, datetime)
 
 
 def test_oracle_decision_entity_validates_confidence_range():
@@ -381,7 +381,7 @@ def test_create_episode_payload_adds_required_fields():
     assert payload['store_id'] == "store_123"
     assert payload['decision'] == "pass"
     assert payload['confidence'] == 0.95
-    assert 'created_at' in payload
+    assert 'entity_created_at' in payload
 
 
 def test_create_episode_payload_uses_provided_created_at():
@@ -393,13 +393,13 @@ def test_create_episode_payload_uses_provided_created_at():
     payload = create_episode_payload(
         EpisodeType.ORACLE_DECISION,
         store_id="store_123",
-        created_at=custom_time,
+        entity_created_at=custom_time,
         decision="pass",
         confidence=0.95
     )
 
     # Verify custom timestamp is preserved
-    assert payload['created_at'] == custom_time
+    assert payload['entity_created_at'] == custom_time
 
 
 def test_create_episode_payload_generates_created_at_if_missing():
@@ -414,8 +414,8 @@ def test_create_episode_payload_generates_created_at_if_missing():
     )
 
     # Verify timestamp was generated
-    assert 'created_at' in payload
-    assert isinstance(payload['created_at'], datetime)
+    assert 'entity_created_at' in payload
+    assert isinstance(payload['entity_created_at'], datetime)
 
 
 # ===========================================
@@ -438,10 +438,11 @@ def test_episode_type_enum_has_expected_values():
     assert EpisodeType.BUG_ROOT_CAUSE_IDENTIFIED.value == "bug_root_cause_identified"
     assert EpisodeType.QUERY_REASONING_TRACE.value == "query_reasoning_trace"
     assert EpisodeType.GRAPH_DISCREPANCY.value == "graph_discrepancy"
+    assert EpisodeType.TOOL_REGISTRATION.value == "tool_registration"
 
     # Verify all values are present
     all_values = [e.value for e in EpisodeType]
-    assert len(all_values) == 11
+    assert len(all_values) == 12
     assert "oracle_decision" in all_values
     assert "failure_pattern" in all_values
     assert "enrichment_outcome" in all_values

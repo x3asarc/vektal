@@ -10,13 +10,13 @@ Phase 14 - Codebase Knowledge Graph & Continual Learning
 import time
 import logging
 import re
-import json
 import os
 from pathlib import Path
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 
 from src.graph.query_templates import QUERY_TEMPLATES, execute_template
+from src.graph.backend_resolver import runtime_backend_mode as _read_runtime_backend_mode
 from src.graph.search_expand_bridge import search_then_expand
 from src.graph.semantic_cache import get_semantic_cache
 from src.graph.convention_checker import check_against_conventions, load_default_conventions
@@ -38,15 +38,7 @@ _ARCHITECTURE_KEYWORDS = (
 
 
 def _runtime_backend_mode() -> str:
-    state_path = Path(".graph/runtime-backend.json")
-    if not state_path.exists():
-        return ""
-    try:
-        payload = json.loads(state_path.read_text(encoding="utf-8"))
-        mode = payload.get("mode", "")
-        return mode if isinstance(mode, str) else ""
-    except Exception:
-        return ""
+    return _read_runtime_backend_mode()
 
 
 def _normalize_query_path(path: str) -> str:

@@ -12,10 +12,9 @@ import inspect
 import threading
 import os
 import time
-import json
-from pathlib import Path
 from typing import List, Dict, Any, Optional
 from src.core.graphiti_client import get_graphiti_client
+from src.graph.backend_resolver import runtime_backend_mode as _read_runtime_backend_mode
 from src.graph.local_graph_store import query_template as local_query_template
 
 logger = logging.getLogger(__name__)
@@ -23,15 +22,7 @@ _NEO4J_UNAVAILABLE_UNTIL = 0.0
 
 
 def _runtime_backend_mode() -> str:
-    state_path = Path(".graph/runtime-backend.json")
-    if not state_path.exists():
-        return ""
-    try:
-        payload = json.loads(state_path.read_text(encoding="utf-8"))
-        mode = payload.get("mode", "")
-        return mode if isinstance(mode, str) else ""
-    except Exception:
-        return ""
+    return _read_runtime_backend_mode()
 
 
 # Standard query templates (Cypher)
@@ -252,7 +243,7 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         # Standard Neo4j 5.x AsyncDriver.execute_query signature uses query_ and parameters_
         # We wrap the call to handle potential sync/async driver variations gracefully
         try:
-            query_result = driver.execute_query(cypher, parameters_=params)
+            query_result = driver.execute_query(query_=cypher, parameters_=params)
         except TypeError:
             # Fallback for older drivers or different signatures
             try:

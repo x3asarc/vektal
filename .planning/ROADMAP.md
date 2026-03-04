@@ -68,6 +68,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 14.2: Tool Calling 2.0 Integration (INSERTED)** `[developer-facing]` - Optimize MCP/tool call semantics (batching, deferred loading, schema examples)
 - [x] **Phase 14.3: Graph Availability + Sync Reliability (INSERTED)** `[developer-facing]` - Guarantee Aura-first graph availability with local Neo4j and snapshot fallback
 - [x] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
+- [x] **Phase 16: Agent Context OS (INSERTED)** `[developer-facing]` - Always-fresh onboarding context, graph-first broker, and live memory governance
 
 ### Future Phases
 
@@ -479,6 +480,20 @@ Plans:
 - [x] 15-10-PLAN.md - Sentry Feedback Closure
 - [x] 15-11a-PLAN.md - Approval Queue Backend (Model + API)
 - [x] 15-11b-PLAN.md - Approval Queue Frontend (CLI + Web UI)
+
+### Phase 16: Agent Context OS (INSERTED)
+**Goal**: Establish a lightweight, always-live agent context operating system with graph-first retrieval and auditable memory governance
+**Depends on**: Phase 15
+**Plans**: 7 plans in 4 waves
+
+Plans:
+- [x] 16-01-PLAN.md - Canonical event schema + append-only event writer
+- [x] 16-02-PLAN.md - Deterministic materializers for working/short/long memory views
+- [x] 16-03-PLAN.md - Single onboarding entrypoint + folder summaries + link map generation
+- [x] 16-04-PLAN.md - Graph-first context broker with reason-coded fallback telemetry
+- [x] 16-05-PLAN.md - Lifecycle hook integration across session/task/phase events
+- [x] 16-06-PLAN.md - Context OS binary gate + operator report + runbook
+- [x] 16-07-PLAN.md - Verification harness, E2E validation, and phase closure artifacts
 
 ---
 

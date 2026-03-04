@@ -10,12 +10,11 @@ Phase 14 - Codebase Knowledge Graph & Continual Learning
 import logging
 import os
 import hashlib
-import json
 import asyncio
 import threading
-from pathlib import Path
 from typing import List, Optional, Callable, Any
 import numpy as np
+from src.graph.backend_resolver import runtime_backend_mode as _read_runtime_backend_mode
 
 logger = logging.getLogger(__name__)
 
@@ -38,15 +37,7 @@ _model_loaded = False
 
 
 def _runtime_backend_mode() -> str:
-    state_path = Path(".graph/runtime-backend.json")
-    if not state_path.exists():
-        return ""
-    try:
-        payload = json.loads(state_path.read_text(encoding="utf-8"))
-        mode = payload.get("mode", "")
-        return mode if isinstance(mode, str) else ""
-    except Exception:
-        return ""
+    return _read_runtime_backend_mode()
 
 
 def _should_force_hash_fallback() -> bool:
@@ -246,35 +237,6 @@ def _execute_query(driver, query: str, parameters: dict) -> List[dict]:
         return res_container[0]
     else:
         return loop.run_until_complete(_run_async())
-
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        # No loop, we can safe run it
-        return asyncio.run(_run_async())
-
-    if loop.is_running():
-        # Loop is running, we must run in a separate thread to avoid "cannot be called from a running event loop"
-        res_container = []
-        err_container = []
-
-        def _thread_target():
-            try:
-                res_container.append(asyncio.run(_run_async()))
-            except Exception as e:
-                err_container.append(e)
-
-        t = threading.Thread(target=_thread_target)
-        t.start()
-        t.join()
-        
-        if err_container:
-            raise err_container[0]
-        return res_container[0]
-    else:
-        return loop.run_until_complete(_run_async())
-
-import inspect
 
 def create_vector_index(client) -> bool:
     """

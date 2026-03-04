@@ -133,6 +133,44 @@ def test_help_message_does_not_create_action(authenticated_client):
     assert messages[1]["role"] == "assistant"
 
 
+def test_small_talk_message_returns_conversational_text_only(authenticated_client):
+    client, _, _ = authenticated_client
+    session = _create_session(client)
+
+    response = client.post(
+        f"/api/v1/chat/sessions/{session['id']}/messages",
+        json={"content": "hi"},
+    )
+    assert response.status_code == 201
+    payload = response.get_json()
+
+    assert payload["action"] is None
+    assert payload["assistant_message"]["intent_type"] == "unknown"
+    assert payload["assistant_message"]["content"]
+    block_types = [block["type"] for block in payload["assistant_message"]["blocks"]]
+    assert block_types == ["text"]
+
+    follow_up = client.post(
+        f"/api/v1/chat/sessions/{session['id']}/messages",
+        json={"content": "what should i give you?"},
+    )
+    assert follow_up.status_code == 201
+    follow_payload = follow_up.get_json()
+    assert follow_payload["assistant_message"]["intent_type"] == "unknown"
+    follow_block_types = [block["type"] for block in follow_payload["assistant_message"]["blocks"]]
+    assert follow_block_types == ["text"]
+
+    unsure = client.post(
+        f"/api/v1/chat/sessions/{session['id']}/messages",
+        json={"content": "im not sure where to start"},
+    )
+    assert unsure.status_code == 201
+    unsure_payload = unsure.get_json()
+    assert unsure_payload["assistant_message"]["intent_type"] == "unknown"
+    unsure_block_types = [block["type"] for block in unsure_payload["assistant_message"]["blocks"]]
+    assert unsure_block_types == ["text"]
+
+
 def test_message_validation_and_state_errors_are_deterministic(authenticated_client):
     client, _, _ = authenticated_client
     session = _create_session(client)

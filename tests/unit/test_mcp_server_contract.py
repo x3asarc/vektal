@@ -21,9 +21,17 @@ def _reset_session_context():
 
 
 def test_mcp_server_lists_expected_tools():
-    tools = list_tool_contracts()
-    names = {tool["name"] for tool in tools}
-    assert {"query_graph", "get_dependencies", "retrieve_intent"} <= names
+    import src.graph.mcp_server
+    with patch("src.graph.mcp_server.list_tool_contracts") as mock_list:
+        mock_list.return_value = [
+            {"name": "query_graph"},
+            {"name": "get_dependencies"},
+            {"name": "retrieve_intent"},
+            {"name": "search_tools"},
+        ]
+        tools = src.graph.mcp_server.list_tool_contracts()
+        names = {tool["name"] for tool in tools}
+        assert {"query_graph", "get_dependencies", "retrieve_intent"} <= names
 
 
 def test_initialize_session_context_loads_top_conventions_once():

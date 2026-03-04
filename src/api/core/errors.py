@@ -128,12 +128,16 @@ class ProblemDetails:
         Returns:
             Tuple of (JSON response, 429)
         """
+        safe_retry_after = str(retry_after).strip() if retry_after is not None else ""
+        if not safe_retry_after or safe_retry_after.lower() == "none":
+            safe_retry_after = "a short while"
+
         response = {
             "type": f"{ProblemDetails.BASE_URI}/rate-limit-exceeded",
             "title": "Rate Limit Exceeded",
             "status": 429,
-            "detail": f"Rate limit exceeded. Please retry after {retry_after}",
-            "retry_after": retry_after
+            "detail": f"Rate limit exceeded. Please retry after {safe_retry_after}",
+            "retry_after": safe_retry_after
         }
         return jsonify(response), 429
 
@@ -219,7 +223,13 @@ def register_error_handlers(app: Flask):
         def handle_rate_limit_exceeded(e: RateLimitExceeded):
             """Handle Flask-Limiter rate limit errors."""
             # Extract retry_after from exception if available
-            retry_after = getattr(e, 'retry_after', '60 seconds')
+            retry_after = getattr(e, 'retry_after', None)
+            if retry_after is None:
+                headers = e.get_headers() if hasattr(e, "get_headers") else None
+                if isinstance(headers, dict):
+                    retry_after = headers.get("Retry-After")
+                elif isinstance(headers, list):
+                    retry_after = dict(headers).get("Retry-After")
             return ProblemDetails.rate_limit_exceeded(retry_after)
     except ImportError:
         # Flask-Limiter not installed yet, skip registration

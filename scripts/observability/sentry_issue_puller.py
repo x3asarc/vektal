@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from dataclasses import dataclass
 import json
 import logging
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,6 +28,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.graph.sentry_ingestor import FailureEvent, ingest_failure_event
+from src.memory.event_log import append_event
+from src.memory.event_schema import EventType, create_event
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +37,15 @@ GRAPH_DIR = PROJECT_ROOT / ".graph"
 CURSOR_PATH = GRAPH_DIR / "sentry-cursor.json"
 PID_PATH = GRAPH_DIR / "sentry-worker.pid"
 HEALTH_PATH = GRAPH_DIR / "sentry-worker-health.json"
+PULLER_SOURCE = "scripts/observability/sentry_issue_puller.py"
+RUN_SESSION_ID = f"sentry-puller-{os.getpid()}"
+
+
+@dataclass(frozen=True)
+class PullResult:
+    events: List[FailureEvent]
+    cursor_state: Dict[str, Any]
+    error: Optional[str] = None
 
 
 def _ensure_graph_dir() -> None:
@@ -80,7 +93,12 @@ def _parse_next_cursor(link_header: str) -> Optional[str]:
     return None
 
 
-def _write_health(status: str, events: int = 0, error: Optional[str] = None) -> None:
+def _write_health(
+    status: str,
+    events: int = 0,
+    error: Optional[str] = None,
+    cursor_state: Optional[Dict[str, Any]] = None,
+) -> None:
     _ensure_graph_dir()
     payload = {
         "pid": os.getpid(),
@@ -88,6 +106,7 @@ def _write_health(status: str, events: int = 0, error: Optional[str] = None) -> 
         "events_processed": events,
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "error": error,
+        "cursor_state": cursor_state or {},
     }
     HEALTH_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
@@ -105,15 +124,30 @@ def _remove_pid() -> None:
         pass
 
 
+def _extract_error_type(issue: Dict[str, Any], title: str) -> str:
+    metadata = issue.get("metadata") if isinstance(issue.get("metadata"), dict) else {}
+    raw = issue.get("error_type") or metadata.get("type") or issue.get("type")
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip()
+    head = title.split(":", 1)[0].strip()
+    return head or "UnknownError"
+
+
 def normalize_issue(issue: Dict[str, Any]) -> FailureEvent:
     """Map Sentry issue data to Phase 14.3 FailureEvent taxonomy."""
     title = issue.get("title", "")
     culprit = issue.get("culprit", "unknown")
+    issue_id = str(issue.get("id", "unknown"))
+    error_type = _extract_error_type(issue, title)
+    affected_module = culprit if isinstance(culprit, str) and culprit.strip() else "unknown"
     tags = {
         t["key"]: t["value"]
         for t in issue.get("tags", [])
         if isinstance(t, dict) and "key" in t and "value" in t
     }
+    tags["issue_id"] = issue_id
+    tags["error_type"] = error_type
+    tags["affected_module"] = affected_module
 
     category = "UNKNOWN"
     title_lower = title.lower()
@@ -128,7 +162,7 @@ def normalize_issue(issue: Dict[str, Any]) -> FailureEvent:
         category = "SYNC_TIMEOUT"
 
     return FailureEvent(
-        event_id=str(issue.get("id", "unknown")),
+        event_id=issue_id,
         title=title,
         category=category,
         culprit=culprit,
@@ -165,7 +199,56 @@ def _resolve_sentry_project() -> tuple[str, str]:
     return "shopify-scraping-script", "shopify-scraping-script"
 
 
-async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
+def _emit_issue_pulled_event(event: FailureEvent) -> None:
+    try:
+        envelope = create_event(
+            event_type=EventType.SENTRY_ISSUE_PULLED,
+            provider="sentry",
+            session_id=RUN_SESSION_ID,
+            source=PULLER_SOURCE,
+            scope={"phase": "15.1", "issue_id": event.event_id},
+            payload={
+                "issue_id": event.event_id,
+                "level": event.level,
+                "error_type": event.tags.get("error_type", "UnknownError"),
+                "affected_module": event.tags.get("affected_module", event.culprit),
+                "timestamp": event.timestamp,
+                "category": event.category,
+                "title": event.title,
+            },
+            provenance={"component": "sentry_issue_puller"},
+        )
+        result = append_event(envelope, fail_open=True)
+        if not result.get("ok", False):
+            logger.warning("[SentryPuller] Canonical event write failed: %s", result.get("error", "unknown"))
+    except Exception as exc:
+        logger.warning("[SentryPuller] Canonical event emission skipped: %s", exc)
+
+
+def _refresh_materialized_views() -> None:
+    script_path = PROJECT_ROOT / "scripts" / "memory" / "materialize_views.py"
+    command = [sys.executable, str(script_path), "--mode", "incremental"]
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+    except Exception as exc:
+        logger.warning("[SentryPuller] Memory view refresh failed: %s", exc)
+        return
+    if completed.returncode != 0:
+        logger.warning(
+            "[SentryPuller] Memory view refresh returned %s: %s",
+            completed.returncode,
+            (completed.stderr or completed.stdout or "").strip()[:300],
+        )
+
+
+async def pull_sentry_issues(manual: bool = False) -> PullResult:
     """Poll Sentry API for unresolved error issues with cursor pagination."""
     auth_token = os.getenv("SENTRY_AUTH_TOKEN")
     org_slug, project_slug = _resolve_sentry_project()
@@ -188,11 +271,21 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
                 "tags": [{"key": "level", "value": "error"}],
             },
         ]
-        return [normalize_issue(i) for i in mock_issues]
+        normalized = [normalize_issue(i) for i in mock_issues]
+        return PullResult(
+            events=normalized,
+            cursor_state={"mode": "manual", "last_cursor": None, "pages_fetched": 1},
+            error=None,
+        )
 
     if not auth_token:
-        logger.warning("[SentryPuller] SENTRY_AUTH_TOKEN missing; poll skipped.")
-        return []
+        error = "SENTRY_AUTH_TOKEN missing"
+        logger.warning("[SentryPuller] %s; poll skipped.", error)
+        return PullResult(
+            events=[],
+            cursor_state={"mode": "api", "last_cursor": _load_cursor(), "pages_fetched": 0},
+            error=error,
+        )
 
     base_url = f"https://sentry.io/api/0/projects/{org_slug}/{project_slug}/issues/"
     headers = {"Authorization": f"Bearer {auth_token}"}
@@ -203,6 +296,8 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
     cursor = _load_cursor()
     events: List[FailureEvent] = []
     seen_ids: Set[str] = set()
+    pages_fetched = 0
+    last_error: Optional[str] = None
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         while True:
@@ -213,10 +308,12 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
             try:
                 resp = await client.get(base_url, headers=headers, params=params)
             except Exception as exc:
+                last_error = f"request_error:{type(exc).__name__}:{str(exc)}"
                 logger.error("[SentryPuller] Request error: %s", exc)
                 break
 
             if resp.status_code != 200:
+                last_error = f"http_error:{resp.status_code}"
                 logger.error(
                     "[SentryPuller] API failed (HTTP %s): %s",
                     resp.status_code,
@@ -224,6 +321,7 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
                 )
                 break
 
+            pages_fetched += 1
             issues = resp.json()
             for issue in issues:
                 event = normalize_issue(issue)
@@ -241,20 +339,32 @@ async def pull_sentry_issues(manual: bool = False) -> List[FailureEvent]:
     if cursor:
         _save_cursor(cursor)
 
-    return events
+    return PullResult(
+        events=events,
+        cursor_state={"mode": "api", "last_cursor": cursor, "pages_fetched": pages_fetched},
+        error=last_error,
+    )
 
 
-async def run_ingestion_cycle(manual: bool = False) -> int:
+async def run_ingestion_cycle(manual: bool = False) -> Dict[str, Any]:
     """Pull and ingest one cycle of Sentry issues. Returns ingested count."""
-    events = await pull_sentry_issues(manual=manual)
-    logger.info("[SentryPuller] Pulled %s event(s).", len(events))
+    pull_result = await pull_sentry_issues(manual=manual)
+    logger.info("[SentryPuller] Pulled %s event(s).", len(pull_result.events))
 
     ingested = 0
-    for event in events:
+    for event in pull_result.events:
+        _emit_issue_pulled_event(event)
         logger.info("[SentryPuller] [%s] %s", event.category, event.title)
         if await ingest_failure_event(event):
             ingested += 1
-    return ingested
+    if pull_result.error is None:
+        _refresh_materialized_views()
+    return {
+        "ingested": ingested,
+        "events_processed": len(pull_result.events),
+        "cursor_state": pull_result.cursor_state,
+        "error": pull_result.error,
+    }
 
 
 async def run_daemon(interval_seconds: int) -> None:
@@ -266,8 +376,13 @@ async def run_daemon(interval_seconds: int) -> None:
     try:
         while True:
             try:
-                ingested = await run_ingestion_cycle(manual=False)
-                _write_health("running", events=ingested)
+                cycle = await run_ingestion_cycle(manual=False)
+                _write_health(
+                    "running",
+                    events=int(cycle["events_processed"]),
+                    error=cycle.get("error"),
+                    cursor_state=cycle.get("cursor_state"),
+                )
             except Exception as exc:
                 logger.exception("[SentryPuller] Daemon cycle failed: %s", exc)
                 _write_health("error", events=0, error=str(exc))
@@ -283,9 +398,14 @@ async def _main_async(args: argparse.Namespace) -> int:
         await run_daemon(interval_seconds=args.interval)
         return 0
 
-    ingested = await run_ingestion_cycle(manual=args.manual)
-    _write_health("running", events=ingested)
-    logger.info("[SentryPuller] Ingested %s event(s).", ingested)
+    cycle = await run_ingestion_cycle(manual=args.manual)
+    _write_health(
+        "running",
+        events=int(cycle["events_processed"]),
+        error=cycle.get("error"),
+        cursor_state=cycle.get("cursor_state"),
+    )
+    logger.info("[SentryPuller] Ingested %s event(s).", cycle["ingested"])
     return 0
 
 

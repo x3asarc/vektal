@@ -16,7 +16,7 @@ import {
 } from "@/features/onboarding/api/onboarding-mutations";
 import { setGuardFlags } from "@/lib/auth/session-flags";
 import { apiRequest, ApiClientError } from "@/lib/api/client";
-import { useJobDetailObserver } from "@/features/jobs/hooks/useJobDetailObserver";
+import { useJobDetailObserver } from "@/lib/jobs/useJobDetailObserver";
 
 function nextState(
   state: OnboardingState,

@@ -15,13 +15,22 @@ interface Approval {
   status: string;
 }
 
+type ApprovalListResponse = {
+  approvals: Approval[];
+};
+
+function parseError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return "Unexpected approval queue error.";
+}
+
 export function ApprovalQueue() {
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadApprovals();
+    void loadApprovals();
   }, []);
 
   const loadApprovals = async () => {
@@ -29,10 +38,10 @@ export function ApprovalQueue() {
       setLoading(true);
       const res = await fetch('/api/v1/approvals/');
       if (!res.ok) throw new Error('Failed to load approvals');
-      const data = await res.json();
+      const data: ApprovalListResponse = await res.json() as ApprovalListResponse;
       setApprovals(data.approvals);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(parseError(err));
     } finally {
       setLoading(false);
     }
@@ -47,8 +56,8 @@ export function ApprovalQueue() {
       if (!res.ok) throw new Error('Failed to approve');
 
       setApprovals(prev => prev.filter(a => a.approval_id !== approvalId));
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error: ${parseError(err)}`);
     }
   };
 
@@ -65,8 +74,8 @@ export function ApprovalQueue() {
       if (!res.ok) throw new Error('Failed to reject');
 
       setApprovals(prev => prev.filter(a => a.approval_id !== approvalId));
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error: ${parseError(err)}`);
     }
   };
 
@@ -77,7 +86,7 @@ export function ApprovalQueue() {
     <div className="approval-queue-container">
       <header className="queue-header">
         <h2>Autonomous Approval Queue</h2>
-        <button className="btn-refresh" onClick={loadApprovals}>Refresh</button>
+        <button className="btn-refresh" onClick={() => { void loadApprovals(); }}>Refresh</button>
       </header>
 
       {approvals.length === 0 ? (
@@ -114,13 +123,13 @@ export function ApprovalQueue() {
               <div className="card-actions">
                 <button
                   className="btn-approve"
-                  onClick={() => handleApprove(approval.approval_id)}
+                  onClick={() => { void handleApprove(approval.approval_id); }}
                 >
                   Approve
                 </button>
                 <button
                   className="btn-reject"
-                  onClick={() => handleReject(approval.approval_id)}
+                  onClick={() => { void handleReject(approval.approval_id); }}
                 >
                   Reject
                 </button>

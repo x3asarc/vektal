@@ -265,13 +265,14 @@ After all waves:
 
 <step name="verify_phase_goal">
 Verify phase achieved its GOAL, not just completed tasks.
+Post-closure regression is enforced inside this verification step (single-command flow), not as a separate command.
 
 ```
 Task(
   prompt="Verify phase {phase_number} goal achievement.
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
-Check must_haves against actual codebase. Create VERIFICATION.md.",
+Check must_haves against actual codebase. Run integrated post-closure regression gate (unit + integration/e2e + runtime smoke + compatibility checks) as part of this verification. Create VERIFICATION.md with gate evidence.",
   subagent_type="gsd-verifier",
   model="{verifier_model}"
 )
@@ -284,7 +285,7 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 
 | Status | Action |
 |--------|--------|
-| `passed` | → update_roadmap |
+| `passed` | -> update_roadmap (only if integrated regression gate also passed) |
 | `human_needed` | Present items for human testing, get approval or feedback |
 | `gaps_found` | Present gap summary, offer `/gsd:plan-phase {phase} --gaps` |
 
@@ -373,3 +374,4 @@ Re-run `/gsd:execute-phase {phase}` → discover_plans finds completed SUMMARYs 
 
 STATE.md tracks: last completed plan, current wave, pending checkpoints.
 </resumption>
+

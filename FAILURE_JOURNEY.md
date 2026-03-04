@@ -78,3 +78,51 @@ Purpose: capture dead ends and hard lessons so future tasks do not repeat them.
 2. Failed Y: SNAPSHOT_CORRUPT: FileNotFoundError: .graph/local-snapshot.json missing (Culprit: src/graph/local_graph_store.py)
 3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
 4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ProgrammingError: (psycopg.errors.UndefinedFunction) operator does not exist: json || jsonb (Culprit: alembic.operations.base in execute)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ProgrammingError: (psycopg.errors.CannotCoerce) COALESCE could not convert type jsonb to json (Culprit: alembic.operations.base in execute)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ValueError: Test exception from Phase 15 - verifying error tracking (Culprit: __main__ in <module>)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: OperationalError: (psycopg.OperationalError) failed to resolve host 'db': [Errno 11001] getaddrinfo failed (Culprit: env_py in run_migrations_online)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ProgrammingError: (psycopg.errors.UndefinedTable) relation "assistant_tool_registry" does not exist (Culprit: alembic.operations.base in execute)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-03 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ProgrammingError: (psycopg.errors.DuplicateColumn) column "schema_json" of relation "assistant_tool_registry" already exists (Culprit: alembic.operations.base in add_column)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-04 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: AURA_UNREACHABLE: Neo4jError: ServiceUnavailable (Aura Paused) (Culprit: src/core/graphiti_client.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-04 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: SNAPSHOT_CORRUPT: FileNotFoundError: .graph/local-snapshot.json missing (Culprit: src/graph/local_graph_store.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)

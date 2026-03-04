@@ -54,7 +54,7 @@ export function StrategyQuiz({ supplierCode = "*" }: StrategyQuizProps) {
   }
 
   return (
-    <form className="panel" onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
+    <form className="panel" onSubmit={(event) => { void onSubmit(event); }} style={{ display: "grid", gap: 12 }}>
       <h2 style={{ margin: 0 }}>Supplier Strategy Quiz</h2>
       <p className="muted" style={{ margin: 0 }}>
         Structured onboarding rules for supplier behavior and dry-run defaults.

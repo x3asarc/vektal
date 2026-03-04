@@ -60,3 +60,23 @@
 9. Three-phase synthesis: `reports/meta/journey-synthesis-<phase-range>.md`.
 10. Governance blueprint reference: `solutionsos/compound-engineering-os-policy.md`.
 11. Canonical role definitions: `ops/governance/roles/README.md`.
+## Memory runtime contract
+<!-- MEMORY-CONTRACT:START -->
+1. Managed section: update `.planning/memory-system-design.md`, then run `python scripts/memory/sync_agents_memory.py`.
+2. Source of truth for memory behavior: `.planning/memory-system-design.md`.
+3. Multi-tier memory contract:
+   - `Working Memory`: location `.memory/working/{session_id}.json`; scope `Single conversation session`; TTL `Until session ends`.
+   - `Short-Term Memory`: location `.memory/short-term/{date}.jsonl`; scope `Daily activity`; TTL `7-30 days (configurable)`.
+   - `Long-Term Memory`: location `.memory/long-term/`; scope `Entire project lifetime`; TTL `Forever (versioned)`.
+4. Runtime hooks/scripts:
+   - Session bootstrap: `python scripts/memory/session_start.py`
+   - Live command sync (Codex PreTool): `python scripts/memory/pre_tool_update.py --provider codex --session-key <stable-id>`
+   - Session finalize: `python scripts/memory/session_end.py --context-file <json>`
+   - Task learnings: `python scripts/memory/task_complete.py --task <id>`
+   - Phase synthesis: `python scripts/memory/phase_complete.py --phase <id> --summary <text>`
+5. Provider SessionStart wiring must include the session bootstrap script in:
+   - `.codex/settings.json`
+   - `.claude/settings.json`
+   - `.gemini/settings.json`
+6. Memory hooks are best-effort and must not block sessions on failure.
+<!-- MEMORY-CONTRACT:END -->

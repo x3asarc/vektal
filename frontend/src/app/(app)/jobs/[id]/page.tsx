@@ -56,7 +56,7 @@ export default function JobDetailPage() {
             {/* Header row */}
             <div className="job-detail-header">
               <span style={{ fontSize: "0.9rem", color: "var(--muted)" }}>
-                Step: <strong style={{ color: "var(--text)" }}>{job.current_step_label ?? job.current_step ?? "Queued"}</strong>
+                Step: <strong data-testid="job-current-step" style={{ color: "var(--text)" }}>{job.current_step_label ?? job.current_step ?? "Queued"}</strong>
               </span>
               <span
                 className="job-status-badge"

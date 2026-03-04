@@ -51,7 +51,7 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
     <section className="panel" data-testid="enrichment-run-configurator">
       <h2>Run Configurator</h2>
       <p className="muted">Dry-run first. Apply only after review and explicit confirmation.</p>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+      <form onSubmit={(event) => { void handleSubmit(event); }} style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
         <label>
           Supplier code
           <input

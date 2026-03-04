@@ -1,15 +1,51 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatWorkspace } from "@/features/chat/components/ChatWorkspace";
+import type { ChatUiMessage } from "@/features/chat/hooks/useChatSession";
+import type { ChatAction, ChatSession } from "@/shared/contracts/chat";
 
-const useChatSessionMock = vi.fn();
+type ChatWorkspaceHookState = {
+  sessions: ChatSession[];
+  session: ChatSession | null;
+  messages: ChatUiMessage[];
+  actions: ChatAction[];
+  loading: boolean;
+  submitting: boolean;
+  error: string | null;
+  streamMode: "sse" | "polling" | "degraded";
+  streamDegraded: boolean;
+  streamError: string | null;
+  sendMessage: (content: string) => Promise<void>;
+  createBulkAction: (input: {
+    content: string;
+    skus: string[];
+    operation?: "add_product" | "update_product";
+    mode?: "immediate" | "scheduled";
+    actionHints?: Record<string, unknown>;
+  }) => Promise<void>;
+  approveAction: (actionId: number, comment?: string) => Promise<void>;
+  applyAction: (actionId: number, mode?: "immediate" | "scheduled") => Promise<void>;
+  delegateAction: (
+    actionId: number,
+    input?: { requestedTools?: string[]; depth?: number; fanOut?: number },
+  ) => Promise<void>;
+  refresh: () => Promise<void>;
+};
+
+const useChatSessionMock = vi.fn<() => ChatWorkspaceHookState>();
+const replaceMock = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: replaceMock }),
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 vi.mock("@/features/chat/hooks/useChatSession", () => ({
-  useChatSession: (...args: unknown[]) => useChatSessionMock(...args),
+  useChatSession: () => useChatSessionMock(),
 }));
 
 describe("ChatWorkspace", () => {
-  const baseState = {
+  const baseState: ChatWorkspaceHookState = {
     sessions: [{ id: 5, user_id: 1, title: "Chat Workspace", state: "in_house", status: "active" }],
     session: { id: 5, user_id: 1, title: "Chat Workspace", state: "in_house", status: "active" },
     messages: [
@@ -48,6 +84,7 @@ describe("ChatWorkspace", () => {
   };
 
   beforeEach(() => {
+    replaceMock.mockReset();
     useChatSessionMock.mockReset();
     useChatSessionMock.mockReturnValue({ ...baseState });
   });
@@ -59,11 +96,17 @@ describe("ChatWorkspace", () => {
   it("renders session state, timeline, and action controls", () => {
     render(<ChatWorkspace />);
 
-    expect(screen.getByText("chat")).toBeInTheDocument();
-    expect(screen.getByText(/Context state:/)).toHaveTextContent("in_house");
+    expect(screen.getByRole("heading", { name: /ai assistant/i })).toBeInTheDocument();
+    expect(screen.getByText(/State:/)).toHaveTextContent("in_house");
     expect(screen.getByTestId("chat-timeline")).toBeInTheDocument();
     expect(screen.getByTestId("chat-actions")).toBeInTheDocument();
     expect(screen.getByTestId("action-card")).toBeInTheDocument();
+  });
+
+  it("does not duplicate assistant text when text block matches content", () => {
+    render(<ChatWorkspace />);
+    const matches = screen.getAllByText("Prepared dry-run.");
+    expect(matches).toHaveLength(1);
   });
 
   it("submits a chat message from composer", async () => {
@@ -76,10 +119,10 @@ describe("ChatWorkspace", () => {
     });
     render(<ChatWorkspace />);
 
-    fireEvent.change(screen.getByLabelText("Message"), {
+    fireEvent.change(screen.getByPlaceholderText(/describe a sku update/i), {
       target: { value: "update SKU-100" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    fireEvent.click(screen.getByTitle("Send"));
 
     await waitFor(() => {
       expect(sendMessage).toHaveBeenCalledWith("update SKU-100");

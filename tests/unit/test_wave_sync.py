@@ -19,13 +19,19 @@ def test_consistency_report_structure():
 
 
 @patch("src.graph.consistency_daemon.get_graphiti_client")
+@patch("src.graph.consistency_daemon.compute_file_hash")
 @patch("os.walk")
 @patch("os.path.exists")
-def test_check_consistency_detects_missing(mock_exists, mock_walk, mock_client):
+@patch("os.listdir")
+@patch("os.path.isfile")
+def test_check_consistency_detects_missing(mock_isfile, mock_listdir, mock_exists, mock_walk, mock_hash, mock_client):
     """Test that missing files are detected."""
+    mock_isfile.return_value = False # No files in root
+    mock_listdir.return_value = []
     mock_exists.return_value = True
     # Simulate one file on disk
     mock_walk.return_value = [("src", [], ["test.py"])]
+    mock_hash.return_value = "fake_hash"
     
     # Client returns empty graph (simulated)
     mock_client.return_value = MagicMock()
@@ -79,7 +85,7 @@ def test_match_query_to_template():
     """Test mapping of NL queries to templates."""
     # Imports
     name, params = match_query_to_template("what imports src/core/db.py")
-    assert name == "imports"
+    assert name == "imported_by"
     assert params["file_path"] == "src/core/db.py"
     
     # Phase code
@@ -96,6 +102,6 @@ def test_query_graph_template_match(mock_execute):
     result = query_graph("what imports src/main.py")
     
     assert result.success is True
-    assert result.template_used == "imports"
+    assert result.template_used == "imported_by"
     assert len(result.data) == 1
     assert result.data[0]["path"] == "src/dep.py"

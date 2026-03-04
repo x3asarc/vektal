@@ -1,16 +1,30 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import JobDetailPage from "@/app/(app)/jobs/[id]/page";
+import type { JobDetail } from "@/features/jobs/hooks/useJobDetailObserver";
 
-const apiRequestMock = vi.fn<(...args: unknown[]) => Promise<unknown>>();
-const useJobDetailObserverMock = vi.fn();
+const {
+  apiRequestMock,
+  useJobDetailObserverMock,
+} = vi.hoisted(() => ({
+  apiRequestMock: vi.fn<(...args: unknown[]) => Promise<unknown>>(),
+  useJobDetailObserverMock: vi.fn<() => JobObserverResult>(),
+}));
+
+type JobObserverResult = {
+  mode: "sse" | "polling" | "degraded";
+  degraded: boolean;
+  error: string | null;
+  job: JobDetail | null;
+};
+const locationAssignMock = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ id: "77" }),
 }));
 
 vi.mock("@/features/jobs/hooks/useJobDetailObserver", () => ({
-  useJobDetailObserver: (...args: unknown[]) => useJobDetailObserverMock(...args),
+  useJobDetailObserver: useJobDetailObserverMock,
 }));
 
 vi.mock("@/lib/api/client", () => ({
@@ -46,7 +60,8 @@ describe("JobDetailPage", () => {
         results_url: "/jobs/77?tab=results",
       },
     });
-    vi.stubGlobal("location", { assign: vi.fn() });
+    locationAssignMock.mockReset();
+    vi.stubGlobal("location", { assign: locationAssignMock });
   });
 
   it("renders progress, step, eta fallback, and retry action", async () => {
@@ -65,7 +80,7 @@ describe("JobDetailPage", () => {
       expect(apiRequestMock).toHaveBeenCalledWith("/api/v1/jobs/77/retry", { method: "POST" });
     });
     await waitFor(() => {
-      expect(window.location.assign).toHaveBeenCalledWith("/jobs/88");
+      expect(locationAssignMock).toHaveBeenCalledWith("/jobs/88");
     });
   });
 });

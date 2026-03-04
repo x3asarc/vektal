@@ -126,6 +126,9 @@ STRIPE_WEBHOOK_SETUP.md
 # --- Temp dirs ---
 temp/
 .graph/
+.firecrawl/
+.tooling/external-tools-health.json
+.tooling/firecrawl-smoke.json
 
 # --- Screenshots in root ---
 *.png

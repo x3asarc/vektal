@@ -34,7 +34,7 @@ describe("ApprovalQueue", () => {
   it("loads and renders pending approvals", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ approvals: [buildApproval()] }),
+      json: () => Promise.resolve({ approvals: [buildApproval()] }),
     });
 
     render(<ApprovalQueue />);
@@ -50,11 +50,11 @@ describe("ApprovalQueue", () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ approvals: [buildApproval()] }),
+        json: () => Promise.resolve({ approvals: [buildApproval()] }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ status: "approved" }),
+        json: () => Promise.resolve({ status: "approved" }),
       });
 
     render(<ApprovalQueue />);
@@ -77,11 +77,11 @@ describe("ApprovalQueue", () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ approvals: [buildApproval()] }),
+        json: () => Promise.resolve({ approvals: [buildApproval()] }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ status: "rejected" }),
+        json: () => Promise.resolve({ status: "rejected" }),
       });
 
     render(<ApprovalQueue />);
@@ -104,7 +104,7 @@ describe("ApprovalQueue", () => {
   it("shows empty state when queue is empty", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ approvals: [] }),
+      json: () => Promise.resolve({ approvals: [] }),
     });
 
     render(<ApprovalQueue />);

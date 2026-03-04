@@ -29,7 +29,7 @@ class MockEventSource {
   emitNamed(name: string, data: unknown) {
     const listener = this.listeners.get(name);
     if (listener) {
-      listener({ data: JSON.stringify(data) } as MessageEvent);
+      listener(new MessageEvent(name, { data: JSON.stringify(data) }));
     }
   }
 

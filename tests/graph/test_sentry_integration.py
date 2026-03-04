@@ -1,8 +1,10 @@
 import pytest
+from pathlib import Path
 from src.graph.orchestrate_healers import normalize_sentry_issue, orchestrate_remediation
 from src.graph.root_cause_classifier import FailureCategory
 from src.graph.sentry_ingestor import ingest_sentry_issue, normalize_sentry_issue as normalize_ingestor_issue
 from unittest.mock import MagicMock, patch, AsyncMock
+from scripts.daemons import health_monitor
 
 @pytest.mark.asyncio
 async def test_infrastructure_failure_flow():
@@ -155,3 +157,89 @@ def test_ingestor_normalization_shape():
     assert normalized["issue_id"] == "SENTRY-NORM"
     assert normalized["error_type"] == "ValueError"
     assert normalized["error_message"] == "bad cfg"
+
+
+@pytest.mark.asyncio
+async def test_health_monitor_trigger_auto_heal_dedupes_same_cycle(monkeypatch):
+    cache_path = Path.cwd() / ".graph" / "pytest-health-cache.json"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(health_monitor, "HEALTH_CACHE_PATH", cache_path)
+
+    issues = [
+        {"id": "SENTRY-1", "title": "Neo4j down", "culprit": "src/core/graphiti_client.py", "level": "error"},
+        {"id": "SENTRY-1", "title": "Neo4j down", "culprit": "src/core/graphiti_client.py", "level": "error"},
+    ]
+
+    popen_calls = {"count": 0}
+    routed_statuses = []
+
+    class _DummyProc:
+        pass
+
+    def _fake_popen(*args, **kwargs):
+        popen_calls["count"] += 1
+        return _DummyProc()
+
+    def _fake_emit(issue, *, routing_status, context_telemetry, detail=""):
+        routed_statuses.append(routing_status)
+
+    monkeypatch.setattr("scripts.daemons.health_monitor.subprocess.Popen", _fake_popen)
+    monkeypatch.setattr("scripts.daemons.health_monitor._emit_issue_routed_event", _fake_emit)
+
+    try:
+        result = await health_monitor._trigger_auto_heal(issues)
+    finally:
+        cache_path.unlink(missing_ok=True)
+
+    assert popen_calls["count"] == 1
+    assert result["auto_heal_running"] is True
+    assert result["active_issue_ids"] == ["SENTRY-1"]
+    assert "triggered" in routed_statuses
+    assert "skipped_duplicate_same_cycle" in routed_statuses
+
+
+@pytest.mark.asyncio
+async def test_health_monitor_check_sentry_returns_issue_telemetry(monkeypatch):
+    monkeypatch.setenv("SENTRY_AUTH_TOKEN", "token")
+    monkeypatch.setenv("SENTRY_ORG_SLUG", "org")
+    monkeypatch.setenv("SENTRY_PROJECT_SLUG", "proj")
+
+    class _FakeResponse:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return [{"id": "SENTRY-42", "title": "Timeout", "culprit": "src/jobs/sync.py", "level": "error"}]
+
+    class _FakeClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return None
+
+        async def get(self, *args, **kwargs):
+            return _FakeResponse()
+
+    monkeypatch.setattr("scripts.daemons.health_monitor.httpx.AsyncClient", lambda *args, **kwargs: _FakeClient())
+    monkeypatch.setattr(
+        "scripts.daemons.health_monitor._trigger_auto_heal",
+        AsyncMock(
+            return_value={
+                "auto_heal_running": True,
+                "active_issue_ids": ["SENTRY-42"],
+                "active_issue_fingerprints": ["sentry-42|timeout|src/jobs/sync.py"],
+                "last_triggered_at": "2026-03-04T00:00:00Z",
+                "context_telemetry": health_monitor._default_context_telemetry(),
+            }
+        ),
+    )
+
+    result = await health_monitor.check_sentry()
+
+    assert result["status"] == "issues"
+    assert result["auto_heal_running"] is True
+    assert result["active_issue_ids"] == ["SENTRY-42"]
+    assert "context_telemetry" in result
+    assert "graph_attempted" in result["context_telemetry"]

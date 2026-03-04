@@ -162,6 +162,29 @@ Extract files modified in this phase from SUMMARY.md, scan each:
 Categorize: 🛑 Blocker (prevents goal) | ⚠️ Warning (incomplete) | ℹ️ Info (notable).
 </step>
 
+<step name="run_integrated_regression_gate">
+Run a heavier integrated post-closure regression gate as part of verification (not a separate command).
+
+Scope rule:
+1. Gate must stay phase-scoped to success metrics and delivered contracts.
+2. No net-new feature work is allowed in this step.
+
+Required checks:
+1. Focused unit regression suite for this phase.
+2. Focused integration/e2e regressions for this phase (if applicable).
+3. At least one runtime smoke path for the phase (CLI/API/daemon path tied to goal).
+4. Compatibility checks against required upstream/downstream contracts.
+
+Execution guidance:
+1. Prefer existing focused tests first.
+2. If focused regression coverage is missing, create focused regression tests and run them.
+3. Capture exact commands and pass/fail outcomes in VERIFICATION.md under a dedicated regression gate section.
+
+Gate result:
+- PASS -> continue status determination.
+- FAIL -> set status to `gaps_found` and include actionable fix clusters.
+</step>
+
 <step name="identify_human_verification">
 **Always needs human:** Visual appearance, user flow completion, real-time behavior (WebSocket/SSE), external service integration, performance feel, error message clarity.
 
@@ -173,7 +196,7 @@ Format each as: Test Name → What to do → Expected result → Why can't verif
 <step name="determine_status">
 **passed:** All truths VERIFIED, all artifacts pass levels 1-3, all key links WIRED, no blocker anti-patterns.
 
-**gaps_found:** Any truth FAILED, artifact MISSING/STUB, key link NOT_WIRED, or blocker found.
+**gaps_found:** Any truth FAILED, artifact MISSING/STUB, key link NOT_WIRED, blocker found, or integrated regression gate failed.
 
 **human_needed:** All automated checks pass but human verification items remain.
 
@@ -218,6 +241,8 @@ Orchestrator routes: `passed` → update_roadmap | `gaps_found` → create/execu
 - [ ] All key links verified
 - [ ] Requirements coverage assessed (if applicable)
 - [ ] Anti-patterns scanned and categorized
+- [ ] Integrated regression gate executed (unit + integration/e2e + runtime smoke + compatibility checks)
+- [ ] Regression gate evidence recorded in VERIFICATION.md
 - [ ] Human verification items identified
 - [ ] Overall status determined
 - [ ] Fix plans generated (if gaps_found)

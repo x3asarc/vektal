@@ -19,9 +19,11 @@ OUTCOME_LOG_PATH = REPO_ROOT / ".graph" / "remediation-outcomes.jsonl"
 
 CATEGORY_SERVICE_MAP = {
     "AURA_UNREACHABLE": "aura",
-    "LOCAL_NEO4J_START_FAIL": "docker",
+    "LOCAL_NEO4J_START_FAIL": "neo4j_health",  # Updated to use neo4j_health remediator
     "SNAPSHOT_CORRUPT": "local_snapshot",
     "SYNC_TIMEOUT": "graph_sync",
+    "NEO4J_CONNECTION_FAIL": "neo4j_health",
+    "DEPENDENCY_MISSING": "dependencies",
 }
 
 
@@ -78,10 +80,14 @@ def route_service_for_classification(category: str, normalized: dict[str, Any]) 
     message = f"{normalized.get('error_message', '')} {normalized.get('affected_module', '')}".lower()
     event_category = str(normalized.get("category") or "").strip().upper()
 
+    # Direct category mapping (highest priority)
     if event_category in CATEGORY_SERVICE_MAP:
         return CATEGORY_SERVICE_MAP[event_category]
 
+    # Infrastructure issues
     if category == FailureCategory.INFRASTRUCTURE:
+        if "neo4j" in message and ("unreachable" in message or "connection" in message):
+            return "neo4j_health"
         if "redis" in message:
             return "redis"
         if "aura" in message:
@@ -92,10 +98,17 @@ def route_service_for_classification(category: str, normalized: dict[str, Any]) 
             return "graph_sync"
         return "docker"
 
+    # Code issues
     if category == FailureCategory.CODE:
         return "code_fix"
 
+    # Config issues
     if category == FailureCategory.CONFIG:
+        # Module/dependency issues
+        if "module" in message and "not found" in message:
+            return "dependencies"
+        if "import" in message and ("error" in message or "failed" in message):
+            return "dependencies"
         if "redis" in message:
             return "redis"
         if "graph" in message or "sync" in message:

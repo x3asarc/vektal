@@ -335,6 +335,8 @@ Rules:
 - Reuse canonical files above; do not create alternate copies of state/requirements/milestones.
 - Keep updates atomic with the verification outcome and phase artifacts (`*-UAT.md`, `*-VERIFICATION.md`).
 - If no field changed in one file, explicitly note "checked - no delta required" in the verify output.
+- Run integrated post-closure regression gate here (unit + integration/e2e + runtime smoke + compatibility checks) and record evidence in `*-VERIFICATION.md`.
+- If integrated regression gate fails, mark verification as not final and route to gap closure planning.
 
 Then present:
 ```
@@ -590,5 +592,6 @@ Default to **major** if unclear. User can correct if needed.
 - [ ] If issues: gsd-plan-checker verifies fix plans
 - [ ] If issues: revision loop until plans pass (max 3 iterations)
 - [ ] If issues == 0: canonical post-verify files synced (`STATE`, `PROJECT`, `ROADMAP`, `MASTER_MAP`, `REQUIREMENTS`, `*-VERIFICATION.md`)
+- [ ] If issues == 0: integrated regression gate executed and recorded in `*-VERIFICATION.md`
 - [ ] Ready for `/gsd:execute-phase --gaps-only` when complete
 </success_criteria>

@@ -19,9 +19,11 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 HEALTH_CACHE_PATH = PROJECT_ROOT / ".graph" / "health-cache.json"
+EXTERNAL_TOOLS_CACHE_PATH = PROJECT_ROOT / ".tooling" / "external-tools-health.json"
 LOG_PATH = PROJECT_ROOT / ".graph" / "health-gate.log"
 
 STALENESS_THRESHOLD_SECONDS = 300  # 5 minutes
+TOOLS_STALENESS_THRESHOLD_SECONDS = 3600  # 60 minutes
 
 
 def _log(message: str) -> None:
@@ -62,6 +64,40 @@ def _is_stale(cache: dict, threshold_seconds: int) -> bool:
         return True  # Assume stale on parse error
 
 
+def _check_external_tools_health() -> None:
+    """Log warnings for external tools health report issues."""
+    if not EXTERNAL_TOOLS_CACHE_PATH.exists():
+        _log("WARN: External tools report missing - quick validator may not have run yet")
+        return
+
+    try:
+        report = json.loads(EXTERNAL_TOOLS_CACHE_PATH.read_text(encoding="utf-8"))
+    except Exception as exc:
+        _log(f"WARN: Failed to parse external tools health report: {exc}")
+        return
+
+    timestamp = report.get("timestamp")
+    if not timestamp:
+        _log("WARN: External tools report missing timestamp")
+        return
+
+    try:
+        updated_at = datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
+        age_seconds = (datetime.now(timezone.utc) - updated_at).total_seconds()
+        if age_seconds > TOOLS_STALENESS_THRESHOLD_SECONDS:
+            _log("WARN: External tools report is stale (>60min)")
+    except Exception:
+        _log("WARN: External tools report timestamp invalid")
+
+    if not bool(report.get("overall_ok")):
+        failing_checks = [
+            check.get("name")
+            for check in report.get("checks", [])
+            if not check.get("ok")
+        ]
+        _log(f"WARN: External tools health check failing: {failing_checks}")
+
+
 def main() -> int:
     """Main hook execution - always returns 0 (never blocks)."""
     start_time = time.perf_counter()
@@ -90,6 +126,8 @@ def main() -> int:
     if deps.get("status") == "missing":
         missing = deps.get("missing", [])
         _log(f"WARN: Missing dependencies: {missing} - background install in progress")
+
+    _check_external_tools_health()
 
     elapsed_ms = (time.perf_counter() - start_time) * 1000
     _log(f"INFO: Health gate check complete in {elapsed_ms:.2f}ms")

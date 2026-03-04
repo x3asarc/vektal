@@ -81,7 +81,8 @@ class PatternMatcher:
         IntentType.ADD_PRODUCT: [
             r'^add\s+(?:sku|product)?\s*[:\s=]?\s*([A-Z0-9-]+)',
             r'^(?:sku|product)\s*[:\s=]?\s*([A-Z0-9-]+)',
-            r'^\s*([A-Z0-9-]{3,20})\s*$',  # Bare SKU
+            # Bare SKU fallback: require at least one digit to avoid matching casual words like "hiii"
+            r'^\s*((?=[A-Z0-9-]{3,20}$)(?=.*\d)[A-Z0-9-]+)\s*$',
         ],
         IntentType.UPDATE_PRODUCT: [
             r'^update\s+(?:sku|product)?\s*[:\s=]?\s*([A-Z0-9-]+)',
@@ -110,6 +111,13 @@ class PatternMatcher:
             r'^help',
             r'^\?+$',
             r'^(?:what|how)\s+can\s+(?:you|i)',
+        ],
+        IntentType.UNKNOWN: [
+            r'^(?:hi|hello|hey|yo|sup|what\'?s up|whats up)\s*[.!?]*$',
+            r'^(?:good\s+(?:morning|afternoon|evening))\s*[.!?]*$',
+            r'^(?:how are you|how\'?s it going|hows it going)\s*[.!?]*$',
+            r'^(?:thanks|thank you|thx)\s*[.!?]*$',
+            r'^(?:(?:i\s+am|i\'?m)\s+)?(?:not\s+sure\s+where\s+to\s+start|where\s+do\s+i\s+start|how\s+do\s+i\s+start|help\s+me\s+start|get\s+started)\s*[.!?]*$',
         ]
     }
 
@@ -129,6 +137,7 @@ class PatternMatcher:
         # Priority order: check specific commands before generic patterns
         priority_order = [
             IntentType.HELP,
+            IntentType.UNKNOWN,
             IntentType.LIST_VENDORS,
             IntentType.GET_STATUS,
             IntentType.UPDATE_PRODUCT,
@@ -373,7 +382,14 @@ Return JSON:
             )
 
         except Exception as e:
-            logger.error(f"API classification failed: {e}")
+            status_code = getattr(getattr(e, "response", None), "status_code", None)
+            if status_code in (401, 403):
+                logger.warning(
+                    "API classification auth failed (HTTP %s); returning unknown intent",
+                    status_code,
+                )
+            else:
+                logger.error(f"API classification failed: {e}")
             return Intent(
                 type=IntentType.UNKNOWN,
                 confidence=0.0,

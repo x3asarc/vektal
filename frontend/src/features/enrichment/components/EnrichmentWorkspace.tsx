@@ -144,15 +144,15 @@ export function EnrichmentWorkspace() {
               <span className="enrichment-badge">Total: <strong>{run.write_plan.counts.total}</strong></span>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="btn-ghost" type="button" onClick={handleRefresh} disabled={isBusy} style={{ fontSize: "0.8rem" }}>
+              <button className="btn-ghost" type="button" onClick={() => { void handleRefresh(); }} disabled={isBusy} style={{ fontSize: "0.8rem" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>refresh</span>
                 Refresh
               </button>
-              <button className="btn-ghost" type="button" onClick={handleApprove} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
+              <button className="btn-ghost" type="button" onClick={() => { void handleApprove(); }} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>check_circle</span>
                 Approve selection
               </button>
-              <button className="btn-primary" type="button" onClick={handleApply} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
+              <button className="btn-primary" type="button" onClick={() => { void handleApply(); }} disabled={isBusy || run.is_stale} style={{ fontSize: "0.8rem" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 15, marginRight: 4 }}>send</span>
                 Apply approved
               </button>

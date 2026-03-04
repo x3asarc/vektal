@@ -413,10 +413,10 @@ class GovernedEnrichmentPipeline:
 
     @staticmethod
     def _fold_oracle_decisions(decisions: list[OracleDecision]) -> OracleDecision:
-        severity = {"accept": 0, "suggest": 1, "hold": 2, "reject": 3}
+        severity = {"pass": 0, "review": 1, "hold": 2, "fail": 3}
         if not decisions:
             return OracleDecision(
-                decision="accept",
+                decision="pass",
                 confidence=1.0,
                 reason_codes=("no_oracle_constraints",),
                 evidence_refs=(),

@@ -1,10 +1,24 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { OnboardingWizard } from "@/features/onboarding/components/OnboardingWizard";
+import type { JobDetail } from "@/lib/jobs/useJobDetailObserver";
 
-const startImportMutateAsyncMock = vi.fn<(...args: unknown[]) => Promise<unknown>>();
-const apiRequestMock = vi.fn<(...args: unknown[]) => Promise<unknown>>();
-const useJobDetailObserverMock = vi.fn();
+const {
+  startImportMutateAsyncMock,
+  apiRequestMock,
+  useJobDetailObserverMock,
+} = vi.hoisted(() => ({
+  startImportMutateAsyncMock: vi.fn<(...args: unknown[]) => Promise<unknown>>(),
+  apiRequestMock: vi.fn<(...args: unknown[]) => Promise<unknown>>(),
+  useJobDetailObserverMock: vi.fn<(jobId: number | string | null) => JobObserverResult>(),
+}));
+
+type JobObserverResult = {
+  mode: "sse" | "polling" | "degraded";
+  degraded: boolean;
+  error: string | null;
+  job: JobDetail | null;
+};
 
 vi.mock("@/features/onboarding/state/onboarding-machine", () => ({
   INITIAL_ONBOARDING_STATE: {
@@ -18,17 +32,17 @@ vi.mock("@/features/onboarding/state/onboarding-machine", () => ({
   markComplete: (state: Record<string, unknown>) => ({ ...state, step: "completed" }),
   toggleAdvanced: (state: Record<string, unknown>) => ({
     ...state,
-    advancedOpen: !Boolean(state.advancedOpen),
+    advancedOpen: !state.advancedOpen,
   }),
 }));
 
 vi.mock("@/features/onboarding/api/onboarding-mutations", () => ({
   useConnectShopifyMutation: () => ({ mutateAsync: vi.fn() }),
-  useStartImportMutation: () => ({ mutateAsync: (...args: unknown[]) => startImportMutateAsyncMock(...args) }),
+  useStartImportMutation: () => ({ mutateAsync: startImportMutateAsyncMock }),
 }));
 
-vi.mock("@/features/jobs/hooks/useJobDetailObserver", () => ({
-  useJobDetailObserver: (...args: unknown[]) => useJobDetailObserverMock(...args),
+vi.mock("@/lib/jobs/useJobDetailObserver", () => ({
+  useJobDetailObserver: useJobDetailObserverMock,
 }));
 
 vi.mock("@/lib/auth/session-flags", () => ({

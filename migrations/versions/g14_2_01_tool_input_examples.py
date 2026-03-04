@@ -14,7 +14,19 @@ down_revision = "f2b3c4d5e6f7"
 branch_labels = None
 depends_on = None
 
+
+def _table_columns(table_name: str) -> set[str]:
+    inspector = sa.inspect(op.get_bind())
+    if not inspector.has_table(table_name):
+        return set()
+    return {column["name"] for column in inspector.get_columns(table_name)}
+
+
 def upgrade() -> None:
+    columns = _table_columns("assistant_tool_registry")
+    if not columns or "metadata_json" not in columns:
+        return
+
     # Seed input_examples for default tools in assistant_tool_registry
     examples_map = {
         "chat.respond": [{"content": "I have found 5 products matching your search."}],
@@ -54,7 +66,13 @@ def upgrade() -> None:
                 """
             ).bindparams(tool_id=tool_id, examples_json=examples_json)
         )
+
+
 def downgrade() -> None:
+    columns = _table_columns("assistant_tool_registry")
+    if not columns or "metadata_json" not in columns:
+        return
+
     # Remove input_examples from metadata_json
     op.execute(
         sa.text(

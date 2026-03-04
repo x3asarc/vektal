@@ -91,7 +91,7 @@ export function FieldChangeRow({
         </button>
         <button
           type="button"
-          onClick={() => onEdit(String(change.after_value ?? ""))}
+          onClick={() => onEdit(toText(change.after_value))}
           disabled={!isEditable}
         >
           Edit value

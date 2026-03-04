@@ -1,16 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type { ResolutionRuleSuggestion, StrategyQuizState } from "@/shared/contracts/resolution";
 
-const saveStrategyQuizMock = vi.fn();
-const fetchRuleSuggestionsMock = vi.fn();
-const acceptRuleSuggestionMock = vi.fn();
-const declineRuleSuggestionMock = vi.fn();
+const {
+  saveStrategyQuizMock,
+  fetchRuleSuggestionsMock,
+  acceptRuleSuggestionMock,
+  declineRuleSuggestionMock,
+} = vi.hoisted(() => ({
+  saveStrategyQuizMock: vi.fn<(input: StrategyQuizState, supplierCode?: string) => Promise<void>>(),
+  fetchRuleSuggestionsMock: vi.fn<() => Promise<ResolutionRuleSuggestion[]>>(),
+  acceptRuleSuggestionMock: vi.fn<(input: ResolutionRuleSuggestion, expiryDays?: number) => Promise<void>>(),
+  declineRuleSuggestionMock: vi.fn<(id: string) => Promise<void>>(),
+}));
 
 vi.mock("@/features/resolution/api/resolution-api", () => ({
-  saveStrategyQuiz: (...args: unknown[]) => saveStrategyQuizMock(...args),
-  fetchRuleSuggestions: (...args: unknown[]) => fetchRuleSuggestionsMock(...args),
-  acceptRuleSuggestion: (...args: unknown[]) => acceptRuleSuggestionMock(...args),
-  declineRuleSuggestion: (...args: unknown[]) => declineRuleSuggestionMock(...args),
+  saveStrategyQuiz: saveStrategyQuizMock,
+  fetchRuleSuggestions: fetchRuleSuggestionsMock,
+  acceptRuleSuggestion: acceptRuleSuggestionMock,
+  declineRuleSuggestion: declineRuleSuggestionMock,
 }));
 
 import { StrategyQuiz } from "@/features/settings/components/StrategyQuiz";

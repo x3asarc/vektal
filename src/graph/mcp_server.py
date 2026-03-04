@@ -13,6 +13,7 @@ from typing import Any, Dict, List
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from src.graph.convention_checker import check_against_conventions, load_default_conventions
+from src.graph.batch_handlers import batch_dependencies_handler, batch_query_handler
 from src.graph.query_interface import query_graph
 from src.graph.query_templates import execute_template
 from src.graph.mcp_response_metadata import enrich_response
@@ -457,16 +458,21 @@ def _search_tools_handler(query: str, tier: int | None = None, top_k: int = 3) -
         try:
             # record["schema"] is the full schema stored in ToolNode
             schema = json.loads(record["schema"]) if isinstance(record["schema"], str) else record["schema"]
+            input_schema = schema.get("inputSchema") if isinstance(schema, dict) and "inputSchema" in schema else schema
+            input_examples = (
+                json.loads(record["examples"])
+                if isinstance(record["examples"], str)
+                else (record["examples"] or [])
+            )
             tools.append(
                 {
                     "name": record["name"],
                     "description": record["description"],
-                    "inputSchema": schema.get("inputSchema") if isinstance(schema, dict) else {},
-                    "input_examples": (
-                        json.loads(record["examples"])
-                        if isinstance(record["examples"], str)
-                        else (record["examples"] or [])
-                    ),
+                    "inputSchema": input_schema if isinstance(input_schema, dict) else {},
+                    "input_examples": input_examples,
+                    # Backward-compatible aliases for existing tests/consumers.
+                    "schema": input_schema if isinstance(input_schema, dict) else {},
+                    "examples": input_examples,
                     "relevance_score": record.get("score", 1.0),
                     # Include full schema for Claude to "load" the tool
                     "fullSchema": schema,

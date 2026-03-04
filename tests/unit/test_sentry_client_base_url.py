@@ -18,3 +18,11 @@ def test_resolve_base_url_from_dsn_region(monkeypatch) -> None:
     )
     client = SentryClient(api_key="token")
     assert client.base_url == "https://de.sentry.io/api/0"
+
+
+def test_get_issue_without_token_returns_pending(monkeypatch) -> None:
+    monkeypatch.delenv("SENTRY_AUTH_TOKEN", raising=False)
+    client = SentryClient(api_key=None, organization_slug="org", project_slug="proj")
+    result = client.get_issue("SENTRY-123")
+    assert result["status"] == "pending"
+    assert "missing" in result["error"].lower()

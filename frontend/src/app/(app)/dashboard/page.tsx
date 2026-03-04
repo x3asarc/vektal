@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DryRunReview } from "@/features/resolution/components/DryRunReview";
@@ -220,7 +220,7 @@ export const DASHBOARD_SECTIONS = [
   "fast-recovery-actions",
 ] as const;
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const searchParams = useSearchParams();
   const batchId = Number(searchParams.get("batchId") ?? "");
 
@@ -287,5 +287,13 @@ export default function DashboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="dashboard-page-wrap" data-testid="dashboard-loading" />}>
+      <DashboardPageContent />
+    </Suspense>
   );
 }

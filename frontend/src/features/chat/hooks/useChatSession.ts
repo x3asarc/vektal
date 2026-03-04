@@ -122,7 +122,6 @@ export function useChatSession(): UseChatSessionResult {
     });
 
     setActionsById((previous) => {
-      let next = new Map(previous);
       const actionIds = new Set<number>();
       for (const msg of messageList.messages) {
         const blocks = msg.blocks ?? [];
@@ -135,7 +134,7 @@ export function useChatSession(): UseChatSessionResult {
       for (const actionId of previous.keys()) {
         actionIds.add(actionId);
       }
-      return next;
+      return new Map(previous);
     });
   }, [sessionId]);
 

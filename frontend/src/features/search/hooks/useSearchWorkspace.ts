@@ -47,6 +47,10 @@ export function preserveSelectionAcrossFilterChange(selectedIds: Iterable<number
   return normalizeSelectedIds(selectedIds);
 }
 
+function resolveScopeMode(mode: ProductSearchRequest["scope_mode"]): SearchScopeMode {
+  return mode ?? "filtered";
+}
+
 export function useSearchWorkspace() {
   const [request, setRequest] = useState<ProductSearchRequest>(DEFAULT_SEARCH_REQUEST);
   const [response, setResponse] = useState<ProductSearchResponse | null>(null);
@@ -83,7 +87,7 @@ export function useSearchWorkspace() {
 
   const rows = response?.data ?? [];
   const totalMatching = response?.scope.total_matching ?? 0;
-  const scopeMode = (request.scope_mode ?? "filtered") as SearchScopeMode;
+  const scopeMode = resolveScopeMode(request.scope_mode);
   const selectedCount = selectedIds.size;
   const selectedIdList = useMemo(() => normalizeSelectedIds(selectedIds), [selectedIds]);
 

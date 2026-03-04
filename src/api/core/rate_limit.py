@@ -27,6 +27,7 @@ Usage:
         return jsonify({'products': []})
 """
 import os
+import re
 from typing import Callable
 from flask import Flask, request
 from flask_login import current_user
@@ -121,8 +122,23 @@ def create_limiter(app: Flask):
     storage_uri = app.config.get("RATELIMIT_STORAGE_URI", redis_url)
 
     def _exempt_non_api_v1() -> bool:
-        """Apply default limits only to versioned API routes."""
-        return not request.path.startswith("/api/v1/")
+        """
+        Apply default limits only to versioned API routes, while exempting chat polling paths.
+
+        Chat UI performs frequent polling/SSE reconnect checks for timeline hydration.
+        Applying low day-level limits to those reads creates false 429s during normal usage.
+        """
+        path = request.path or ""
+        if not path.startswith("/api/v1/"):
+            return True
+
+        if request.method == "GET" and re.match(r"^/api/v1/chat/sessions/\d+/messages$", path):
+            return True
+
+        if request.method == "GET" and re.match(r"^/api/v1/chat/sessions/\d+/stream$", path):
+            return True
+
+        return False
 
     limiter = Limiter(
         key_func=get_rate_limit_key,

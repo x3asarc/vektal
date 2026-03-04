@@ -13,6 +13,11 @@ function parseSkuCsv(input: string): string[] {
     .filter(Boolean);
 }
 
+function hasAssistantTextBlock(message: { role: "user" | "assistant" | "system"; blocks: Array<{ type: string; text?: string | null }> }): boolean {
+  if (message.role === "user") return false;
+  return message.blocks.some((block) => block.type === "text" && typeof block.text === "string" && block.text.trim().length > 0);
+}
+
 export function ChatWorkspace() {
   const chat = useChatSession();
   const router = useRouter();
@@ -141,7 +146,7 @@ export function ChatWorkspace() {
                   <strong>{message.role}</strong>
                   {message.pending && <span className="muted"> pending…</span>}
                 </header>
-                <p>{message.content}</p>
+                {(!hasAssistantTextBlock(message) || message.role === "user") && <p>{message.content}</p>}
                 {message.role !== "user" && message.blocks.length > 0 && (
                   <MessageBlockRenderer blocks={message.blocks} />
                 )}
@@ -177,7 +182,7 @@ export function ChatWorkspace() {
           {chat.error && <p className="chat-error" style={{ margin: 0 }}>{chat.error}</p>}
 
           {/* Glass message composer */}
-          <form className="chat-glass-composer" onSubmit={handleSendMessage}>
+          <form className="chat-glass-composer" onSubmit={(event) => { void handleSendMessage(event); }}>
             <textarea
               id="chat-message-input"
               rows={2}
@@ -214,7 +219,7 @@ export function ChatWorkspace() {
 
           {/* Bulk form (collapsible) */}
           {showBulk && (
-            <form className="chat-glass-composer" onSubmit={handleBulkSubmit} style={{ gap: 8 }}>
+            <form className="chat-glass-composer" onSubmit={(event) => { void handleBulkSubmit(event); }} style={{ gap: 8 }}>
               <label style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 500 }}>
                 Bulk SKUs (comma or newline separated)
               </label>

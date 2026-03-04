@@ -8,7 +8,8 @@ from src.graph.mcp_server import list_tool_contracts
 def test_mcp_tools_have_examples():
     """Verify all MCP tools have non-empty input_examples."""
     tools = list_tool_contracts()
-    assert len(tools) >= 3
+    # Deferred-loading mode may intentionally expose only base tools.
+    assert len(tools) >= 1
 
     for tool in tools:
         assert "input_examples" in tool, f"Tool {tool['name']} missing input_examples"

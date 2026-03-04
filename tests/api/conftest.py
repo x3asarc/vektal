@@ -60,17 +60,22 @@ def _resolve_test_database_url() -> str:
     return f'postgresql+psycopg://{db_user}:{quoted_password}@localhost:{db_port}/{db_name}'
 
 
-def _resolve_redis_url() -> str:
+def _resolve_redis_url(env_var: str, default: str) -> str:
     """Normalize Redis URL for local test runner."""
-    redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-    return redis_url.replace('redis://redis:', 'redis://localhost:')
+    url = os.getenv(env_var, default)
+    # Ensure it's a string (os.getenv might return None if default is None)
+    if not url:
+        return default
+    return url.replace('redis://redis:', 'redis://localhost:')
 
 
 # Set test environment variables before any application imports
 TEST_DATABASE_URL = _resolve_test_database_url()
 # Force normalized local URLs for host-run test process.
 os.environ['DATABASE_URL'] = TEST_DATABASE_URL
-os.environ['REDIS_URL'] = _resolve_redis_url()
+os.environ['REDIS_URL'] = _resolve_redis_url('REDIS_URL', 'redis://localhost:6379/0')
+os.environ['CELERY_BROKER_URL'] = _resolve_redis_url('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+os.environ['CELERY_RESULT_BACKEND'] = _resolve_redis_url('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 os.environ.setdefault('SECRET_KEY', 'test-secret-key')
 os.environ.setdefault('FLASK_SECRET_KEY', 'test-secret-key')
 
@@ -87,3 +92,4 @@ class TestConfig:
     WTF_CSRF_ENABLED = False
     ENABLE_API_VERSION_ENFORCEMENT = True
     RATELIMIT_ENABLED = False
+    CORS_ORIGINS = "http://localhost:3000"

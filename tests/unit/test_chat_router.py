@@ -5,10 +5,12 @@ Tests pattern matching, intent classification, handler routing, and response gen
 """
 
 import pytest
+import requests
 from unittest.mock import Mock, patch
 from src.core.chat.router import (
     ChatRouter,
     PatternMatcher,
+    APILLMClassifier,
     IntentType,
     Intent,
     RouteResult
@@ -119,6 +121,23 @@ class TestPatternMatcher:
             assert intent is not None, f"Failed to match: {test_case}"
             assert intent.type == IntentType.HELP
 
+    def test_small_talk_patterns_route_to_unknown(self):
+        """Small talk should short-circuit to UNKNOWN via pattern matching."""
+        test_cases = [
+            'hi',
+            'hello',
+            "what's up",
+            'how are you?',
+            'thanks!',
+            "i'm not sure where to start",
+        ]
+
+        for test_case in test_cases:
+            intent = self.matcher.match(test_case)
+            assert intent is not None, f"Failed to match: {test_case}"
+            assert intent.type == IntentType.UNKNOWN
+            assert intent.method == 'pattern'
+
     def test_status_patterns(self):
         """Test status patterns."""
         test_cases = [
@@ -146,6 +165,8 @@ class TestPatternMatcher:
     def test_no_match(self):
         """Test messages that don't match patterns."""
         intent = self.matcher.match('this is some random text')
+        assert intent is None
+        intent = self.matcher.match('hiii')
         assert intent is None
 
     def test_case_insensitive(self):
@@ -435,6 +456,18 @@ class TestChatRouter:
         assert result.intent.type == IntentType.UNKNOWN
         assert result.handler_name == 'unknown'
 
+    def test_route_small_talk_message(self):
+        """Small talk should not require local/API classification."""
+        result = self.router.route('hi')
+        assert result.intent.type == IntentType.UNKNOWN
+        assert result.intent.method == 'pattern'
+        assert result.handler_name == 'unknown'
+
+        result = self.router.route("i'm not sure where to start")
+        assert result.intent.type == IntentType.UNKNOWN
+        assert result.intent.method == 'pattern'
+        assert result.handler_name == 'unknown'
+
     def test_no_handler_registered(self):
         """Test behavior when no handler registered for intent."""
         router = ChatRouter()  # Fresh router with no handlers
@@ -564,6 +597,26 @@ class TestIntegration:
         # Verify fallback to API LLM for unknown
         result = router.route('this is totally ambiguous text')
         assert result.intent.method in ['local_llm', 'api_llm']
+
+
+class TestAPILLMClassifier:
+    """Focused tests for API classifier error-handling paths."""
+
+    def test_auth_failure_returns_unknown_without_error_log(self):
+        """HTTP 401/403 should degrade gracefully without error-level logging."""
+        classifier = APILLMClassifier(api_key="invalid-key")
+        error = requests.HTTPError("Unauthorized")
+        response = requests.Response()
+        response.status_code = 401
+        error.response = response
+
+        with patch("requests.post", side_effect=error), patch("src.core.chat.router.logger") as mock_logger:
+            intent = classifier.classify("some ambiguous request")
+
+        assert intent.type == IntentType.UNKNOWN
+        assert intent.method == "api_llm"
+        mock_logger.warning.assert_called()
+        mock_logger.error.assert_not_called()
 
 
 if __name__ == '__main__':

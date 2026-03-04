@@ -15,6 +15,13 @@ fi
 
 # Phase 15 health gate: fast cache-based checks (1-2ms vs 2-5s blocking)
 python scripts/governance/health_gate.py || true
+
+if [ -n "$HOOK_INPUT" ]; then
+  printf '%s' "$HOOK_INPUT" | python scripts/memory/pre_tool_update.py --provider codex --session-key "${PPID:-$WINDOW_HINT}" --window-hint "$WINDOW_HINT" || true
+else
+  python scripts/memory/pre_tool_update.py --provider codex --session-key "${PPID:-$WINDOW_HINT}" --window-hint "$WINDOW_HINT" || true
+fi
+
 python scripts/hooks/antigravity_watchdog.py --spawn --provider codex >/dev/null 2>&1 || true
 python scripts/hooks/antigravity_notify.py --provider codex --source heartbeat --heartbeat --window-hint "$WINDOW_HINT" >/dev/null 2>&1 || true
 

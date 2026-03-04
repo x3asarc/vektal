@@ -37,16 +37,14 @@ class SentryClient:
     def get_issue(self, issue_id: str) -> Dict[str, Any]:
         """
         Query Sentry for issue details.
-        
-        Note: For Phase 15.1 simulation, if SENTRY_AUTH_TOKEN is missing,
-        this returns a 'resolved' mock state.
         """
         if not self.api_key:
-            logger.debug(f"Sentry API key missing, returning mock for {issue_id}")
+            logger.warning("SENTRY_AUTH_TOKEN missing; issue %s remains pending validation", issue_id)
             return {
-                'id': issue_id,
-                'status': 'resolved',
-                'activity': [] # No new activity means validated success
+                "id": issue_id,
+                "status": "pending",
+                "activity": [],
+                "error": "SENTRY_AUTH_TOKEN missing",
             }
 
         try:
@@ -57,7 +55,7 @@ class SentryClient:
             return resp.json()
         except Exception as e:
             logger.error(f"Sentry API call failed: {e}")
-            return {'status': 'unknown', 'error': str(e)}
+            return {"id": issue_id, "status": "pending", "activity": [], "error": str(e)}
 
 def get_sentry_client() -> SentryClient:
     return SentryClient()

@@ -100,6 +100,82 @@ Auth: Flask-Login + Redis sessions · rate limits 100/500/2000 req/day by tier
 
 ---
 
+## Knowledge Graph — Primary Context Source
+
+**Neo4j/Graphiti knowledge graph is the DEFAULT for ALL context operations.**
+
+Every code search, file exploration, import tracing, and context gathering MUST use the graph first.
+This is not optional — it's the root configuration for how this system understands the codebase.
+
+### Configuration (Required)
+
+Environment variables in `.env`:
+```
+GRAPH_ORACLE_ENABLED=true
+NEO4J_URI=neo4j+s://5953bf18.databases.neo4j.io
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=<your-password>
+```
+
+### What's in the Graph
+
+- **2,784 nodes**: File, Class, Function, PlanningDoc, Tool, Convention, Entity, Community
+- **6,254 relationships**: IMPORTS, CALLS, DEFINES_CLASS, DEFINES_FUNCTION, CONTAINS, RELATES_TO
+- **Full codebase**: All Python/TypeScript files, their relationships, and semantic embeddings
+- **Live data**: Synced with current codebase state
+
+### How to Use It
+
+```python
+from src.graph.query_interface import query_graph
+
+# Find what imports a file
+result = query_graph("imported_by", {"file_path": "src/core/embeddings.py"})
+
+# Find what a file imports
+result = query_graph("imports", {"file_path": "src/core/embeddings.py"})
+
+# Trace impact radius (what depends on this)
+result = query_graph("impact_radius", {"file_path": "src/core/embeddings.py"})
+
+# Find similar files (semantic search)
+result = query_graph("similar_files", {"file_path": "path/to/file.py", "limit": 5, "threshold": 0.7})
+
+# Find function callers
+result = query_graph("function_callers", {"function_name": "my_function"})
+
+# Find function callees
+result = query_graph("function_callees", {"function_name": "my_function"})
+```
+
+Available templates: `imports`, `imported_by`, `similar_files`, `planning_context`, `phase_code`,
+`impact_radius`, `similar_failures`, `function_callers`, `function_callees`, `functions_in_file`,
+`top_conventions`, `recent_discrepancies`, `tool_search`, `tool_search_text`
+
+### Integration Points
+
+**Always use graph queries for:**
+- Dead code investigation — trace where code SHOULD be called, why it's not
+- Import analysis — understand dependency chains
+- Code exploration — find related files and patterns
+- Context retrieval — gather relevant code for assistant responses
+- Impact analysis — understand what breaks if you change something
+- Duplication detection — find similar code patterns across codebase
+
+**Fallback behavior:**
+- If graph unavailable → falls back to local snapshot or grep/file search
+- Graph queries log gracefully and don't break the flow
+- Empty results from graph are valid (means truly no connections)
+
+### Maintenance
+
+Graph is populated by `scripts/graph/sync_to_neo4j.py`. Run this after major codebase changes
+to keep the graph in sync. The graph includes semantic embeddings via `sentence-transformers/all-MiniLM-L6-v2`.
+
+**See also:** `docs/KNOWLEDGE_GRAPH.md` for complete reference documentation.
+
+---
+
 ## Assistant Tier Rules (production safety — never bypass)
 
 - **Tier 1:** read-safe only, zero mutations

@@ -11,10 +11,9 @@ Phase 13.2 - Oracle Framework Reuse
 import os
 import logging
 import time
-import json
-from pathlib import Path
 from typing import Optional, Callable, TypeVar, Any, Dict
 import asyncio
+from src.graph.backend_resolver import runtime_backend_mode as _read_runtime_backend_mode
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +21,89 @@ logger = logging.getLogger(__name__)
 _graphiti_client: Optional[Any] = None
 _import_failed = False
 _graph_unavailable_until: float = 0.0
+_local_embedder: Optional[Any] = None
 
 # Try to import graphiti-core (may not be installed in all environments)
 try:
     from graphiti_core import Graphiti
+    from graphiti_core.embedder import EmbedderClient
 except ImportError:
     logger.warning("graphiti-core not installed - graph Oracle will be unavailable")
     Graphiti = None
+    EmbedderClient = None
     _import_failed = True
 
 T = TypeVar('T')
+
+
+class LocalSentenceTransformerEmbedder(EmbedderClient if EmbedderClient else object):
+    """
+    Local sentence-transformers embedder for Graphiti.
+
+    Uses the same model that populated the graph (sentence-transformers/all-MiniLM-L6-v2)
+    to ensure embedding consistency between graph nodes and search queries.
+
+    Benefits:
+    - Zero cost (no API calls)
+    - Faster (local inference, no network latency)
+    - Self-contained (no external dependencies)
+    - Consistent with graph population
+    """
+
+    def __init__(self, model_name: str = 'sentence-transformers/all-MiniLM-L6-v2'):
+        """Initialize with sentence-transformers model."""
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.model = SentenceTransformer(model_name)
+            self.model_name = model_name
+            logger.info(f"Initialized local embedder with model: {model_name}")
+        except ImportError:
+            logger.error("sentence-transformers not installed - cannot use local embedder")
+            raise
+        except Exception as e:
+            logger.error(f"Failed to load sentence-transformers model: {e}")
+            raise
+
+    async def create(self, input_data: list[str]) -> list[list[float]]:
+        """
+        Generate embeddings for input texts.
+
+        Args:
+            input_data: List of text strings to embed
+
+        Returns:
+            List of embedding vectors (lists of floats)
+        """
+        try:
+            # sentence-transformers encode is synchronous, so we run it in executor
+            loop = asyncio.get_event_loop()
+            embeddings = await loop.run_in_executor(
+                None,
+                lambda: self.model.encode(input_data, convert_to_numpy=True)
+            )
+            # Convert numpy arrays to lists for Graphiti
+            return embeddings.tolist()
+        except Exception as e:
+            logger.error(f"Failed to generate embeddings: {e}")
+            raise
+
+
+def _get_local_embedder() -> Optional[Any]:
+    """Get or create singleton local embedder instance."""
+    global _local_embedder
+
+    if _local_embedder is not None:
+        return _local_embedder
+
+    if EmbedderClient is None:
+        return None
+
+    try:
+        _local_embedder = LocalSentenceTransformerEmbedder()
+        return _local_embedder
+    except Exception as e:
+        logger.warning(f"Failed to initialize local embedder: {e}")
+        return None
 
 
 def _neo4j_uri_candidates() -> list[str]:
@@ -43,15 +115,7 @@ def _neo4j_uri_candidates() -> list[str]:
 
 
 def _runtime_backend_mode() -> str:
-    state_path = Path(".graph/runtime-backend.json")
-    if not state_path.exists():
-        return ""
-    try:
-        payload = json.loads(state_path.read_text(encoding="utf-8"))
-        mode = payload.get("mode", "")
-        return mode if isinstance(mode, str) else ""
-    except Exception:
-        return ""
+    return _read_runtime_backend_mode()
 
 
 def _find_reachable_neo4j_uri(user: str, password: str) -> Optional[str]:
@@ -153,14 +217,26 @@ def get_graphiti_client() -> Optional[Any]:
             _graph_unavailable_until = time.time() + _graph_backoff_seconds()
             return None
 
-        _bridge_openrouter_env()
-
-        # Initialize Graphiti client
-        _graphiti_client = Graphiti(
-            uri=reachable_uri,
-            user=neo4j_user,
-            password=neo4j_password
-        )
+        # Get local embedder (sentence-transformers)
+        local_embedder = _get_local_embedder()
+        if local_embedder is None:
+            logger.warning("Local embedder unavailable - falling back to OpenAI")
+            _bridge_openrouter_env()
+            # Initialize Graphiti client with default OpenAI embedder
+            _graphiti_client = Graphiti(
+                uri=reachable_uri,
+                user=neo4j_user,
+                password=neo4j_password
+            )
+        else:
+            # Initialize Graphiti client with local sentence-transformers embedder
+            _graphiti_client = Graphiti(
+                uri=reachable_uri,
+                user=neo4j_user,
+                password=neo4j_password,
+                embedder=local_embedder
+            )
+            logger.info("Using local sentence-transformers embedder (no API key needed)")
 
         logger.info(f"Graphiti client initialized with URI: {reachable_uri} (configured={configured_uri})")
         _graph_unavailable_until = 0.0

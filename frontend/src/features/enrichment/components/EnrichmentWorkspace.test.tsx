@@ -126,10 +126,10 @@ describe("EnrichmentWorkspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Start dry-run" }));
     await waitFor(() => expect(startEnrichmentRun).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByRole("button", { name: "Approve selection" }));
+    fireEvent.click(screen.getByRole("button", { name: /approve selection/i }));
     await waitFor(() => expect(approveEnrichmentRun).toHaveBeenCalledWith(55, expect.any(Object)));
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply approved" }));
+    fireEvent.click(screen.getByRole("button", { name: /apply approved/i }));
     await waitFor(() => expect(applyEnrichmentRun).toHaveBeenCalledWith(55, expect.any(Object)));
     await waitFor(() => expect(fetchEnrichmentReview).toHaveBeenCalledWith(55));
     expect(screen.getByTestId("enrichment-apply-result")).toHaveTextContent("Job #88 queued on");

@@ -242,6 +242,97 @@ def create_openapi_app(config_object=None):
             sentry_gauge("api.health.status", 0)
             return {'status': 'error', 'database': 'disconnected', 'error': str(e)}, 500
 
+    @app.route('/doctor', methods=['GET'])
+    def doctor():
+        """Comprehensive diagnostic endpoint for all critical services."""
+        import redis
+        from datetime import datetime, timezone
+
+        diagnostics = {
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'overall_status': 'ok',
+            'services': {}
+        }
+
+        # Check PostgreSQL
+        try:
+            db.session.execute(db.text('SELECT version()'))
+            diagnostics['services']['postgresql'] = {'status': 'ok', 'connected': True}
+        except Exception as e:
+            diagnostics['services']['postgresql'] = {'status': 'error', 'connected': False, 'error': str(e)}
+            diagnostics['overall_status'] = 'degraded'
+
+        # Check Redis
+        try:
+            redis_client = app.config.get('SESSION_REDIS')
+            if redis_client:
+                redis_client.ping()
+                diagnostics['services']['redis'] = {'status': 'ok', 'connected': True}
+            else:
+                diagnostics['services']['redis'] = {'status': 'not_configured', 'connected': False}
+                diagnostics['overall_status'] = 'degraded'
+        except Exception as e:
+            diagnostics['services']['redis'] = {'status': 'error', 'connected': False, 'error': str(e)}
+            diagnostics['overall_status'] = 'degraded'
+
+        # Check Neo4j (via health cache)
+        try:
+            from pathlib import Path
+            import json
+            health_cache_path = Path(app.root_path).parent / '.graph' / 'health-cache.json'
+            if health_cache_path.exists():
+                with open(health_cache_path) as f:
+                    health_data = json.load(f)
+                neo4j_status = health_data.get('neo4j', {})
+                diagnostics['services']['neo4j'] = {
+                    'status': 'ok' if neo4j_status.get('available') else 'error',
+                    'connected': neo4j_status.get('available', False),
+                    'last_check': neo4j_status.get('last_check_at')
+                }
+                if not neo4j_status.get('available'):
+                    diagnostics['overall_status'] = 'degraded'
+            else:
+                diagnostics['services']['neo4j'] = {'status': 'unknown', 'connected': False, 'error': 'health cache not found'}
+                diagnostics['overall_status'] = 'degraded'
+        except Exception as e:
+            diagnostics['services']['neo4j'] = {'status': 'error', 'connected': False, 'error': str(e)}
+            diagnostics['overall_status'] = 'degraded'
+
+        # Check Celery workers
+        try:
+            from src.celery_app import app as celery_app
+            inspect = celery_app.control.inspect(timeout=2.0)
+            active_workers = inspect.active()
+            if active_workers:
+                diagnostics['services']['celery'] = {
+                    'status': 'ok',
+                    'workers': list(active_workers.keys()),
+                    'worker_count': len(active_workers)
+                }
+            else:
+                diagnostics['services']['celery'] = {'status': 'warning', 'workers': [], 'worker_count': 0}
+                diagnostics['overall_status'] = 'degraded'
+        except Exception as e:
+            diagnostics['services']['celery'] = {'status': 'error', 'error': str(e)}
+            diagnostics['overall_status'] = 'degraded'
+
+        # Check Sentry
+        try:
+            sentry_dsn = app.config.get('SENTRY_DSN')
+            diagnostics['services']['sentry'] = {
+                'status': 'ok' if sentry_dsn else 'not_configured',
+                'configured': bool(sentry_dsn)
+            }
+        except Exception as e:
+            diagnostics['services']['sentry'] = {'status': 'error', 'error': str(e)}
+
+        # Add version and environment info
+        diagnostics['version'] = app.config.get('VERSION', '1.0.0')
+        diagnostics['environment'] = app.config.get('FLASK_ENV', 'production')
+
+        status_code = 200 if diagnostics['overall_status'] == 'ok' else 503
+        return diagnostics, status_code
+
     return app
 
 

@@ -48,7 +48,7 @@ function parseEnvelope(raw: unknown): ChatStreamEnvelope | null {
 function parseEventData(eventData: unknown): ChatStreamEnvelope | null {
   if (typeof eventData !== "string" || !eventData) return null;
   try {
-    const parsed = JSON.parse(eventData) as unknown;
+    const parsed: unknown = JSON.parse(eventData);
     return parseEnvelope(parsed);
   } catch {
     return null;
@@ -77,8 +77,8 @@ function attachNamedEvent(
   eventName: string,
 ) {
   source.addEventListener(eventName, (event) => {
-    const messageEvent = event as MessageEvent;
-    const envelope = parseEventData(messageEvent.data);
+    if (!(event instanceof MessageEvent)) return;
+    const envelope = parseEventData(event.data);
     if (!envelope) return;
     notifyListeners(sessionId, eventName, envelope);
   });
