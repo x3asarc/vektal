@@ -1,0 +1,67 @@
+name: Deploy Frontend to Production
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'frontend/**'
+      - 'Dockerfile.frontend'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        run: |
+          docker build -f Dockerfile.frontend -t vektal-frontend:latest .
+
+      - name: Test build artifacts
+        run: |
+          echo "✓ Frontend Docker image built successfully"
+          docker images | grep vektal-frontend
+
+      - name: Trigger Dokploy webhook (if configured)
+        if: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
+        run: |
+          curl -X POST "${{ secrets.DOKPLOY_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"refs/heads/master","repository":{"full_name":"x3asarc/vektal"}}'
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend Build:** ✓ Success" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ secrets.DOKPLOY_WEBHOOK_URL }}" ]; then
+            echo "- **Dokploy Webhook:** ✓ Triggered" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Dokploy Webhook:** ⚠️ Not configured" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Go to Dokploy dashboard" >> $GITHUB_STEP_SUMMARY
+            echo "2. Update project to use 'vektal' repo" >> $GITHUB_STEP_SUMMARY
+            echo "3. Set Dockerfile to 'Dockerfile.frontend'" >> $GITHUB_STEP_SUMMARY
+            echo "4. Manually trigger deployment" >> $GITHUB_STEP_SUMMARY
+          fi
