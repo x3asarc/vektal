@@ -509,3 +509,17 @@ Plans:
 | 14.2. Tool Calling 2.0 | 7/7 | Complete | 2026-02-26 |
 | 14.3. Graph Availability + Sync | 7/7 | Complete | 2026-03-01 |
 | 15. Self-Healing & Optimization | 12/12 | Complete | 2026-03-02 |
+| 15.1. Sentry Autonomous Intake + Verified Auto-Resolution | 4/4 | Complete | 2026-03-04 |
+| 16. Agent Context OS | 7/7 | Complete | 2026-03-03 |
+
+### Phase 15.1: Sentry Autonomous Intake and Verified Auto-Resolution (INSERTED)
+
+**Goal:** Close the Sentry loop by pulling unresolved production issues, routing them through the existing health/remediation stack, and only marking them resolved once the Sentry API reports no new activity.
+**Depends on:** Phase 15 (self-healing + health monitor), Phase 14.3 Sentry ingestion artifacts, and Phase 16 Context OS telemetry/memory contracts
+**Plans:** 4 plans in 2 waves
+
+Plans:
+- [x] 15.1-01-PLAN.md - Sentry intake normalization and canonical issue-pulled events (Wave 1)
+- [x] 15.1-02-PLAN.md - Health monitor deduped routing and issue-level telemetry (Wave 1)
+- [x] 15.1-03-PLAN.md - Verified Sentry closure gate in client and feedback loop (Wave 2)
+- [x] 15.1-04-PLAN.md - Focused verification suite and binary closure evidence (Wave 2)
