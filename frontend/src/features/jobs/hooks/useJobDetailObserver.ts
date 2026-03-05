@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiRequest } from "@/lib/api/client";
 import {
   createTransportLadder,
@@ -27,13 +27,19 @@ export type JobDetail = {
   results_url?: string | null;
 };
 
+export type JobObserverEvent = {
+  id: string;
+  at: string;
+  kind: "sse" | "poll" | "transport" | "error";
+  message: string;
+};
+
 type JobDetailResponse = {
   job: JobDetail;
 };
 
 function resolveApiBase(): string {
   if (process.env.NEXT_PUBLIC_API_BASE_URL) return process.env.NEXT_PUBLIC_API_BASE_URL;
-  // Default to same-origin so /api/* requests use Next.js rewrite proxy in dev.
   return "";
 }
 
@@ -107,16 +113,33 @@ export function useJobDetailObserver(jobId: number | string | null) {
   const [mode, setMode] = useState<TransportMode>("sse");
   const [degraded, setDegraded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<JobObserverEvent[]>([]);
+  const [reconnectNonce, setReconnectNonce] = useState(0);
 
   const ladder = useMemo(() => createTransportLadder(), []);
   const pollingRef = useRef<number | null>(null);
   const inactivityRef = useRef<number | null>(null);
+  const pollNowRef = useRef<(() => Promise<void>) | null>(null);
+
+  const appendEvent = useCallback((kind: JobObserverEvent["kind"], message: string) => {
+    setEvents((previous) => {
+      const next: JobObserverEvent = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        at: new Date().toISOString(),
+        kind,
+        message,
+      };
+      return [next, ...previous].slice(0, 30);
+    });
+  }, []);
 
   useEffect(() => {
     if (!jobId) return;
 
     let disposed = false;
     let eventSource: EventSource | null = null;
+
+    appendEvent("transport", "Observer initialized.");
 
     const cleanupPolling = () => {
       if (pollingRef.current !== null) {
@@ -131,22 +154,28 @@ export function useJobDetailObserver(jobId: number | string | null) {
         if (disposed) return;
         setJob(detail.job);
         setError(null);
+        appendEvent("poll", `Polling update: ${detail.job.status}`);
         if (ladder.getSnapshot().mode === "degraded") {
           const next = ladder.markPollingRecovery();
           setMode(next.mode);
           setDegraded(false);
+          appendEvent("transport", "Recovered from degraded mode via polling.");
         }
       } catch (err) {
         if (disposed) return;
         const next = ladder.markPollingFailure("polling_failed");
         setMode(next.mode);
         setDegraded(true);
-        setError(err instanceof Error ? err.message : "Polling failed.");
+        const message = err instanceof Error ? err.message : "Polling failed.";
+        setError(message);
+        appendEvent("error", message);
       }
     };
+    pollNowRef.current = pollJob;
 
     const startPolling = () => {
       cleanupPolling();
+      appendEvent("transport", "Switching to polling transport.");
       void pollJob();
       pollingRef.current = window.setInterval(
         () => void pollJob(),
@@ -158,6 +187,7 @@ export function useJobDetailObserver(jobId: number | string | null) {
     if (typeof window !== "undefined" && "EventSource" in window) {
       eventSource = new window.EventSource(streamUrl, { withCredentials: true });
       const eventName = `job_${jobId}`;
+      appendEvent("transport", "Attempting SSE transport.");
 
       const handleStreamPayload = (event: MessageEvent) => {
         const payload = eventDataToPayload(event.data);
@@ -166,7 +196,10 @@ export function useJobDetailObserver(jobId: number | string | null) {
         setMode("sse");
         setDegraded(false);
         setError(null);
-        if (parsed) setJob(parsed);
+        if (parsed) {
+          setJob(parsed);
+          appendEvent("sse", `SSE update: ${parsed.status}`);
+        }
       };
 
       eventSource.addEventListener(eventName, handleStreamPayload as EventListener);
@@ -174,6 +207,7 @@ export function useJobDetailObserver(jobId: number | string | null) {
       eventSource.onerror = () => {
         const snapshot = ladder.getSnapshot();
         if (snapshot.lastSseEventAt === null) {
+          appendEvent("transport", "SSE unavailable. Falling back to polling.");
           setMode("polling");
           startPolling();
           return;
@@ -181,10 +215,12 @@ export function useJobDetailObserver(jobId: number | string | null) {
         const next = ladder.checkInactivity(Date.now() + snapshot.inactivityThresholdMs + 1);
         setMode(next.mode);
         if (next.mode === "polling") {
+          appendEvent("transport", "SSE stale. Falling back to polling.");
           startPolling();
         }
       };
     } else {
+      appendEvent("transport", "EventSource unavailable. Using polling.");
       startPolling();
     }
 
@@ -198,6 +234,7 @@ export function useJobDetailObserver(jobId: number | string | null) {
 
     return () => {
       disposed = true;
+      pollNowRef.current = null;
       cleanupPolling();
       if (inactivityRef.current !== null) {
         window.clearInterval(inactivityRef.current);
@@ -207,12 +244,25 @@ export function useJobDetailObserver(jobId: number | string | null) {
         eventSource.close();
       }
     };
-  }, [jobId, ladder]);
+  }, [appendEvent, jobId, ladder, reconnectNonce]);
+
+  const pollNow = useCallback(async () => {
+    if (!pollNowRef.current) return;
+    await pollNowRef.current();
+  }, []);
+
+  const reconnect = useCallback(() => {
+    appendEvent("transport", "Reconnect requested by user.");
+    setReconnectNonce((value) => value + 1);
+  }, [appendEvent]);
 
   return {
     job,
     mode,
     degraded,
     error,
+    events,
+    pollNow,
+    reconnect,
   };
 }

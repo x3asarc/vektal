@@ -49,11 +49,11 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
 
   return (
     <section className="panel" data-testid="enrichment-run-configurator">
-      <h2>Run Configurator</h2>
-      <p className="muted">Dry-run first. Apply only after review and explicit confirmation.</p>
-      <form onSubmit={(event) => { void handleSubmit(event); }} style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <label>
-          Supplier code
+      <h2 className="forensic-card-title">Run Configurator</h2>
+      <p className="forensic-card-copy">Dry-run first. Apply only after review and explicit confirmation.</p>
+      <form onSubmit={(event) => { void handleSubmit(event); }} className="forensic-control-grid">
+        <label className="forensic-field">
+          <span className="forensic-field-label">Supplier code</span>
           <input
             type="text"
             value={supplierCode}
@@ -61,8 +61,8 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
             aria-label="supplier code"
           />
         </label>
-        <label>
-          Profile
+        <label className="forensic-field">
+          <span className="forensic-field-label">Profile</span>
           <select
             value={runProfile}
             onChange={(event) => setRunProfile(event.target.value as EnrichmentProfile)}
@@ -73,8 +73,8 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
             <option value="deep">deep</option>
           </select>
         </label>
-        <label>
-          Language
+        <label className="forensic-field">
+          <span className="forensic-field-label">Language</span>
           <select
             value={targetLanguage}
             onChange={(event) => setTargetLanguage(event.target.value as EnrichmentLanguage)}
@@ -84,8 +84,8 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
             <option value="en">en</option>
           </select>
         </label>
-        <label>
-          Dry-run TTL (minutes)
+        <label className="forensic-field">
+          <span className="forensic-field-label">Dry-run TTL (minutes)</span>
           <input
             type="number"
             min={5}
@@ -95,7 +95,7 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
             aria-label="dry run ttl"
           />
         </label>
-        <label style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <label className="forensic-field" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           <input
             type="checkbox"
             checked={supplierVerified}
@@ -105,7 +105,7 @@ export function EnrichmentRunConfigurator({ onStart, isSubmitting }: EnrichmentR
           Supplier verified
         </label>
         <div style={{ display: "flex", alignItems: "end" }}>
-          <button type="submit" disabled={isSubmitting}>
+          <button className="btn-primary" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Starting..." : "Start dry-run"}
           </button>
         </div>

@@ -43,6 +43,7 @@ function nextState(
 export function OnboardingWizard() {
   const [state, setState] = useState(INITIAL_ONBOARDING_STATE);
   const [shopDomain, setShopDomain] = useState("example.myshopify.com");
+  const [csvRaw, setCsvRaw] = useState("sku,title,price");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [retryError, setRetryError] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
@@ -96,23 +97,58 @@ export function OnboardingWizard() {
     }
   }, [state.step]);
 
+  const progress = useMemo(() => {
+    const map: Record<OnboardingState["step"], number> = {
+      connect_shopify: 1,
+      choose_ingest: 2,
+      preview_start_import: 3,
+      import_progress: 3,
+      completed: 3,
+    };
+    return map[state.step] ?? 1;
+  }, [state.step]);
+
+  const csvSummary = useMemo(() => {
+    const lines = csvRaw
+      .split(/\r?\n/g)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (lines.length <= 1) {
+      return { rows: 0, invalid: 0 };
+    }
+    const dataLines = lines.slice(1);
+    let invalid = 0;
+    for (const line of dataLines) {
+      const columns = line.split(",").map((part) => part.trim());
+      if (columns.length < 2 || !columns[0]) invalid += 1;
+    }
+    return { rows: dataLines.length, invalid };
+  }, [csvRaw]);
+
   return (
     <section className="panel">
-      <h2>{stepLabel}</h2>
-      <p className="muted">
+      <h2 className="forensic-card-title">{stepLabel}</h2>
+      <p className="forensic-card-copy">
         Completion rule: either Sync Store or Upload CSV path can complete
         onboarding.
       </p>
 
+      <div className="forensic-chip-row">
+        <span className={`forensic-chip ${progress >= 1 ? "is-active" : ""}`}>1. Connect</span>
+        <span className={`forensic-chip ${progress >= 2 ? "is-active" : ""}`}>2. Upload / Sync</span>
+        <span className={`forensic-chip ${progress >= 3 ? "is-active" : ""}`}>3. Preview</span>
+      </div>
+
       {state.step === "connect_shopify" && (
-        <div style={{ display: "grid", gap: 8 }}>
-          <label htmlFor="shop-domain">Shopify Domain</label>
+        <div className="onboarding-step">
+          <label htmlFor="shop-domain" className="forensic-field-label">Shopify Domain</label>
           <input
             id="shop-domain"
             value={shopDomain}
             onChange={(event) => setShopDomain(event.currentTarget.value)}
           />
           <button
+            className="btn-primary"
             type="button"
             disabled={isRedirectingToShopify}
             onClick={() => {
@@ -136,7 +172,7 @@ export function OnboardingWizard() {
             {isRedirectingToShopify ? "Redirecting to Shopify..." : "Connect Shopify"}
           </button>
           {authUrl && (
-            <p className="muted">
+            <p className="forensic-card-copy">
               Shopify auth URL generated:
               {" "}
               <a href={authUrl} target="_blank" rel="noreferrer">
@@ -148,17 +184,17 @@ export function OnboardingWizard() {
       )}
 
       {state.step === "choose_ingest" && (
-        <div style={{ display: "grid", gap: 8 }}>
-          <p>
+        <div className="onboarding-step">
+          <p className="forensic-card-copy">
             Choose ingest path:
             <strong> Sync Store </strong>
             is the primary CTA.
           </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={() => setState((prev) => nextState(prev, "sync"))}>
+          <div className="forensic-actions">
+            <button className="btn-primary" type="button" onClick={() => setState((prev) => nextState(prev, "sync"))}>
               Sync Store
             </button>
-            <button type="button" onClick={() => setState((prev) => nextState(prev, "csv"))}>
+            <button className="btn-ghost" type="button" onClick={() => setState((prev) => nextState(prev, "csv"))}>
               Upload CSV
             </button>
           </div>
@@ -166,14 +202,15 @@ export function OnboardingWizard() {
       )}
 
       {state.step === "preview_start_import" && (
-        <div style={{ display: "grid", gap: 8 }}>
-          <p>
+        <div className="onboarding-step">
+          <p className="forensic-card-copy">
             Preview and Start Import
             {state.ingestPath === "sync_store"
               ? " - Sync defaults to import everything."
               : " - CSV ingest selected."}
           </p>
           <button
+            className="btn-ghost"
             type="button"
             onClick={() => setState((prev) => nextState(prev, "advanced"))}
           >
@@ -181,13 +218,33 @@ export function OnboardingWizard() {
           </button>
           {state.advancedOpen && (
             <div className="panel">
-              <p className="muted">
+              <p className="forensic-card-copy">
                 Advanced scope/filter options are explicit. Empty selections do
                 not silently alter import intent.
               </p>
             </div>
           )}
+          {state.ingestPath === "upload_csv" && (
+            <div className="panel onboarding-csv-panel">
+              <label className="forensic-field">
+                <span className="forensic-field-label">CSV payload</span>
+                <textarea
+                  rows={6}
+                  value={csvRaw}
+                  onChange={(event) => setCsvRaw(event.target.value)}
+                  placeholder={"sku,title,price\nSKU-100,Paint A,12.99"}
+                />
+              </label>
+              <div className="forensic-chip-row">
+                <span className="forensic-chip">Rows: {csvSummary.rows}</span>
+                <span className={`forensic-chip ${csvSummary.invalid > 0 ? "is-warning" : ""}`}>
+                  Invalid: {csvSummary.invalid}
+                </span>
+              </div>
+            </div>
+          )}
           <button
+            className="btn-primary"
             type="button"
             onClick={() => {
               setErrorMessage(null);
@@ -209,8 +266,8 @@ export function OnboardingWizard() {
       )}
 
       {state.step === "import_progress" && (
-        <div style={{ display: "grid", gap: 8 }}>
-          <p>Import in progress. You can navigate away without blocking.</p>
+        <div className="onboarding-step">
+          <p className="forensic-card-copy">Import in progress. You can navigate away without blocking.</p>
           {observed.job ? (
             <>
               <div className="progress-shell" aria-label="onboarding-progress">
@@ -221,32 +278,47 @@ export function OnboardingWizard() {
                   }}
                 />
               </div>
-              <p className="muted">
+              <div className="onboarding-status-grid">
+                <div className="panel">
+                  <p className="forensic-inline-note">Progress</p>
+                  <p className="forensic-card-copy">
                 {Number(observed.job.percent_complete ?? 0).toFixed(1)}% complete
-              </p>
-              <p className="muted">
+                  </p>
+                </div>
+                <div className="panel">
+                  <p className="forensic-inline-note">Step</p>
+                  <p className="forensic-card-copy">
                 Step: <strong>{observed.job.current_step_label ?? observed.job.current_step ?? "Queued"}</strong>
-              </p>
-              <p className="muted">
+                  </p>
+                </div>
+                <div className="panel">
+                  <p className="forensic-inline-note">ETA</p>
+                  <p className="forensic-card-copy">
                 ETA: <strong>{typeof observed.job.eta_seconds === "number" ? `${observed.job.eta_seconds}s` : "Calculating ETA..."}</strong>
-              </p>
-              <p className="muted">
+                  </p>
+                </div>
+                <div className="panel">
+                  <p className="forensic-inline-note">Processed</p>
+                  <p className="forensic-card-copy">
                 Processed: <strong>{observed.job.processed_items ?? 0}</strong> / <strong>{observed.job.total_items ?? 0}</strong>
-              </p>
+                  </p>
+                </div>
+              </div>
               {observed.job.error_message && (
-                <p className="muted" style={{ color: "var(--error)" }}>
+                <p className="chat-action-warning">
                   {observed.job.error_message}
                 </p>
               )}
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div className="forensic-actions">
                 {observed.job.results_url && (
-                  <a href={observed.job.results_url}>View results</a>
+                  <a className="btn-ghost" href={observed.job.results_url}>View results</a>
                 )}
                 {activeJobId && (
-                  <a href={`/jobs/${activeJobId}`}>Open job detail</a>
+                  <a className="btn-ghost" href={`/jobs/${activeJobId}`}>Open job detail</a>
                 )}
                 {observed.job.can_retry && activeJobId && (
                   <button
+                    className="btn-ghost"
                     type="button"
                     disabled={retrying}
                     onClick={() => {
@@ -276,14 +348,15 @@ export function OnboardingWizard() {
               </div>
             </>
           ) : (
-            <p className="muted">Waiting for live job status...</p>
+            <p className="forensic-card-copy">Waiting for live job status...</p>
           )}
           {retryError && (
-            <p className="muted" style={{ color: "var(--error)" }}>
+            <p className="chat-action-warning">
               {retryError}
             </p>
           )}
           <button
+            className="btn-primary"
             type="button"
             onClick={() => {
               setState((prev) => nextState(prev, "done"));
@@ -296,7 +369,7 @@ export function OnboardingWizard() {
       )}
 
       {state.step === "completed" && (
-        <p>
+        <p className="forensic-card-copy">
           Onboarding complete. You can now use
           <strong> /dashboard </strong>
           as the default landing.
@@ -304,9 +377,8 @@ export function OnboardingWizard() {
       )}
 
       {errorMessage && (
-        <div className="panel" style={{ borderColor: "var(--error)" }}>
-          <strong>Request error</strong>
-          <p className="muted">{errorMessage}</p>
+        <div className="chat-action-warning">
+          <strong>Request error</strong> {errorMessage}
         </div>
       )}
     </section>

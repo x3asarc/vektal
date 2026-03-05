@@ -16,6 +16,9 @@ type JobObserverResult = {
   degraded: boolean;
   error: string | null;
   job: JobDetail | null;
+  events: Array<{ id: string; at: string; kind: "sse" | "poll" | "transport" | "error"; message: string }>;
+  pollNow: () => Promise<void>;
+  reconnect: () => void;
 };
 const locationAssignMock = vi.fn();
 
@@ -47,6 +50,9 @@ describe("JobDetailPage", () => {
       mode: "sse",
       degraded: false,
       error: null,
+      events: [],
+      pollNow: vi.fn(async () => {}),
+      reconnect: vi.fn(),
       job: {
         id: 77,
         status: "failed_terminal",
