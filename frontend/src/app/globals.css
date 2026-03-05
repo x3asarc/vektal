@@ -1,17 +1,20 @@
 /* Fonts loaded via <link> tags in layout.tsx */
 
 :root {
-  --bg: #0a0a0f;
-  --surface: #121212;
-  --card: #1c1c24;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.20);
-  --text: #f4f4f5;
-  --muted: #71717a;
-  --accent: #ffffff;
-  --error: #f87171;
-  --warning: #fbbf24;
-  --ok: #34d399;
+  --bg: var(--token-surface-panel);
+  --surface: var(--token-surface-panel);
+  --card: var(--token-surface-card);
+  --border: var(--token-surface-border);
+  --border-hover: var(--token-surface-border-active);
+  --text: var(--token-text-heading);
+  --muted: var(--token-text-body);
+  --accent: var(--token-brand-primary);
+  --error: var(--token-brand-warning);
+  --warning: var(--token-brand-warning);
+  --ok: var(--token-brand-secondary);
+  --radius-ui: var(--token-border-radius, 0);
+  --radius-pill: var(--token-border-radius, 0);
+  --radius-round: var(--token-border-radius, 0);
   --sidebar-width: 64px;
 }
 
@@ -26,22 +29,19 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #0a0a0f;
+  background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: var(--token-font-family, "JetBrains Mono", "IBM Plex Mono", monospace);
   overflow: hidden;
 }
 
-/* ─── Scrollbar ──────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-/* ─── Typography ──────────────────────────────────────────────── */
 a { color: var(--accent); }
 
-/* ─── Material Symbols ───────────────────────────────────────── */
 .material-symbols-rounded {
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
   font-size: 20px;
@@ -53,7 +53,6 @@ a { color: var(--accent); }
   font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
 }
 
-/* ─── Glass utilities ────────────────────────────────────────── */
 .glass-panel {
   background: rgba(18, 18, 18, 0.6);
   backdrop-filter: blur(12px);
@@ -67,7 +66,6 @@ a { color: var(--accent); }
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* ─── Base elements ──────────────────────────────────────────── */
 button,
 input,
 select,
@@ -75,7 +73,6 @@ textarea {
   font: inherit;
 }
 
-/* ─── AppShell layout ────────────────────────────────────────── */
 main {
   max-width: none;
   margin: 0;
@@ -95,7 +92,6 @@ main {
   position: relative;
 }
 
-/* ─── Sidebar ────────────────────────────────────────────────── */
 .app-sidebar {
   width: var(--sidebar-width);
   flex-shrink: 0;
@@ -138,7 +134,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   border: 1px solid transparent;
   background: transparent;
   color: var(--muted);
@@ -149,11 +145,11 @@ main {
 }
 .sidebar-icon-btn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--text);
 }
 .sidebar-icon-btn.active {
   background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  color: var(--text);
   border-color: rgba(255, 255, 255, 0.10);
 }
 
@@ -178,11 +174,10 @@ main {
   border-color: var(--border-hover);
 }
 
-/* ─── Common panel ───────────────────────────────────────────── */
 .panel {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 16px;
 }
 
@@ -190,23 +185,21 @@ main {
   color: var(--muted);
 }
 
-/* ─── Progress ───────────────────────────────────────────────── */
 .progress-shell {
   width: 100%;
   height: 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+  background: linear-gradient(90deg, var(--token-brand-primary) 0%, var(--token-brand-secondary) 100%);
   transition: width 0.3s ease;
 }
 
-/* ─── Dashboard home ─────────────────────────────────────────── */
 .dashboard-page-wrap {
   flex: 1;
   overflow-y: auto;
@@ -248,7 +241,7 @@ main {
 .dashboard-title {
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin: 0 0 10px;
   letter-spacing: -0.02em;
 }
@@ -279,7 +272,6 @@ main {
   50% { transform: rotate(10deg); }
 }
 
-/* ─── Dashboard starters ─────────────────────────────────────── */
 .dashboard-starters {
   width: 100%;
 }
@@ -302,7 +294,7 @@ main {
 .starter-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 22px 20px;
   display: flex;
   align-items: center;
@@ -343,7 +335,7 @@ main {
 .starter-card-btn {
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 7px 14px;
   background: rgba(255, 255, 255, 0.04);
   color: #d4d4d8;
@@ -358,12 +350,11 @@ main {
   text-decoration: none;
 }
 .starter-card-btn:hover {
-  color: #fff;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.28);
 }
 
-/* ─── Dashboard quick-action pills ──────────────────────────── */
 .dashboard-pills {
   display: flex;
   flex-wrap: wrap;
@@ -377,7 +368,7 @@ main {
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--muted);
@@ -388,12 +379,11 @@ main {
   cursor: pointer;
 }
 .dashboard-pill:hover {
-  color: #fff;
+  color: var(--text);
   border-color: var(--border-hover);
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* ─── Dashboard chat input ───────────────────────────────────── */
 .dashboard-input-wrap {
   width: 100%;
   position: relative;
@@ -403,7 +393,7 @@ main {
   position: absolute;
   inset: -1px;
   background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
-  border-radius: 13px;
+  border-radius: var(--radius-ui);
   filter: blur(8px);
   opacity: 0.5;
   pointer-events: none;
@@ -421,7 +411,7 @@ main {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 18px 20px;
 }
 
@@ -462,7 +452,7 @@ main {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   border: 1px solid rgba(255, 255, 255, 0.07);
   background: rgba(255, 255, 255, 0.04);
   color: var(--muted);
@@ -473,7 +463,7 @@ main {
   white-space: nowrap;
 }
 .dashboard-tool-btn:hover {
-  color: #fff;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -484,7 +474,6 @@ main {
   justify-content: center;
 }
 
-/* + add button — circular ring style */
 .dashboard-tool-btn--add {
   width: 30px;
   height: 30px;
@@ -497,7 +486,7 @@ main {
 }
 .dashboard-tool-btn--add:hover {
   border-color: rgba(255, 255, 255, 0.40);
-  color: #fff;
+  color: var(--text);
   background: transparent;
 }
 
@@ -511,10 +500,10 @@ main {
 .dashboard-submit-btn {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   border: none;
-  background: #fff;
-  color: #000;
+  background: var(--accent);
+  color: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -523,7 +512,7 @@ main {
   flex-shrink: 0;
 }
 .dashboard-submit-btn:hover {
-  background: #e4e4e7;
+  background: var(--token-brand-secondary);
 }
 .dashboard-submit-btn:disabled {
   opacity: 0.35;
@@ -544,7 +533,6 @@ main {
   flex-shrink: 0;
 }
 
-/* ─── Chat workspace ─────────────────────────────────────────── */
 .chat-workspace {
   display: grid;
   gap: 16px;
@@ -566,7 +554,7 @@ main {
 
 .chat-message {
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   padding: 12px;
   background: var(--card);
 }
@@ -594,7 +582,7 @@ main {
 .chat-action-controls input {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 8px;
   background: rgba(28, 28, 36, 0.4);
   color: var(--text);
@@ -628,11 +616,11 @@ main {
 
 .chat-action-status {
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: rgba(99, 102, 241, 0.15);
   font-size: 0.75rem;
-  color: #818cf8;
+  color: var(--token-brand-primary);
 }
 
 .chat-action-controls {
@@ -652,7 +640,7 @@ main {
   overflow: auto;
   background: #0f172a;
   color: #dbeafe;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 10px;
 }
 
@@ -681,7 +669,7 @@ main {
   gap: 8px;
   flex-wrap: wrap;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 6px 8px;
 }
 
@@ -692,7 +680,7 @@ main {
 
 .chat-block {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 8px;
   background: var(--card);
 }
@@ -723,13 +711,12 @@ main {
 .chat-fallback-notice {
   border: 1px solid rgba(251, 191, 36, 0.3);
   background: rgba(251, 191, 36, 0.06);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 8px 12px;
   font-size: 0.8rem;
   color: var(--warning);
 }
 
-/* ─── Page wrapper (shared by chat / search / enrichment / jobs) ─── */
 .page-wrap {
   flex: 1;
   display: flex;
@@ -746,7 +733,7 @@ main {
 .page-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin: 0 0 4px;
   letter-spacing: -0.02em;
 }
@@ -766,7 +753,6 @@ main {
   gap: 16px;
 }
 
-/* ─── Chat page layout ───────────────────────────────────────── */
 .chat-page {
   flex: 1;
   display: flex;
@@ -788,7 +774,7 @@ main {
 .chat-page-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
   margin: 0;
 }
 
@@ -804,7 +790,7 @@ main {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-ui);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   font-size: 0.72rem;
@@ -857,7 +843,7 @@ main {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -890,10 +876,10 @@ main {
 .chat-glass-send {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   border: none;
-  background: #fff;
-  color: #000;
+  background: var(--accent);
+  color: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -902,7 +888,7 @@ main {
   transition: background 0.15s, opacity 0.15s;
 }
 
-.chat-glass-send:hover:not(:disabled) { background: #e4e4e7; }
+.chat-glass-send:hover:not(:disabled) { background: var(--token-brand-secondary); }
 .chat-glass-send:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* Bulk section toggle */
@@ -920,11 +906,10 @@ main {
 }
 .chat-bulk-toggle:hover { color: var(--text); }
 
-/* ─── Search page layout ─────────────────────────────────────── */
 .search-filters-bar {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 16px 20px;
   display: grid;
   gap: 8px;
@@ -946,7 +931,7 @@ main {
 .search-filters-bar select {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 7px 10px;
   color: var(--text);
   font-size: 0.85rem;
@@ -972,7 +957,7 @@ main {
 .search-scope-bar {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -989,7 +974,7 @@ main {
 .search-scope-bar select {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius-ui);
   padding: 4px 8px;
   color: var(--text);
   font-size: 0.78rem;
@@ -1000,11 +985,10 @@ main {
   background: var(--card);
 }
 
-/* ─── Enrichment page layout ─────────────────────────────────── */
 .enrichment-run-summary {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -1015,7 +999,7 @@ main {
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
 }
 
 .enrichment-run-meta {
@@ -1026,7 +1010,7 @@ main {
 
 .enrichment-badge {
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   font-size: 0.72rem;
@@ -1038,7 +1022,6 @@ main {
   font-weight: 500;
 }
 
-/* ─── Jobs page ──────────────────────────────────────────────── */
 .jobs-empty {
   display: flex;
   flex-direction: column;
@@ -1063,7 +1046,7 @@ main {
 .job-detail-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-ui);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -1080,7 +1063,7 @@ main {
 
 .job-status-badge {
   padding: 4px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   font-size: 0.72rem;
   font-weight: 600;
@@ -1110,7 +1093,7 @@ main {
 .job-status-badge[data-status="running"],
 .job-status-badge[data-status="processing"] {
   background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
+  color: var(--token-brand-primary);
   border-color: rgba(99, 102, 241, 0.3);
 }
 
@@ -1123,7 +1106,7 @@ main {
 .job-stat-box {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -1141,7 +1124,7 @@ main {
 .job-stat-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
 }
 
 .job-transport-bar {
@@ -1151,7 +1134,7 @@ main {
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   font-size: 0.75rem;
   color: var(--muted);
 }
@@ -1160,14 +1143,13 @@ main {
   color: var(--text);
 }
 
-/* ─── Auth / Login page ──────────────────────────────────────── */
 .auth-page {
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0a0a0f;
+  background: var(--bg);
   position: relative;
   overflow: hidden;
 }
@@ -1194,7 +1176,7 @@ main {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 16px;
+  border-radius: var(--radius-ui);
   padding: 40px 36px;
   display: flex;
   flex-direction: column;
@@ -1212,23 +1194,23 @@ main {
   height: 36px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text);
 }
 
 .auth-logo-text {
   font-size: 1rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
 }
 
 .auth-heading {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -1262,7 +1244,7 @@ main {
 .auth-input {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 10px 14px;
   color: var(--text);
   font-size: 0.875rem;
@@ -1278,10 +1260,10 @@ main {
 .auth-submit-btn {
   width: 100%;
   padding: 11px 0;
-  background: #fff;
-  color: #000;
+  background: var(--accent);
+  color: var(--bg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -1289,7 +1271,7 @@ main {
   margin-top: 4px;
 }
 
-.auth-submit-btn:hover { background: #e4e4e7; }
+.auth-submit-btn:hover { background: var(--token-brand-secondary); }
 .auth-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .auth-error {
@@ -1299,13 +1281,13 @@ main {
   padding: 8px 12px;
   background: rgba(248, 113, 113, 0.08);
   border: 1px solid rgba(248, 113, 113, 0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
 }
 
 .auth-notice {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-ui);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -1351,7 +1333,6 @@ main {
   flex-wrap: wrap;
 }
 
-/* ─── Shared page btn styles ────────────────────────────────── */
 button,
 .btn {
   cursor: pointer;
@@ -1360,7 +1341,7 @@ button,
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 7px 14px;
   color: var(--muted);
   font-size: 0.8rem;
@@ -1369,7 +1350,7 @@ button,
 }
 
 .btn-ghost:hover {
-  color: #fff;
+  color: var(--text);
   border-color: var(--border-hover);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -1380,25 +1361,23 @@ button,
 }
 
 .btn-primary {
-  background: #fff;
-  color: #000;
+  background: var(--accent);
+  color: var(--bg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-ui);
   padding: 7px 18px;
   font-size: 0.8rem;
   font-weight: 600;
   transition: background 0.15s, opacity 0.15s;
 }
 
-.btn-primary:hover { background: #e4e4e7; }
+.btn-primary:hover { background: var(--token-brand-secondary); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ─── Settings / Onboarding page ────────────────────────────── */
 .settings-page .page-body {
   max-width: 720px;
 }
 
-/* ─── Overrides for nested .panel inside page-body ──────────── */
 .page-body > .panel,
 .page-body > section.panel {
   margin: 0;

@@ -1,0 +1,281 @@
+.title-icon {
+  margin-right: var(--space-2);
+  font-size: 1rem;
+}
+
+.icon-sm {
+  font-size: 15px;
+}
+
+.page-body--narrow {
+  max-width: 720px;
+}
+
+.forensic-section-title {
+  margin: 0;
+  color: var(--text-heading);
+  font-size: 0.85rem;
+  letter-spacing: var(--token-tracking-wide);
+  text-transform: uppercase;
+}
+
+.forensic-session-line {
+  margin-bottom: 0;
+}
+
+.forensic-inline-actions,
+.forensic-stack-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.forensic-link-btn {
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+}
+
+.forensic-zero {
+  margin: 0;
+}
+
+.forensic-zero-top {
+  margin-top: 0;
+}
+
+.forensic-center-muted {
+  text-align: center;
+  font-size: var(--token-font-sm);
+}
+
+.auth-icon {
+  font-size: 18px;
+}
+
+.auth-message {
+  margin: 0;
+}
+
+.auth-notice-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.auth-dev-section {
+  margin-top: var(--space-3);
+}
+
+.auth-dev-pill {
+  font-size: 0.72rem;
+  padding: 5px 10px;
+}
+
+.jobs-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.jobs-toolbar-copy {
+  margin: 4px 0 0;
+}
+
+.jobs-card-head {
+  display: grid;
+  gap: 4px;
+}
+
+.jobs-card-error {
+  margin: 0;
+}
+
+.jobs-card-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.job-transport-warning {
+  color: var(--brand-warning);
+  margin-left: var(--space-2);
+}
+
+.job-step-line {
+  font-size: 0.9rem;
+  color: var(--text-mono);
+}
+
+.job-step-line strong,
+.enrichment-result-strong {
+  color: var(--text-heading);
+}
+
+.job-progress-copy {
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+}
+
+.job-error {
+  margin: 0;
+  color: var(--brand-warning);
+  font-size: 0.825rem;
+}
+
+.job-detail-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.job-link-btn {
+  font-size: 0.8rem;
+  padding: 7px 14px;
+  text-decoration: none;
+}
+
+.btn-compact {
+  font-size: 0.8rem;
+}
+
+.search-scope-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-token {
+  font-size: 0.68rem;
+  color: var(--text-mono);
+}
+
+.search-clear-btn {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  margin-left: auto;
+}
+
+.search-error {
+  color: var(--brand-warning);
+  margin: 0;
+}
+
+.search-loading {
+  margin: 0;
+}
+
+.chat-fallback-wrap {
+  padding: 0 var(--space-8);
+}
+
+.chat-section-title {
+  font-size: 0.78rem;
+  color: var(--text-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 8px 0 4px;
+}
+
+.chat-error-zero {
+  margin: 0;
+}
+
+.chat-bulk-form {
+  gap: var(--space-2);
+}
+
+.chat-bulk-label {
+  font-size: 0.72rem;
+  color: var(--text-mono);
+  font-weight: var(--token-weight-medium);
+}
+
+.chat-bulk-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.chat-bulk-submit {
+  font-size: 0.78rem;
+}
+
+.enrichment-error {
+  color: var(--brand-warning);
+  margin: 0;
+}
+
+.enrichment-meta-row {
+  gap: 6px;
+}
+
+.enrichment-stale-badge {
+  color: var(--brand-warning);
+  border-color: rgba(255, 77, 77, 0.35);
+}
+
+.enrichment-apply-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.enrichment-success-icon {
+  color: var(--brand-secondary);
+  font-size: 20px;
+}
+
+.search-filters-actions .btn-primary,
+.search-filters-actions .btn-ghost {
+  font-size: 0.8rem;
+}
+
+.search-filters-actions .btn-primary {
+  padding: 7px 16px;
+}
+
+.search-filters-actions .btn-ghost {
+  padding: 7px 12px;
+}
+
+.chat-glass-toolbar .material-symbols-rounded,
+.job-link-btn .material-symbols-rounded,
+.btn-compact .material-symbols-rounded {
+  margin-right: 4px;
+}
+
+.forensic-nav-link.is-active {
+  border-color: var(--surface-border-active);
+  background: var(--token-interactive-active);
+  color: var(--text-heading);
+}
+
+.forensic-nav-link.is-active .material-symbols-rounded {
+  color: var(--token-brand-blueprint);
+}
+
+@media (max-width: 1024px) {
+  .chat-fallback-wrap {
+    padding: 0 var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .jobs-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-scope-label {
+    width: 100%;
+  }
+
+  .search-clear-btn {
+    margin-left: 0;
+  }
+
+  .job-link-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

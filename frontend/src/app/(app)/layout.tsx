@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
-import { AppShell } from "@/shell/components/AppShell";
+import { ForensicShell } from "@/shell/components/ForensicShell";
 
 type AppLayoutProps = {
   children: ReactNode;
 };
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  return <AppShell>{children}</AppShell>;
+  return <ForensicShell>{children}</ForensicShell>;
 }

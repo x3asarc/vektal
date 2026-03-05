@@ -1,0 +1,87 @@
+:root {
+  /* Handshake from images/design-tokens-v2.json */
+  --token-theme-identity: "Orbital Forensics / Brutalist Archive v2";
+
+  --token-brand-primary: #a0a0ff;
+  --token-brand-primary-dim: rgba(160, 160, 255, 0.1);
+  --token-brand-secondary: #00ff9d;
+  --token-brand-warning: #ff4d4d;
+  --token-brand-blueprint: #e0e0e0;
+
+  --token-surface-void: #020203;
+  --token-surface-panel: #0a0a0b;
+  --token-surface-card: #121214;
+  --token-surface-border: #27272a;
+  --token-surface-border-active: #3f3f46;
+
+  --token-text-heading: #f8fafc;
+  --token-text-body: #94a3b8;
+  --token-text-mono: #a1a1aa;
+  --token-text-datestamp: #52525b;
+
+  --token-interactive-hover: rgba(160, 160, 255, 0.08);
+  --token-interactive-active: rgba(160, 160, 255, 0.15);
+  --token-focus-ring: 0 0 0 1px #a0a0ff;
+
+  --token-space-unit: 4px;
+  --token-space-grid-gap: 1px;
+  --token-space-dense: 8px;
+  --token-space-standard: 16px;
+  --token-space-comfortable: 24px;
+
+  --token-font-family: "JetBrains Mono", "IBM Plex Mono", monospace;
+  --token-font-micro: 0.65rem;
+  --token-font-xs: 0.75rem;
+  --token-font-sm: 0.875rem;
+  --token-font-base: 1rem;
+  --token-font-lg: 1.25rem;
+  --token-font-xl: 1.5rem;
+  --token-weight-light: 300;
+  --token-weight-regular: 400;
+  --token-weight-medium: 500;
+  --token-tracking-tight: -0.02em;
+  --token-tracking-wide: 0.05em;
+  --token-tracking-widest: 0.1em;
+
+  --token-border-width: 1px;
+  --token-border-style: solid;
+  --token-border-radius: 0;
+
+  --motion-duration-instant: 0ms;
+  --motion-duration-fast: 140ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 360ms;
+  --motion-duration-slower: 600ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --motion-easing-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-easing-exit: cubic-bezier(0.7, 0, 0.84, 0);
+
+  --token-texture-grid-void:
+    linear-gradient(to right, #18181b 1px, transparent 1px),
+    linear-gradient(to bottom, #18181b 1px, transparent 1px);
+  --token-texture-pixel-dust: radial-gradient(circle, #a0a0ff 1px, transparent 1px);
+
+  /* Back-compat aliases for older styles still in the app */
+  --brand-primary: var(--token-brand-primary);
+  --brand-primary-dim: var(--token-brand-primary-dim);
+  --brand-secondary: var(--token-brand-secondary);
+  --brand-warning: var(--token-brand-warning);
+  --surface-void: var(--token-surface-void);
+  --surface-panel: var(--token-surface-panel);
+  --surface-card: var(--token-surface-card);
+  --surface-border: var(--token-surface-border);
+  --surface-border-active: var(--token-surface-border-active);
+  --text-heading: var(--token-text-heading);
+  --text-body: var(--token-text-body);
+  --text-mono: var(--token-text-mono);
+  --text-dim: var(--token-text-datestamp);
+  --focus-ring: var(--token-focus-ring);
+
+  --text: var(--token-text-heading);
+  --muted: var(--token-text-body);
+  --warning: var(--token-brand-warning);
+  --error: var(--token-brand-warning);
+  --ok: var(--token-brand-secondary);
+  --border: var(--token-surface-border);
+}

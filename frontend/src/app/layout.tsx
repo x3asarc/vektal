@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import "@/app/globals.css";
+import "@/app/design-tokens.css";
+import "@/app/forensic-theme.css";
+import "@/app/forensic-workspaces.css";
+import "@/app/forensic-pages.css";
 import { Providers } from "@/shell/providers";
 
 export const metadata: Metadata = {
@@ -19,7 +23,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;700&display=swap"
           rel="stylesheet"
         />
         <link
@@ -27,7 +31,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           rel="stylesheet"
         />
       </head>
-      <body suppressHydrationWarning style={{ background: "#0a0a0f" }}>
+      <body suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>
