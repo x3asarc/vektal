@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$Domain = "app.vektal.systems",
-  [string]$ExpectedIPv4 = "89.167.74.58",
+  [string]$ExpectedIPv4 = "",
   [string]$ExpectedIPv6 = "",
   [string]$OutputPath = ""
 )
@@ -77,6 +77,10 @@ Add-Line "timestamp_utc=$(Get-Date -Format o)"
 Add-Line "domain=$Domain"
 Add-Line "expected_ipv4=$ExpectedIPv4"
 Add-Line "expected_ipv6=$ExpectedIPv6"
+
+if ([string]::IsNullOrWhiteSpace($ExpectedIPv4)) {
+  Add-Line "note=ExpectedIPv4 not provided; DNS mismatch checks are advisory only."
+}
 
 Run-Capture "Local DNS A" {
   Resolve-DnsName $Domain -Type A |

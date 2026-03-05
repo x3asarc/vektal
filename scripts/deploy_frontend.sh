@@ -1,57 +1,58 @@
 #!/bin/bash
-# Manual deployment script for Vektal frontend
+# Manual deployment script for Vektal frontend.
 # Usage: ./scripts/deploy_frontend.sh [production|staging]
 
-set -e
+set -euo pipefail
 
 ENVIRONMENT="${1:-production}"
 DOCKER_TAG="vektal-frontend:${ENVIRONMENT}"
+PROJECT_NAME="${PROJECT_NAME:-vektal}"
+PUBLIC_DOMAIN="${PUBLIC_DOMAIN:-app.vektal.systems}"
 
 echo "========================================="
 echo "Vektal Frontend Deployment"
 echo "========================================="
 echo "Environment: $ENVIRONMENT"
 echo "Docker Tag: $DOCKER_TAG"
+echo "Domain: $PUBLIC_DOMAIN"
 echo ""
 
-# Step 1: Build the Docker image
-echo "[1/3] Building Docker image..."
+echo "[1/4] Building Docker image..."
 docker build -f Dockerfile.frontend -t "$DOCKER_TAG" .
-echo "✓ Docker image built successfully"
+echo "[OK] Docker image built successfully"
 echo ""
 
-# Step 2: Test the build
-echo "[2/3] Testing build artifacts..."
+echo "[2/4] Testing build artifacts..."
 docker images | grep vektal-frontend
-echo "✓ Build artifacts verified"
+echo "[OK] Build artifacts verified"
 echo ""
 
-# Step 3: Deployment instructions
-echo "[3/3] Deployment options:"
-echo ""
-echo "Option A - Local Test:"
+echo "[3/4] Deployment options:"
+echo "Option A - Local test:"
 echo "  docker run -p 3000:3000 -e NODE_ENV=production $DOCKER_TAG"
 echo "  Then visit: http://localhost:3000"
 echo ""
-echo "Option B - Push to Registry:"
-echo "  docker tag $DOCKER_TAG registry.your-server.com/vektal-frontend:latest"
-echo "  docker push registry.your-server.com/vektal-frontend:latest"
+echo "Option B - Stack rollout:"
+echo "  docker compose up -d nginx backend frontend --build"
+echo "  curl -I https://$PUBLIC_DOMAIN/health"
 echo ""
-echo "Option C - Dokploy Manual Trigger:"
+echo "Option C - Dokploy manual trigger:"
 echo "  1. Log into Dokploy dashboard"
-echo "  2. Select 'vektal' project"
-echo "  3. Click 'Deploy' button"
+echo "  2. Select '$PROJECT_NAME' project"
+echo "  3. Trigger deploy"
 echo ""
 
-if [ -n "$DOKPLOY_WEBHOOK_URL" ]; then
-    echo "Option D - Webhook Trigger:"
-    curl -X POST "$DOKPLOY_WEBHOOK_URL" \
-        -H "Content-Type: application/json" \
-        -d '{"ref":"refs/heads/master","repository":{"full_name":"x3asarc/vektal"}}'
-    echo "✓ Webhook triggered"
+if [ -n "${DOKPLOY_WEBHOOK_URL:-}" ]; then
+  echo "[4/4] Triggering Dokploy webhook..."
+  curl -X POST "$DOKPLOY_WEBHOOK_URL" \
+    -H "Content-Type: application/json" \
+    -d '{"ref":"refs/heads/master","repository":{"full_name":"x3asarc/vektal"}}'
+  echo "[OK] Webhook triggered"
+else
+  echo "[4/4] DOKPLOY_WEBHOOK_URL not set. Skipping webhook trigger."
 fi
 
 echo ""
 echo "========================================="
-echo "Deployment preparation complete!"
+echo "Deployment preparation complete"
 echo "========================================="
