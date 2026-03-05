@@ -42,7 +42,15 @@ export function ForensicShell({ children }: ForensicShellProps) {
           ))}
         </nav>
       </aside>
-      <section className="forensic-content">{children}</section>
+      <section className="forensic-content">
+        <aside className="forensic-about" aria-label="About Vektal">
+          <p className="forensic-about-title">About Vektal</p>
+          <p className="forensic-about-copy">
+            Vektal OS is the governed console for catalog forensics, enrichment, and approvals.
+          </p>
+        </aside>
+        {children}
+      </section>
     </div>
   );
 }
