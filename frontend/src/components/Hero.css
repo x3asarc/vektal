@@ -1,0 +1,291 @@
+/* Hero Section - Orbital Forensics / Brutalist Archive Theme */
+
+.hero-section {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - var(--sidebar-width, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+  background: var(--token-surface-panel, #020203);
+  overflow: hidden;
+}
+
+/* Background: Subtle grid pattern (terminal aesthetic) */
+.hero-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 80%);
+  pointer-events: none;
+}
+
+/* Background: Radial glow (subtle atmospheric depth) */
+.hero-bg-glow {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(160, 160, 255, 0.06) 0%, transparent 65%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Content container */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 52rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(1rem, 3vw, 1.5rem);
+  animation: hero-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .hero-content {
+    animation: hero-fade-in 0.3s ease-out backwards;
+  }
+
+  @keyframes hero-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* Headline: Large monospace display */
+.hero-headline {
+  font-family: var(--token-font-family, "JetBrains Mono", "IBM Plex Mono", monospace);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--token-text-heading, #F8FAFC);
+  margin: 0;
+  animation: hero-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+}
+
+/* Subheadline: Technical descriptor */
+.hero-subheadline {
+  font-family: var(--token-font-family, "JetBrains Mono", "IBM Plex Mono", monospace);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--token-text-body, #A1A1AA);
+  margin: 0;
+  max-width: 42rem;
+  animation: hero-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+}
+
+/* CTA wrapper */
+.hero-cta-wrapper {
+  margin-top: clamp(0.75rem, 2vw, 1.25rem);
+  animation: hero-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
+}
+
+/* CTA Button: Brutalist terminal-style */
+.hero-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.75rem;
+  background: var(--token-brand-primary, #A0A0FF);
+  color: var(--token-text-inverse, #020203);
+  font-family: var(--token-font-family, "JetBrains Mono", "IBM Plex Mono", monospace);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--token-brand-primary, #A0A0FF);
+  border-radius: var(--token-border-radius, 0);
+  cursor: pointer;
+  transition:
+    background var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+    border-color var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+    color var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1)),
+    transform var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  position: relative;
+}
+
+.hero-cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, var(--token-brand-primary, #A0A0FF), var(--token-brand-secondary, #00FF9D));
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+  z-index: -1;
+  border-radius: var(--token-border-radius, 0);
+}
+
+.hero-cta-btn:hover {
+  background: var(--token-brand-secondary, #00FF9D);
+  border-color: var(--token-brand-secondary, #00FF9D);
+  color: var(--token-text-inverse, #020203);
+  transform: translateY(-2px);
+}
+
+.hero-cta-btn:hover::before {
+  opacity: 0.4;
+}
+
+.hero-cta-btn:focus-visible {
+  outline: 2px solid var(--token-brand-primary, #A0A0FF);
+  outline-offset: 3px;
+}
+
+.hero-cta-btn:active {
+  transform: translateY(0);
+}
+
+/* Reduced motion: remove transforms */
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta-btn {
+    transition: background 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out;
+  }
+
+  .hero-cta-btn:hover {
+    transform: none;
+  }
+
+  .hero-cta-btn:active {
+    transform: none;
+  }
+}
+
+.hero-cta-text {
+  display: inline-block;
+}
+
+.hero-cta-icon {
+  font-size: 1.125rem;
+  transition: transform var(--motion-duration-fast, 140ms) var(--motion-easing-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.hero-cta-btn:hover .hero-cta-icon {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cta-btn:hover .hero-cta-icon {
+    transform: none;
+  }
+}
+
+/* Status indicator (system health badge) */
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--token-surface-border, #27272A);
+  border-radius: var(--token-border-radius, 0);
+  font-family: var(--token-font-family, "JetBrains Mono", "IBM Plex Mono", monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--token-text-body, #A1A1AA);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: hero-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
+}
+
+.hero-status-indicator {
+  width: 6px;
+  height: 6px;
+  background: var(--token-brand-secondary, #00FF9D);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--token-brand-secondary, #00FF9D);
+  animation: hero-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hero-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-status-indicator {
+    animation: none;
+  }
+}
+
+.hero-status-text {
+  display: inline-block;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1.25rem;
+  }
+
+  .hero-headline {
+    font-size: 2rem;
+  }
+
+  .hero-subheadline {
+    font-size: 0.95rem;
+  }
+
+  .hero-cta-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+  }
+
+  .hero-status {
+    font-size: 0.68rem;
+    padding: 0.45rem 0.875rem;
+  }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-section {
+    padding: 3rem 2rem;
+  }
+}
+
+/* Accessibility: High contrast mode support */
+@media (prefers-contrast: high) {
+  .hero-headline {
+    color: #FFFFFF;
+  }
+
+  .hero-cta-btn {
+    border-width: 2px;
+  }
+
+  .hero-bg-grid,
+  .hero-bg-glow {
+    display: none;
+  }
+}
