@@ -17,7 +17,8 @@ echo "Repo: $REPO_PATH"
 echo "Domain: $PUBLIC_DOMAIN"
 echo ""
 
-ssh root@"$SERVER_IP" <<ENDSSH
+ssh root@"$SERVER_IP" \
+  "REPO_PATH='$REPO_PATH' PROJECT_NAME='$PROJECT_NAME' PUBLIC_DOMAIN='$PUBLIC_DOMAIN' bash -s" <<'ENDSSH'
 set -euo pipefail
 
 echo "[1/5] Navigating to project directory..."
@@ -58,11 +59,11 @@ for attempt in 1 2 3 4 5 6; do
     PUBLIC_OK=1
     break
   fi
-  echo "[WARN] Public health probe failed (attempt \\$attempt/6). Retrying in 10s..."
+  echo "[WARN] Public health probe failed (attempt $attempt/6). Retrying in 10s..."
   sleep 10
 done
 
-if [ "\\$PUBLIC_OK" -eq 1 ]; then
+if [ "$PUBLIC_OK" -eq 1 ]; then
   echo "[OK] Public gateway health"
 else
   echo "[ERROR] Public gateway health probe failed after retries."
