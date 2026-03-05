@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ActionCard } from "@/features/chat/components/ActionCard";
 import { MessageBlockRenderer } from "@/features/chat/components/MessageBlockRenderer";
 import { useChatSession } from "@/features/chat/hooks/useChatSession";
+import { OperationalErrorCard } from "@/components/OperationalErrorCard";
+import { stableDiagnosticId } from "@/lib/diagnostics";
 
 function parseSkuCsv(input: string): string[] {
   return input
@@ -25,6 +27,7 @@ export function ChatWorkspace() {
   const [messageInput, setMessageInput] = useState("");
   const [bulkSkuInput, setBulkSkuInput] = useState("");
   const [showBulk, setShowBulk] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const autoSentRef = useRef(false);
 
   // Auto-send ?q= param arriving from dashboard prompt input
@@ -86,12 +89,23 @@ export function ChatWorkspace() {
     setBulkSkuInput("");
   }
 
+  const combinedError = chat.streamError || chat.error;
+  const diagnosticId = combinedError ? stableDiagnosticId(combinedError) : null;
+
+  async function handleRetrySession() {
+    if (chat.session) {
+      await chat.refresh();
+      return;
+    }
+    window.location.reload();
+  }
+
   return (
     <div className="chat-page" data-testid="chat-workspace">
       {/* Header bar */}
       <header className="chat-page-header">
         <h1 className="chat-page-title">
-          <span className="material-symbols-rounded filled-icon" style={{ marginRight: 8 }}>auto_awesome</span>
+          <span className="material-symbols-rounded filled-icon title-icon">auto_awesome</span>
           AI Assistant
         </h1>
         <div className="chat-page-meta">
@@ -102,14 +116,14 @@ export function ChatWorkspace() {
             State: <strong>&nbsp;{chat.session?.state ?? "at_door"}</strong>
           </span>
           <span className="chat-page-badge">
-            Stream: <strong>&nbsp;{chat.streamMode}{chat.streamDegraded ? " ⚠" : ""}</strong>
+            Stream: <strong>&nbsp;{chat.streamMode}{chat.streamDegraded ? " !" : ""}</strong>
           </span>
         </div>
       </header>
 
       {/* Route fallback notice */}
       {latestRouteNotice && (
-        <div style={{ padding: "0 32px" }}>
+        <div className="chat-fallback-wrap">
           <aside className="chat-fallback-notice" data-testid="safe-tier-fallback">
             <strong>Fallback stage:</strong> {latestRouteNotice.fallbackStage}
             {latestRouteNotice.suggestedEscalation && (
@@ -124,7 +138,7 @@ export function ChatWorkspace() {
         <div className="chat-page-timeline">
           <div className="chat-page-empty">
             <span className="material-symbols-rounded">hourglass_empty</span>
-            <p>Loading session…</p>
+            <p>Loading session...</p>
           </div>
         </div>
       ) : (
@@ -144,7 +158,7 @@ export function ChatWorkspace() {
               >
                 <header>
                   <strong>{message.role}</strong>
-                  {message.pending && <span className="muted"> pending…</span>}
+                  {message.pending && <span className="muted"> pending...</span>}
                 </header>
                 {(!hasAssistantTextBlock(message) || message.role === "user") && <p>{message.content}</p>}
                 {message.role !== "user" && message.blocks.length > 0 && (
@@ -157,7 +171,7 @@ export function ChatWorkspace() {
           {/* Action cards inside timeline */}
           {!chat.loading && chat.actions.length > 0 && (
             <section className="chat-actions" data-testid="chat-actions">
-              <h2 style={{ fontSize: "0.78rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.08em", margin: "8px 0 4px" }}>
+              <h2 className="chat-section-title">
                 Action Controls
               </h2>
               {chat.actions.map((action) => (
@@ -178,8 +192,31 @@ export function ChatWorkspace() {
       {/* Footer: composer + bulk */}
       {!chat.loading && (
         <footer className="chat-page-footer">
-          {chat.streamError && <p className="chat-error" style={{ margin: 0 }}>{chat.streamError}</p>}
-          {chat.error && <p className="chat-error" style={{ margin: 0 }}>{chat.error}</p>}
+          {combinedError ? (
+            <OperationalErrorCard
+              title="Assistant transport degraded"
+              detail={combinedError}
+              diagnosticId={diagnosticId ?? undefined}
+              retryLabel="Retry session bootstrap"
+              onRetry={() => { void handleRetrySession(); }}
+              secondaryLabel={showDiagnostics ? "Hide diagnostics" : "Show diagnostics"}
+              onSecondaryAction={() => setShowDiagnostics((value) => !value)}
+            />
+          ) : null}
+
+          {showDiagnostics ? (
+            <section className="chat-diagnostics panel">
+              <h2 className="forensic-card-title forensic-zero-top">Stream Diagnostics</h2>
+              <div className="chat-diagnostics-grid">
+                <span>Session ID: <strong>{chat.session?.id ?? "none"}</strong></span>
+                <span>Mode: <strong>{chat.streamMode}</strong></span>
+                <span>Degraded: <strong>{chat.streamDegraded ? "yes" : "no"}</strong></span>
+                <span>Messages: <strong>{chat.messages.length}</strong></span>
+                <span>Actions: <strong>{chat.actions.length}</strong></span>
+                <span>State: <strong>{chat.session?.state ?? "at_door"}</strong></span>
+              </div>
+            </section>
+          ) : null}
 
           {/* Glass message composer */}
           <form className="chat-glass-composer" onSubmit={(event) => { void handleSendMessage(event); }}>
@@ -188,7 +225,7 @@ export function ChatWorkspace() {
               rows={2}
               value={messageInput}
               onChange={(event) => setMessageInput(event.target.value)}
-              placeholder="Describe a SKU update, e.g. set SKU-100 price to 12.99…"
+              placeholder="Describe a SKU update, e.g. set SKU-100 price to 12.99..."
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -203,7 +240,7 @@ export function ChatWorkspace() {
                 className="chat-bulk-toggle"
                 onClick={() => setShowBulk((v) => !v)}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>list_alt</span>
+                <span className="material-symbols-rounded">list_alt</span>
                 Bulk SKUs
               </button>
               <button
@@ -212,15 +249,15 @@ export function ChatWorkspace() {
                 disabled={chat.submitting || !messageInput.trim()}
                 title="Send"
               >
-                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_upward</span>
+                <span className="material-symbols-rounded">arrow_upward</span>
               </button>
             </div>
           </form>
 
           {/* Bulk form (collapsible) */}
           {showBulk && (
-            <form className="chat-glass-composer" onSubmit={(event) => { void handleBulkSubmit(event); }} style={{ gap: 8 }}>
-              <label style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 500 }}>
+            <form className="chat-glass-composer chat-bulk-form" onSubmit={(event) => { void handleBulkSubmit(event); }}>
+              <label className="chat-bulk-label">
                 Bulk SKUs (comma or newline separated)
               </label>
               <textarea
@@ -230,14 +267,13 @@ export function ChatWorkspace() {
                 onChange={(event) => setBulkSkuInput(event.target.value)}
                 placeholder={"SKU-100\nSKU-200\nSKU-300"}
               />
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <div className="chat-bulk-actions">
                 <button
-                  className="btn-ghost"
                   type="submit"
                   disabled={chat.submitting || parseSkuCsv(bulkSkuInput).length === 0}
-                  style={{ fontSize: "0.78rem" }}
+                  className="btn-ghost chat-bulk-submit"
                 >
-                  {chat.submitting ? "Submitting…" : `Create bulk action (${parseSkuCsv(bulkSkuInput).length} SKUs)`}
+                  {chat.submitting ? "Submitting..." : `Create bulk action (${parseSkuCsv(bulkSkuInput).length} SKUs)`}
                 </button>
               </div>
             </form>

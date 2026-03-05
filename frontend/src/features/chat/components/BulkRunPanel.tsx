@@ -40,8 +40,8 @@ export function BulkRunPanel({ action }: BulkRunPanelProps) {
 
   return (
     <section className="panel chat-bulk-panel" data-testid="bulk-run-panel">
-      <h3>Bulk Run</h3>
-      <p className="muted">
+      <h3 className="forensic-card-title">Bulk Run</h3>
+      <p className="forensic-card-copy">
         {totalSkus} SKU(s) across {chunkCount} chunk(s). Status: <strong>{action.status}</strong>
       </p>
       <div className="chat-bulk-summary">
@@ -70,7 +70,9 @@ export function BulkRunPanel({ action }: BulkRunPanelProps) {
           return (
             <div key={chunkId} className="chat-bulk-chunk" data-chunk-status={status}>
               <strong>{chunkId}</strong>
-              <span>{status}</span>
+              <span className="forensic-state-tag" data-state={status === "completed" ? "ok" : status === "blocked" ? "blocked" : "warning"}>
+                {status}
+              </span>
               <span>A:{rowApplied}</span>
               <span>C:{rowConflicted}</span>
               <span>F:{rowFailed}</span>

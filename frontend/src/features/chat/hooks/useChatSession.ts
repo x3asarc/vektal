@@ -97,6 +97,18 @@ function isChatActionStatus(value: unknown): value is ChatActionStatus {
   );
 }
 
+function collectActionIds(messages: ChatMessage[]): number[] {
+  const actionIds = new Set<number>();
+  for (const message of messages) {
+    for (const block of message.blocks ?? []) {
+      if (block.type !== "action") continue;
+      const id = block.data?.action_id;
+      if (typeof id === "number") actionIds.add(id);
+    }
+  }
+  return [...actionIds];
+}
+
 export function useChatSession(): UseChatSessionResult {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [session, setSession] = useState<ChatSession | null>(null);
@@ -111,6 +123,7 @@ export function useChatSession(): UseChatSessionResult {
   const refresh = useCallback(async () => {
     if (!sessionId) return;
     const messageList = await listChatMessages(sessionId, 150);
+    const actionIds = collectActionIds(messageList.messages);
     setMessages((previous) => {
       let next = [...previous];
       for (const msg of messageList.messages) {
@@ -121,20 +134,18 @@ export function useChatSession(): UseChatSessionResult {
         .sort((a, b) => a.id - b.id);
     });
 
+    if (actionIds.length === 0) return;
+
+    const responses = await Promise.allSettled(
+      actionIds.map((actionId) => getChatAction(sessionId, actionId)),
+    );
     setActionsById((previous) => {
-      const actionIds = new Set<number>();
-      for (const msg of messageList.messages) {
-        const blocks = msg.blocks ?? [];
-        for (const block of blocks) {
-          if (block.type !== "action") continue;
-          const raw = block.data?.action_id;
-          if (typeof raw === "number") actionIds.add(raw);
-        }
+      let next = new Map(previous);
+      for (const response of responses) {
+        if (response.status !== "fulfilled") continue;
+        next = upsertActionMap(next, response.value);
       }
-      for (const actionId of previous.keys()) {
-        actionIds.add(actionId);
-      }
-      return new Map(previous);
+      return next;
     });
   }, [sessionId]);
 
@@ -210,6 +221,23 @@ export function useChatSession(): UseChatSessionResult {
         const messageList = await listChatMessages(active.id, 150);
         if (cancelled) return;
         setMessages(messageList.messages.sort((a, b) => a.id - b.id));
+        const actionIds = collectActionIds(messageList.messages);
+        if (actionIds.length > 0) {
+          const responses = await Promise.allSettled(
+            actionIds.map((actionId) => getChatAction(active.id, actionId)),
+          );
+          if (cancelled) return;
+          setActionsById(() => {
+            let next = new Map<number, ChatAction>();
+            for (const response of responses) {
+              if (response.status !== "fulfilled") continue;
+              next = upsertActionMap(next, response.value);
+            }
+            return next;
+          });
+        } else {
+          setActionsById(new Map());
+        }
         setError(null);
       } catch (reason: unknown) {
         if (cancelled) return;

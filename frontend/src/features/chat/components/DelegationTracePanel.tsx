@@ -37,7 +37,7 @@ export function DelegationTracePanel({ trace }: DelegationTracePanelProps) {
     <section className="panel delegation-trace" data-testid="delegation-trace">
       <button
         type="button"
-        className="delegation-trace-toggle"
+        className="btn-ghost delegation-trace-toggle"
         onClick={() => setExpanded((prev) => !prev)}
       >
         {expanded ? "Hide Trace" : "View Trace"} - {summary}

@@ -67,9 +67,11 @@ export function ActionCard({
         <h3>
           Action #{action.id} <span className="muted">({action.action_type})</span>
         </h3>
-        <span className="chat-action-status">{action.status}</span>
+        <span className="forensic-state-tag" data-state={canApply ? "approved" : requiresDecision ? "warning" : "ok"}>
+          {action.status}
+        </span>
       </header>
-      <p className="muted">
+      <p className="forensic-card-copy">
         Dry-run preview is mandatory before apply. Approve at product scope, then apply.
       </p>
       {warningText && (
@@ -85,6 +87,7 @@ export function ActionCard({
           onChange={(event) => setComment(event.target.value)}
         />
         <button
+          className="btn-ghost"
           type="button"
           disabled={!canApprove || submitting}
           onClick={() => void onApprove(action.id, comment || undefined)}
@@ -92,6 +95,7 @@ export function ActionCard({
           {submitting ? "Approving..." : "Approve"}
         </button>
         <button
+          className="btn-primary"
           type="button"
           disabled={!canApply || submitting}
           onClick={() => void onApply(action.id)}
@@ -100,6 +104,7 @@ export function ActionCard({
         </button>
         {onDelegate && (
           <button
+            className="btn-ghost"
             type="button"
             disabled={submitting}
             onClick={() => void onDelegate(action.id)}

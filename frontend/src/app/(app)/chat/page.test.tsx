@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHAT_WORKSPACE_SECTIONS } from "@/app/(app)/chat/page";
+import { CHAT_WORKSPACE_SECTIONS } from "@/app/(app)/chat/sections";
 
 describe("chat page contract", () => {
   it("declares required workspace sections", () => {
