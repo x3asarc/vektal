@@ -21,6 +21,22 @@ export default function LoginPage() {
   const [existingSessionMessage, setExistingSessionMessage] = useState<string | null>(
     null,
   );
+  const [resettingSession, setResettingSession] = useState(false);
+
+  async function resetStaleSession() {
+    setResettingSession(true);
+    setError(null);
+    try {
+      await apiRequest<{ success: boolean }>("/api/v1/auth/logout", { method: "POST" });
+    } catch {
+      // Best effort reset.
+    } finally {
+      setGuardFlags({ A: false, V: false, S: false });
+      setExistingSessionTarget(null);
+      setExistingSessionMessage(null);
+      setResettingSession(false);
+    }
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -55,7 +71,6 @@ export default function LoginPage() {
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        // Only clear auth flags on definitive auth failures.
         if (err instanceof ApiClientError && (err.normalized.status === 401 || err.normalized.status === 403)) {
           setGuardFlags({ A: false, V: false, S: false });
         }
@@ -72,8 +87,8 @@ export default function LoginPage() {
       <div className="auth-page">
         <div className="auth-glow" aria-hidden />
         <div className="auth-card">
-          <p className="muted" style={{ textAlign: "center", fontSize: "0.875rem" }}>
-            Checking session…
+          <p className="muted forensic-center-muted">
+            Checking session...
           </p>
         </div>
       </div>
@@ -85,25 +100,22 @@ export default function LoginPage() {
       <div className="auth-glow" aria-hidden />
 
       <div className="auth-card">
-        {/* Logo */}
         <div className="auth-logo">
           <div className="auth-logo-icon">
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>asterisk</span>
+            <span className="material-symbols-rounded auth-icon">asterisk</span>
           </div>
           <span className="auth-logo-text">Platform</span>
         </div>
 
-        {/* Heading */}
         <div>
           <h1 className="auth-heading">Sign in</h1>
           <p className="auth-subheading">Enter your credentials to continue.</p>
         </div>
 
-        {/* Existing session notice */}
-        {existingSessionMessage && (
+        {existingSessionMessage ? (
           <div className="auth-notice">
-            <p style={{ margin: 0 }}>{existingSessionMessage}</p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <p className="auth-message">{existingSessionMessage}</p>
+            <div className="auth-notice-actions">
               <button
                 className="btn-primary"
                 type="button"
@@ -116,26 +128,17 @@ export default function LoginPage() {
               <button
                 className="btn-ghost"
                 type="button"
-                disabled={loading}
+                disabled={loading || resettingSession}
                 onClick={() => {
-                  setError(null);
-                  setLoading(true);
-                  void apiRequest<{ success: boolean }>("/api/v1/auth/logout", { method: "POST" })
-                    .finally(() => {
-                      setGuardFlags({ A: false, V: false, S: false });
-                      setExistingSessionTarget(null);
-                      setExistingSessionMessage(null);
-                      setLoading(false);
-                    });
+                  void resetStaleSession();
                 }}
               >
-                Use different account
+                {resettingSession ? "Resetting..." : "Use different account"}
               </button>
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Login form */}
         <form
           className="auth-form"
           onSubmit={(event) => {
@@ -185,45 +188,58 @@ export default function LoginPage() {
               id="password"
               type="password"
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder="........"
               value={password}
               onChange={(e) => setPassword(e.currentTarget.value)}
               required
             />
           </div>
-          {error && <p className="auth-error">{error}</p>}
+          {error ? <p className="auth-error">{error}</p> : null}
           <button className="auth-submit-btn" type="submit" disabled={loading}>
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
+          <div className="auth-notice-actions">
+            <button
+              className="btn-ghost"
+              type="button"
+              disabled={resettingSession || loading}
+              onClick={() => { void resetStaleSession(); }}
+            >
+              {resettingSession ? "Resetting..." : "Reset stale session"}
+            </button>
+            <button
+              className="btn-ghost"
+              type="button"
+              onClick={() => router.replace("/auth/verify")}
+            >
+              Need email verification?
+            </button>
+          </div>
         </form>
 
-        {/* Dev controls */}
-        {devBypassEnabled && (
+        {devBypassEnabled ? (
           <div>
             <div className="auth-divider">dev only</div>
-            <div className="auth-dev-section" style={{ marginTop: 12 }}>
+            <div className="auth-dev-section">
               <p className="auth-dev-label">Developer Session Controls</p>
               <div className="auth-dev-buttons">
                 <button
-                  className="btn-ghost"
+                  className="btn-ghost auth-dev-pill"
                   type="button"
-                  style={{ fontSize: "0.72rem", padding: "5px 10px" }}
                   onClick={() => { setGuardFlags({ A: true, V: false, S: false }); router.replace("/auth/verify"); }}
                 >
                   Unverified
                 </button>
                 <button
-                  className="btn-ghost"
+                  className="btn-ghost auth-dev-pill"
                   type="button"
-                  style={{ fontSize: "0.72rem", padding: "5px 10px" }}
                   onClick={() => { setGuardFlags({ A: true, V: true, S: false }); router.replace("/onboarding"); }}
                 >
                   Verified
                 </button>
                 <button
-                  className="btn-ghost"
+                  className="btn-ghost auth-dev-pill"
                   type="button"
-                  style={{ fontSize: "0.72rem", padding: "5px 10px" }}
                   onClick={() => { setGuardFlags({ A: true, V: true, S: true }); router.replace("/dashboard"); }}
                 >
                   Full access
@@ -231,7 +247,7 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

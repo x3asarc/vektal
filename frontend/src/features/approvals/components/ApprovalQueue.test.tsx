@@ -43,7 +43,8 @@ describe("ApprovalQueue", () => {
       expect(fetchMock).toHaveBeenCalledWith("/api/v1/approvals/");
     });
     expect(screen.getByText("Fix Redis reconnect policy")).toBeInTheDocument();
-    expect(screen.getByText("82%")).toBeInTheDocument();
+    expect(screen.getByText("low")).toBeInTheDocument();
+    expect(screen.getByText("14")).toBeInTheDocument();
   });
 
   it("approves an item and removes it from the list", async () => {

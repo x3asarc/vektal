@@ -6,12 +6,12 @@ export default function SettingsPage() {
     <div className="page-wrap settings-page">
       <div className="page-header">
         <h1 className="page-title">
-          <span className="material-symbols-rounded" style={{ marginRight: 8 }}>settings</span>
+          <span className="material-symbols-rounded title-icon">settings</span>
           Settings
         </h1>
         <p className="page-subtitle">Strategy configuration and rule management.</p>
       </div>
-      <div className="page-body" style={{ maxWidth: 720 }}>
+      <div className="page-body page-body--narrow">
         <StrategyQuiz />
         <RuleSuggestionsInbox />
       </div>
