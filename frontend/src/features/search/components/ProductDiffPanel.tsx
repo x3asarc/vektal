@@ -29,29 +29,30 @@ function asText(value: unknown): string {
 export function ProductDiffPanel({ rows }: ProductDiffPanelProps) {
   return (
     <section className="panel" data-testid="product-diff-panel">
-      <h2>Side-by-Side Diff</h2>
-      <p className="muted">Review before/after values before approval.</p>
+      <h2 className="forensic-card-title">Side-by-Side Diff</h2>
+      <p className="forensic-card-copy">Review before/after values before approval.</p>
       {rows.length === 0 ? (
-        <p className="muted">No pending diff rows.</p>
+        <p className="forensic-card-copy">No pending diff rows.</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="forensic-table-wrap">
+          <table className="forensic-table">
           <thead>
             <tr>
-              <th style={{ textAlign: "left", padding: 8 }}>Field</th>
-              <th style={{ textAlign: "left", padding: 8 }}>Before</th>
-              <th style={{ textAlign: "left", padding: 8 }}>After</th>
-              <th style={{ textAlign: "left", padding: 8 }}>Policy</th>
+              <th>Field</th>
+              <th>Before</th>
+              <th>After</th>
+              <th>Policy</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.field}>
-                <td style={{ borderTop: "1px solid var(--border)", padding: 8 }}>{row.field}</td>
-                <td style={{ borderTop: "1px solid var(--border)", padding: 8 }}>{asText(row.before)}</td>
-                <td style={{ borderTop: "1px solid var(--border)", padding: 8 }}>{asText(row.after)}</td>
-                <td style={{ borderTop: "1px solid var(--border)", padding: 8 }}>
+                <td>{row.field}</td>
+                <td>{asText(row.before)}</td>
+                <td>{asText(row.after)}</td>
+                <td>
                   {row.altTextState ? (
-                    <span data-alt-text-state={row.altTextState}>{row.altTextState}</span>
+                    <span className="diff-state-chip" data-alt-text-state={row.altTextState}>{row.altTextState}</span>
                   ) : (
                     <span className="muted">n/a</span>
                   )}
@@ -60,6 +61,7 @@ export function ProductDiffPanel({ rows }: ProductDiffPanelProps) {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </section>
   );

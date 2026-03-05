@@ -66,11 +66,11 @@ export function SearchResultGrid({
 
   return (
     <section className="panel" data-testid="search-result-grid">
-      <h2>Results</h2>
-      <p className="muted">Columns can be toggled per session.</p>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+      <h2 className="forensic-card-title">Results</h2>
+      <p className="forensic-card-copy">Columns can be toggled per session.</p>
+      <div className="forensic-chip-row" style={{ marginBottom: 12 }}>
         {SEARCH_COLUMNS.map((column) => (
-          <label key={column.key} style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+          <label key={column.key} className="search-column-toggle">
             <input
               type="checkbox"
               checked={visibleColumns.has(column.key)}
@@ -88,28 +88,27 @@ export function SearchResultGrid({
             />
             <span>{column.label}</span>
             {column.protected ? (
-              <small data-protected-column="true" style={{ color: "var(--warning)" }}>
+              <small data-protected-column="true" className="search-column-lock">
                 Protected
               </small>
             ) : null}
           </label>
         ))}
       </div>
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="forensic-table-wrap">
+        <table className="forensic-table">
           <thead>
             <tr>
-              <th style={{ textAlign: "left", padding: 8 }}>Select</th>
+              <th>Select</th>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  style={{ textAlign: "left", padding: 8 }}
                   data-column-key={column.key}
                   data-editable={column.protected ? "false" : "true"}
                 >
                   {column.label}
                   {column.protected ? (
-                    <span style={{ color: "var(--warning)", marginLeft: 6 }}>(locked)</span>
+                    <span style={{ color: "var(--brand-warning)", marginLeft: 6 }}>(locked)</span>
                   ) : null}
                 </th>
               ))}
@@ -118,14 +117,14 @@ export function SearchResultGrid({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + 1} style={{ padding: 10 }}>
+                <td colSpan={columns.length + 1}>
                   No products found.
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
                 <tr key={row.id}>
-                  <td style={{ padding: 8 }}>
+                  <td>
                     <input
                       aria-label={`Select product ${row.id}`}
                       type="checkbox"
@@ -134,7 +133,7 @@ export function SearchResultGrid({
                     />
                   </td>
                   {columns.map((column) => (
-                    <td key={`${row.id}-${column.key}`} style={{ borderTop: "1px solid var(--border)", padding: 8 }}>
+                    <td key={`${row.id}-${column.key}`}>
                       {renderCellValue(row, column.key)}
                     </td>
                   ))}

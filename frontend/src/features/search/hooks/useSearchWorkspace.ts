@@ -60,14 +60,17 @@ export function useSearchWorkspace() {
 
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     setIsLoading(true);
     setError(null);
 
     void fetchProductSearch(request, controller.signal)
       .then((payload) => {
+        if (!active) return;
         setResponse(payload);
       })
       .catch((reason: unknown) => {
+        if (!active) return;
         if (reason instanceof ApiClientError) {
           setError(reason.normalized.detail);
         } else if (reason instanceof Error && reason.name !== "AbortError") {
@@ -77,10 +80,12 @@ export function useSearchWorkspace() {
         }
       })
       .finally(() => {
+        if (!active) return;
         setIsLoading(false);
       });
 
     return () => {
+      active = false;
       controller.abort();
     };
   }, [request]);

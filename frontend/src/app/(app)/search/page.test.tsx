@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SEARCH_PAGE_SECTIONS } from "@/app/(app)/search/page";
+import { SEARCH_PAGE_SECTIONS } from "@/app/(app)/search/sections";
 import { SEARCH_COLUMNS } from "@/features/search/components/SearchResultGrid";
 import {
   createSelectionFreeze,

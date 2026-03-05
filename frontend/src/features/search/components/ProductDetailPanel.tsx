@@ -18,17 +18,17 @@ export function ProductDetailPanel({ product }: ProductDetailPanelProps) {
   if (!product) {
     return (
       <section className="panel" data-testid="product-detail-panel">
-        <h2>Product Detail</h2>
-        <p className="muted">Select a product to inspect complete details.</p>
+        <h2 className="forensic-card-title">Product Detail</h2>
+        <p className="forensic-card-copy">Select a product to inspect complete details.</p>
       </section>
     );
   }
 
   return (
     <section className="panel" data-testid="product-detail-panel">
-      <h2>Product Detail</h2>
-      <p className="muted">Lineage-ready view for precision review.</p>
-      <dl style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 8, margin: 0 }}>
+      <h2 className="forensic-card-title">Product Detail</h2>
+      <p className="forensic-card-copy">Lineage-ready view for precision review.</p>
+      <dl className="search-detail-grid">
         <dt>ID</dt>
         <dd>{product.id}</dd>
         <dt>Title</dt>
@@ -44,10 +44,10 @@ export function ProductDetailPanel({ product }: ProductDetailPanelProps) {
         <dt>Price</dt>
         <dd>{typeof product.price === "number" ? `$${product.price.toFixed(2)}` : "-"}</dd>
       </dl>
-      <h3 style={{ marginBottom: 6 }}>Description</h3>
-      <p>{product.description ?? "-"}</p>
-      <h3 style={{ marginBottom: 6 }}>Tags</h3>
-      <p>{(product.tags ?? []).length > 0 ? (product.tags ?? []).join(", ") : "-"}</p>
+      <h3 className="forensic-card-title" style={{ marginTop: 8 }}>Description</h3>
+      <p className="forensic-card-copy">{product.description ?? "-"}</p>
+      <h3 className="forensic-card-title" style={{ marginTop: 8 }}>Tags</h3>
+      <p className="forensic-card-copy">{(product.tags ?? []).length > 0 ? (product.tags ?? []).join(", ") : "-"}</p>
     </section>
   );
 }

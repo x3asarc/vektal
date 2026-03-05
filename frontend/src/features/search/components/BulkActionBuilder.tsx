@@ -78,17 +78,17 @@ export function BulkActionBuilder({ selectedRows, selection }: BulkActionBuilder
 
   return (
     <section className="panel" data-testid="bulk-action-builder">
-      <h2>Bulk Action Builder</h2>
-      <p className="muted">
+      <h2 className="forensic-card-title">Bulk Action Builder</h2>
+      <p className="forensic-card-copy">
         Operation-first staging with admission checks before apply.
       </p>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 8 }}>
-        <label>
-          Supplier code
+      <form onSubmit={handleSubmit} className="forensic-control-grid">
+        <label className="forensic-field">
+          <span className="forensic-field-label">Supplier code</span>
           <input value={supplierCode} onChange={(event) => setSupplierCode(event.target.value)} />
         </label>
-        <label>
-          Operation
+        <label className="forensic-field">
+          <span className="forensic-field-label">Operation</span>
           <select value={operation} onChange={(event) => setOperation(event.target.value as (typeof OPERATIONS)[number])}>
             {OPERATIONS.map((item) => (
               <option key={item} value={item}>
@@ -97,8 +97,8 @@ export function BulkActionBuilder({ selectedRows, selection }: BulkActionBuilder
             ))}
           </select>
         </label>
-        <label>
-          Field
+        <label className="forensic-field">
+          <span className="forensic-field-label">Field</span>
           <select value={fieldName} onChange={(event) => setFieldName(event.target.value as (typeof MUTABLE_FIELDS)[number])}>
             {MUTABLE_FIELDS.map((item) => (
               <option key={item} value={item}>
@@ -107,12 +107,12 @@ export function BulkActionBuilder({ selectedRows, selection }: BulkActionBuilder
             ))}
           </select>
         </label>
-        <label>
-          Value
+        <label className="forensic-field">
+          <span className="forensic-field-label">Value</span>
           <input value={value} onChange={(event) => setValue(event.target.value)} />
         </label>
-        <label>
-          Alt-text policy
+        <label className="forensic-field">
+          <span className="forensic-field-label">Alt-text policy</span>
           <select
             value={altTextPolicy}
             onChange={(event) => setAltTextPolicy(event.target.value as "preserve" | "approved_overwrite")}
@@ -121,15 +121,15 @@ export function BulkActionBuilder({ selectedRows, selection }: BulkActionBuilder
             <option value="approved_overwrite">approved_overwrite</option>
           </select>
         </label>
-        <div>
+        <p className="bulk-builder-locked">
           <strong>Protected fields</strong>:{" "}
           {LOCKED_FIELDS.map((field) => (
-            <span key={field} data-protected-field={field} style={{ marginRight: 8 }}>
+            <code key={field} data-protected-field={field}>
               {field}
-            </span>
+            </code>
           ))}
-        </div>
-        <button type="submit" disabled={mutation.isPending || selectedIds.length === 0}>
+        </p>
+        <button className="btn-primary" type="submit" disabled={mutation.isPending || selectedIds.length === 0}>
           Stage action block
         </button>
       </form>
