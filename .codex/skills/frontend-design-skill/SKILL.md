@@ -1,175 +1,305 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics. Make sure to use this skill whenever the user wants to build, redesign, or improve any visual UI — even if they don't say "design" explicitly.
+description: Create distinctive, production-grade frontend interfaces with strong design quality and implementation rigor. Use when building or redesigning web UI, when `design-tokens-v2.json` is provided, or when `deployment-validator` returns FAIL and design corrections are required. Make sure to use this skill immediately after token extraction and in remediation loops after failed validation.
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. The goal is real working code with exceptional visual quality — not invented from scratch when great building blocks exist, but thoughtfully composed, themed, and elevated.
+This skill turns design intent into production frontend code. It should consume structured tokens first, then build themed UI using the project stack.
 
 ---
 
-## Pre-flight: Existing design work?
+## Pipeline position
 
-**Before doing anything else**, ask the user this question and wait for the answer:
+- Previous skill: `taste-to-token-extractor`
+- Current skill: `frontend-design`
+- Next skill: `frontend-deploy-debugger`
 
-> "Do you have existing frontend design files I should work from — things like a design system, style guide, component files, CSS/Tailwind tokens, Figma exports, or UI that already exists and needs updating? Or are we starting fresh?"
+If `design-tokens-v2.json` exists, treat it as primary design input.
 
-Based on the answer:
+---
 
-- **Existing files** → Scan and read them first (see below), then update/extend rather than replace. Preserve the established aesthetic, tokens, and patterns unless the user explicitly asks to change them.
-- **Starting fresh** → Proceed to Step 0 and build from scratch.
+## Closed-loop contract
 
-### If existing design files are present
+This skill participates in an iterative loop:
 
-Run a quick scan to find what's there:
-```powershell
-# Find design-related files
-Get-ChildItem -Recurse -Include "*.css", "*.scss", "globals.*", "tailwind.config.*", "theme.*", "tokens.*", "design-system.*", "*.figma.json" | Select-Object -First 30 -ExpandProperty FullName
+`frontend-design -> frontend-deploy-debugger -> deployment-validator`
 
-# Check for existing component directories
-Get-ChildItem -Directory -Path "src/components/", "components/", "ui/" -ErrorAction SilentlyContinue
+If validator result is `FAIL`, this skill must be called again with validator evidence and remediation advice, then produce targeted design/code fixes.
+
+---
+
+## Step 0: Input contract and token-first workflow
+
+Before any UI implementation, look for:
+
+- `design-tokens-v2.json`
+- `design-tokens-v2.*.json`
+- any user-provided token file path
+- latest `frontend-deploy-debugger` report (if available)
+- latest `deployment-validator` report (if available)
+
+If token JSON exists, parse it first and lock these foundations:
+
+- `tokens.colors`
+- `tokens.typography`
+- `tokens.spacing`
+- `tokens.radius`
+- `tokens.motion`
+
+If validator/debugger reports exist, treat them as mandatory context and prioritize fixes that address failing gates without regressing previously passing checks.
+
+If token JSON is missing, ask whether to continue without it or run `taste-to-token-extractor` first.
+
+---
+
+## Step 1: Detect environment
+
+Detect:
+
+- framework (`next`, `react`, `vue`, `svelte`, static html)
+- styling system (Tailwind, CSS Modules, plain CSS, styled-components)
+- existing component libraries
+- existing tokens in `globals.css`, `tailwind.config.*`, or theme files
+
+Preserve existing design-system conventions unless user asks for a reset.
+
+---
+
+## Step 2: Map tokens to implementation primitives
+
+When `design-tokens-v2.json` is present, always map it into runtime styling primitives.
+
+### Required mapping
+
+1. `tokens.colors` -> CSS custom properties and theme roles
+2. `tokens.typography` -> font families, size scale, role styles
+3. `tokens.spacing` -> spacing scale and layout spacing variables
+4. `tokens.radius` -> radius and border-width variables
+5. `tokens.motion` -> duration/easing vars and reduced-motion-safe transitions
+
+### Tailwind projects
+
+- extend `theme.colors` from token roles/primitives
+- extend `fontFamily`, `fontSize`, `spacing`, `borderRadius`
+- map motion tokens via CSS variables and utility classes
+
+### Non-Tailwind projects
+
+- create/update global token stylesheet with CSS variables
+- apply token roles in component styles instead of hardcoded values
+
+Do not invent conflicting values when valid tokens are provided.
+
+---
+
+## Step 3: Build UI with component strategy
+
+### Component source evaluation
+
+Before building from scratch, evaluate available sources in this order:
+
+1. **Existing project components** - Reuse when quality is high and appropriate
+2. **Magic (21st.dev) via MCP** - Query for production-grade patterns (optional)
+3. **Custom build** - Full control, use when Magic doesn't fit or adds complexity
+
+Magic is a **resource to query, not a requirement**. Always prefer simple over clever.
+
+---
+
+### When to query Magic (optional)
+
+Query Magic MCP when building:
+- Complex interactive sections (hero, pricing, testimonials, feature grids)
+- Standard UI patterns (nav, footer, dashboard shells, auth forms)
+- High-polish components where custom build would be time-intensive
+
+**Skip Magic when:**
+- Building simple components (buttons, cards, basic layouts)
+- Requirements are highly specific to your domain
+- You're already familiar with the pattern
+- Magic MCP is unavailable or slow
+
+---
+
+### Magic query workflow
+
+If querying Magic, follow this lightweight discovery process:
+
+#### 3.1 Identify functional requirements
+
+Define what you need **functionally** (not visually):
+- Component type: "hero section", "pricing table", "navigation", etc.
+- Required functionality: "must have CTA button and background image"
+- Constraints: "mobile responsive", "supports dark mode", "keyboard accessible"
+
+**Important:** Query Magic based on **function and structure**, not design tokens.
+Tokens define the theme; Magic provides the structural patterns.
+
+#### 3.2 Query Magic MCP
+
+Use available Magic MCP tools to search the component library:
+- Search by component type/category
+- Filter by required features
+- Get component metadata (props, variants, complexity, dependencies)
+
+**Quick timeout:** If Magic doesn't respond within a few seconds, move on to custom build.
+
+#### 3.3 Evaluate results
+
+For each Magic component returned, assess:
+- **Functional fit:** Does it meet requirements?
+- **Theming effort:** Can it be themed to project tokens easily?
+- **Complexity:** Is it simpler than custom build?
+- **Dependencies:** Does it bring unwanted dependencies?
+
+Present top 2-3 options with pros/cons in your response:
+
+```markdown
+## Magic Component Options
+
+### Option 1: [component-name]
+- Pros: [...]
+- Cons: [...]
+- Theming effort: low|medium|high
+- Recommendation: [use|skip]
+
+### Option 2: [component-name]
+- Pros: [...]
+- Cons: [...]
+- Theming effort: low|medium|high
+- Recommendation: [use|skip]
+
+### Custom build
+- Pros: Full control, exactly fits requirements
+- Cons: More implementation time
+- Recommendation: [preferred if Magic doesn't fit]
 ```
 
-Then read the key files — at minimum:
-- Global CSS / `globals.css` → extract the color palette, typography scale, spacing, and any CSS variables
-- `tailwind.config.*` → extract custom tokens, theme extensions, font config
-- A sample existing component → understand the code patterns and naming conventions in use
+This makes Magic options **visible and discoverable** without forcing a choice.
 
-Summarize what you found before proceeding:
-> "I found your existing design system. Here's what's established: [palette, fonts, tokens, patterns]. I'll work within this and only change what you've asked me to update."
+#### 3.4 Implement choice
 
-Then proceed to Step 1 with this context locked in — don't override existing decisions unless the user asks.
+**If using Magic component:**
+1. Fetch component code via Magic MCP
+2. Install required dependencies
+3. Theme component to project tokens (critical - see Step 3.5)
+4. Test responsiveness and accessibility
+5. Document which Magic component was used
+
+**If building custom:**
+1. Use project tokens from the start
+2. Follow existing component patterns
+3. Ensure accessibility and responsiveness
+4. Keep implementation lean
 
 ---
 
-## Step 0: Detect the environment
+### Step 3.5: Theme Magic components to project tokens
 
-Before anything else, understand what you're working with.
+When using Magic components, **always theme them** to project tokens. Never leave vendor defaults.
 
-**If a codebase exists**, run these commands to detect the stack:
-```powershell
-if (Test-Path "package.json") { Get-Content "package.json" | Select-String '"react"|"next"|"vue"|"svelte"|"tailwind"|"vite"' }
-Get-ChildItem -Path "src/", "app/", "pages/" -ErrorAction SilentlyContinue
+#### Theming workflow
+
+1. **Identify themeable properties:**
+   - Colors (backgrounds, text, borders, brand elements)
+   - Typography (font families, sizes, weights, line heights)
+   - Spacing (padding, margins, gaps)
+   - Radius (border-radius values)
+   - Motion (transitions, animations)
+
+2. **Map tokens to component:**
+   - Replace hardcoded colors with `var(--color-*)` or Tailwind token classes
+   - Replace hardcoded spacing with token scale values
+   - Replace hardcoded typography with role styles (h1, body, etc.)
+   - Ensure motion respects `prefers-reduced-motion`
+
+3. **Verify consistency:**
+   - Component should look native to the project
+   - No visual discontinuity with existing UI
+   - Design tokens fully applied
+
+#### Example theming
+
+**Before (Magic default):**
+```tsx
+<div className="bg-blue-600 text-white p-8 rounded-lg">
+  <h2 className="text-4xl font-bold">Hello</h2>
+</div>
 ```
 
-Then identify:
-- Framework: React, Next.js, Vue, Svelte, or plain HTML
-- Styling: Tailwind, CSS modules, styled-components, plain CSS
-- Component libraries already installed (shadcn/ui, Radix, etc.)
-- Existing design tokens (check `tailwind.config.*`, `globals.css`, CSS variables)
-
-**If no codebase exists** (greenfield or artifact), ask the user before proceeding:
-
-> "Before I start, what stack should I use? Here are my recommendations based on your use case:"
-> - **Single-file / artifact / prototype**: Plain HTML + CSS + JS (no dependencies, runs anywhere)
-> - **Modern web app**: Next.js + Tailwind CSS + shadcn/ui (production-ready, great DX)
-> - **Component library / design system**: React + Tailwind + 21st.dev components
-> - **Something else?** Tell me and I'll adapt.
-
-Wait for confirmation before writing any code.
-
----
-
-## Step 1: Design thinking
-
-Once you know the stack, understand the context and commit to a BOLD aesthetic direction:
-
-- **Purpose**: What problem does this interface solve? Who uses it?
-- **Tone**: Pick an extreme and commit — brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian. Use these as starting points, not boxes to fit into.
-- **Constraints**: Performance, accessibility, existing brand/tokens.
-- **Differentiation**: What's the one thing someone will remember about this UI?
-
-**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work — the key is intentionality, not intensity.
-
----
-
-## Step 2: Component strategy
-
-### In a React / Next.js / Tailwind project
-
-**Check 21st.dev first.** Before hand-rolling any component, check whether a high-quality version exists at 21st.dev. It ships polished, animated, production-ready React + Tailwind components that consistently outperform model-generated primitives.
-
-Use 21st.dev components for:
-- Hero sections, feature grids, pricing tables
-- Navigation bars, sidebars, footers
-- Cards, testimonials, stats blocks
-- Buttons, inputs, modals with animations
-- Dashboard layouts and data displays
-
-**How to use 21st.dev components:**
-```bash
-# Install via npx (recommended)
-npx shadcn@latest add "https://21st.dev/r/[component-name]"
-
-# Or browse https://21st.dev and copy the component code directly
+**After (themed to tokens):**
+```tsx
+<div className="bg-brand-primary text-surface-on-brand p-section rounded-card">
+  <h2 className="text-heading-xl font-heading">Hello</h2>
+</div>
 ```
 
-When referencing a 21st.dev component in your plan, name it explicitly: *"I'll use the 21st.dev Bento Grid for the features section."* Then install or inline it and theme it to the project's design tokens.
+---
 
-**The agent's role shifts when using 21st.dev:**
-- From: inventing raw UI primitives
-- To: selecting the right components, composing layouts, applying the aesthetic vision, and writing only the parts that don't already exist
+### Step 3.6: Mix Magic + custom freely
 
-### In a plain HTML / artifact context
+You're not locked into one approach. Common patterns:
 
-No external dependencies available. Build everything inline — but apply the same aesthetic rigor. The absence of a component library is not an excuse for generic output.
+- **Magic for structure, custom for domain logic:** Use Magic hero layout, but replace generic content with domain-specific components
+- **Magic for one section, custom for others:** Use Magic pricing table, build custom dashboard from scratch
+- **Start with Magic, refactor later:** Use Magic to ship fast, replace with custom if needs evolve
+
+The goal is **compositional freedom**, not dependency on any single source.
 
 ---
 
-## Step 3: Frontend aesthetics
+## Step 4: Visual quality and accessibility
 
-Apply these regardless of stack:
+Must satisfy:
 
-**Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts (Arial, Inter, Roboto, system fonts). Pair a distinctive display font with a refined body font. In HTML, load from Google Fonts or use @font-face. In React/Next.js, use `next/font` or import in globals.
+- keyboard navigability and visible focus states
+- WCAG AA contrast targets
+- semantic HTML structure
+- responsive behavior for mobile/tablet/desktop
+- `prefers-reduced-motion` support for animated UI
 
-**Color & Theme**: Commit to a cohesive palette. Use CSS variables or Tailwind config for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes. Define the palette before writing components.
-
-**Motion**: High-impact over scattered. One well-orchestrated page load with staggered reveals creates more delight than a dozen micro-interactions. In plain HTML/CSS, use `animation-delay` and `@keyframes`. In React, use the Motion library when available. Always respect `prefers-reduced-motion`.
-
-**Spatial composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density — never the default centered-column layout.
-
-**Backgrounds & visual details**: Create atmosphere. Gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, grain overlays. Match the effect to the aesthetic direction.
-
-**NEVER use**: Inter/Roboto/Arial as body fonts, purple gradients on white, predictable card-heavy layouts, or any pattern that looks like it came from a generic AI UI tutorial.
-
-No design should look like another. Vary light/dark themes, font choices, and aesthetics deliberately. Never converge on safe defaults like Space Grotesk or blue-on-white.
+Avoid generic design defaults. Keep the visual direction intentional and consistent with token DNA.
 
 ---
 
-## Step 4: Accessibility & production quality
+## Step 5: Delivery format
 
-Every output must be:
-- **Keyboard navigable**: visible focus states on all interactive elements
-- **Contrast-compliant**: WCAG AA minimum (4.5:1 for body text)
-- **Semantic HTML**: proper heading hierarchy, landmark roles, button vs. link distinction
-- **Responsive**: mobile-first, or at minimum tested at 375px, 768px, and 1280px
-- **Performance-conscious**: no unnecessary re-renders, lazy-load images, avoid layout shift
+Return:
 
----
+1. **Implemented files and key edits**
+2. **Token mapping summary** (`design-tokens-v2` -> CSS/Tailwind targets)
+3. **Install commands** (if any)
+4. **Magic component usage** (if any):
+   ```markdown
+   ### Magic Components Used
+   - [component-name] from 21st.dev
+     - Location: [file path]
+     - Theming applied: [summary]
+     - Customizations: [any modifications made]
+   ```
+5. **Component source breakdown**:
+   - Magic: [list of Magic components used]
+   - Custom: [list of custom components built]
+   - Mixed: [components that started with Magic but were heavily customized]
+6. **Unresolved assumptions or `N/A` token decisions**
 
-## Step 5: Implementation
-
-Match complexity to the vision:
-- Maximalist designs need elaborate code — extensive animations, layered effects, rich detail
-- Minimalist/refined designs need restraint — precision in spacing, typography, and subtle micro-details
-
-Write production-grade, well-organized code. If using 21st.dev components, show the install command and integration clearly. If building from scratch, structure CSS with variables at the top and components logically grouped.
-
-**Deliver:**
-1. The complete implementation (all files, or single file if artifact)
-2. A brief note on the aesthetic direction chosen and why
-3. Any install commands needed (21st.dev components, fonts, etc.)
-4. What to do next to extend or customize it
+This breakdown helps you understand what came from Magic vs custom build, making it easier to explore Magic later or refactor as needed.
 
 ---
 
-## What not to do
+## Step 6: Mandatory pipeline handoff
 
-- Don't start coding before knowing the stack
-- Don't reinvent components that 21st.dev already does better
-- Don't use generic aesthetics — Space Grotesk + purple gradient is not a design direction
-- Don't scatter micro-interactions everywhere — fewer, higher-impact moments
-- Don't ignore existing design tokens if the project already has them
+After implementation is complete, immediately continue with `frontend-deploy-debugger` for a quick regression check and runtime verification.
 
----
+Include this handoff payload:
 
-Remember: You are capable of extraordinary creative work. Don't hold back — show what can truly be created when thinking outside the box and committing fully to a distinctive vision. The goal is a UI that feels *deliberately designed*, not AI-generated.
+```json
+{
+  "next_skill": "frontend-deploy-debugger",
+  "handoff_reason": "Frontend implementation/remediation complete; run quick regression deployment checks.",
+  "local_target_url": "http://localhost:<port-or-N/A>",
+  "public_target_url": "https://<domain-or-N/A>",
+  "run_commands": ["<dev-or-start-command>"],
+  "changed_files": ["path/one", "path/two"],
+  "iteration": "<n>"
+}
+```

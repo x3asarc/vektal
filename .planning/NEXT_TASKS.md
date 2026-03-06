@@ -1,6 +1,6 @@
 # Next Tasks Queue
 
-Last updated: 2026-03-03
+Last updated: 2026-03-04
 
 ## Session State: v1.0 Completion & Environment Sync (2026-03-02)
 
@@ -103,23 +103,29 @@ Last updated: 2026-03-03
 
 ---
 
-## Priority 3: Implement Memory System with Hooks
+## Priority 3: Native LLM Capability Context for Chat UX
 
-**Plan**: `.planning/memory-system-design.md`
+**Plan**:
+- `.planning/phases/future-production-refinement/priority-3-native-llm-capability-context/context.md`
+- `.planning/phases/future-production-refinement/priority-3-native-llm-capability-context/research.md`
+- `.planning/phases/future-production-refinement/priority-3-native-llm-capability-context/plan.md`
 
-**Status**: Designed, ready to implement
+**Status**: Planned (context captured), execution not started
 
-**What's needed**:
-- Working memory (short-term cache, session-scoped)
-- Long-term memory (persistent across sessions)
-- Hooks: SessionEnd, TaskComplete, PhaseComplete
-- Auto-update mechanisms
+**Why this is next**:
+- Current fallback can still feel command-router-first for normal conversation.
+- User expectation is native assistant behavior (ChatGPT/Gemini-like) when intent is unclear.
+- Fallback must stay capability-grounded (runtime/tool/infra limits) to avoid misleading guidance.
+- OpenRouter low-cost model policy is required to keep usage affordable.
 
-**Impact**: AI assistants maintain context across sessions, learn from patterns
+**What this phase will deliver**:
+- Capability-packet-grounded fallback responses.
+- Anti-repetition conversational guardrails.
+- Cost-aware model policy (default + fallback model).
+- Graceful degraded-mode behavior for rate-limit/provider issues.
+- Playwright + Firecrawl verification loop for deployed chat UX.
 
-**Total effort**: ~3 hours
-
-**When to do**: After deployment verification
+**Dependency**: Priority 2 deployment evidence remains active; Priority 3 can be prepared in parallel but closes after deployment verification path is stable.
 
 ---
 

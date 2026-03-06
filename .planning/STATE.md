@@ -19,7 +19,9 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 - Phase 16: Agent Context OS (entrypoint docs, graph-first broker, lifecycle memory hooks, governance gate) (Complete)
 - Phase 15.1: Sentry autonomous intake, deduped routing, and verified closure gating (Complete)
 
-**Next:** Future phase backlog and production refinement.
+**Next:** Future production refinement execution:
+- `priority-2-dokploy-e2e` (deployment evidence closure)
+- `priority-3-native-llm-capability-context` (native conversational fallback + capability-aware grounding)
 
 ## Context Snapshot
 

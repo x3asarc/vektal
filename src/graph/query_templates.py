@@ -247,9 +247,12 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         except TypeError:
             # Fallback for older drivers or different signatures
             try:
-                query_result = driver.execute_query(cypher, parameters=params)
+                query_result = driver.execute_query(cypher, params)
             except TypeError:
-                query_result = driver.execute_query(cypher, params=params)
+                try:
+                    query_result = driver.execute_query(cypher, parameters=params)
+                except TypeError:
+                    query_result = driver.execute_query(cypher, params=params)
 
         if inspect.isawaitable(query_result):
             async def _await_query() -> List[Dict[str, Any]]:

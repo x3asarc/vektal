@@ -10,10 +10,14 @@ import logging
 import socket
 import httpx
 from typing import Optional, List, Dict, Any
+from dotenv import load_dotenv
 from src.graph.remediation_registry import registry
 from src.graph.universal_fixer import NanoFixerLoop, RemediationResult
 
 logger = logging.getLogger(__name__)
+
+# Ensure probe commands resolve credentials from local .env in standalone runs.
+load_dotenv()
 
 async def probe_aura() -> bool:
     """
@@ -35,7 +39,8 @@ async def probe_aura() -> bool:
     async with httpx.AsyncClient(timeout=2.0) as client:
         try:
             resp = await client.post(url, auth=auth, json=payload)
-            if resp.status_code == 200:
+            # Aura Query API can return 200/202 depending on processing mode.
+            if resp.is_success:
                 logger.info("[Probe] Aura Cloud Query API v2 OK.")
                 return True
             else:

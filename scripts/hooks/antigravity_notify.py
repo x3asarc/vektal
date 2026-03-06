@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import platform
 import re
 import subprocess
@@ -19,6 +20,13 @@ import time
 import uuid
 from pathlib import Path
 from typing import Any
+
+try:
+    from scripts.hooks.antigravity_windows_notify import send_windows_notification
+except ModuleNotFoundError:
+    # Allow execution as `python scripts/hooks/antigravity_notify.py`.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from scripts.hooks.antigravity_windows_notify import send_windows_notification
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STATE_PATH = REPO_ROOT / ".graph/antigravity-notify-state.json"
@@ -128,11 +136,26 @@ def _load_state() -> dict[str, Any]:
     return _normalize_state(parsed)
 
 
-def _save_state(state: dict[str, Any]) -> None:
+def _save_state(state: dict[str, Any]) -> bool:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    temp = STATE_PATH.with_suffix(".tmp")
-    temp.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    temp.replace(STATE_PATH)
+    payload = json.dumps(state, indent=2)
+    # State updates can happen concurrently from hooks/watchdog; retry briefly
+    # on transient lock races instead of crashing caller workflows.
+    for attempt in range(4):
+        temp = STATE_PATH.with_name(f"{STATE_PATH.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
+        try:
+            temp.write_text(payload, encoding="utf-8")
+            temp.replace(STATE_PATH)
+            return True
+        except (PermissionError, FileNotFoundError, OSError):
+            try:
+                temp.unlink(missing_ok=True)
+            except OSError:
+                pass
+            if attempt == 3:
+                return False
+            time.sleep(0.05 * (attempt + 1))
+    return False
 
 
 def classify_trigger(text: str) -> str | None:
@@ -169,8 +192,15 @@ def _default_message(provider: str, trigger: str, window_hint: str = "") -> str:
     return f"{provider_label}: Edit acceptance is required. Return to the {provider_label} terminal{hint_suffix}."
 
 
-def _escape_ps_single_quoted(value: str) -> str:
-    return value.replace("'", "''")
+def _env_is_true(name: str, default: str = "0") -> bool:
+    value = str(os.getenv(name, default)).strip().lower()
+    return value in {"1", "true", "yes", "on"}
+
+
+def _default_auto_focus(trigger: str) -> bool:
+    if trigger != "approval":
+        return False
+    return _env_is_true("ANTIGRAVITY_AUTO_FOCUS_APPROVAL", "0")
 
 
 def _send_windows_notification(
@@ -180,95 +210,13 @@ def _send_windows_notification(
     window_hint: str = "",
     auto_focus: bool = False,
 ) -> bool:
-    title_ps = _escape_ps_single_quoted(title[:120])
-    message_ps = _escape_ps_single_quoted(message[:240])
-    provider_ps = _escape_ps_single_quoted((provider or "").lower())
-    window_hint_ps = _escape_ps_single_quoted((window_hint or "").strip())
-    auto_focus_ps = "$true" if auto_focus else "$false"
-    script = (
-        "$ErrorActionPreference='Stop';"
-        "Add-Type -AssemblyName System.Windows.Forms;"
-        "Add-Type -AssemblyName System.Drawing;"
-        "$provider='"
-        + provider_ps
-        + "';"
-        "$windowHint='"
-        + window_hint_ps
-        + "';"
-        "$autoFocus="
-        + auto_focus_ps
-        + ";"
-        "$openAction={"
-        "$activated=$false;"
-        "try{"
-        "$wsh=New-Object -ComObject WScript.Shell;"
-        "$titleHints=@();"
-        "$processHints=@();"
-        "if($windowHint){ $titleHints += $windowHint };"
-        "if($windowHint){ if($wsh.AppActivate($windowHint)){ $activated=$true } };"
-        "if($provider -eq 'codex'){"
-        "if($env:ANTIGRAVITY_CODEX_WINDOW_TITLES){ $titleHints += ($env:ANTIGRAVITY_CODEX_WINDOW_TITLES -split ',') };"
-        "if($env:ANTIGRAVITY_CODEX_PROCESS_NAMES){ $processHints += ($env:ANTIGRAVITY_CODEX_PROCESS_NAMES -split ',') };"
-        "$titleHints += @('Codex','Antigravity');"
-        "$processHints += @('WindowsTerminal','Code','pwsh','powershell');"
-        "} elseif($provider -eq 'claude'){"
-        "if($env:ANTIGRAVITY_CLAUDE_WINDOW_TITLES){ $titleHints += ($env:ANTIGRAVITY_CLAUDE_WINDOW_TITLES -split ',') };"
-        "if($env:ANTIGRAVITY_CLAUDE_PROCESS_NAMES){ $processHints += ($env:ANTIGRAVITY_CLAUDE_PROCESS_NAMES -split ',') };"
-        "$titleHints += @('Claude','Antigravity');"
-        "$processHints += @('WindowsTerminal','Code','pwsh','powershell');"
-        "} elseif($provider -eq 'gemini'){"
-        "if($env:ANTIGRAVITY_GEMINI_WINDOW_TITLES){ $titleHints += ($env:ANTIGRAVITY_GEMINI_WINDOW_TITLES -split ',') };"
-        "if($env:ANTIGRAVITY_GEMINI_PROCESS_NAMES){ $processHints += ($env:ANTIGRAVITY_GEMINI_PROCESS_NAMES -split ',') };"
-        "$titleHints += @('Gemini','Antigravity');"
-        "$processHints += @('WindowsTerminal','Code','pwsh','powershell');"
-        "};"
-        "if($env:ANTIGRAVITY_WINDOW_TITLES){ $titleHints += ($env:ANTIGRAVITY_WINDOW_TITLES -split ',') };"
-        "if($env:ANTIGRAVITY_PROCESS_NAMES){ $processHints += ($env:ANTIGRAVITY_PROCESS_NAMES -split ',') };"
-        "$titleHints += @('Antigravity');"
-        "$procs=Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle };"
-        "foreach($hint in ($titleHints | Where-Object { $_ -and $_.Trim() -ne '' } | Select-Object -Unique)){"
-        "$match=$procs | Where-Object { $_.MainWindowTitle -like ('*' + $hint + '*') } | Select-Object -First 1;"
-        "if($match){"
-        "if($wsh.AppActivate($match.Id)){ $activated=$true; break }"
-        "}"
-        "}"
-        "if(-not $activated){"
-        "foreach($pname in ($processHints | Where-Object { $_ -and $_.Trim() -ne '' } | Select-Object -Unique)){"
-        "$pmatch=Get-Process -Name $pname -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1;"
-        "if($pmatch){ if($wsh.AppActivate($pmatch.Id)){ $activated=$true; break } }"
-        "}"
-        "}"
-        "} catch {};"
-        "if(-not $activated){"
-        "$targets=@($env:ANTIGRAVITY_URL,'antigravity://',$env:ANTIGRAVITY_EXE) | Where-Object { $_ -and $_.Trim() -ne '' };"
-        "foreach($target in $targets){"
-        "try{ Start-Process -FilePath $target | Out-Null; break } catch {}"
-        "};"
-        "}"
-        "};"
-        "if($autoFocus){ try{ & $openAction | Out-Null } catch {} };"
-        "$n=New-Object System.Windows.Forms.NotifyIcon;"
-        "$n.Icon=[System.Drawing.SystemIcons]::Information;"
-        "$n.BalloonTipTitle='"
-        + title_ps
-        + "';"
-        "$n.BalloonTipText='"
-        + message_ps
-        + "';"
-        "$n.add_BalloonTipClicked($openAction);"
-        "$n.Visible=$true;"
-        "$n.ShowBalloonTip(5000);"
-        "$end=(Get-Date).AddMilliseconds(6000);"
-        "while((Get-Date) -lt $end){ [System.Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 };"
-        "$n.Dispose();"
+    return send_windows_notification(
+        title=title,
+        message=message,
+        provider=provider,
+        window_hint=window_hint,
+        auto_focus=auto_focus,
     )
-    completed = subprocess.run(
-        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    return completed.returncode == 0
 
 
 def _send_macos_notification(title: str, message: str) -> bool:
@@ -327,8 +275,7 @@ def should_send(dedupe_key: str, cooldown_seconds: int, force: bool) -> bool:
     if now - last_sent < cooldown_seconds:
         return False
     state["dedupe"][dedupe_key] = now
-    _save_state(state)
-    return True
+    return bool(_save_state(state))
 
 
 def _log_event(provider: str, trigger: str, sent: bool, message: str, source: str) -> None:
@@ -471,7 +418,7 @@ def emit_notification(
         return False
 
     effective_hint = window_hint or get_window_hint(provider)
-    effective_auto_focus = (trigger == "approval") if auto_focus is None else auto_focus
+    effective_auto_focus = _default_auto_focus(trigger) if auto_focus is None else auto_focus
     sent = False
     if not dry_run:
         sent = send_system_notification(

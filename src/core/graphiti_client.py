@@ -217,11 +217,13 @@ def get_graphiti_client() -> Optional[Any]:
             _graph_unavailable_until = time.time() + _graph_backoff_seconds()
             return None
 
+        # Bridge OpenRouter env vars for Graphiti's LLM client (always needed)
+        _bridge_openrouter_env()
+
         # Get local embedder (sentence-transformers)
         local_embedder = _get_local_embedder()
         if local_embedder is None:
-            logger.warning("Local embedder unavailable - falling back to OpenAI")
-            _bridge_openrouter_env()
+            logger.warning("Local embedder unavailable - using OpenAI for embeddings")
             # Initialize Graphiti client with default OpenAI embedder
             _graphiti_client = Graphiti(
                 uri=reachable_uri,
@@ -236,7 +238,7 @@ def get_graphiti_client() -> Optional[Any]:
                 password=neo4j_password,
                 embedder=local_embedder
             )
-            logger.info("Using local sentence-transformers embedder (no API key needed)")
+            logger.info("Using local sentence-transformers embedder for query embeddings")
 
         logger.info(f"Graphiti client initialized with URI: {reachable_uri} (configured={configured_uri})")
         _graph_unavailable_until = 0.0

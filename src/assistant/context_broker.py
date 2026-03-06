@@ -14,69 +14,76 @@ _TOKEN_RE = re.compile(r"\S+")
 
 
 def _default_graph_fetcher(query: str, top_k: int) -> list[str]:
-    """Default graph fetcher using Neo4j/Graphiti knowledge graph.
+    """Default graph fetcher using Neo4j knowledge graph.
 
     This is the PRIMARY context source for all operations.
     Falls back gracefully if graph is unavailable.
 
-    Uses Graphiti's semantic search directly for natural language queries.
+    Uses direct Neo4j queries against the existing graph schema.
     """
     import logging
     logger = logging.getLogger(__name__)
 
     try:
-        import asyncio
-        from src.core.graphiti_client import get_graphiti_client
+        from neo4j import GraphDatabase
+        import os
 
-        client = get_graphiti_client()
-        if not client:
-            # Graph not enabled or unavailable - fallback will handle
-            logger.debug("Graph client not available")
+        uri = os.getenv('NEO4J_URI')
+        user = os.getenv('NEO4J_USER', 'neo4j')
+        password = os.getenv('NEO4J_PASSWORD')
+
+        if not password:
+            logger.debug("Neo4j password not set")
             return []
 
-        # Run async search in sync context
-        async def _async_search():
-            return await client.search(query=query, num_results=min(top_k, 10))
+        logger.debug(f"Querying graph for: {query}")
 
-        # Check if we're already in an async context
-        try:
-            loop = asyncio.get_running_loop()
-            # Already in async context - can't use asyncio.run()
-            # Return empty to fallback
-            logger.debug("Already in async context, cannot use asyncio.run()")
-            return []
-        except RuntimeError:
-            # Not in async context - safe to use asyncio.run()
-            logger.debug(f"Running graph search for query: {query}")
-            search_results = asyncio.run(_async_search())
-            logger.debug(f"Graph search returned {len(search_results) if search_results else 0} results")
-
-        if not search_results:
-            logger.debug("Graph search returned empty results")
+        # Extract meaningful keywords from query (words longer than 3 chars)
+        import re
+        words = [w for w in re.findall(r'\w+', query) if len(w) > 3]
+        if not words:
+            logger.debug("No meaningful keywords in query")
             return []
 
-        # Format results as context snippets
+        # Use the most specific term (usually the longest word)
+        search_term = max(words, key=len)
+        logger.debug(f"Using search term: {search_term}")
+
+        driver = GraphDatabase.driver(uri, auth=(user, password), connection_timeout=5.0)
+
+        # Simple text search across File nodes using the key term
+        cypher = """
+        MATCH (f:File)
+        WHERE f.path IS NOT NULL AND f.summary IS NOT NULL
+        AND (toLower(f.path) CONTAINS toLower($search_text)
+             OR toLower(f.summary) CONTAINS toLower($search_text))
+        RETURN f.path AS path, f.summary AS summary
+        LIMIT $limit
+        """
+
+        with driver.session() as session:
+            result = session.run(cypher, search_text=search_term, limit=top_k)
+            records = list(result)
+
+        driver.close()
+
+        if not records:
+            logger.debug("No graph results found")
+            return []
+
+        # Format as context snippets
         snippets = []
-        for result in search_results[:top_k]:
-            # Graphiti returns Entity nodes with name and summary
-            if hasattr(result, 'name') and hasattr(result, 'summary'):
-                snippet = f"[{result.name}] {result.summary[:200]}"
-                snippets.append(snippet)
-                logger.debug(f"Added snippet from Entity: {result.name}")
-            elif isinstance(result, dict):
-                name = result.get('name', '')
-                summary = result.get('summary', '')
-                if name:
-                    snippet = f"[{name}] {summary[:200]}"
-                    snippets.append(snippet)
-                    logger.debug(f"Added snippet from dict: {name}")
+        for record in records:
+            path = record.get("path", "")
+            summary = record.get("summary", "")
+            if path:
+                snippets.append(f"[{path}] {summary[:200]}")
 
         logger.debug(f"Returning {len(snippets)} snippets from graph")
         return snippets
 
     except Exception as e:
         # Graph unavailable - fallback will handle this
-        # Log the error for debugging but don't crash
         logger.warning(f"Graph fetch failed: {e}", exc_info=True)
         return []
 
@@ -194,7 +201,10 @@ def assemble_context(
 
     graph_attempted = True
     try:
+        import logging
+        logging.debug(f"assemble_context: Calling graph fetcher with query='{query}', top_k={top_k}")
         graph_results = effective_graph_fetcher(query, top_k)
+        logging.debug(f"assemble_context: Got {len(graph_results) if graph_results else 0} results")
         if graph_results:
             snippets.extend([item for item in graph_results if isinstance(item, str) and item.strip()])
             provenance.extend([{"source": "graph", "path": "graph://query"} for _ in snippets])
@@ -202,7 +212,9 @@ def assemble_context(
         else:
             fallback_used = True
             fallback_reason = FallbackReason.GRAPH_EMPTY
-    except Exception:
+    except Exception as e:
+        import logging
+        logging.error(f"assemble_context: Exception during graph fetch: {e}", exc_info=True)
         fallback_used = True
         fallback_reason = FallbackReason.GRAPH_ERROR
 

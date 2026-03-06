@@ -46,6 +46,15 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"ref":"refs/heads/master","repository":{"full_name":"x3asarc/vektal"}}'
 
+      - name: DNS preflight diagnostics
+        run: |
+          echo "DNS A records for app.vektal.systems:"
+          getent ahostsv4 app.vektal.systems | awk '{print $1}' | sort -u || true
+          echo "Resolver check via 1.1.1.1:"
+          nslookup -type=A app.vektal.systems 1.1.1.1 || true
+          echo "Resolver check via 8.8.8.8:"
+          nslookup -type=A app.vektal.systems 8.8.8.8 || true
+
       - name: Validate public gateway health
         env:
           PUBLIC_URL: https://app.vektal.systems/health
@@ -62,6 +71,8 @@ jobs:
           done
           if [ "$success" -ne 1 ]; then
             echo "Public gateway validation failed for $PUBLIC_URL"
+            echo "Gateway TCP probe:"
+            curl -vk --max-time 15 "$PUBLIC_URL" || true
             exit 1
           fi
 

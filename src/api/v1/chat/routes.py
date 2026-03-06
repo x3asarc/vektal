@@ -256,7 +256,13 @@ def _resolve_store_id_or_error(requested_store_id: int | None):
     return user_store.id, None
 
 
-def _generate_ai_reply(user_message: str, intent_type: str, handler_message: str) -> str | None:
+def _generate_ai_reply(
+    user_message: str,
+    intent_type: str,
+    handler_message: str,
+    *,
+    capability_context: str = "",
+) -> str | None:
     """
     Call OpenRouter to generate a conversational AI reply.
 
@@ -276,13 +282,16 @@ def _generate_ai_reply(user_message: str, intent_type: str, handler_message: str
         "discover new vendor sites, list vendors, and check system status. "
         "Keep replies concise and friendly. If the user asks something you can act on, "
         "tell them the exact command to use. If it's a greeting or small talk, respond naturally "
-        "and invite them to try a command."
+        "and invite them to try a command. "
+        "You must ground your reply in the Runtime Capability Packet and avoid claiming capabilities "
+        "that are not listed as currently available."
     )
 
     context = (
         f"The user said: \"{user_message}\"\n"
         f"Classified intent: {intent_type}\n"
         f"Default handler response: {handler_message}\n\n"
+        f"Runtime Capability Packet:\n{capability_context or 'unavailable'}\n\n"
         "Generate a friendly, helpful reply (1-3 sentences). "
         "If the intent is 'unknown', guide the user toward useful commands."
     )
@@ -477,6 +486,13 @@ def _build_local_conversational_reply(
 
 def _build_minimal_unknown_reply(user_message: str) -> str:
     text = (user_message or "").strip()
+    local_reply = _build_local_conversational_reply(
+        user_message=text,
+        intent_type=IntentType.UNKNOWN.value,
+        handler_message="",
+    )
+    if local_reply:
+        return local_reply
     if _is_small_talk_message(text):
         return (
             "Hey. I am here and ready to help. "
@@ -493,11 +509,71 @@ def _build_minimal_unknown_reply(user_message: str) -> str:
     )
 
 
+def _build_runtime_capability_packet(
+    *,
+    route_summary: dict[str, Any],
+    runtime_payload: dict[str, Any],
+    session_state: str,
+    tier: str,
+    store_connected: bool,
+) -> str:
+    effective_tools = route_summary.get("effective_toolset") or []
+    tool_summary: list[dict[str, Any]] = []
+    for raw in effective_tools[:10]:
+        if not isinstance(raw, dict):
+            continue
+        examples = raw.get("input_examples")
+        first_example = examples[0] if isinstance(examples, list) and examples else None
+        tool_summary.append(
+            {
+                "tool_id": raw.get("tool_id"),
+                "mutates_data": bool(raw.get("mutates_data", False)),
+                "requires_integration": raw.get("requires_integration"),
+                "required_role": raw.get("required_role"),
+                "example": first_example,
+            }
+        )
+
+    reasons = route_summary.get("reasons") or []
+    constraints = [
+        item
+        for item in reasons
+        if isinstance(item, str)
+        and (
+            "hidden because" in item
+            or "denied" in item
+            or "blocked" in item
+            or "upgrade" in item
+            or "fallback_stage" in item
+        )
+    ][:8]
+
+    packet = {
+        "session_state": session_state,
+        "tier": tier,
+        "store_connected": store_connected,
+        "route_decision": route_summary.get("route_decision"),
+        "approval_mode": route_summary.get("approval_mode"),
+        "intent_type": route_summary.get("intent_type"),
+        "runtime_mode": runtime_payload.get("mode"),
+        "effective_tools": tool_summary,
+        "constraints": constraints,
+        "infra_roles": {
+            "ingress": "Traefik/NGINX route traffic to frontend/backend services.",
+            "workers": "Celery workers execute async jobs and long-running actions.",
+            "backend_api": "Flask API enforces policy, approvals, and session state.",
+            "redis": "Redis backs queues, sessions, and rate-limiting counters.",
+        },
+    }
+    return json.dumps(packet, ensure_ascii=True, separators=(",", ":"))
+
+
 def _build_assistant_blocks(
     route_result,
     *,
     extra_blocks: list[dict[str, Any]] | None = None,
     raw_user_message: str = "",
+    capability_context: str = "",
 ) -> list[dict[str, Any]]:
     response_payload = route_result.response or {}
     blocks: list[ChatBlock] = []
@@ -516,6 +592,7 @@ def _build_assistant_blocks(
                 user_message=raw_user_message,
                 intent_type=intent_type,
                 handler_message=primary_text or "",
+                capability_context=capability_context,
             )
         primary_text = ai_reply or _build_minimal_unknown_reply(raw_user_message)
         blocks.append(ChatBlock(type="text", text=primary_text))
@@ -529,6 +606,7 @@ def _build_assistant_blocks(
             user_message=raw_user_message,
             intent_type=intent_type,
             handler_message=primary_text or "",
+            capability_context=capability_context,
         )
         if ai_reply:
             primary_text = ai_reply
@@ -924,6 +1002,13 @@ def create_message(session_id: int):
         "fallback_reason_code": provider_route.fallback_reason_code,
         "policy_snapshot_hash": provider_route.policy_snapshot_hash,
     }
+    capability_context = _build_runtime_capability_packet(
+        route_summary=route_summary,
+        runtime_payload=runtime_payload,
+        session_state=session.state,
+        tier=_user_tier_value(),
+        store_connected=bool(getattr(current_user, "shopify_store", None)),
+    )
     route_event = AssistantRouteEvent(
         user_id=current_user.id,
         store_id=session.store_id,
@@ -1017,6 +1102,7 @@ def create_message(session_id: int):
         route_result,
         extra_blocks=extra_blocks or None,
         raw_user_message=payload.content,
+        capability_context=capability_context,
     )
     assistant_content = next(
         (block.get("text") for block in assistant_blocks if block.get("type") == "text" and block.get("text")),

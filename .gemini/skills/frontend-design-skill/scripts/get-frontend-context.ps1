@@ -41,8 +41,9 @@ if ($globalsPath) {
 # 3. Component Dependency Scan (Imports)
 if ($ComponentPath -and (Test-Path $ComponentPath)) {
     Write-Host "`nMapping Dependencies for: $ComponentPath" -ForegroundColor Yellow
-    Get-Content $ComponentPath | Select-String "from ['"].*['"]" | ForEach-Object {
-        Write-Host "  Imports: $($_.Matches.Value)"
+    # Simpler regex to avoid nested quote escape hell in PowerShell
+    Get-Content $ComponentPath | Select-String "from\s+['\"].+['\"]" | ForEach-Object {
+        Write-Host "  Imports: $($_.Line.Trim())"
     }
 }
 

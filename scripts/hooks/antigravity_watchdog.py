@@ -244,6 +244,7 @@ def _scan_file(provider: str, path: Path, state: dict[str, Any]) -> None:
             dry_run=False,
             title=f"Antigravity: Return To {provider.capitalize()}",
             window_hint=notify.get_window_hint(provider),
+            auto_focus=False,
         )
 
     files_state[key] = {"offset": size, "size": size}
@@ -251,6 +252,7 @@ def _scan_file(provider: str, path: Path, state: dict[str, Any]) -> None:
 
 def _remind_stale_alerts(reminder_seconds: int, heartbeat_grace_seconds: int) -> None:
     now = time.time()
+    sent_signatures: set[tuple[str, str, str]] = set()
     for alert in notify.get_active_alerts():
         provider = alert.get("provider", "codex")
         last_heartbeat = notify.get_last_heartbeat(provider)
@@ -260,9 +262,15 @@ def _remind_stale_alerts(reminder_seconds: int, heartbeat_grace_seconds: int) ->
         if now - last_reminder < reminder_seconds:
             continue
         message = alert.get("message") or f"{provider}: approval is still pending."
+        trigger = str(alert.get("trigger", "manual_verify"))
+        signature = (provider, trigger, message)
+        if signature in sent_signatures:
+            notify.mark_alert_reminded(str(alert.get("id")), reminder_ts=now)
+            continue
+        sent_signatures.add(signature)
         notify.emit_notification(
             provider=provider,
-            trigger=alert.get("trigger", "manual_verify"),
+            trigger=trigger,
             message=message,
             source="watchdog-reminder",
             force=True,
@@ -270,8 +278,9 @@ def _remind_stale_alerts(reminder_seconds: int, heartbeat_grace_seconds: int) ->
             dry_run=False,
             title=f"Antigravity: Return To {provider.capitalize()}",
             window_hint=str(alert.get("window_hint") or notify.get_window_hint(provider)),
+            auto_focus=False,
         )
-        notify.mark_alert_reminded(str(alert.get("id")))
+        notify.mark_alert_reminded(str(alert.get("id")), reminder_ts=now)
 
 
 def _spawn_watchdog(providers: list[str], poll_seconds: int, reminder_seconds: int, heartbeat_grace_seconds: int) -> int:

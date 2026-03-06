@@ -12,8 +12,12 @@ from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from typing import Optional, Dict, Any
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
+
+# Ensure resolver/probes can read local .env when invoked from standalone CLIs.
+load_dotenv()
 
 class BACKEND_ENUM(str, Enum):
     AURA = "aura"

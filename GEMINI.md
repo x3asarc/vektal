@@ -1,17 +1,33 @@
-# Gemini CLI — Shopify Multi-Supplier Platform
+# Gemini CLI — Vektal (Shopify Multi-Supplier Platform)
 
 > You are a learning system. Read this completely before touching anything.
 
 ## What This Is
 
-Multi-tenant SaaS platform automating Shopify product management for craft/hobby stores (8+ vendors,
-4,000+ SKUs). Production: Bastelschachtel.at. **Phase 13.2 of 15. 95/106 plans complete.**
-Remaining phases: 13.2 (Oracle Framework Reuse), 14 (Continuous Optimization), 15 (Self-Healing).
+Multi-tenant SaaS platform (Vektal) automating Shopify product management for craft/hobby stores (8+ vendors,
+4,000+ SKUs). Production: Bastelschachtel.at. **Phase 16 - Agent Context OS - COMPLETE.**
+Next: Future production refinement (Priority 2-3).
 
 **Read first on every session:**
-- `.planning/STATE.md` — current phase, gate status, last completed work
-- `.planning/ROADMAP.md` — phase definitions and success criteria
+- `docs/AGENT_START_HERE.md` — Primary onboarding entrypoint
+- `.planning/STATE.md` — Current phase, gate status, last completed work
+- `.planning/ROADMAP.md` — Phase definitions and success criteria
 - Active task: `.planning/phases/<phase>/<task>/PLAN.md`
+
+---
+
+## Safety Protocols (Production Protection)
+
+Vektal employs a multi-layered safety architecture to prevent accidental data loss or corruption:
+
+1.  **Tiered Assistant Architecture:**
+    *   **Tier 1 (Read-Safe):** Only allowed to read files and query the graph. Zero mutation capability.
+    *   **Tier 2 (Dry-Run Gated):** Performs changes in a dry-run mode first. Requires explicit human approval via the `verification_oracle` before any application to production/master.
+    *   **Tier 3 (Delegated Workers):** Specialized agents for high-volume tasks. depth ≤2, fan-out ≤5, budget 20 steps / 120s.
+2.  **Kill-Switch (`kill_switch.py`):** A global circuit breaker that gates every Tier 2/3 mutation. If the system detects anomalous behavior, the kill-switch engages automatically.
+3.  **Field Policy (`field_policy.py`):** Hard-blocks mutations to immutable fields (e.g., historical audit logs). Price and inventory threshold breaches trigger mandatory HITL (Human-In-The-Loop) review.
+4.  **Sandbox Execution:** All code execution and script testing occurs within a hardened Docker-based sandbox with 6-gate validation.
+5.  **Context OS Gate:** `python scripts/governance/context_os_gate.py` ensures all changes are backed by canonical lifecycle events and verified via the graph before completion.
 
 ---
 
@@ -71,7 +87,7 @@ Default is yes. New module needs explicit justification.
 
 Four reports at `reports/<phase>/<task>/`:
 1. `self-check.md` — Builder self-review
-2. `review.md` — Two-pass (`pass_1_timestamp` predate `plan_context_opened_at`)
+2. `review.md` — Two-pass (`pass_1_timestamp` must predate `plan_context_opened_at`)
 3. `structure-audit.md` — StructureGuardian placement/naming
 4. `integrity-audit.md` — IntegrityWarden dependencies/licenses/secrets
 
@@ -86,7 +102,7 @@ Roles: `ops/governance/roles/` · Severity: `STANDARDS.md` · Structure: `ops/ST
 **Backend:** Flask · Flask-OpenAPI3 · PostgreSQL (psycopg3) · SQLAlchemy · Celery + Redis
 **Frontend:** Next.js 14 · TypeScript · App Router → `frontend/src/features/<feature>/`
 **Infra:** Docker Compose (nginx, backend, celery_worker, celery_scraper, flower, db, redis)
-**AI:** OpenRouter/Gemini Flash · sentence-transformers · Vision AI (cached)
+**AI:** OpenRouter/Gemini Flash · Neo4j/Graphiti · sentence-transformers · Vision AI (cached)
 
 **Entry points:**
 - API: `src/api/app.py` → blueprints at `src/api/v1/`
@@ -148,10 +164,6 @@ result = query_graph("function_callers", {"function_name": "my_function"})
 result = query_graph("function_callees", {"function_name": "my_function"})
 ```
 
-Available templates: `imports`, `imported_by`, `similar_files`, `planning_context`, `phase_code`,
-`impact_radius`, `similar_failures`, `function_callers`, `function_callees`, `functions_in_file`,
-`top_conventions`, `recent_discrepancies`, `tool_search`, `tool_search_text`
-
 ### Integration Points
 
 **Always use graph queries for:**
@@ -162,57 +174,28 @@ Available templates: `imports`, `imported_by`, `similar_files`, `planning_contex
 - Impact analysis — understand what breaks if you change something
 - Duplication detection — find similar code patterns across codebase
 
-**Fallback behavior:**
-- If graph unavailable → falls back to local snapshot or grep/file search
-- Graph queries log gracefully and don't break the flow
-- Empty results from graph are valid (means truly no connections)
-
-### Maintenance
-
-Graph is populated by `scripts/graph/sync_to_neo4j.py`. Run this after major codebase changes
-to keep the graph in sync. The graph includes semantic embeddings via `sentence-transformers/all-MiniLM-L6-v2`.
-
-**See also:** `docs/KNOWLEDGE_GRAPH.md` for complete reference documentation.
-
 ---
 
-## Assistant Tier Rules (production safety — never bypass)
+## Branch Workflow (always — no direct commits to master)
 
-- **Tier 1:** read-safe only, zero mutations
-- **Tier 2:** dry-run first, explicit approval before any apply
-- **Tier 3:** delegated workers — depth ≤2, fan-out ≤5, budget 20 steps / 120s
-- **Kill-switch** (`kill_switch.py`) gates every Tier 2/3 mutation
-- **Field policy** (`field_policy.py`) — immutable fields hard-blocked; price/inventory
-  threshold breaches trigger HITL before apply
+```
+git checkout -b <type>/<short-description>   # start every piece of work on a branch
+# ... make changes, run tests ...
+git add <files>
+git commit -m "type: description"
+git push -u origin <branch-name>             # opens PR link on GitHub
+# CI runs automatically → merge when green → delete branch
+git checkout master && git pull              # sync master after merge
+git branch -d <branch-name>                 # clean up local branch
+```
 
----
+**Branch naming:**
+- `feat/` — new feature or phase work
+- `fix/` — bug fix
+- `phase/` — full GSD phase (e.g. `phase/16-agent-context-os`)
+- `chore/` — tooling, config, docs
 
-## Task Mode
-
-| Work type | Mode |
-|---|---|
-| New tests, vendor adapters, KISS audits | Async — run to completion |
-| Oracle/verifier interface changes | Synchronous — stay in loop |
-| Tier routing, kill-switch, field policy | Synchronous — highest risk |
-| Phase 13.2 / 14 / 15 architectural scope | Synchronous |
-
-**Slot Machine Protocol (high-complexity tasks):**
-Commit checkpoint → run autonomously 30 min → if wrong direction: `git reset --hard <checkpoint>`,
-re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOURNEY.md`.
-
----
-
-## Session Rituals
-
-**Start:** Read `STATE.md` → read active PLAN.md → state file theory → begin.
-
-**End:**
-1. Update `docs/MASTER_MAP.md` if any module changed
-2. Update `STATE.md`: what done, what next, open questions
-3. Learning loop — for every finding, triage as one of:
-   - **Apply now** → make the change
-   - **Capture** → add to `LEARNINGS.md` with date + context
-   - **Dismiss** → say why, move on
+**Rule:** `master` = always deployable. Never commit half-finished work directly to master.
 
 ---
 
@@ -223,7 +206,8 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 - No `src/models/` changes without a migration
 - No task closure without all four gate reports
 - No new top-level files/dirs without asking
-- No guessing at state — read `STATE.md` first
+- No guessing at state — read `STATE.md` and `AGENT_START_HERE.md` first
+- No direct commits to `master` — always use a branch + PR
 
 **Protected paths** (never auto-move): `.planning/` · `.rules` · `AGENTS.md`
 
@@ -232,7 +216,7 @@ re-prompt with one new constraint learned from the failure. Log in `FAILURE_JOUR
 ## Pointers
 
 `AGENTS.md` · `STANDARDS.md` · `ops/STRUCTURE_SPEC.md` · `ops/governance/roles/README.md`
-`FAILURE_JOURNEY.md` · `LEARNINGS.md` · `docs/MASTER_MAP.md`
+`FAILURE_JOURNEY.md` · `LEARNINGS.md` · `docs/MASTER_MAP.md` · `docs/AGENT_START_HERE.md`
 
 **Code Factory CI layer:**
 `risk-policy.json` · `scripts/governance/risk_tier_gate.py` · `scripts/governance/sha_gate.py`

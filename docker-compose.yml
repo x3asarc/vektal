@@ -70,6 +70,9 @@ services:
       # AI service keys
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_TEXT_MODEL=${OPENROUTER_TEXT_MODEL:-google/gemini-3.1-flash-lite-preview}
+      - OPENROUTER_TEXT_FALLBACK_MODEL=${OPENROUTER_TEXT_FALLBACK_MODEL:-openrouter/auto}
+      - ENABLE_GEMINI_FALLBACK=${ENABLE_GEMINI_FALLBACK:-0}
       - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
       - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
       # Shopify credentials

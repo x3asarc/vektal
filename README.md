@@ -1,121 +1,119 @@
-# Vektal
+# Vektal (Shopify Multi-Supplier Platform)
 
-**AI-powered product intelligence platform** — conversational interface for managing Shopify product catalogs at scale.
+**AI-powered product intelligence & self-healing automation** — A multi-tenant SaaS platform automating Shopify product management for craft/hobby stores (8+ vendors, 4,000+ SKUs).
 
-Built for store operators who need to resolve, enrich, and bulk-manage product data through natural language instead of manual workflows.
-
----
-
-## What It Does
-
-- **Conversational AI** — chat with an AI assistant to add, update, or bulk-import products
-- **Product Resolution** — resolve SKUs from supplier data or the web automatically
-- **Enrichment Engine** — governed AI enrichment pipeline with quality gates and audit trails
-- **Real-time Job Tracking** — live progress on background jobs via SSE streaming
-- **Search & Discovery** — search your product catalog with filters and snapshots
-- **Dry-run Reviews** — preview changes before applying them to your Shopify store
+Built for store operators to resolve, enrich, and bulk-manage product catalogs through a graph-grounded conversational interface and autonomous self-healing runtime.
 
 ---
 
-## Stack
+## 🚀 What It Does
+
+- **Graph-First Conversational AI** — Manage products via a chat assistant grounded in a Neo4j knowledge graph of your entire codebase and catalog.
+- **Self-Healing Runtime** — Autonomous detection and resolution of system issues, fueled by Sentry intake and verified closure gating.
+- **Agent Context OS** — A specialized execution layer with lifecycle memory hooks, reason-coded fallback, and binary governance gates.
+- **Product Resolution & Enrichment** — Automated SKU resolution from suppliers/web with governed AI enrichment pipelines (Vision AI + SEO).
+- **Multi-Layer Safety** — Tiered assistant architecture (T1/T2/T3) with dry-run gating, kill switches, and field-level mutation policies.
+- **Real-time Observability** — Live job tracking via SSE, comprehensive audit trails, and automated risk-tier gating.
+
+---
+
+## 🛠️ Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 16 (App Router), React 19, TypeScript 5 |
-| Styling | Pure CSS custom properties, Material Symbols icons |
-| State | Zustand (client), TanStack React Query (server) |
-| Backend | Python / Flask, SQLAlchemy, Celery |
-| Database | PostgreSQL with Alembic migrations |
-| Queue | Redis + Celery workers |
-| AI | Claude (Anthropic) — multi-tier routing (T1/T2/T3) |
-| Auth | OAuth + email verification |
-| Infra | Docker Compose, Nginx reverse proxy |
+| **Frontend** | Next.js 14 (App Router), TypeScript, Tailwind/Vanilla CSS |
+| **Backend** | Python 3.11+, Flask-OpenAPI3, SQLAlchemy (psycopg3), Celery |
+| **Knowledge Graph**| Neo4j + Graphiti (2,700+ nodes, 6,200+ relationships) |
+| **Data Layer** | PostgreSQL, Redis (Sessions/Queue), Vector Embeddings |
+| **AI Orchestration**| Gemini Flash / Claude 3.5 — Multi-tier routing with RAG |
+| **Self-Healing** | Sentry Intake + Sandbox Execution (Docker-based) |
+| **Infrastructure** | Docker Compose, Nginx, Dokploy (CI/CD) |
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 vektal/
-├── frontend/               # Next.js app
-│   └── src/
-│       ├── app/            # Route pages (App Router)
-│       ├── features/       # Feature modules (chat, jobs, search, enrichment)
-│       └── shell/          # AppShell, Sidebar, providers
-├── src/                    # Python backend
-│   ├── api/                # Flask API (v1 routes)
-│   ├── assistant/          # AI tier routing + governance
-│   ├── resolution/         # Product resolution engine
-│   ├── jobs/               # Job orchestration + Celery tasks
-│   └── models/             # SQLAlchemy models
-├── migrations/             # Alembic DB migrations
-├── nginx/                  # Nginx config
-├── docker-compose.yml
-└── .planning/              # GSD roadmap + phase plans
+├── .planning/              # Canonical lifecycle + execution state (ROADMAP.md)
+├── .agents/                # Agent-specific skills, configurations, and protocols
+├── .graph/                 # Knowledge graph configuration and bootstrap logic
+├── .memory/                # Persistent event memory and context snapshots
+├── src/                    # Primary backend and orchestration code
+│   ├── api/                # Flask/OpenAPI endpoints
+│   ├── assistant/          # Agent Context OS & Governance (Kill-switch/Oracle)
+│   ├── core/               # Domain logic, embeddings, and constants
+│   ├── graph/              # Neo4j/Graphiti query interfaces
+│   ├── resolution/         # Self-healing and auto-resolution logic
+│   └── models/             # SQLAlchemy database models
+├── frontend/               # Next.js frontend application
+├── scripts/                # Governance, context-os, and validation scripts
+├── reports/                # Mandatory governance gate evidence (4-report standard)
+├── tests/                  # Unit, Integration, API, Graph, and E2E (Playwright)
+└── docker-compose.yml      # Local stack orchestration (12+ services)
 ```
 
 ---
 
-## Getting Started
+## 🚦 Current Status (2026-03-06)
+
+- **Phase 1-16 Complete:** Core Infrastructure, API, Frontend, AI, Knowledge Graph, Self-Healing, and **Agent Context OS** are fully implemented.
+- **Phase 15.1 Complete:** Sentry autonomous intake and verified auto-resolution loop is active.
+- **Gate Status:** `GREEN` (Context OS compatibility gate passed).
+- **Target:** Production Refinement & Native LLM capability grounding.
+
+---
+
+## ⚡ Getting Started
 
 ### Prerequisites
 
 - Docker + Docker Compose
 - Node.js 20+
 - Python 3.11+
+- Neo4j Instance (Graphiti-compatible)
 
-### Run with Docker
-
-```bash
-docker-compose up --build
-```
-
-Frontend → `http://localhost:3000`
-Backend API → `http://localhost:5000`
-
-### Run Frontend Locally
+### Quick Start (Docker)
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# 1. Setup environment
+cp .env.example .env
+
+# 2. Start the full stack (12+ services)
+docker-compose up --build -d
+
+# 3. Verify Context OS Gate
+python scripts/governance/context_os_gate.py --window-hours 24
 ```
 
-### Run Backend Locally
-
-```bash
-pip install -r requirements.txt
-python src/app.py
-```
+- **Frontend:** `http://localhost:3000`
+- **Backend API:** `http://localhost:5000`
+- **Flower (Celery):** `http://localhost:5555`
 
 ---
 
-## Key Features
+## 🛡️ Governance & Safety
 
-### Dashboard
-Dark-theme AI chat home — starter cards, quick-action pills, and a full-width chat composer with Attach, Deep Search, and Generate Image tools.
+Vektal operates under a **Binary Governance Gate** system. No mutation reaches production without passing the following:
+1. **Self-Check:** Builder self-review.
+2. **Peer Review:** Two-pass verification.
+3. **Structure Audit:** `StructureGuardian` placement/naming verification.
+4. **Integrity Audit:** `IntegrityWarden` dependency/license/secret check.
 
-### Chat Interface
-Real-time streaming AI responses via SSE. Supports single SKU queries, bulk imports, and inline action approvals with delegation traces.
-
-### Enrichment Workspace
-Governed enrichment pipeline with oracle signal verification, quality gates, field-level policies, and dry-run compilation before any data is applied.
-
-### Job Tracker
-Live job status with progress bars, retry logic, and terminal notifications. Supports cancellation and priority queuing.
+**Kill-Switch:** A global circuit breaker (`src/assistant/governance/kill_switch.py`) gates every mutation.
 
 ---
 
-## Architecture Highlights
+## 📖 Documentation
 
-- **Multi-tier AI routing** — T1 (fast/cheap) → T2 (capable) → T3 (heavy) with automatic fallback
-- **Governed enrichment** — field-level policies, kill switches, and audit checkpoints at every step
-- **Idempotent job execution** — all jobs are safe to retry with deduplication
-- **Contract tests** — API contracts validated independently of implementation
-- **Observability** — instrumentation signals, correlation IDs, and canary gates
+- **[docs/AGENT_START_HERE.md](docs/AGENT_START_HERE.md)** — Primary entrypoint for AI/human operators.
+- **[docs/DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** — Detailed repository layout.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — System boundaries and module relationships.
+- **[AGENTS.md](AGENTS.md)** — Governance constitution and assistant roles.
+- **[LEARNINGS.md](LEARNINGS.md)** — Cumulative anti-loop and architectural insights.
 
 ---
 
-## License
+## 📄 License
 
-MIT
+MIT © 2026 Vektal Team. Production instance: [Bastelschachtel.at](https://bastelschachtel.at).

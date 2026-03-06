@@ -149,6 +149,7 @@ def test_small_talk_message_returns_conversational_text_only(authenticated_clien
     assert payload["assistant_message"]["content"]
     block_types = [block["type"] for block in payload["assistant_message"]["blocks"]]
     assert block_types == ["text"]
+    greeting_text = payload["assistant_message"]["content"]
 
     follow_up = client.post(
         f"/api/v1/chat/sessions/{session['id']}/messages",
@@ -159,6 +160,8 @@ def test_small_talk_message_returns_conversational_text_only(authenticated_clien
     assert follow_payload["assistant_message"]["intent_type"] == "unknown"
     follow_block_types = [block["type"] for block in follow_payload["assistant_message"]["blocks"]]
     assert follow_block_types == ["text"]
+    assert "outcome you want" in follow_payload["assistant_message"]["content"].lower()
+    assert follow_payload["assistant_message"]["content"] != greeting_text
 
     unsure = client.post(
         f"/api/v1/chat/sessions/{session['id']}/messages",
@@ -169,6 +172,8 @@ def test_small_talk_message_returns_conversational_text_only(authenticated_clien
     assert unsure_payload["assistant_message"]["intent_type"] == "unknown"
     unsure_block_types = [block["type"] for block in unsure_payload["assistant_message"]["blocks"]]
     assert unsure_block_types == ["text"]
+    assert "start with one simple goal" in unsure_payload["assistant_message"]["content"].lower()
+    assert unsure_payload["assistant_message"]["content"] != greeting_text
 
 
 def test_message_validation_and_state_errors_are_deterministic(authenticated_client):

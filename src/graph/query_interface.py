@@ -121,30 +121,31 @@ def match_query_to_template(query: str) -> Optional[tuple]:
     Returns:
         (template_name, params) tuple or None if no match.
     """
-    query = query.lower().strip()
+    raw_query = query.strip()
+    lowered_query = raw_query.lower()
     
     # "what imports X" or "X imported by" -> imports template
-    if match := re.search(r'what imports ([\w./\\-]+)', query):
+    if match := re.search(r'what imports ([\w./\\-]+)', raw_query, flags=re.IGNORECASE):
         return "imported_by", {"file_path": _normalize_query_path(match.group(1))}
     
     # "what does X depend on" or "X imports" -> imported_by template
-    if match := re.search(r'what does ([\w./\\-]+) depend on', query):
+    if match := re.search(r'what does ([\w./\\-]+) depend on', raw_query, flags=re.IGNORECASE):
         return "imports", {"file_path": _normalize_query_path(match.group(1))}
     
     # "find similar to X" -> similar_files template
-    if match := re.search(r'find similar to ([\w./\\-]+)', query):
+    if match := re.search(r'find similar to ([\w./\\-]+)', raw_query, flags=re.IGNORECASE):
         return "similar_files", {"file_path": _normalize_query_path(match.group(1)), "limit": 5, "threshold": 0.6}
     
     # "what implements Phase X" -> phase_code template
-    if match := re.search(r'what implements phase ([\d.]+)', query):
+    if match := re.search(r'what implements phase ([\d.]+)', lowered_query):
         return "phase_code", {"phase": match.group(1)}
         
     # "impact radius of X" -> impact_radius template
-    if match := re.search(r'impact radius of ([\w./\\-]+)', query):
+    if match := re.search(r'impact radius of ([\w./\\-]+)', raw_query, flags=re.IGNORECASE):
         return "impact_radius", {"file_path": _normalize_query_path(match.group(1))}
         
     # "callers of function X" -> function_callers template
-    if match := re.search(r'callers of function ([\w.]+)', query):
+    if match := re.search(r'callers of function ([\w.]+)', raw_query, flags=re.IGNORECASE):
         return "function_callers", {"function_name": match.group(1)}
         
     return None

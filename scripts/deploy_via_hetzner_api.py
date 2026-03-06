@@ -3,12 +3,14 @@
 
 import os
 import requests
+import socket
 import time
 
 HETZNER_API_TOKEN = os.getenv('HETZNER_CLOUD_API_TOKEN')
-SERVER_ID = 121393256  # ubuntu-4gb-hel1-1
+SERVER_ID_RAW = os.getenv("HETZNER_SERVER_ID", "121393256")  # ubuntu-4gb-hel1-1
 API_BASE = "https://api.hetzner.cloud/v1"
 PUBLIC_DOMAIN = os.getenv("PUBLIC_DOMAIN", "app.vektal.systems")
+ALLOW_DOMAIN_MISMATCH = os.getenv("ALLOW_DOMAIN_MISMATCH", "0") == "1"
 
 def api_call(endpoint, method="GET", data=None):
     """Make Hetzner API call."""
@@ -23,10 +25,41 @@ def api_call(endpoint, method="GET", data=None):
     response.raise_for_status()
     return response.json()
 
-def get_server_ip():
+def get_server_ip(server_id: int):
     """Get server IP address."""
-    result = api_call(f"servers/{SERVER_ID}")
+    result = api_call(f"servers/{server_id}")
     return result['server']['public_net']['ipv4']['ip']
+
+
+def resolve_domain_ipv4(domain: str) -> list[str]:
+    """Resolve IPv4 addresses for the target domain."""
+    try:
+        infos = socket.getaddrinfo(domain, 443, socket.AF_INET, socket.SOCK_STREAM)
+        return sorted({entry[4][0] for entry in infos})
+    except Exception:
+        return []
+
+
+def enforce_domain_alignment(server_ip: str) -> bool:
+    """Prevent accidental deployment to a host not behind the public domain."""
+    domain_ips = resolve_domain_ipv4(PUBLIC_DOMAIN)
+    if not domain_ips:
+        print(f"[WARN] Could not resolve A records for {PUBLIC_DOMAIN}; skipping strict alignment check.")
+        return True
+
+    print(f"[Preflight] {PUBLIC_DOMAIN} A records: {', '.join(domain_ips)}")
+    if server_ip in domain_ips:
+        print("[OK] Server IP matches public domain A record")
+        return True
+
+    print(f"[WARN] Server IP {server_ip} is not in {PUBLIC_DOMAIN} A records.")
+    if ALLOW_DOMAIN_MISMATCH:
+        print("[WARN] Continuing because ALLOW_DOMAIN_MISMATCH=1.")
+        return True
+
+    print("[ERROR] Blocking deploy to avoid wrong-target rollout.")
+    print("[HINT] Update DNS or set ALLOW_DOMAIN_MISMATCH=1 for intentional split routing.")
+    return False
 
 def trigger_webhook_deployment():
     """Trigger Dokploy webhook if available."""
@@ -82,11 +115,21 @@ def main():
         print("[ERROR] HETZNER_CLOUD_API_TOKEN not found in environment")
         return 1
 
+    try:
+        server_id = int(SERVER_ID_RAW)
+    except ValueError:
+        print(f"[ERROR] Invalid HETZNER_SERVER_ID: {SERVER_ID_RAW!r}")
+        print("[HINT] Set HETZNER_SERVER_ID to a numeric Hetzner server id.")
+        return 1
+
     # Get server info
-    server_ip = get_server_ip()
+    server_ip = get_server_ip(server_id)
     print(f"Server IP: {server_ip}")
-    print(f"Server ID: {SERVER_ID}")
+    print(f"Server ID: {server_id}")
     print()
+
+    if not enforce_domain_alignment(server_ip):
+        return 1
 
     # Try webhook deployment first
     webhook_success = trigger_webhook_deployment()

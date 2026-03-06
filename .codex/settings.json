@@ -13,6 +13,38 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "filter": {
+          "tool": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/governance/health_gate.py",
+            "blockOnFailure": false
+          },
+          {
+            "type": "command",
+            "command": "python scripts/memory/pre_tool_update.py --provider codex --session-key codex-pretool --window-hint codex",
+            "blockOnFailure": false
+          },
+          {
+            "type": "command",
+            "command": "python scripts/hooks/antigravity_notify.py --provider codex --source pre_tool_use --heartbeat --window-hint codex",
+            "blockOnFailure": false
+          }
+        ]
+      }
     ]
+  },
+  "mcpServers": {
+    "synthex-knowledge-graph": {
+      "command": "./venv/Scripts/python.exe",
+      "args": [
+        "src/graph/mcp_server.py"
+      ]
+    }
   }
 }

@@ -18,6 +18,10 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 from src.graph.file_parser import parse_python_file
+from src.graph.frontend_imports import (
+    extract_ts_import_modules,
+    resolve_frontend_import_to_file,
+)
 
 
 def _normalize(path: str) -> str:
@@ -168,19 +172,21 @@ def _snapshot_cache_path() -> Path:
     return Path(os.environ.get("LOCAL_GRAPH_SNAPSHOT_CACHE_PATH", ".graph/local-snapshot.json"))
 
 
-def _candidate_python_files() -> List[str]:
-    roots = [Path("src"), Path("tests"), Path("scripts")]
+def _candidate_source_files() -> List[str]:
+    roots = [Path("src"), Path("tests"), Path("scripts"), Path("frontend/src")]
+    patterns = ("*.py", "*.ts", "*.tsx", "*.js", "*.jsx")
     files: List[str] = []
     for root in roots:
         if not root.exists():
             continue
-        for candidate in root.rglob("*.py"):
-            files.append(_normalize(str(candidate)))
+        for pattern in patterns:
+            for candidate in root.rglob(pattern):
+                files.append(_normalize(str(candidate)))
     return files
 
 
 def _build_snapshot() -> LocalGraphSnapshot:
-    files = set(_candidate_python_files())
+    files = set(_candidate_source_files())
     imports_out: Dict[str, Set[str]] = defaultdict(set)
     imports_in: Dict[str, Set[str]] = defaultdict(set)
     functions_by_file: Dict[str, List[str]] = defaultdict(list)
@@ -194,24 +200,39 @@ def _build_snapshot() -> LocalGraphSnapshot:
     file_to_planning: Dict[str, Set[str]] = defaultdict(set)
 
     for path in files:
-        parsed = parse_python_file(path)
-        for imp in parsed.imports:
-            module = imp.from_module or imp.name
-            resolved = _resolve_module_to_file(module)
-            if resolved:
-                imports_out[path].add(resolved)
-                imports_in[resolved].add(path)
+        if path.endswith(".py"):
+            parsed = parse_python_file(path)
+            for imp in parsed.imports:
+                module = imp.from_module or imp.name
+                resolved = _resolve_module_to_file(module)
+                if resolved:
+                    imports_out[path].add(resolved)
+                    imports_in[resolved].add(path)
 
-        module_name = _module_name_from_path(path)
-        for fn in parsed.functions:
-            full_name = f"{module_name}.{fn.name}"
-            functions_by_file[path].append(full_name)
-            function_file[full_name] = path
-            by_file_and_name[(path, fn.name)] = full_name
-            by_name[fn.name].append(full_name)
-            by_full_name.add(full_name)
+            module_name = _module_name_from_path(path)
+            for fn in parsed.functions:
+                full_name = f"{module_name}.{fn.name}"
+                functions_by_file[path].append(full_name)
+                function_file[full_name] = path
+                by_file_and_name[(path, fn.name)] = full_name
+                by_name[fn.name].append(full_name)
+                by_full_name.add(full_name)
+            continue
+
+        if path.endswith((".ts", ".tsx", ".js", ".jsx")) and Path(path).exists():
+            try:
+                content = Path(path).read_text(encoding="utf-8")
+            except Exception:
+                continue
+            for module in extract_ts_import_modules(content):
+                resolved = resolve_frontend_import_to_file(module, path)
+                if resolved:
+                    imports_out[path].add(resolved)
+                    imports_in[resolved].add(path)
 
     for path in files:
+        if not path.endswith(".py"):
+            continue
         if not Path(path).exists():
             continue
         try:
