@@ -1,0 +1,62 @@
+asterisk
+VEKTAL OS
+space_dashboard
+DASHBOARD
+search
+SEARCH
+auto_awesome
+CHAT
+inventory_2
+ENRICHMENT
+work_history
+JOBS
+settings_suggest
+ONBOARDING
+settings
+SETTINGS
+approval_delegation
+APPROVALS
+
+ABOUT VEKTAL
+
+Vektal OS is the governed console for catalog forensics, enrichment, and approvals.
+
+Store Link
+Auth
+Chat
+Jobs
+Search
+Environment: Production · Region: EU-Central-1
+Product Data Command Center
+
+Real-time catalog health and operational control.
+
+Error: Failed to fetch dashboard summary
+Automated Insights
+
+Your catalog is 100% healthy. All critical fields are populated across all SKUs.
+
+START AUTO-FIX RUN
+Operational Control Dock
+Authenticated Session
+auto_awesomeAI ASSISTANT
+Session:
+ No session
+State:
+ at_door
+Stream:
+ sse
+chat_bubble_outline
+
+Start by describing a SKU or bulk SKU list.
+
+ASSISTANT TRANSPORT DEGRADED
+diag:ad669f39
+
+Log in first via POST /api/v1/auth/login, then retry this request. (HTTP 401)
+
+RETRY SESSION BOOTSTRAP
+SHOW DIAGNOSTICS
+list_alt
+BULK SKUS
+arrow_upward
