@@ -1,0 +1,72 @@
+{
+  "theme_identity": "Digital Forensic / Brutalist Archive. A high-end mix of government black-box surveillance, Rhodia bureaucratic stationery, and glitchy HUD interfaces.",
+  "tokens": {
+    "colors": {
+      "brand": {
+        "primary": "#A0A0FF",
+        "secondary": "#00FF00",
+        "accent": "#FFFFFF",
+        "warning": "#FF4D4D"
+      },
+      "surface": {
+        "background": "#050505",
+        "foreground": "#F0F0F0",
+        "card": "#0A0A0A",
+        "border": "#1A1A1A",
+        "dither": "rgba(160, 160, 255, 0.05)"
+      },
+      "interactive": {
+        "hover": "rgba(160, 160, 255, 0.15)",
+        "active": "rgba(160, 160, 255, 0.25)",
+        "focus": "0 0 0 1px #A0A0FF"
+      }
+    },
+    "spacing": {
+      "base": "0.5rem",
+      "grid": "2rem",
+      "ch": "1ch"
+    },
+    "shape": {
+      "radius": "0px",
+      "border_width": "1px"
+    },
+    "typography": {
+      "display": "'JetBrains Mono', monospace",
+      "body": "'IBM Plex Mono', monospace",
+      "weights": {
+        "light": 300,
+        "regular": 400,
+        "bold": 600
+      }
+    }
+  },
+  "patterns": {
+    "textures": {
+      "grain": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
+      "dot_matrix": "radial-gradient(circle, var(--primary) 1px, transparent 1px)"
+    },
+    "components": [
+      {
+        "name": "Forensic HUD Frame",
+        "css": "border: 1px solid var(--border); position: relative; padding: 2ch; &::before { content: '[SCAN_ACTIVE]'; position: absolute; top: -1ch; left: 2ch; background: var(--background); font-size: 0.7rem; color: var(--primary); }"
+      },
+      {
+        "name": "Brutalist Data Table",
+        "description": "High-density Rhodia-style lists with 1px borders and no padding-left.",
+        "tokens": { "border": "1px solid var(--border)", "font_size": "0.85rem" }
+      },
+      {
+        "name": "Pixel Dust Gradient",
+        "css": "mask-image: radial-gradient(black, transparent); background-image: var(--dot_matrix); background-size: 4px 4px;"
+      }
+    ]
+  },
+  "technical_assets": {
+    "css_vars": {
+      "--primary": "#A0A0FF",
+      "--secondary": "#00FF00",
+      "--bg": "#050505",
+      "--border": "rgba(255, 255, 255, 0.1)"
+    }
+  }
+}

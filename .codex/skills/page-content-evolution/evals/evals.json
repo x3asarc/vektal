@@ -1,0 +1,24 @@
+{
+  "skill_name": "page-content-evolution",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit my app pages and tell me what buttons and options are missing, especially in /settings where it is too basic.",
+      "expected_output": "Uses Playwright and Firecrawl captures, produces structured page-state JSON, and gives scoped recommendations with in_scope or phase_later decisions.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need page-by-page UX recommendations that are realistic for current roadmap phase, not random feature bloat.",
+      "expected_output": "Reads roadmap/state constraints, validates recommendations with a rubric, and provides a prioritized build order.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Before proposing UI changes, prove you understood what currently exists on each page from screenshots and scrape data.",
+      "expected_output": "Builds evidence-backed inventory and extracts current actions/options/states before recommendations.",
+      "files": []
+    }
+  ]
+}
+

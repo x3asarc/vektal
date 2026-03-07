@@ -60,6 +60,15 @@ class Product(db.Model, TimestampMixin):
     hs_code = db.Column(String(20))
     country_of_origin = db.Column(String(2))  # ISO 3166-1 alpha-2
 
+    # Extended Shopify Data (Phase 17)
+    collections_json = db.Column(JSON)  # List of collection names/IDs
+    metafields_json = db.Column(JSON)   # Scoped metafields
+    price_per_unit_value = db.Column(Numeric(10, 2))
+    price_per_unit_unit = db.Column(String(50))
+
+    # Catalog Health (Phase 17)
+    completeness_score = db.Column(Numeric(5, 2), index=True)
+
     # Sync tracking
     last_synced_at = db.Column(db.DateTime(timezone=True))
     sync_status = db.Column(String(50), default='pending')  # pending, synced, error

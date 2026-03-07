@@ -1,0 +1,89 @@
+{
+  "id": "d1e93948-d447-41ca-9944-19bbc1731eef",
+  "model": "sonar",
+  "created": 1772562075,
+  "usage": {
+    "prompt_tokens": 95,
+    "completion_tokens": 749,
+    "total_tokens": 844,
+    "search_context_size": "low",
+    "cost": {
+      "input_tokens_cost": 9e-05,
+      "output_tokens_cost": 0.00075,
+      "request_cost": 0.005,
+      "total_cost": 0.00584
+    }
+  },
+  "citations": [
+    "https://sombrainc.com/blog/ai-context-engineering-guide",
+    "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "https://www.stack-ai.com/blog/the-2026-guide-to-agentic-workflow-architectures",
+    "https://www.uipath.com/blog/ai/adopting-agentic-ai-2026-things-you-can-do-right-now",
+    "https://www.vellum.ai/blog/beginners-guide-to-building-ai-agents",
+    "https://pub.towardsai.net/ai-agents-in-2026-a-practical-guide-918239017060"
+  ],
+  "search_results": [
+    {
+      "title": "The Guide to AI Context Engineering in 2026 - Sombra",
+      "url": "https://sombrainc.com/blog/ai-context-engineering-guide",
+      "date": "2026-01-23",
+      "last_updated": "2026-03-03",
+      "snippet": "Prompt engineering is fading. Learn why context engineering is the key to scalable, reliable AI systems and agentic workflows in 2026.",
+      "source": "web"
+    },
+    {
+      "title": "Effective context engineering for AI agents - Anthropic",
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "date": "2025-09-29",
+      "last_updated": "2026-03-03",
+      "snippet": "Context is a critical but finite resource for AI agents. In this post, we explore strategies for effectively curating and managing the context ...",
+      "source": "web"
+    },
+    {
+      "title": "The 2026 Guide to Agentic Workflow Architectures - Stack AI",
+      "url": "https://www.stack-ai.com/blog/the-2026-guide-to-agentic-workflow-architectures",
+      "date": "2026-01-26",
+      "last_updated": "2026-03-03",
+      "snippet": "This guide uses four categories: single agent workflows, hierarchical multi agent workflows, sequential pipeline workflows, and decentralized ...",
+      "source": "web"
+    },
+    {
+      "title": "Adopting agentic AI in 2026: 5 things you can do right now | UiPath",
+      "url": "https://www.uipath.com/blog/ai/adopting-agentic-ai-2026-things-you-can-do-right-now",
+      "date": "2026-01-19",
+      "last_updated": "2026-02-24",
+      "snippet": "1. Unlock the data trapped in documents and communications \u00b7 2. Start experimenting with AI agents now \u00b7 3. Design and orchestrate your processes ...",
+      "source": "web"
+    },
+    {
+      "title": "Beginners Guide to Building AI Agents - Vellum AI",
+      "url": "https://www.vellum.ai/blog/beginners-guide-to-building-ai-agents",
+      "date": "2025-12-03",
+      "last_updated": "2026-02-26",
+      "snippet": "A practical beginner guide to buildAI agents. Learn what they are, how they work, and build one fast with Vellum's no-code Agent Builder and AI Apps.",
+      "source": "web"
+    },
+    {
+      "title": "AI Agents in 2026: A Practical Guide",
+      "url": "https://pub.towardsai.net/ai-agents-in-2026-a-practical-guide-918239017060",
+      "date": "2026-02-21",
+      "snippet": "RAG vs workflows vs agents, plus the 4 guardrails: state, action selection, budgets, and recovery.",
+      "source": "web"
+    }
+  ],
+  "object": "chat.completion",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "### 1) Working/Short/Long Memory Layering\nLayer memory hierarchically: **short-term (working) memory** holds immediate task context (e.g., current conversation turns) via summarization and compaction to avoid overflow; **long-term memory** stores stable facts, user state, and milestones in structured formats like summaries or notes for retrieval.[1][2][3] Use a central **context manager** to condense transcripts into running state descriptions (e.g., decisions, goals) and feed role-specific views to agents\u2014reasoning agents get structured data, response agents get summaries.[1][2] For long-horizon tasks, combine compaction for flow, note-taking for iterations, and multi-agent handoffs for persistence.[2]\n\n### 2) Graph-First Retrieval with Fallbacks\nPrioritize **graph-based retrieval** (e.g., knowledge graphs for entity relationships) as primary for precise, structured recall, falling back to semantic search or RAG for broader queries.[1][3] Design retrieval around observed context patterns: discover from behavior, build graph stores for user state/actions/threads, and use agent-specific formatting.[1] Fallbacks include runtime tool use (e.g., search APIs) with heuristics to avoid dead-ends; pre-compute where possible for speed over exploration.[2][3]\n\n### 3) Token and Latency Control\nKeep context **tight and informative**: summarize aggressively, avoid appending full histories, and measure token usage per step.[1][2][3] Optimize via **compaction** (condense old details), structured storage (edit/audit facts), and relevance filtering\u2014target <80% window fill for pollution resistance.[2][3] Reduce latency with single-agent for linear tasks, hierarchical multi-agent for parallel work, and pre-retrieval over runtime exploration.[2][3]\n\n### 4) Cross-Terminal/Session Continuity\nMaintain continuity via **persistent context managers** tracking user state, threads, and actions across sessions/terminals.[1][3] Store in auditable long-term memory (avoid sensitive data without consent); retrieve via graphs or summaries on resume.[1][3] Use orchestration layers for handoffs, human gates, and unified visibility to prevent sprawl.[1][4]\n\n### 5) Common Failure Modes Observed by Teams\n- **Context pollution/flakiness**: Ad-hoc prompting or unfiltered appending leads to irrelevant info overwhelming models\u2014fix with standardization and compaction.[1][2]\n- **Token overflow in long tasks**: Exceeding windows without layering causes incoherence\u2014mitigate via summaries and multi-agent delegation.[2][3]\n- **Retrieval misuse**: Agents chase dead-ends or ignore keys without heuristics/tools\u2014add guidance and fallbacks.[2]\n- **Agent sprawl**: Disconnected agents lack governance, causing unintended actions\u2014use orchestration, audits, sandboxes.[3][4]\n- **State loss**: Poor persistence breaks continuity\u2014centralize managers and structured memory.[1][3]\n\nSources: [Sombra Guide](https://sombrainc.com/blog/ai-context-engineering-guide)[1], [Anthropic Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)[2], [Stack AI 2026 Guide](https://www.stack-ai.com/blog/the-2026-guide-to-agentic-workflow-architectures)[3], [UiPath Adoption](https://www.uipath.com/blog/ai/adopting-agentic-ai-2026-things-you-can-do-right-now)[4]."
+      },
+      "delta": {
+        "role": "assistant",
+        "content": ""
+      },
+      "finish_reason": "stop"
+    }
+  ]
+}

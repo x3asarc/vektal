@@ -1,0 +1,210 @@
+[
+    {
+        "page_id":  "home",
+        "route":  "/",
+        "capture_route":  "/",
+        "local_url":  "http://localhost:3000/",
+        "public_url":  "https://app.vektal.systems/",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/home-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/home-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/home.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/"
+                   ]
+    },
+    {
+        "page_id":  "dashboard",
+        "route":  "/dashboard",
+        "capture_route":  "/dashboard",
+        "local_url":  "http://localhost:3000/dashboard",
+        "public_url":  "https://app.vektal.systems/dashboard",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/dashboard.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/dashboard"
+                   ]
+    },
+    {
+        "page_id":  "chat",
+        "route":  "/chat",
+        "capture_route":  "/chat",
+        "local_url":  "http://localhost:3000/chat",
+        "public_url":  "https://app.vektal.systems/chat",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/chat-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/chat-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/chat.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/chat"
+                   ]
+    },
+    {
+        "page_id":  "enrichment",
+        "route":  "/enrichment",
+        "capture_route":  "/enrichment",
+        "local_url":  "http://localhost:3000/enrichment",
+        "public_url":  "https://app.vektal.systems/enrichment",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/enrichment.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/enrichment"
+                   ]
+    },
+    {
+        "page_id":  "jobs",
+        "route":  "/jobs",
+        "capture_route":  "/jobs",
+        "local_url":  "http://localhost:3000/jobs",
+        "public_url":  "https://app.vektal.systems/jobs",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/jobs.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/jobs"
+                   ]
+    },
+    {
+        "page_id":  "job_detail",
+        "route":  "/jobs/[id]",
+        "capture_route":  "/jobs/1",
+        "local_url":  "http://localhost:3000/jobs/1",
+        "public_url":  "https://app.vektal.systems/jobs/1",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/jobs__id.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/jobs/1"
+                   ]
+    },
+    {
+        "page_id":  "onboarding",
+        "route":  "/onboarding",
+        "capture_route":  "/onboarding",
+        "local_url":  "http://localhost:3000/onboarding",
+        "public_url":  "https://app.vektal.systems/onboarding",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/onboarding.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/onboarding"
+                   ]
+    },
+    {
+        "page_id":  "search",
+        "route":  "/search",
+        "capture_route":  "/search",
+        "local_url":  "http://localhost:3000/search",
+        "public_url":  "https://app.vektal.systems/search",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/search-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/search-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/search.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/search"
+                   ]
+    },
+    {
+        "page_id":  "settings",
+        "route":  "/settings",
+        "capture_route":  "/settings",
+        "local_url":  "http://localhost:3000/settings",
+        "public_url":  "https://app.vektal.systems/settings",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/settings-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/settings-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/settings.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/settings"
+                   ]
+    },
+    {
+        "page_id":  "approvals",
+        "route":  "/approvals",
+        "capture_route":  "/approvals",
+        "local_url":  "http://localhost:3000/approvals",
+        "public_url":  "https://app.vektal.systems/approvals",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/approvals.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/approvals"
+                   ]
+    },
+    {
+        "page_id":  "auth_login",
+        "route":  "/auth/login",
+        "capture_route":  "/auth/login",
+        "local_url":  "http://localhost:3000/auth/login",
+        "public_url":  "https://app.vektal.systems/auth/login",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/auth__login.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/auth/login"
+                   ]
+    },
+    {
+        "page_id":  "auth_verify",
+        "route":  "/auth/verify",
+        "capture_route":  "/auth/verify",
+        "local_url":  "http://localhost:3000/auth/verify",
+        "public_url":  "https://app.vektal.systems/auth/verify",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/auth__verify.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/auth/verify"
+                   ]
+    },
+    {
+        "page_id":  "test",
+        "route":  "/test",
+        "capture_route":  "/test",
+        "local_url":  "http://localhost:3000/test",
+        "public_url":  "https://app.vektal.systems/test",
+        "playwright_desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/test-desktop.png",
+        "playwright_mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/test-mobile.png",
+        "firecrawl_output":  ".planning/page-audit/run-20260305-203815/captures/firecrawl/test.txt",
+        "playwright_desktop_status":  "ok",
+        "playwright_mobile_status":  "ok",
+        "firecrawl_status":  "error",
+        "errors":  [
+                       "firecrawl scrape failed for https://app.vektal.systems/test"
+                   ]
+    }
+]

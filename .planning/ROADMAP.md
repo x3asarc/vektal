@@ -538,3 +538,28 @@ Plans:
 - [x] 15.1-02-PLAN.md - Health monitor deduped routing and issue-level telemetry (Wave 1)
 - [x] 15.1-03-PLAN.md - Verified Sentry closure gate in client and feedback loop (Wave 2)
 - [x] 15.1-04-PLAN.md - Focused verification suite and binary closure evidence (Wave 2)
+
+### Phase 17: Product Data Command Center + Chat-First Product Ops
+**Goal**: Transform the platform into a "System of Record" alongside Shopify with real-time sync, catalog health scoring, and forensic rollback.
+**Depends on**: Phase 16, Phase 10
+**Plans**: 6 plans in 6 waves
+
+Plans:
+- [x] 17.1-PLAN.md - Data Contract (Completeness scoring & Model extensions) (Wave 1)
+- [x] 17.2-PLAN.md - Ingest Hardening (Automated metrics & Watermarking) (Wave 2)
+- [x] 17.3-PLAN.md - Shopify Listener (Webhook receiver & Reconciliation poller) (Wave 3)
+- [x] 17.4-PLAN.md - Dashboard Metrics API (Summary & Search filters) (Wave 4)
+- [x] 17.5-PLAN.md - Dashboard UI (Command Center & Chat Dock) (Wave 5)
+- [x] 17.6-PLAN.md - Rollback UX (Pre-flight audit & Execution) (Wave 6)
+
+### Phase 18: Evolutionary Schema Engine (Nanoclaw) (INSERTED)
+**Goal**: Implement "Self-Writing DNA" where the system autonomously detects new data shapes in incoming webhooks and evolves its own database schema to accommodate them.
+**Depends on**: Phase 17 (Webhook infrastructure), Phase 15 (Sandbox & Governance)
+**Audience**: `[developer-facing]` - Automates schema maintenance.
+**Plans**: TBD
+
+Plans:
+- [ ] 18.1-PLAN.md - Picoclaw Observer (Data shape detection & anomaly tagging)
+- [ ] 18.2-PLAN.md - Nanoclaw Architect (Type inference & Model rewriting)
+- [ ] 18.3-PLAN.md - The Foundry (Automated migration generation & Sandboxed application)
+- [ ] 18.4-PLAN.md - Governance GUI (Human approval queue for schema expansion)

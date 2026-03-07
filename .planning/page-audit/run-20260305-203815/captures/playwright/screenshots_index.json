@@ -1,0 +1,83 @@
+{
+    "screenshots":  [
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/home-mobile.png",
+                            "page_id":  "home",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/home-desktop.png",
+                            "route":  "/"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-mobile.png",
+                            "page_id":  "dashboard",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-desktop.png",
+                            "route":  "/dashboard"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/chat-mobile.png",
+                            "page_id":  "chat",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/chat-desktop.png",
+                            "route":  "/chat"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-mobile.png",
+                            "page_id":  "enrichment",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-desktop.png",
+                            "route":  "/enrichment"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-mobile.png",
+                            "page_id":  "jobs",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-desktop.png",
+                            "route":  "/jobs"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-mobile.png",
+                            "page_id":  "job_detail",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-desktop.png",
+                            "route":  "/jobs/[id]"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-mobile.png",
+                            "page_id":  "onboarding",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-desktop.png",
+                            "route":  "/onboarding"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/search-mobile.png",
+                            "page_id":  "search",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/search-desktop.png",
+                            "route":  "/search"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/settings-mobile.png",
+                            "page_id":  "settings",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/settings-desktop.png",
+                            "route":  "/settings"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-mobile.png",
+                            "page_id":  "approvals",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-desktop.png",
+                            "route":  "/approvals"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-mobile.png",
+                            "page_id":  "auth_login",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-desktop.png",
+                            "route":  "/auth/login"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-mobile.png",
+                            "page_id":  "auth_verify",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-desktop.png",
+                            "route":  "/auth/verify"
+                        },
+                        {
+                            "mobile":  ".planning/page-audit/run-20260305-203815/captures/playwright/test-mobile.png",
+                            "page_id":  "test",
+                            "desktop":  ".planning/page-audit/run-20260305-203815/captures/playwright/test-desktop.png",
+                            "route":  "/test"
+                        }
+                    ],
+    "run_id":  "run-20260305-203815"
+}

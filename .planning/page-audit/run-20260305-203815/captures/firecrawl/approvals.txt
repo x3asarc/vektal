@@ -1,0 +1,1 @@
+Error: The URL failed to load in the browser with error code "ERR_TUNNEL_CONNECTION_FAILED". Firecrawl encountered an internal proxy error while establishing the tunnel. This is an internal Firecrawl proxy error. Please retry or contact support.

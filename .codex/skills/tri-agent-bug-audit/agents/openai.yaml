@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tri-Agent Bug Audit"
+  short_description: "Neutral + adversarial bug validation workflow"
+  default_prompt: "Run a tri-agent bug audit on this codebase and return adjudicated findings."

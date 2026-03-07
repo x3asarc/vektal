@@ -1,0 +1,11 @@
+{
+    "mcp_resource_templates":  [
+
+                               ],
+    "checked_at":  "2026-03-05T21:04:26.3525148+01:00",
+    "run_id":  "run-20260305-203815",
+    "mcp_resources":  [
+
+                      ],
+    "note":  "No Playwright MCP server resources were available in this session."
+}

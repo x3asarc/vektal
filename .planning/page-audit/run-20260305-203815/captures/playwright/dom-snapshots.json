@@ -1,0 +1,675 @@
+[
+  {
+    "page_id": "home",
+    "route": "/",
+    "capture_route": "/",
+    "url": "http://localhost:3000/",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "space_dashboardOrbital Forensics Console",
+        "Session Status",
+        "Catalog Integrity",
+        "Queued Jobs",
+        "Pending Approvals",
+        "Graph Context Mode",
+        "Next Operators"
+      ],
+      "buttons": [],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        },
+        {
+          "text": "Run Search Sweep",
+          "href": "/search"
+        },
+        {
+          "text": "Open Assistant",
+          "href": "/chat"
+        },
+        {
+          "text": "Inspect Jobs",
+          "href": "/jobs"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "dashboard",
+    "route": "/dashboard",
+    "capture_route": "/dashboard",
+    "url": "http://localhost:3000/dashboard",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "space_dashboardOrbital Forensics Console",
+        "Session Status",
+        "Catalog Integrity",
+        "Queued Jobs",
+        "Pending Approvals",
+        "Graph Context Mode",
+        "Next Operators"
+      ],
+      "buttons": [],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        },
+        {
+          "text": "Run Search Sweep",
+          "href": "/search"
+        },
+        {
+          "text": "Open Assistant",
+          "href": "/chat"
+        },
+        {
+          "text": "Inspect Jobs",
+          "href": "/jobs"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "chat",
+    "route": "/chat",
+    "capture_route": "/chat",
+    "url": "http://localhost:3000/chat",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "auto_awesomeAI Assistant"
+      ],
+      "buttons": [],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": [
+        "hourglass_emptyLoading session…"
+      ]
+    }
+  },
+  {
+    "page_id": "enrichment",
+    "route": "/enrichment",
+    "capture_route": "/enrichment",
+    "url": "http://localhost:3000/enrichment",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "inventory_2Product Enrichment",
+        "Run Configurator"
+      ],
+      "buttons": [
+        "Start dry-run"
+      ],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [
+        "quick",
+        "standard",
+        "deep",
+        "de",
+        "en"
+      ],
+      "toggles": [
+        "supplier verified"
+      ],
+      "textInputs": [
+        "supplier code"
+      ],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "jobs",
+    "route": "/jobs",
+    "capture_route": "/jobs",
+    "url": "http://localhost:3000/jobs",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "work_historyJobs"
+      ],
+      "buttons": [
+        "refreshRefresh"
+      ],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        },
+        {
+          "text": "Open onboarding",
+          "href": "/onboarding"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": [
+        "inboxNo jobs found yet.Create your first run from onboarding or chat bulk actions.Open onboarding"
+      ]
+    }
+  },
+  {
+    "page_id": "job_detail",
+    "route": "/jobs/[id]",
+    "capture_route": "/jobs/1",
+    "url": "http://localhost:3000/jobs/1",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "work_historyJob 1"
+      ],
+      "buttons": [],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": [
+        "hourglass_emptyWaiting for job data…"
+      ]
+    }
+  },
+  {
+    "page_id": "onboarding",
+    "route": "/onboarding",
+    "capture_route": "/onboarding",
+    "url": "http://localhost:3000/onboarding",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "settings_suggestOnboarding",
+        "Step 1: Connect Shopify"
+      ],
+      "buttons": [
+        "Connect Shopify"
+      ],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "search",
+    "route": "/search",
+    "capture_route": "/search",
+    "url": "http://localhost:3000/search",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "searchCatalog Search",
+        "Results",
+        "Product Detail",
+        "Side-by-Side Diff",
+        "Bulk Action Builder",
+        "Admission Outcome"
+      ],
+      "buttons": [
+        "filter_listApply",
+        "Reset",
+        "Clear selection",
+        "Stage action block"
+      ],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [
+        "Any",
+        "active",
+        "draft",
+        "inactive",
+        "visible",
+        "filtered",
+        "explicit",
+        "set",
+        "replace",
+        "add",
+        "remove",
+        "clear",
+        "increase",
+        "decrease",
+        "conditional_set",
+        "title",
+        "description",
+        "price",
+        "sku",
+        "barcode",
+        "image_url",
+        "product_type",
+        "tags",
+        "alt_text",
+        "preserve",
+        "approved_overwrite"
+      ],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "settings",
+    "route": "/settings",
+    "capture_route": "/settings",
+    "url": "http://localhost:3000/settings",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "settingsSettings",
+        "Supplier Strategy Quiz",
+        "Rule Suggestions Inbox"
+      ],
+      "buttons": [
+        "Save strategy quiz"
+      ],
+      "links": [
+        {
+          "text": "space_dashboardDashboard",
+          "href": "/dashboard"
+        },
+        {
+          "text": "searchSearch",
+          "href": "/search"
+        },
+        {
+          "text": "auto_awesomeChat",
+          "href": "/chat"
+        },
+        {
+          "text": "inventory_2Enrichment",
+          "href": "/enrichment"
+        },
+        {
+          "text": "work_historyJobs",
+          "href": "/jobs"
+        },
+        {
+          "text": "settings_suggestOnboarding",
+          "href": "/onboarding"
+        },
+        {
+          "text": "settingsSettings",
+          "href": "/settings"
+        },
+        {
+          "text": "approval_delegationApprovals",
+          "href": "/approvals"
+        }
+      ],
+      "tabs": [],
+      "filters": [
+        "Create as draft",
+        "Ignore",
+        "Ask every time",
+        "Scrape all variants automatically",
+        "Only scrape base product",
+        "Immediate",
+        "Scheduled"
+      ],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "approvals",
+    "route": "/approvals",
+    "capture_route": "/approvals",
+    "url": "http://localhost:3000/approvals",
+    "status": "ok",
+    "dom": {
+      "title": "Approval Queue | Shopify Multi-Supplier",
+      "headings": [
+        "approval_delegationAutonomous Approval Queue"
+      ],
+      "buttons": [],
+      "links": [],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": [
+        "Loading approvals..."
+      ]
+    }
+  },
+  {
+    "page_id": "auth_login",
+    "route": "/auth/login",
+    "capture_route": "/auth/login",
+    "url": "http://localhost:3000/auth/login",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [],
+      "buttons": [],
+      "links": [],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "auth_verify",
+    "route": "/auth/verify",
+    "capture_route": "/auth/verify",
+    "url": "http://localhost:3000/auth/verify",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "Verify Email"
+      ],
+      "buttons": [
+        "Mark Email Verified",
+        "Verified + Store Linked"
+      ],
+      "links": [],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  },
+  {
+    "page_id": "test",
+    "route": "/test",
+    "capture_route": "/test",
+    "url": "http://localhost:3000/test",
+    "status": "ok",
+    "dom": {
+      "title": "Shopify Multi-Supplier Platform",
+      "headings": [
+        "lab_profileFrontend Test Console"
+      ],
+      "buttons": [],
+      "links": [],
+      "tabs": [],
+      "filters": [],
+      "toggles": [],
+      "textInputs": [],
+      "statusTokens": []
+    }
+  }
+]

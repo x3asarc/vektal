@@ -1,0 +1,502 @@
+{
+  "run_id": "run-20260305-203815",
+  "generated_at": "2026-03-05T20:03:49.312Z",
+  "pages": [
+    {
+      "page_id": "home",
+      "route": "/",
+      "recommendations": [
+        {
+          "title": "Add live backend health + last-sync timestamp card",
+          "type": "content_block",
+          "user_value": "Gives immediate confidence that automation services are online before actions are started.",
+          "complexity": "low",
+          "dependencies": [
+            "GET /health",
+            "frontend dashboard card component"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add quick-start checklist (Connect store, Run search, Start enrichment)",
+          "type": "content_block",
+          "user_value": "Reduces first-session drop-off by guiding operators to first successful workflow.",
+          "complexity": "medium",
+          "dependencies": [
+            "onboarding status",
+            "jobs/search counters"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "dashboard",
+      "route": "/dashboard",
+      "recommendations": [
+        {
+          "title": "Add KPI trend deltas (24h change and direction)",
+          "type": "content_block",
+          "user_value": "Helps users detect regressions without opening deeper pages.",
+          "complexity": "medium",
+          "dependencies": [
+            "metrics endpoint with historical values"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Gate primary CTA by readiness and show blocked reason",
+          "type": "state_feedback",
+          "user_value": "Prevents dead-end clicks when prerequisites are missing.",
+          "complexity": "low",
+          "dependencies": [
+            "auth/store readiness flags"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "chat",
+      "route": "/chat",
+      "recommendations": [
+        {
+          "title": "Add inline Retry Session bootstrap button in error banner",
+          "type": "button",
+          "user_value": "Lets users recover from transient 500s without full page refresh.",
+          "complexity": "low",
+          "dependencies": [
+            "existing /api/v1/chat/sessions endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add collapsible diagnostics panel (SSE state, last event id, fallback mode)",
+          "type": "content_block",
+          "user_value": "Speeds issue triage and reduces support back-and-forth.",
+          "complexity": "medium",
+          "dependencies": [
+            "chat stream client telemetry"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "enrichment",
+      "route": "/enrichment",
+      "recommendations": [
+        {
+          "title": "Add dry-run preflight summary (estimated items, conflict count, policy blockers)",
+          "type": "content_block",
+          "user_value": "Improves confidence before launching long-running jobs.",
+          "complexity": "medium",
+          "dependencies": [
+            "enrichment preflight API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add recent enrichment runs table with quick-open report action",
+          "type": "navigation",
+          "user_value": "Makes iterative tuning faster by reusing previous runs.",
+          "complexity": "medium",
+          "dependencies": [
+            "jobs/enrichment run listing API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "jobs",
+      "route": "/jobs",
+      "recommendations": [
+        {
+          "title": "Add status filter chips (running, failed, completed) with counts",
+          "type": "option",
+          "user_value": "Allows rapid scanning of failed jobs for remediation.",
+          "complexity": "low",
+          "dependencies": [
+            "jobs list payload includes status"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add retry-last-request action in error state card",
+          "type": "button",
+          "user_value": "Reduces friction after transient backend failures.",
+          "complexity": "low",
+          "dependencies": [
+            "jobs fetch command reuse"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "job_detail",
+      "route": "/jobs/[id]",
+      "recommendations": [
+        {
+          "title": "Add manual Poll Now and Reconnect Stream buttons",
+          "type": "button",
+          "user_value": "Restores control when SSE transport degrades.",
+          "complexity": "low",
+          "dependencies": [
+            "existing polling fallback endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add event timeline panel (queued, running, retries, terminal state)",
+          "type": "content_block",
+          "user_value": "Makes long-running job progression auditable by operators.",
+          "complexity": "medium",
+          "dependencies": [
+            "job events payload"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "onboarding",
+      "route": "/onboarding",
+      "recommendations": [
+        {
+          "title": "Add 3-step progress rail (Connect, Upload CSV, Preview)",
+          "type": "content_block",
+          "user_value": "Clarifies completion path and reduces abandonment.",
+          "complexity": "medium",
+          "dependencies": [
+            "onboarding state machine"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add CSV upload + validation summary step",
+          "type": "button",
+          "user_value": "Enables users to complete onboarding without leaving the wizard.",
+          "complexity": "medium",
+          "dependencies": [
+            "CSV ingest endpoint + validation contract"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "search",
+      "route": "/search",
+      "recommendations": [
+        {
+          "title": "Replace raw error text with actionable error card (retry + diagnostic id)",
+          "type": "state_feedback",
+          "user_value": "Improves recovery speed and support traceability.",
+          "complexity": "low",
+          "dependencies": [
+            "problem-details normalization"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add saved search presets for recurring vendor/status filters",
+          "type": "option",
+          "user_value": "Reduces repetitive filter setup for daily operations.",
+          "complexity": "medium",
+          "dependencies": [
+            "client-side preset storage or API profile endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "settings",
+      "route": "/settings",
+      "recommendations": [
+        {
+          "title": "Add inbox actions (Accept, Ignore, Edit Rule) with preview diff",
+          "type": "option",
+          "user_value": "Converts passive suggestions into executable configuration updates.",
+          "complexity": "medium",
+          "dependencies": [
+            "rule suggestion mutation endpoints"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add unsaved-change prompt and save-success toast",
+          "type": "state_feedback",
+          "user_value": "Prevents accidental loss of configuration changes.",
+          "complexity": "low",
+          "dependencies": [
+            "form dirty-state tracking"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "approvals",
+      "route": "/approvals",
+      "recommendations": [
+        {
+          "title": "Add Retry Load and Switch to Polling controls in error state",
+          "type": "button",
+          "user_value": "Restores access to pending approvals after transient failures.",
+          "complexity": "low",
+          "dependencies": [
+            "approvals fetch API + poll mode"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add approval queue table with risk/source/age columns",
+          "type": "content_block",
+          "user_value": "Enables prioritization of high-impact approvals.",
+          "complexity": "medium",
+          "dependencies": [
+            "approval item metadata in API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "auth_login",
+      "route": "/auth/login",
+      "recommendations": [
+        {
+          "title": "Add Forgot Password and Resend Verification links",
+          "type": "navigation",
+          "user_value": "Reduces login dead-ends for non-happy paths.",
+          "complexity": "medium",
+          "dependencies": [
+            "password reset + resend verification endpoints"
+          ],
+          "scope_decision": "phase_later",
+          "verification": {
+            "scope_alignment": "fail",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add stale-session detector with one-click logout-reset",
+          "type": "button",
+          "user_value": "Improves recovery when backend session and UI state diverge.",
+          "complexity": "low",
+          "dependencies": [
+            "existing /api/v1/auth/logout"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "auth_verify",
+      "route": "/auth/verify",
+      "recommendations": [
+        {
+          "title": "Show explicit fallback notice when verification context is missing",
+          "type": "state_feedback",
+          "user_value": "Prevents confusion from silent redirects.",
+          "complexity": "low",
+          "dependencies": [
+            "route guard context flags"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add resend verification CTA with cooldown timer",
+          "type": "button",
+          "user_value": "Lets users complete verification without leaving flow.",
+          "complexity": "medium",
+          "dependencies": [
+            "resend verification backend endpoint"
+          ],
+          "scope_decision": "phase_later",
+          "verification": {
+            "scope_alignment": "fail",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "test",
+      "route": "/test",
+      "recommendations": [
+        {
+          "title": "Add live dependency matrix (frontend, backend, Redis, Postgres) with timestamps",
+          "type": "content_block",
+          "user_value": "Improves pre-release validation confidence.",
+          "complexity": "low",
+          "dependencies": [
+            "health endpoints"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Protect /test route behind dev-only gate",
+          "type": "navigation",
+          "user_value": "Avoids exposing internal diagnostics in production sessions.",
+          "complexity": "low",
+          "dependencies": [
+            "environment guard"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    }
+  ]
+}

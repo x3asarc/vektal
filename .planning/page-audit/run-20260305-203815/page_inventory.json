@@ -1,0 +1,98 @@
+{
+    "base_url":  "http://localhost:3000",
+    "run_id":  "run-20260305-203815",
+    "pages":  [
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "home",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "dashboard",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/dashboard"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "chat",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/chat"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "enrichment",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/enrichment"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "jobs",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/jobs"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "job_detail",
+                      "source":  "code",
+                      "is_settings_page":  false,
+                      "route":  "/jobs/[id]"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "onboarding",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/onboarding"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "search",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/search"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "settings",
+                      "source":  "both",
+                      "is_settings_page":  true,
+                      "route":  "/settings"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "approvals",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/approvals"
+                  },
+                  {
+                      "requires_auth":  false,
+                      "page_id":  "auth_login",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/auth/login"
+                  },
+                  {
+                      "requires_auth":  false,
+                      "page_id":  "auth_verify",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/auth/verify"
+                  },
+                  {
+                      "requires_auth":  true,
+                      "page_id":  "test",
+                      "source":  "both",
+                      "is_settings_page":  false,
+                      "route":  "/test"
+                  }
+              ],
+    "generated_at":  "2026-03-05T20:38:31.8479779+01:00"
+}

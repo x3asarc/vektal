@@ -22,6 +22,48 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _finalize_product_metrics(job: Job) -> None:
+    """
+    Compute completeness scores for all products in the store and update watermarks.
+    
+    This is triggered upon successful completion of an ingest job.
+    """
+    if not job.store_id:
+        return
+
+    # 1. Update Completeness Scores for all products in this store
+    from src.models.product import Product
+    from src.core.products.completeness import calculate_completeness
+    
+    # We load all products for the store. 
+    # For very large catalogs (>10k), we might want to chunk this, 
+    # but for Phase 17's target (4k SKUs), a single batch is efficient.
+    products = Product.query.filter_by(store_id=job.store_id).all()
+    
+    updates = []
+    for p in products:
+        metrics = calculate_completeness(p)
+        updates.append({
+            "id": p.id,
+            "completeness_score": metrics["completeness_score"]
+        })
+        
+    if updates:
+        db.session.bulk_update_mappings(Product, updates)
+
+    # 2. Update Store Watermarks if this was a Shopify Ingest
+    from src.models.job import JobType
+    if job.job_type == JobType.INGEST_SHOPIFY:
+        store = job.store
+        if store:
+            store.last_full_ingest_at = _now()
+            # Cursor is stored in job parameters if provided by the scraper/ingest logic
+            if job.parameters and "last_shopify_cursor" in job.parameters:
+                store.last_shopify_cursor = job.parameters["last_shopify_cursor"]
+
+    db.session.commit()
+
+
 def _due_pending_checkpoints(job_id: int, now: datetime) -> int:
     return (
         db.session.query(func.count(AuditCheckpoint.id))
@@ -163,8 +205,16 @@ def finalize_job(job_id: int, mode: str | None = None) -> dict:
     db.session.commit()
     announce_job_progress(job_id=job.id, job=job)
 
-    # Emit vendor catalog change episode on successful completion (Phase 13.2)
     if job.status == JobStatus.COMPLETED:
+        # Phase 17: Update product completeness metrics and watermarks
+        from src.models.job import JobType
+        if job.job_type in {JobType.INGEST_CATALOG, JobType.INGEST_SHOPIFY}:
+            try:
+                _finalize_product_metrics(job)
+            except Exception as e:
+                # Fail-open: don't break the whole finalizer if metrics fail
+                print(f"Error finalizing product metrics for job {job.id}: {e}")
+
         try:
             from src.tasks.graphiti_sync import emit_episode
             from src.core.synthex_entities import EpisodeType

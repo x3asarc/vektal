@@ -1,0 +1,66 @@
+{
+  "theme_identity": "Description of the visual language",
+  "tokens": {
+    "colors": {
+      "brand": {
+        "primary": "Hex/HSL",
+        "secondary": "Hex/HSL",
+        "accent": "Hex/HSL"
+      },
+      "surface": {
+        "background": "Hex/HSL",
+        "foreground": "Hex/HSL",
+        "card": "Hex/HSL"
+      },
+      "interactive": {
+        "hover": "Hex/HSL",
+        "active": "Hex/HSL",
+        "focus": "Hex/HSL"
+      }
+    },
+    "spacing": {
+      "base_unit": "px",
+      "scale": [4, 8, 12, 16, 24, 32, 48, 64]
+    },
+    "shape": {
+      "radius": {
+        "sm": "px",
+        "md": "px",
+        "lg": "px",
+        "xl": "px"
+      },
+      "border_width": {
+        "thin": "1px",
+        "thick": "2px"
+      }
+    },
+    "effects": {
+      "shadows": [
+        "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+        "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+      ],
+      "blur": "10px",
+      "opacity": {
+        "muted": "0.6",
+        "overlay": "0.1"
+      }
+    },
+    "typography": {
+      "families": ["Display Font", "Body Font", "Mono Font"],
+      "weights": [400, 500, 600, 700],
+      "line_heights": {
+        "tight": 1.25,
+        "relaxed": 1.625
+      }
+    }
+  },
+  "patterns": {
+    "layout_type": "bento|sidebar|center-peak",
+    "component_blueprints": [
+      {
+        "name": "Component Name",
+        "visual_notes": "Specific notes on design DNA"
+      }
+    ]
+  }
+}

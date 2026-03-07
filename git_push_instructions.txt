@@ -1,0 +1,12 @@
+Pending git operations and how to push them:
+
+1. The most recent commit is `docs: add phase 15.1 Sentry automation` (SHA ad00f07).
+   - It includes the four new `.planning/phases/15.1-*.md` artifacts, plus updates to `.planning/ROADMAP.md` and `.planning/STATE.md`.
+2. Stage/commit status: clean (no unstaged changes related to this work).
+
+To push everything:
+1. Open a new terminal where SSH to `git@github.com` works (resolve the Windows Win32 error 5 signal-pipe issue first).
+2. Run `git status -sb` to confirm the working tree is clean.
+3. Run `git push origin master`.
+
+If SSH remains blocked, alternatively configure the repo to use HTTPS (`git remote set-url origin https://github.com/<owner>/<repo>.git`) and push with a PAT, then document that in this file or the README.

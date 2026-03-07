@@ -44,6 +44,7 @@ class JobType(enum.Enum):
     CATALOG_IMPORT = "catalog_import"
     VENDOR_SCRAPE = "vendor_scrape"
     INGEST_CATALOG = "ingest_catalog"
+    INGEST_SHOPIFY = "ingest_shopify"
 
 
 class Job(db.Model, TimestampMixin):
@@ -70,7 +71,7 @@ class Job(db.Model, TimestampMixin):
             unique=True,
             postgresql_where=text(
                 "store_id IS NOT NULL "
-                "AND job_type = 'INGEST_CATALOG' "
+                "AND job_type IN ('INGEST_CATALOG', 'INGEST_SHOPIFY') "
                 "AND status IN ('PENDING', 'QUEUED', 'RUNNING', 'CANCEL_REQUESTED')"
             ),
         ),

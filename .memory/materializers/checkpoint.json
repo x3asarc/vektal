@@ -1,0 +1,19 @@
+{
+  "days": [
+    "2026-03-03",
+    "2026-03-04"
+  ],
+  "last_run_at": "2026-03-04T18:15:21Z",
+  "last_run_epoch": 1772648121.599618,
+  "mode": "incremental",
+  "sessions": [
+    "sentry-puller-14224",
+    "sentry-puller-32764",
+    "session-codex-phase16-01",
+    "session-codex-phase16-a",
+    "session-codex-phase16-b",
+    "session-codex-phase16-c",
+    "session-codex-phase16-d",
+    "session-codex-test-16-05"
+  ]
+}

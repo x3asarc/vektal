@@ -1,0 +1,878 @@
+{
+  "run_id": "run-20260305-203815",
+  "base_url": "http://localhost:3000",
+  "scope_context": {
+    "current_phase": "Future Phase: Production Refinement & Integration Cleanup",
+    "in_scope_summary": "Production hardening of existing workflows: error recovery, missing controls, better state feedback, and clearer operator flows.",
+    "out_of_scope_summary": "Net-new platform domains (user data knowledge graph, large net-new architecture, speculative services not present in current stack)."
+  },
+  "pages": [
+    {
+      "page_id": "home",
+      "route": "/",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/home-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/home-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/home.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Run Search Sweep",
+          "Open Assistant",
+          "Inspect Jobs"
+        ],
+        "secondary_actions": [
+          "Navigate to Search/Chat/Enrichment/Jobs/Onboarding/Settings/Approvals"
+        ],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Root route mirrors dashboard without onboarding context for first-time users.",
+        "No explicit system health timestamp despite telemetry framing."
+      ],
+      "recommendations": [
+        {
+          "title": "Add live backend health + last-sync timestamp card",
+          "type": "content_block",
+          "user_value": "Gives immediate confidence that automation services are online before actions are started.",
+          "complexity": "low",
+          "dependencies": [
+            "GET /health",
+            "frontend dashboard card component"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add quick-start checklist (Connect store, Run search, Start enrichment)",
+          "type": "content_block",
+          "user_value": "Reduces first-session drop-off by guiding operators to first successful workflow.",
+          "complexity": "medium",
+          "dependencies": [
+            "onboarding status",
+            "jobs/search counters"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "dashboard",
+      "route": "/dashboard",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/dashboard-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/dashboard.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Run Search Sweep",
+          "Open Assistant",
+          "Inspect Jobs"
+        ],
+        "secondary_actions": [
+          "Sidebar navigation"
+        ],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "KPI cards are static; no trend/change indicators.",
+        "No CTA prioritization based on account readiness."
+      ],
+      "recommendations": [
+        {
+          "title": "Add KPI trend deltas (24h change and direction)",
+          "type": "content_block",
+          "user_value": "Helps users detect regressions without opening deeper pages.",
+          "complexity": "medium",
+          "dependencies": [
+            "metrics endpoint with historical values"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Gate primary CTA by readiness and show blocked reason",
+          "type": "state_feedback",
+          "user_value": "Prevents dead-end clicks when prerequisites are missing.",
+          "complexity": "low",
+          "dependencies": [
+            "auth/store readiness flags"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "chat",
+      "route": "/chat",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/chat-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/chat-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/chat.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Send message",
+          "Bulk SKUs"
+        ],
+        "secondary_actions": [
+          "Session state banner",
+          "Stream status indicators"
+        ],
+        "settings_options": [
+          "Stream mode (sse/poll fallback)"
+        ],
+        "filters": [],
+        "states_coverage": {
+          "loading": true,
+          "empty": true,
+          "error": true,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Chat workspace shows Internal Server Error without inline recovery action.",
+        "No explicit reconnect/reset session control when stream bootstrap fails."
+      ],
+      "recommendations": [
+        {
+          "title": "Add inline Retry Session bootstrap button in error banner",
+          "type": "button",
+          "user_value": "Lets users recover from transient 500s without full page refresh.",
+          "complexity": "low",
+          "dependencies": [
+            "existing /api/v1/chat/sessions endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add collapsible diagnostics panel (SSE state, last event id, fallback mode)",
+          "type": "content_block",
+          "user_value": "Speeds issue triage and reduces support back-and-forth.",
+          "complexity": "medium",
+          "dependencies": [
+            "chat stream client telemetry"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "enrichment",
+      "route": "/enrichment",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/enrichment-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/enrichment.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Start dry-run"
+        ],
+        "secondary_actions": [
+          "Profile/language/TTL selection"
+        ],
+        "settings_options": [
+          "Supplier verified toggle"
+        ],
+        "filters": [
+          "profile",
+          "language",
+          "quick",
+          "standard",
+          "deep",
+          "de",
+          "en"
+        ],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "No preflight summary of expected impact before dry-run start.",
+        "No visible recent-run history from the same workspace."
+      ],
+      "recommendations": [
+        {
+          "title": "Add dry-run preflight summary (estimated items, conflict count, policy blockers)",
+          "type": "content_block",
+          "user_value": "Improves confidence before launching long-running jobs.",
+          "complexity": "medium",
+          "dependencies": [
+            "enrichment preflight API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add recent enrichment runs table with quick-open report action",
+          "type": "navigation",
+          "user_value": "Makes iterative tuning faster by reusing previous runs.",
+          "complexity": "medium",
+          "dependencies": [
+            "jobs/enrichment run listing API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "jobs",
+      "route": "/jobs",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/jobs-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/jobs.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Refresh",
+          "Open Onboarding",
+          "refreshRefresh"
+        ],
+        "secondary_actions": [
+          "Recent jobs list"
+        ],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": true,
+          "error": true,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Empty state and server error are shown simultaneously without remediation flow.",
+        "No filtering by status or age in jobs list."
+      ],
+      "recommendations": [
+        {
+          "title": "Add status filter chips (running, failed, completed) with counts",
+          "type": "option",
+          "user_value": "Allows rapid scanning of failed jobs for remediation.",
+          "complexity": "low",
+          "dependencies": [
+            "jobs list payload includes status"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add retry-last-request action in error state card",
+          "type": "button",
+          "user_value": "Reduces friction after transient backend failures.",
+          "complexity": "low",
+          "dependencies": [
+            "jobs fetch command reuse"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "job_detail",
+      "route": "/jobs/[id]",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/jobs__id-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/jobs__id.txt"
+      },
+      "current_state": {
+        "primary_ctas": [],
+        "secondary_actions": [
+          "Transport state indicator"
+        ],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": true,
+          "empty": false,
+          "error": true,
+          "success": false
+        }
+      },
+      "gaps": [
+        "Job detail can remain in waiting state without user controls.",
+        "No visible fallback controls for degraded transport mode."
+      ],
+      "recommendations": [
+        {
+          "title": "Add manual Poll Now and Reconnect Stream buttons",
+          "type": "button",
+          "user_value": "Restores control when SSE transport degrades.",
+          "complexity": "low",
+          "dependencies": [
+            "existing polling fallback endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add event timeline panel (queued, running, retries, terminal state)",
+          "type": "content_block",
+          "user_value": "Makes long-running job progression auditable by operators.",
+          "complexity": "medium",
+          "dependencies": [
+            "job events payload"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "onboarding",
+      "route": "/onboarding",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/onboarding-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/onboarding.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Connect Shopify"
+        ],
+        "secondary_actions": [],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Only step 1 is visible; the expected CSV upload and preview flow is missing in-page.",
+        "No completion progress indicator across onboarding milestones."
+      ],
+      "recommendations": [
+        {
+          "title": "Add 3-step progress rail (Connect, Upload CSV, Preview)",
+          "type": "content_block",
+          "user_value": "Clarifies completion path and reduces abandonment.",
+          "complexity": "medium",
+          "dependencies": [
+            "onboarding state machine"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add CSV upload + validation summary step",
+          "type": "button",
+          "user_value": "Enables users to complete onboarding without leaving the wizard.",
+          "complexity": "medium",
+          "dependencies": [
+            "CSV ingest endpoint + validation contract"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "search",
+      "route": "/search",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/search-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/search-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/search.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Apply",
+          "Reset",
+          "Clear Selection",
+          "Stage Action Block",
+          "filter_listApply",
+          "Clear selection",
+          "Stage action block"
+        ],
+        "secondary_actions": [
+          "Toggle result columns",
+          "Scope/mode selection"
+        ],
+        "settings_options": [
+          "Mode",
+          "Status filter",
+          "Bulk operation selector"
+        ],
+        "filters": [
+          "Query",
+          "Vendor code",
+          "Status",
+          "Scope mode",
+          "Any",
+          "active",
+          "draft",
+          "inactive",
+          "visible",
+          "filtered",
+          "explicit",
+          "set"
+        ],
+        "states_coverage": {
+          "loading": false,
+          "empty": true,
+          "error": true,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Search error displays raw message without remediation guidance.",
+        "No saved filter preset or recent query recall despite repeated workflows."
+      ],
+      "recommendations": [
+        {
+          "title": "Replace raw error text with actionable error card (retry + diagnostic id)",
+          "type": "state_feedback",
+          "user_value": "Improves recovery speed and support traceability.",
+          "complexity": "low",
+          "dependencies": [
+            "problem-details normalization"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add saved search presets for recurring vendor/status filters",
+          "type": "option",
+          "user_value": "Reduces repetitive filter setup for daily operations.",
+          "complexity": "medium",
+          "dependencies": [
+            "client-side preset storage or API profile endpoint"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "settings",
+      "route": "/settings",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/settings-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/settings-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/settings.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Save Strategy Quiz",
+          "Save strategy quiz"
+        ],
+        "secondary_actions": [
+          "Field-group consent checkboxes"
+        ],
+        "settings_options": [
+          "Variant policy",
+          "Scraping policy",
+          "Execution mode",
+          "Consent scope"
+        ],
+        "filters": [
+          "Create as draft",
+          "Scrape all variants automatically",
+          "Immediate",
+          "Ignore",
+          "Ask every time",
+          "Only scrape base product",
+          "Scheduled"
+        ],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": true,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Rule Suggestions Inbox fails with internal error and has no fallback action.",
+        "No unsaved-changes guard when leaving the page after edits."
+      ],
+      "recommendations": [
+        {
+          "title": "Add inbox actions (Accept, Ignore, Edit Rule) with preview diff",
+          "type": "option",
+          "user_value": "Converts passive suggestions into executable configuration updates.",
+          "complexity": "medium",
+          "dependencies": [
+            "rule suggestion mutation endpoints"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add unsaved-change prompt and save-success toast",
+          "type": "state_feedback",
+          "user_value": "Prevents accidental loss of configuration changes.",
+          "complexity": "low",
+          "dependencies": [
+            "form dirty-state tracking"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "approvals",
+      "route": "/approvals",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/approvals-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/approvals.txt"
+      },
+      "current_state": {
+        "primary_ctas": [],
+        "secondary_actions": [],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": true,
+          "empty": false,
+          "error": true,
+          "success": false
+        }
+      },
+      "gaps": [
+        "Approval queue is blocked by load error with no recovery controls.",
+        "No queue breakdown or risk-level grouping visible."
+      ],
+      "recommendations": [
+        {
+          "title": "Add Retry Load and Switch to Polling controls in error state",
+          "type": "button",
+          "user_value": "Restores access to pending approvals after transient failures.",
+          "complexity": "low",
+          "dependencies": [
+            "approvals fetch API + poll mode"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add approval queue table with risk/source/age columns",
+          "type": "content_block",
+          "user_value": "Enables prioritization of high-impact approvals.",
+          "complexity": "medium",
+          "dependencies": [
+            "approval item metadata in API"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "auth_login",
+      "route": "/auth/login",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/auth__login-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/auth__login.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Sign In"
+        ],
+        "secondary_actions": [
+          "Email input",
+          "Password input"
+        ],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "No explicit forgot-password/reset path visible.",
+        "No inline indication for locked/expired backend sessions."
+      ],
+      "recommendations": [
+        {
+          "title": "Add Forgot Password and Resend Verification links",
+          "type": "navigation",
+          "user_value": "Reduces login dead-ends for non-happy paths.",
+          "complexity": "medium",
+          "dependencies": [
+            "password reset + resend verification endpoints"
+          ],
+          "scope_decision": "phase_later",
+          "verification": {
+            "scope_alignment": "fail",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add stale-session detector with one-click logout-reset",
+          "type": "button",
+          "user_value": "Improves recovery when backend session and UI state diverge.",
+          "complexity": "low",
+          "dependencies": [
+            "existing /api/v1/auth/logout"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "auth_verify",
+      "route": "/auth/verify",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/auth__verify-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/auth__verify.txt"
+      },
+      "current_state": {
+        "primary_ctas": [
+          "Mark Email Verified",
+          "Verified + Store Linked"
+        ],
+        "secondary_actions": [],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": true,
+          "success": false
+        }
+      },
+      "gaps": [
+        "Runtime capture redirects to login; verification page is not consistently reachable in current state.",
+        "No fallback explanation when verification context is missing."
+      ],
+      "recommendations": [
+        {
+          "title": "Show explicit fallback notice when verification context is missing",
+          "type": "state_feedback",
+          "user_value": "Prevents confusion from silent redirects.",
+          "complexity": "low",
+          "dependencies": [
+            "route guard context flags"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Add resend verification CTA with cooldown timer",
+          "type": "button",
+          "user_value": "Lets users complete verification without leaving flow.",
+          "complexity": "medium",
+          "dependencies": [
+            "resend verification backend endpoint"
+          ],
+          "scope_decision": "phase_later",
+          "verification": {
+            "scope_alignment": "fail",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    },
+    {
+      "page_id": "test",
+      "route": "/test",
+      "evidence": {
+        "playwright_desktop_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/test-desktop.png",
+        "playwright_mobile_screenshot": ".planning/page-audit/run-20260305-203815/captures/playwright/test-mobile.png",
+        "firecrawl_output_file": ".planning/page-audit/run-20260305-203815/captures/firecrawl/test.txt"
+      },
+      "current_state": {
+        "primary_ctas": [],
+        "secondary_actions": [],
+        "settings_options": [],
+        "filters": [],
+        "states_coverage": {
+          "loading": false,
+          "empty": false,
+          "error": false,
+          "success": true
+        }
+      },
+      "gaps": [
+        "Diagnostic page has no actionable checks beyond static confirmation text.",
+        "Page appears publicly routable in current runtime."
+      ],
+      "recommendations": [
+        {
+          "title": "Add live dependency matrix (frontend, backend, Redis, Postgres) with timestamps",
+          "type": "content_block",
+          "user_value": "Improves pre-release validation confidence.",
+          "complexity": "low",
+          "dependencies": [
+            "health endpoints"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        },
+        {
+          "title": "Protect /test route behind dev-only gate",
+          "type": "navigation",
+          "user_value": "Avoids exposing internal diagnostics in production sessions.",
+          "complexity": "low",
+          "dependencies": [
+            "environment guard"
+          ],
+          "scope_decision": "in_scope",
+          "verification": {
+            "scope_alignment": "pass",
+            "technical_feasibility": "pass",
+            "consistency_with_ia": "pass",
+            "measurable_outcome": "pass"
+          }
+        }
+      ]
+    }
+  ]
+}

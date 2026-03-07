@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-03-03T20:29:20Z",
+  "mode": "full",
+  "overall_ok": true,
+  "checks": [
+    {
+      "name": "binary:firecrawl",
+      "ok": true,
+      "details": "found"
+    },
+    {
+      "name": "binary:perplexity-mcp.cmd",
+      "ok": true,
+      "details": "found"
+    },
+    {
+      "name": "binary:npx",
+      "ok": true,
+      "details": "found"
+    },
+    {
+      "name": "firecrawl:status",
+      "ok": true,
+      "details": "\u001b[38;5;208m\ud83d\udd25 \u001b[1mfirecrawl\u001b[0m \u001b[2mcli\u001b[0m \u001b[2mv1.9.4\u001b[0m\n\n  \u001b[32m\u25cf\u001b[0m Authenticated \u001b[2mvia FIRECRAWL_API_KEY\u001b[0m\n  \u001b[2mConcurrency:\u001b[0m 0/2 jobs \u001b[2m(parallel scrape limit)\u001b[0m\n  \u001b[2mCredits:\u001b[0m 418 \u001b[2m(pay-as-you-go)\u001b[0m\n  \u001b[2m.firecrawl:\u001b[0m present \u001b[2m- 1 sites\u001b[0m\n  \u001b[2m.gitignore:\u001b[0m present \u001b[2m- .firecrawl ignored: yes\u001b[0m"
+    },
+    {
+      "name": "perplexity:key",
+      "ok": true,
+      "details": "present"
+    },
+    {
+      "name": "perplexity:mcp_start",
+      "ok": true,
+      "details": "process started and remained alive"
+    },
+    {
+      "name": "context7:key",
+      "ok": true,
+      "details": "missing (optional when MCP startup succeeds)"
+    },
+    {
+      "name": "context7:config_reference",
+      "ok": true,
+      "details": "C:/Users/Hp/Documents/Shopify Scraping Script/.gemini/settings.json"
+    },
+    {
+      "name": "context7:mcp_start",
+      "ok": true,
+      "details": "process started and remained alive"
+    },
+    {
+      "name": "firecrawl:search_smoke",
+      "ok": true,
+      "details": "no output"
+    },
+    {
+      "name": "perplexity:api_smoke",
+      "ok": true,
+      "details": "PERPLEXITY_OK"
+    }
+  ]
+}

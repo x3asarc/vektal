@@ -1,0 +1,16 @@
+{
+  "session_id": "session-fa07adb6",
+  "started_at": "2026-03-03T12:24:16Z",
+  "updated_at": "2026-03-03T12:24:16Z",
+  "context": {
+    "current_task": "prove-memory"
+  },
+  "recent_files": [],
+  "recent_commands": [],
+  "insights": [
+    "proof session"
+  ],
+  "next_steps": [
+    "done"
+  ]
+}

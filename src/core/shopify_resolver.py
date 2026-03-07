@@ -112,6 +112,14 @@ class ShopifyResolver:
         matches = self._query_products(f"title:*{title}*")
         return {"matches": matches, "errors": [] if matches else ["no product found"], "used_rest": False}
 
+    def fetch_updated_products(self, since_at: str, limit: int = 50):
+        """
+        Fetch products updated since a specific ISO timestamp using GraphQL.
+        Used for Phase 17 reconciliation polling.
+        """
+        query = f"updated_at:>{since_at}"
+        return self._query_products(query, first=limit)
+
     def _query_products(self, query, first=5):
         gql = """
         query FindProducts($query: String!, $first: Int!) {

@@ -185,6 +185,8 @@ class ProductSearchQuery(BaseModel):
 
     price_min: float | None = Field(default=None, ge=0)
     price_max: float | None = Field(default=None, ge=0)
+    completeness_min: float | None = Field(default=None, ge=0, le=100)
+    completeness_max: float | None = Field(default=None, ge=0, le=100)
     inventory_total_min: int | None = Field(default=None, ge=0)
     inventory_total_max: int | None = Field(default=None, ge=0)
 
@@ -224,6 +226,7 @@ class ProductResponse(BaseModel):
     compare_at_price: float | None = None
     weight_grams: float | None = None
     status: str | None = None
+    completeness_score: float | None = None
     created_at: str | None = None
     updated_at: str | None = None
 
@@ -302,6 +305,11 @@ class ProductDetailResponse(BaseModel):
     country_of_origin: str | None = None
     sync_status: str | None = None
     sync_error: str | None = None
+    completeness_score: float | None = None
+    collections_json: list[dict] | list[str] | None = None
+    metafields_json: list[dict] | None = None
+    price_per_unit_value: float | None = None
+    price_per_unit_unit: str | None = None
     is_active: bool
     is_published: bool
     created_at: str | None = None

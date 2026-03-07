@@ -37,6 +37,10 @@ class ShopifyStore(db.Model, TimestampMixin):
     # Store status
     is_active = db.Column(Boolean, default=True, nullable=False)
 
+    # Ingest watermarks (Phase 17)
+    last_full_ingest_at = db.Column(db.DateTime(timezone=True))
+    last_shopify_cursor = db.Column(String(255))
+
     # Relationships
     user = relationship('User', back_populates='shopify_store')
 

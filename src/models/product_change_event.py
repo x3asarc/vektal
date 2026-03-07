@@ -50,7 +50,13 @@ class ProductChangeEvent(db.Model, TimestampMixin):
     before_payload = db.Column(JSON, nullable=True)
     after_payload = db.Column(JSON, nullable=True)
     diff_payload = db.Column(JSON, nullable=True)
+    
+    # metadata_json: Stores transient event state and Phase 17 Live Reconcile anchors:
+    # - shopify_version_hash: Hash of the Shopify payload at event time
+    # - shopify_updated_at: Shopify's updated_at timestamp at event time
+    # - dry_run_id: Associated dry-run for traceablity
     metadata_json = db.Column(JSON, nullable=True)
+    
     note = db.Column(Text, nullable=True)
 
     resolution_batch_id = db.Column(

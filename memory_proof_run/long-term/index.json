@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "generated_from": ".planning/memory-system-design.md",
+  "last_updated": "2026-03-03T12:24:16Z",
+  "event_counters": {
+    "session_start": 1,
+    "task_complete": 1,
+    "pattern_recorded": 1,
+    "phase_complete": 1,
+    "session_end": 1
+  },
+  "phase_summaries": [
+    {
+      "phase": "prove-memory",
+      "path": "long-term/architecture/evolution/phase-prove-memory.md",
+      "updated_at": "2026-03-03T12:24:15Z"
+    }
+  ],
+  "last_event": {
+    "type": "session_end",
+    "source": "session-end-hook",
+    "timestamp": "2026-03-03T12:24:16Z"
+  }
+}

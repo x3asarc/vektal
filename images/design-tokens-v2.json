@@ -1,0 +1,253 @@
+{
+  "version": "2.0",
+  "theme_identity": "Orbital Forensics / Brutalist Archive. A high-fidelity technical aesthetic blending Nostromo terminal cues, bureaucratic grid systems, and deep-space telemetry.",
+  "source": {
+    "input_type": "mixed",
+    "references": [
+      "legacy images/design-tokens-v2.json",
+      "http://127.0.0.1:3000 runtime CSS"
+    ],
+    "confidence": "medium"
+  },
+  "tokens": {
+    "colors": {
+      "primitives": {
+        "brand": {
+          "300": "#BEBEFF",
+          "400": "#A0A0FF",
+          "500": "#8F8FFF",
+          "600": "#6E6ED9",
+          "700": "#5252AE"
+        },
+        "neutral": {
+          "0": "#F8FAFC",
+          "50": "#E0E0E0",
+          "100": "#A1A1AA",
+          "200": "#52525B",
+          "700": "#3F3F46",
+          "800": "#27272A",
+          "900": "#121214",
+          "950": "#0A0A0B",
+          "1000": "#020203"
+        }
+      },
+      "roles": {
+        "background": "{colors.primitives.neutral.1000}",
+        "foreground": "{colors.primitives.neutral.0}",
+        "surface": "{colors.primitives.neutral.950}",
+        "surface_elevated": "{colors.primitives.neutral.900}",
+        "text_primary": "{colors.primitives.neutral.0}",
+        "text_secondary": "{colors.primitives.neutral.100}",
+        "text_inverse": "{colors.primitives.neutral.1000}",
+        "border": "{colors.primitives.neutral.800}",
+        "border_strong": "{colors.primitives.neutral.700}",
+        "brand_primary": "{colors.primitives.brand.400}",
+        "brand_secondary": "#00FF9D",
+        "brand_accent": "{colors.primitives.neutral.50}"
+      },
+      "semantic": {
+        "success": "#00FF9D",
+        "warning": "#FF4D4D",
+        "danger": "#FF4D4D",
+        "info": "{colors.primitives.brand.400}"
+      },
+      "states": {
+        "hover_overlay": "rgba(160, 160, 255, 0.08)",
+        "active_overlay": "rgba(160, 160, 255, 0.15)",
+        "focus_ring": "{colors.primitives.brand.400}",
+        "disabled_opacity": "0.5"
+      },
+      "contrast_targets": {
+        "body_text_min": "4.5:1",
+        "large_text_min": "3:1",
+        "non_text_ui_min": "3:1"
+      }
+    },
+    "typography": {
+      "families": {
+        "display": "\"JetBrains Mono\", \"IBM Plex Mono\", monospace",
+        "body": "\"JetBrains Mono\", \"IBM Plex Mono\", monospace",
+        "mono": "\"JetBrains Mono\", \"IBM Plex Mono\", monospace"
+      },
+      "weights": {
+        "light": 300,
+        "regular": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "size_scale": {
+        "2xs": "0.65rem",
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "md": "1rem",
+        "lg": "1.25rem",
+        "xl": "1.5rem",
+        "2xl": "2rem",
+        "3xl": "2.5rem"
+      },
+      "line_height_scale": {
+        "tight": 1.2,
+        "snug": 1.35,
+        "normal": 1.5,
+        "relaxed": 1.65
+      },
+      "letter_spacing_scale": {
+        "tight": "-0.02em",
+        "normal": "0em",
+        "wide": "0.05em",
+        "wider": "0.1em"
+      },
+      "role_map": {
+        "h1": {
+          "family": "display",
+          "size": "3xl",
+          "weight": "bold",
+          "line_height": "tight",
+          "letter_spacing": "tight"
+        },
+        "h2": {
+          "family": "display",
+          "size": "2xl",
+          "weight": "semibold",
+          "line_height": "tight",
+          "letter_spacing": "tight"
+        },
+        "body": {
+          "family": "body",
+          "size": "md",
+          "weight": "regular",
+          "line_height": "normal",
+          "letter_spacing": "normal"
+        },
+        "caption": {
+          "family": "mono",
+          "size": "xs",
+          "weight": "medium",
+          "line_height": "normal",
+          "letter_spacing": "wide"
+        }
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "scale": {
+        "0": "0",
+        "1": "0.25rem",
+        "2": "0.5rem",
+        "3": "0.75rem",
+        "4": "1rem",
+        "5": "1.25rem",
+        "6": "1.5rem",
+        "8": "2rem",
+        "10": "2.5rem",
+        "12": "3rem"
+      },
+      "layout": {
+        "container_max": "80rem",
+        "section_padding_y": "clamp(2rem, 5vw, 4rem)",
+        "section_padding_x": "clamp(1rem, 3vw, 2rem)",
+        "grid_gap": "1px"
+      }
+    },
+    "radius": {
+      "scale": {
+        "none": "0",
+        "xs": "0",
+        "sm": "0",
+        "md": "0",
+        "lg": "0",
+        "pill": "0"
+      },
+      "component_map": {
+        "button": "none",
+        "card": "none",
+        "input": "none",
+        "chip": "none",
+        "modal": "none"
+      },
+      "border_width": {
+        "hairline": "1px",
+        "default": "1px",
+        "strong": "2px"
+      }
+    },
+    "motion": {
+      "duration": {
+        "instant": "0ms",
+        "fast": "140ms",
+        "base": "220ms",
+        "slow": "360ms",
+        "slower": "600ms"
+      },
+      "easing": {
+        "standard": "cubic-bezier(0.2, 0, 0, 1)",
+        "emphasized": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "entrance": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "exit": "cubic-bezier(0.7, 0, 0.84, 0)"
+      },
+      "presets": {
+        "hover": "color var(--motion-duration-fast) var(--motion-easing-standard), border-color var(--motion-duration-fast) var(--motion-easing-standard), background var(--motion-duration-fast) var(--motion-easing-standard)",
+        "focus": "box-shadow var(--motion-duration-fast) var(--motion-easing-standard)",
+        "modal_enter": "opacity var(--motion-duration-base) var(--motion-easing-entrance), transform var(--motion-duration-base) var(--motion-easing-entrance)"
+      },
+      "keyframes": {
+        "fade_up": {
+          "from": {
+            "opacity": 0,
+            "transform": "translateY(10px)"
+          },
+          "to": {
+            "opacity": 1,
+            "transform": "translateY(0)"
+          }
+        }
+      },
+      "reduced_motion": {
+        "enabled": true,
+        "strategy": "Keep state changes, remove non-essential transforms and long transitions."
+      }
+    },
+    "effects": {
+      "shadows": {
+        "sm": "0 1px 2px rgba(0, 0, 0, 0.2)",
+        "md": "0 12px 28px rgba(0, 0, 0, 0.35)",
+        "lg": "0 24px 48px rgba(0, 0, 0, 0.45)"
+      },
+      "blur": {
+        "glass": "16px",
+        "backdrop": "20px"
+      },
+      "opacity": {
+        "muted": "0.64",
+        "overlay": "0.1",
+        "disabled": "0.45"
+      }
+    }
+  },
+  "patterns": {
+    "layout_type": "sidebar",
+    "component_blueprints": [
+      {
+        "name": "Forensic Card",
+        "visual_notes": "Dense panel with 1px border and corner tick accent.",
+        "states": ["default", "hover", "active", "focus-visible", "disabled"]
+      },
+      {
+        "name": "Schematic Table",
+        "visual_notes": "High-density grid, uppercase micro-labels, line-based hierarchy.",
+        "states": ["default", "hover", "focus-visible"]
+      },
+      {
+        "name": "Status Chip",
+        "visual_notes": "Rectangular tag with semantic border tint and condensed mono text.",
+        "states": ["default", "hover", "disabled"]
+      }
+    ]
+  },
+  "implementation_hints": {
+    "css_variables_output": true,
+    "tailwind_theme_mapping": true,
+    "notes": "Token aliases should remain in sync with CSS custom properties under frontend/src/app/design-tokens.css."
+  }
+}

@@ -1,0 +1,43 @@
+Scraping 5 URLs...
+Timing: {
+  "url": "https://app.vektal.systems/",
+  "requestTime": "2026-03-03T20:11:06.965Z",
+  "duration": "135ms",
+  "status": "error",
+  "error": "connect EACCES 35.245.250.27:443"
+}
+[1/5] Error: https://app.vektal.systems/ - connect EACCES 35.245.250.27:443
+Timing: {
+  "url": "https://app.vektal.systems/dashboard",
+  "requestTime": "2026-03-03T20:11:07.062Z",
+  "duration": "41ms",
+  "status": "error",
+  "error": "connect EACCES 35.245.250.27:443"
+}
+[2/5] Error: https://app.vektal.systems/dashboard - connect EACCES 35.245.250.27:443
+Timing: {
+  "url": "https://app.vektal.systems/chat",
+  "requestTime": "2026-03-03T20:11:07.065Z",
+  "duration": "45ms",
+  "status": "error",
+  "error": "connect EACCES 35.245.250.27:443"
+}
+[3/5] Error: https://app.vektal.systems/chat - connect EACCES 35.245.250.27:443
+Timing: {
+  "url": "https://app.vektal.systems/jobs",
+  "requestTime": "2026-03-03T20:11:07.068Z",
+  "duration": "42ms",
+  "status": "error",
+  "error": "connect EACCES 35.245.250.27:443"
+}
+[4/5] Error: https://app.vektal.systems/jobs - connect EACCES 35.245.250.27:443
+Timing: {
+  "url": "https://app.vektal.systems/search",
+  "requestTime": "2026-03-03T20:11:07.071Z",
+  "duration": "41ms",
+  "status": "error",
+  "error": "connect EACCES 35.245.250.27:443"
+}
+[5/5] Error: https://app.vektal.systems/search - connect EACCES 35.245.250.27:443
+
+Completed: 0/5 succeeded, 5 failed

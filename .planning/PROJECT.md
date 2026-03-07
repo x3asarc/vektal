@@ -1,210 +1,60 @@
-# Shopify Multi-Supplier Platform
+# Vektal (Shopify Multi-Supplier Platform)
 
 ## What This Is
 
-A production SaaS platform for craft/hobby stores to automate multi-vendor product management on Shopify. The system intelligently scrapes supplier data, enriches products with AI-powered SEO and image analysis, and maintains 4,000+ SKU catalogs with minimal manual intervention. Currently deployed at Bastelschachtel.at, transitioning from CLI-based tool to multi-tenant web platform with modular apps (analytics, image management, scraping jobs, product management).
+Vektal is a production-grade SaaS platform that automates multi-vendor Shopify product management for craft and hobby stores. It uses a graph-grounded AI assistant and an autonomous self-healing runtime to maintain accurate, SEO-optimized catalogs for 4,000+ SKUs across 8+ suppliers with minimal human intervention.
 
 ## Core Value
 
-Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, image editing, or content writing.
-
-## Current Milestone: v1.0 Production-Ready Architecture
-
-**Goal:** Transform organic codebase into maintainable, containerized architecture ready for SaaS scaling.
-**Status:** Active
-**Current checkpoint:** Phase 14.1 execution complete (`14.1-01`..`14.1-06`); next is phase-close verification and Phase 15 planning.
-
-**Target outcomes:**
-- Clean, organized codebase (30+ scripts archived, duplicates consolidated)
-- Docker-based microservices architecture (frontend, backend, scrapers, workers)
-- Modern web dashboard with progressive onboarding (starting with simplified MVP)
-- Agent-driven cleanup and migration (autonomous refactoring where possible)
-- Production deployment-ready containers with clear boundaries
-
-## Milestone Status
-
-| Milestone | Scope | Status | Evidence |
-|---|---|---|---|
-| Milestone A: Foundation Buildout | Phases 1-6 | Complete | `.planning/ROADMAP.md`, `.planning/STATE.md` |
-| Milestone B: Frontend + Resolution | Phases 7-8 | Complete | `.planning/phases/07-frontend-framework-setup/07-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md` |
-| Milestone C: Real-Time + Conversational Ops | Phases 9-10 | Complete | `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md` |
-| Milestone D: Scale + Optimization | Phases 11-14 (+14.1 insertion) | Complete | Phases 11-14.1 complete (`11`..`14.1`, plan execution closed) |
-
-## Execution Snapshot (2026-02-23)
-
-- Completed phases: 1, 1.1, 2, 2.1, 2.2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13.1, 13.2, 14, 14.1
-- Current phase: transition window before Phase 15 (Self-Healing & Runtime Optimization)
-- Phase 5 outcomes:
-  - OpenAPI/Swagger docs at `/api/docs`
-  - Versioned v1 API domains: products, jobs, vendors, user versioning
-  - RFC 7807 error responses, cursor pagination, tier rate limits, SSE progress streaming
-  - Per-user API version migration lifecycle with rollback window
-  - Verification suite complete (`38 passed` in `tests/api/`)
-- Phase 5 artifacts:
-  - `.planning/phases/05-backend-api-design/05-05-SUMMARY.md`
-  - `.planning/phases/05-backend-api-design/05-SUMMARY.md`
-- Phase 8 outcomes:
-  - Resolution source-priority + dry-run compiler APIs with structural conflict handling
-  - Collaborative review UX (lock-aware) + strategy quiz + rule suggestion inbox
-  - Guarded apply engine (preflight, recovery logs, adaptive throttling, image sovereignty)
-  - Verification artifacts: `.planning/phases/08-product-resolution-engine/08-UAT.md`, `.planning/phases/08-product-resolution-engine/08-VERIFICATION.md`
-- Phase 9 outcomes:
-  - Canonical backend progress contract parity across SSE/polling/list/detail + guarded retry semantics (`09-01`)
-  - Frontend live progress UX across jobs detail, onboarding, and terminal notifications with actionable links (`09-02`)
-  - Verification artifacts: `.planning/phases/09-real-time-progress-tracking/09-01-SUMMARY.md`, `.planning/phases/09-real-time-progress-tracking/09-02-SUMMARY.md`, `.planning/phases/09-real-time-progress-tracking/09-VERIFICATION.md`
-- Phase 10 outcomes:
-  - Chat API/session/action contract foundation with typed block responses and SSE stream semantics (`10-01`)
-  - Single-SKU conversational dry-run/approval/apply workflow with recovery-link conflict holds (`10-02`)
-  - Bulk conversational orchestration for up to 1000 SKUs with adaptive chunk concurrency and queue-backed execution (`10-03`)
-  - Full `/chat` operator workspace with structured rendering, bounded stream subscription, and in-chat approval controls (`10-04`)
-  - Verification artifacts: `.planning/phases/10-conversational-ai-interface/10-01-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-02-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-03-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-04-SUMMARY.md`, `.planning/phases/10-conversational-ai-interface/10-VERIFICATION.md`
-- Phase 12 outcomes:
-  - Backend-authoritative tier routing, capability projection, and scoped memory retrieval contracts (`12-01`)
-  - Tier1/Tier2 runtime semantics with semantic-firewall enforcement and fallback-stage telemetry (`12-02`)
-  - Tier3 delegation guardrails with tier-aware queue routing and delegation trace UX (`12-03`)
-  - Verification artifacts: `.planning/phases/12-tier-system-architecture/12-01-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-02-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-03-SUMMARY.md`, `.planning/phases/12-tier-system-architecture/12-VERIFICATION.md`
-- Phase 13 outcomes (verified complete):
-  - `13-01` execution shield completed (runtime policy, retry/breaker matrix, idempotency, Tier3 TTL/dead-letter)
-  - `13-02` governance/recovery completed (verification oracle, kill-switch enforcement, tenant field policy thresholds)
-  - `13-03` deployment/observability/security hardening completed (provider route lineage, ops gates, redaction/retention, deploy guard workflow)
-  - `13-04` instrumentation foundation completed (preference/oracle signal capture, export contracts, no-autonomy guardrail)
-  - Verification artifacts: `.planning/phases/13-integration-hardening-deployment/13-01-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-02-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-03-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-04-SUMMARY.md`, `.planning/phases/13-integration-hardening-deployment/13-VERIFICATION.md`, `reports/13/13-01/*`, `reports/13/13-02/*`, `reports/13/13-03/*`, `reports/13/13-04/*`
-- Phase 13.1 progress (verified complete):
-  - `13.1-01` completed (capability audit + dry-run policy contracts)
-  - `13.1-02` completed (profiles/eligibility/oracle/idempotency foundations)
-  - `13.1-03` completed (lifecycle API + queue-backed execution + `/enrichment` workspace)
-  - `13.1-04` completed (benchmark/evaluation gates + lineage audit export + deterministic governance gate)
-  - Evidence artifacts: `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-01-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-02-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-03-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-04-SUMMARY.md`, `.planning/phases/13.1-product-data-enrichment-protocol-v2-integration/13.1-VERIFICATION.md`, `reports/13.1/13.1-01/*`, `reports/13.1/13.1-02/*`, `reports/13.1/13.1-03/*`, `reports/13.1/13.1-04/*`
+Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, image editing, or content writing, backed by a system that autonomously detects and resolves issues.
 
 ## Requirements
 
 ### Validated
 
-**Production Infrastructure (Currently Working):**
-- ✓ Flask OAuth app with Shopify integration
-- ✓ Pipeline orchestration engine (CSV → scrape → enrich → approve → apply)
-- ✓ Vision AI image analysis (Gemini) + SEO generation (GPT-4)
-- ✓ Safety mechanisms (dry-run, approval workflow, rollback, safeguards doc)
-- ✓ Multi-vendor scraping (Python BeautifulSoup/Selenium + JS Playwright)
-- ✓ Image processing framework (YAML-driven transformations)
-- ✓ Shopify GraphQL API integration (products, variants, media, inventory)
-- ✓ Job tracking and resume capability (PostgreSQL-backed)
-
-**Proven Workflows:**
-- ✓ Bulk CSV upload → automated processing → results tracking
-- ✓ Single product CLI operations with approval workflow
-- ✓ Image replacement with vision AI verification
-- ✓ German SEO content generation
+- ✓ **Multi-Vendor Scraping** — Python (BS4/Selenium) and JS (Playwright) engines for 8+ suppliers.
+- ✓ **AI Enrichment Pipeline** — Vision AI (Gemini) for images and GPT-4 for German SEO content.
+- ✓ **Graph-First Context OS** — Neo4j/Graphiti knowledge graph as the primary context source for AI agents.
+- ✓ **Self-Healing Runtime** — Sentry-driven intake and autonomous remediation for infrastructure issues.
+- ✓ **Conversational Interface** — Real-time chat for product resolution, updates, and bulk imports.
+- ✓ **Safety Gates** — Binary governance gates (Structure/Integrity) and multi-tier (T1/T2/T3) AI routing.
 
 ### Active
 
-<!-- Milestone v1.0 scope - building toward these -->
-**Note:** The checklist below is historical planning context. Canonical execution state is tracked in `.planning/ROADMAP.md` and `.planning/STATE.md`.
-
-**Phase 1: Codebase Cleanup & Analysis**
-- [ ] Archive 30+ one-off scripts (apply_*, scrape_*, fix_*, dry_run_*)
-- [ ] Consolidate duplicate CLI tools (5 update scripts → unified interface)
-- [ ] Organize tests (move to tests/, adopt pytest)
-- [ ] Document architecture (create comprehensive ARCHITECTURE.md)
-- [ ] Agent-driven code analysis (identify dead code, dependencies, patterns)
-
-**Phase 2: Python vs JavaScript Scraper Strategy**
-- [ ] Agent analysis of both implementations (performance, maintainability, coverage)
-- [ ] Clear boundary definition (what stays Python, what stays JS, integration points)
-- [ ] Unified vendor configuration (single YAML source of truth)
-- [ ] Scraper interface standardization (input/output contracts)
-
-**Phase 3: Docker Architecture Design**
-- [ ] Container strategy (services: frontend, API, scrapers, workers, databases)
-- [ ] Network and data flow design (how containers communicate)
-- [ ] Configuration management (env vars, secrets, volume mounts)
-- [ ] Development vs production environments
-- [ ] Docker Compose orchestration
-
-**Phase 4: Backend Containerization**
-- [ ] Flask API container (src/core/* modules exposed as REST/GraphQL)
-- [ ] Worker container (job processing, background tasks)
-- [ ] Database containers (PostgreSQL for app data, Redis for queues)
-- [ ] Scraper container (unified scraping service)
-- [ ] API documentation (OpenAPI/Swagger)
-
-**Phase 5: Frontend Framework & Architecture**
-- [ ] Agent analysis and recommendation (React/Vue/Svelte vs Flask+HTMX)
-- [ ] Frontend container setup
-- [ ] Progressive onboarding UI (simplified initial experience)
-- [ ] Core navigation structure (routing to future modular apps)
-- [ ] API integration layer
-
-**Phase 6: MVP Web Dashboard**
-- [ ] Simplified onboarding flow (connect Shopify, understand your products)
-- [ ] Single unified interface (Phase 1 of modular vision)
-- [ ] Job submission and monitoring (upload CSV, track progress)
-- [ ] Results view (success/failure, preview changes, approve)
-- [ ] Basic product search and view
-
-**Phase 7: Deployment & Integration**
-- [ ] Docker Compose for full stack (all containers working together)
-- [ ] Environment configuration (dev, staging, production)
-- [ ] Data migration from current setup (databases, CSVs)
-- [ ] Integration testing (end-to-end workflows)
-- [ ] Production deployment readiness (CI/CD, monitoring, logs)
+- [ ] **Unified Command Center** — Real-time dashboard for catalog integrity and ingestion health.
+- [ ] **Hardened Ingestion Contracts** — Pydantic-based validation for all incoming vendor data.
+- [ ] **Live Ingestion Listener** — SSE-based stream for tracking bulk jobs in the UI.
+- [ ] **Rollback UX** — One-click restoration for low-confidence enrichment jobs.
+- [ ] **Production Deployment** — Full-stack rollout to Dokploy with verified E2E browser tests.
 
 ### Out of Scope
 
-<!-- Explicitly excluded from v1.0 -->
-
-- **Modular app separation (Analytics, Image Mgmt, Scraping, Products)** — v1.0 has unified interface; modularization comes in v2.0
-- **Multi-tenant architecture** — v1.0 is single-tenant ready for SaaS; multi-tenancy in v2.0
-- **Mobile app** — Web-first, mobile later
-- **Real-time notifications** — Email/polling sufficient for v1.0
-- **Advanced analytics** — Basic reporting only; full analytics in v2.0
-- **Multiple Shopify store support** — Single store per instance in v1.0
-- **User management/teams** — Single user per instance for now
-- **Billing/subscriptions** — Not needed for v1.0 (single deployment)
+- **Multi-Store Management** — v1.0 is strictly single-tenant (one Shopify store per instance) to ensure stability.
+- **Native Mobile App** — Focus remains on a high-fidelity web dashboard; mobile is deferred to v2.0.
+- **Third-Party Marketplace Integration** — Integration with Amazon/eBay is excluded to maintain focus on Shopify excellence.
 
 ## Context
 
-### Current State
-
-- **Deployment:** Production use at Bastelschachtel.at (4,000 SKUs)
-- **Architecture:** Monolithic Python app + scattered CLI scripts
-- **Codebase:** Organic growth; 50 root scripts, 18 core modules, production-tested but needs organization
-- **Technical debt:** Duplication (5 update scripts, 2 scraper implementations), scattered tests, no containerization
-- **Strengths:** Battle-tested safety mechanisms, advanced AI integration, configuration-driven
-
-### User Feedback Themes
-
-1. **"Too many scripts"** - Need unified interface, not 10 different CLI tools
-2. **"Hard to see what will happen"** - Want preview before changes (dry-run exists but CLI-only)
-3. **"Onboarding is complex"** - Need simpler initial experience for new users
-4. **"Want to monitor jobs"** - Web UI for progress tracking essential
-
-### Technical Environment
-
-- **Current:** Python 3.12+, Flask, PostgreSQL, Redis, Selenium/Playwright, OpenAI/Gemini APIs
-- **Target:** Containerized microservices with completed backend API, frontend foundation, and product resolution engine; next milestone is real-time progress UX.
-- **External:** Shopify GraphQL API, 8 vendor websites, AI APIs (OpenAI, Gemini)
+- **Current State**: Transitioning from a verified v1.0 architecture to a production-refined command center.
+- **User Feedback**: Operators need better visibility into "what the system is doing" during autonomous cycles.
+- **Technical Debt**: Legacy scripts (30+) have been archived, but some integration hardening remains in Phase 17.
+- **Ecosystem**: Relies on Shopify GraphQL API, Neo4j/Graphiti, and multi-model AI orchestration (Gemini/Claude).
 
 ## Constraints
 
-- **Shopify API**: GraphQL only, rate limits (throttling logic required)
-- **AI Budget**: Vision AI capped at €1/day, €30/month (caching critical)
-- **Vendor Scraping**: Respect robots.txt, implement delays, handle anti-scraping
-- **Data Privacy**: Store credentials securely, no API keys in code
-- **Backward Compatibility**: Existing Bastelschachtel.at deployment must continue working during migration
-- **German Language**: SEO and content generation must support German e-commerce conventions
+- **Budget**: Vision AI processing is budget-capped at €1/day (enforced by `vision_cache`).
+- **API Limits**: Shopify GraphQL rate limits require adaptive throttling (enforced in `shopify_apply.py`).
+- **Language**: All SEO and enrichment content must be generated in German for the target market.
+- **Security**: Binary context gate (`scripts/governance/context_os_gate.py`) must pass before any production mutation.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Cleanup before features | 30+ scripts make codebase unmaintainable; organize first, then build | — Pending |
-| Agent-driven refactoring | Leverage awesome-claude-code + GSD for autonomous cleanup | — Pending |
-| Docker-first architecture | Scalability requirement; separates concerns, enables multi-tenant future | — Pending |
-| Progressive onboarding | Users overwhelmed by modular apps immediately; start simple, grow complexity | — Pending |
-| Python scraper vs JS scraper | Both exist; agents will analyze and recommend clear strategy | — Pending |
-| Frontend framework | React/Vue/Svelte vs Flask templates; agents will evaluate and recommend | — Pending |
+| Graph-First RAG | Codebase complexity exceeded lexical search limits; Neo4j provides 100% awareness. | ✓ Good |
+| Sentry-Driven Intake | Manual issue reporting was too slow for a self-healing system. | ✓ Good |
+| Vanilla CSS over Tailwind | Maximum flexibility for distinctive frontend design without utility-class bloat. | ✓ Good |
+| Tiered AI Routing | Balances cost (T1) with reasoning depth (T3) for complex tasks. | ✓ Good |
 
 ---
-*Created: 2026-02-03 after repository evaluation*
-*Last updated: 2026-02-16 after Phase 13 phase-level verify-work closure*
+*Last updated: 2026-03-06 after Phase 16 closure & Phase 17 activation*

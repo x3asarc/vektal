@@ -81,7 +81,9 @@ def register_v1_blueprints(app):
     from src.api.v1.versioning import versioning_bp
     from src.api.v1.chat import chat_bp
     from src.api.v1.ops import ops_bp
+    from src.api.v1.ops.dashboard import dashboard_bp
     from src.api.v1.approvals import approvals_bp
+    from src.api.v1.shopify.webhooks import shopify_webhooks_bp
 
     # ===== V1 API Routes (versioned, preferred) =====
     # Register auth blueprints under /api/v1/
@@ -102,7 +104,9 @@ def register_v1_blueprints(app):
     app.register_blueprint(versioning_bp, url_prefix='/api/v1/user')
     app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
     app.register_blueprint(ops_bp, url_prefix='/api/v1/ops')
+    app.register_blueprint(dashboard_bp, url_prefix='/api/v1/ops/dashboard')
     app.register_blueprint(approvals_bp, url_prefix='/api/v1/approvals')
+    app.register_blueprint(shopify_webhooks_bp, url_prefix='/api/v1/shopify')
 
     # ===== Legacy Routes (backward compatibility) =====
     # Keep /auth and /billing working during transition

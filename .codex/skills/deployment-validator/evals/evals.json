@@ -1,0 +1,24 @@
+{
+  "skill_name": "deployment-validator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Confirm my frontend is actually deployed: localhost works on 3000 and public domain should return homepage.",
+      "expected_output": "Returns gate-by-gate PASS/FAIL with status code evidence and explicit overall verdict.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "After Docker changes, verify if this is genuinely fixed or still broken. I need proof, not guesses.",
+      "expected_output": "Runs mandatory gates, includes command evidence and identifies precise failing gate if any.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Use browser-level validation only if needed, but do not block on optional tools.",
+      "expected_output": "Keeps optional Playwright/Firecrawl checks non-blocking and still delivers deterministic verdict.",
+      "files": []
+    }
+  ]
+}
+
