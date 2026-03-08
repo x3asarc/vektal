@@ -27,6 +27,6 @@ Phase: $ARGUMENTS
 </context>
 
 <process>
-Execute the remove-phase workflow from @./.claude/get-shit-done/workflows/remove-phase.md end-to-end.
 Preserve all validation gates (future phase check, work check), renumbering logic, and commit.
 </process>
+</phase-number>

@@ -25,9 +25,9 @@ Arguments: $ARGUMENTS (format: <after-phase-number> <description>)
 
 @.planning/ROADMAP.md
 @.planning/STATE.md
-</context>
+</description>
 
 <process>
-Execute the insert-phase workflow from @./.claude/get-shit-done/workflows/insert-phase.md end-to-end.
 Preserve all validation gates (argument parsing, phase verification, decimal calculation, roadmap updates).
 </process>
+</after-phase-number></context></description></after></after>

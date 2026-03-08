@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 name: frontend-deploy-debugger
 description: Diagnose and fix frontend deployment failures across localhost, Docker, and Linux servers, then prepare clean cutover to public URL. Use when deployment is failing, when runtime ports/proxy are broken, or immediately after `frontend-design` implementation to run a quick regression check before validation. Use Neo4j/Graphiti (Graffiti) graph context to trace impacted files and blast radius before edits. Make sure to use this skill on each loop iteration between `frontend-design` and `deployment-validator`.
 ---

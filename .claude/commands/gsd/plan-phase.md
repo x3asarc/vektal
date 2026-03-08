@@ -39,7 +39,6 @@ Normalize phase input in step 2 before any directory lookups.
 </context>
 
 <process>
-Execute the plan-phase workflow from @./.claude/get-shit-done/workflows/plan-phase.md end-to-end.
 
 **Mandatory preflight:** if phase CONTEXT.md does not exist, auto-run the discuss-phase question flow first (big context window), create CONTEXT.md, then continue planning.
 **Mandatory Q&A evidence gate:** planning cannot continue unless CONTEXT.md records explicit discussion evidence (`questions_answered >= 4`).

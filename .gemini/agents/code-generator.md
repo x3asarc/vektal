@@ -1,3 +1,16 @@
+---
+name: code-generator
+description: Generates code with intent capture for knowledge graph enrichment.
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+color: blue
+---
+
 # Code Generator Agent
 
 Agent for generating code with intent capture for knowledge graph enrichment.

@@ -14,6 +14,17 @@ Next: Future production refinement (Priority 2-3).
 - `.planning/ROADMAP.md` — Phase definitions and success criteria
 - Active task: `.planning/phases/<phase>/<task>/PLAN.md`
 
+## Agent System (Commander Architecture — ACTIVE)
+
+All non-trivial work routes through the Commander system. Do not execute directly — route via Commander.
+
+**Entry point:** `.gemini/agents/commander.md`
+**Hierarchy:** Commander → Bundle (config) → Leads → Specialists
+**Agents:** `.gemini/agents/` — commander, bundle, design-lead, engineering-lead, forensic-lead, infrastructure-lead, project-lead, validator, task-observer
+**Skills:** `.gemini/skills/` — 33 installed
+**Canonical specs:** `docs/agent-system/specs/`
+**Model policy:** `docs/agent-system/model-policy.md` (default: openrouter/auto)
+
 ---
 
 ## Safety Protocols (Production Protection)

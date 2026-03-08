@@ -33,6 +33,5 @@ Use when: You know exactly what to do and the task is small enough to not need r
 </context>
 
 <process>
-Execute the quick workflow from @./.claude/get-shit-done/workflows/quick.md end-to-end.
 Preserve all workflow gates (validation, task description, planning, execution, state updates, commits).
 </process>

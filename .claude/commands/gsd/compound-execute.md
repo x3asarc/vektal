@@ -33,6 +33,6 @@ Arguments: $ARGUMENTS
 </context>
 
 <process>
-Execute the compound workflow from @./.claude/get-shit-done/workflows/compound-execute.md end-to-end.
 Preserve governance gates, phase workflow gates, and canonical state update discipline.
 </process>
+</NN></phase-number>

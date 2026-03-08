@@ -1,0 +1,103 @@
+[
+  {
+    "id": 1,
+    "query": "settings page is too basic, what toggles and controls should users have?",
+    "should_trigger": true
+  },
+  {
+    "id": 2,
+    "query": "audit each route and tell me which buttons are missing by user workflow",
+    "should_trigger": true
+  },
+  {
+    "id": 3,
+    "query": "before redesigning, understand what actions exist on dashboard/search/settings",
+    "should_trigger": true
+  },
+  {
+    "id": 4,
+    "query": "use screenshots to map page gaps and recommend practical options for each page",
+    "should_trigger": true
+  },
+  {
+    "id": 5,
+    "query": "what should be on this page besides the current empty cards and one button?",
+    "should_trigger": true
+  },
+  {
+    "id": 6,
+    "query": "give me page-by-page IA and CTA improvements that match current scope",
+    "should_trigger": true
+  },
+  {
+    "id": 7,
+    "query": "analyze my app routes and propose missing states like loading, empty, and error actions",
+    "should_trigger": true
+  },
+  {
+    "id": 8,
+    "query": "I need structured output of existing page actions and recommended new ones",
+    "should_trigger": true
+  },
+  {
+    "id": 9,
+    "query": "evaluate current page content and interaction model, not just colors and fonts",
+    "should_trigger": true
+  },
+  {
+    "id": 10,
+    "query": "which user options should be added to /settings, /jobs, and /chat to make this production ready?",
+    "should_trigger": true
+  },
+  {
+    "id": 11,
+    "query": "redesign this landing page to feel premium with stronger typography and visual style",
+    "should_trigger": false
+  },
+  {
+    "id": 12,
+    "query": "extract design tokens from this pinterest board and generate a style system",
+    "should_trigger": false
+  },
+  {
+    "id": 13,
+    "query": "my docker ports clash and domain returns 502, debug deployment",
+    "should_trigger": false
+  },
+  {
+    "id": 14,
+    "query": "verify localhost and production URL health checks with pass fail verdict",
+    "should_trigger": false
+  },
+  {
+    "id": 15,
+    "query": "scrape these docs pages and summarize the authentication section",
+    "should_trigger": false
+  },
+  {
+    "id": 16,
+    "query": "clean up my changed code and simplify duplicated logic",
+    "should_trigger": false
+  },
+  {
+    "id": 17,
+    "query": "create a brand new skill for triaging SQL bugs",
+    "should_trigger": false
+  },
+  {
+    "id": 18,
+    "query": "find deep bugs in this backend with multi-agent audit",
+    "should_trigger": false
+  },
+  {
+    "id": 19,
+    "query": "just use firecrawl browser to click through and scrape everything",
+    "should_trigger": false
+  },
+  {
+    "id": 20,
+    "query": "build a gorgeous dashboard UI from scratch, surprise me visually",
+    "should_trigger": false
+  }
+]
+

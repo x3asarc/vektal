@@ -1,6 +1,7 @@
 ---
+disable-model-invocation: true
 name: deployment-validator
-description: Validate that a frontend is truly reachable and healthy on localhost and public URL using repeatable evidence. Use after `frontend-deploy-debugger` on every loop iteration. If validation fails, send comprehensive analysis and remediation guidance back to `frontend-design`; if validation passes, stop the pipeline and call no further skills.
+description: Use when user wants to Validate that a frontend is truly reachable and healthy on localhost and public URL using repeatable evidence. Use after `frontend-deploy-debugger` on every loop iteration. If validation fails, send comprehensive analysis and remediation guidance back to `frontend-design`; if validation passes, stop the pipeline and call no further skills.
 ---
 
 # Deployment Validator

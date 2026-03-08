@@ -1,3 +1,5 @@
+---
+---
 # Pico-Warden: Bootstrap Recovery Loop
 
 **Agent ID:** `agent-24c66e02-7099-4027-9d66-24e319a17251`

@@ -1,7 +1,14 @@
 ---
 name: gsd-debugger
 description: Investigates bugs using scientific method, manages debug sessions, handles checkpoints. Spawned by /gsd:debug orchestrator.
-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: orange
 ---
 
@@ -1153,7 +1160,7 @@ Orchestrator presents checkpoint to user, gets response, spawns fresh continuati
 
 See <checkpoint_behavior> section for full format.
 
-</structured_returns>
+</checkpoint_behavior>
 
 <modes>
 
@@ -1196,3 +1203,4 @@ Check for mode flags in prompt context:
 - [ ] Fix verified against original symptoms
 - [ ] Appropriate return format based on mode
 </success_criteria>
+</structured_returns>

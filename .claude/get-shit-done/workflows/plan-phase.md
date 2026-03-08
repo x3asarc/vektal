@@ -405,7 +405,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 /gsd:execute-phase {X}
 
-<sub>/clear first â†’ fresh context window</sub>
+<sub>/clear first â†’ fresh context window</offer_next>
 
 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -414,7 +414,7 @@ Verification: {Passed | Passed with override | Skipped}
 - /gsd:plan-phase {X} --research â€” re-research first
 
 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-</offer_next>
+
 
 <success_criteria>
 - [ ] .planning/ directory validated

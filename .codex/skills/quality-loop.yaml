@@ -1,0 +1,119 @@
+name: quality-loop
+description: Start iterative product quality improvement loop using Ralph Wiggum technique
+
+instructions: |
+  # Product Quality Improvement Loop (Ralph Wiggum Integration)
+
+  This skill runs an iterative loop that continuously improves product quality until a target score is reached.
+
+  ## What It Does
+
+  1. Scans products from Shopify (up to limit)
+  2. Checks quality score (0-100) for each product
+  3. Automatically dispatches repair jobs for fixable issues:
+     - Country of origin & HS codes (from vendor configs)
+     - SEO meta descriptions & titles
+     - Product tags (AI-generated)
+     - Collection assignments
+     - Product categorization
+  4. Re-checks quality after repairs
+  5. Repeats until target score reached or max iterations hit
+
+  ## Command
+
+  Run the quality loop with:
+  ```bash
+  python orchestrator/quality_loop_ralph.py --limit <n> --target-score <score> --max-iterations <n>
+  ```
+
+  ## Default Parameters
+  - `--limit 20` - Process 20 products
+  - `--target-score 85` - Target score of 85/100
+  - `--max-iterations 10` - Stop after 10 iterations
+
+  ## Example Usage
+
+  ```bash
+  # Process 50 products, target 90/100, max 20 iterations
+  python orchestrator/quality_loop_ralph.py --limit 50 --target-score 90 --max-iterations 20
+  ```
+
+  ## Completion Signal
+
+  The loop outputs `<promise>QUALITY_TARGET_REACHED</promise>` when:
+  - All products meet or exceed target score
+  - OR max iterations reached
+
+  ## Integration with Ralph Wiggum
+
+  To use with Ralph Wiggum's self-referential loop:
+
+  ```bash
+  /ralph-loop "Improve product quality to 90/100 for 50 products. Run: python orchestrator/quality_loop_ralph.py --limit 50 --target-score 90 --max-iterations 30. Output <promise>QUALITY_TARGET_REACHED</promise> when done." --completion-promise "QUALITY_TARGET_REACHED" --max-iterations 30
+  ```
+
+  This creates a persistent loop that will:
+  - Run quality checks
+  - Auto-repair issues
+  - Re-check quality
+  - Continue until all products score ≥90/100
+
+  ## What Gets Fixed
+
+  ✅ **Automatically Fixed:**
+  - Country of origin (from vendor configs)
+  - HS codes (from vendor configs)
+  - SEO titles (generated if missing)
+  - SEO descriptions (shortened if too long, generated if missing)
+  - Product tags (AI-generated if <3 tags)
+  - Collections (pattern-matched)
+  - Product type/category (from title/tags)
+
+  ⚠️ **Requires Manual Setup:**
+  - URL handles (needs Shopify API permission: write_online_store_navigation)
+  - Product weight (API limitation - read-only)
+  - Images (requires selenium + vendor URLs)
+
+  ## Monitoring Progress
+
+  After each iteration, you'll see:
+  ```
+  Products checked: 50
+  Average score: 73.2/100
+  Score range: 57-92/100
+  Below target: 23
+
+  Status: ✗ 23/50 products below target
+  ```
+
+  The loop continues until:
+  ```
+  Status: ✓ All 50 products meet target (90+)
+
+  <promise>QUALITY_TARGET_REACHED</promise>
+  ```
+
+  ## Tips for Best Results
+
+  1. **Start small** - Test with --limit 10 first
+  2. **Set realistic targets** - 85/100 is achievable, 100/100 may not be (weight/images)
+  3. **Use max iterations** - Prevent infinite loops with --max-iterations
+  4. **Review vendor configs** - Ensure vendor_configs.yaml has logistics data
+  5. **Check API permissions** - Some repairs need Shopify API access
+
+  ## Troubleshooting
+
+  If quality scores stop improving:
+  - Check which fields are missing (review master file)
+  - Verify vendor configs have logistics data
+  - Confirm API permissions are set
+  - Some fields (weight, images) may need manual intervention
+
+params: []
+
+examples:
+  - prompt: "Start quality loop for 20 products targeting 85/100"
+    command: "python orchestrator/quality_loop_ralph.py --limit 20 --target-score 85 --max-iterations 10"
+
+  - prompt: "Improve all products to 90/100 with Ralph loop"
+    command: "/ralph-loop \"Improve product quality. Run: python orchestrator/quality_loop_ralph.py --limit 50 --target-score 90 --max-iterations 30\" --completion-promise \"QUALITY_TARGET_REACHED\" --max-iterations 30"

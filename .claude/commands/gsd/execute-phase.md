@@ -47,6 +47,6 @@ Preflight routing before execution:
    (or gaps flow).
 5. Only then execute this workflow.
 
-Execute the execute-phase workflow from @./.claude/get-shit-done/workflows/execute-phase.md end-to-end.
 Preserve all workflow gates (wave execution, checkpoint handling, verification, state updates, routing).
 </process>
+</phase-number>

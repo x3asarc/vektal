@@ -18,8 +18,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PID_FILE = PROJECT_ROOT / ".graph" / "health-monitor.pid"
 CACHE_FILE = PROJECT_ROOT / ".graph" / "health-cache.json"
 START_SCRIPT = PROJECT_ROOT / "scripts" / "daemons" / "start_health_monitor.sh"
-TOOLS_VALIDATOR = PROJECT_ROOT / "scripts" / "tools" / "validate_external_tools.py"
-TOOLS_REPORT = PROJECT_ROOT / ".tooling" / "external-tools-health.json"
 
 
 def _is_daemon_running() -> bool:
@@ -47,36 +45,8 @@ def _is_daemon_running() -> bool:
         return False
 
 
-def _start_tools_validator() -> None:
-    """Start external tools quick validation in background for every session."""
-    if not TOOLS_VALIDATOR.exists():
-        print("[SessionStart] External tools validator not found; skipping")
-        return
-
-    try:
-        subprocess.Popen(
-            [
-                sys.executable,
-                str(TOOLS_VALIDATOR),
-                "--mode",
-                "quick",
-                "--report",
-                str(TOOLS_REPORT),
-            ],
-            cwd=PROJECT_ROOT,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
-        )
-        print("[SessionStart] External tools quick validation started")
-    except Exception as exc:
-        print(f"[SessionStart] WARNING: Failed to start external tools validation: {exc}")
-
-
 def main() -> int:
     """Main hook entry point."""
-    _start_tools_validator()
-
     if _is_daemon_running():
         print("[SessionStart] Health monitor daemon already running")
         return 0

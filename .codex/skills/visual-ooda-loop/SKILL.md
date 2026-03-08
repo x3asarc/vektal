@@ -1,6 +1,6 @@
 ---
 name: visual-ooda-loop
-description: Orchestrates a visual verification loop for frontend changes. Use Playwright and Firecrawl to capture live visual evidence from localhost or public URLs, then analyze for congruence with the implementation plan and design tokens. Make sure to use this skill after frontend changes are pushed and technical deployment gates have passed.
+description: Use when user wants to Orchestrates a visual verification loop for frontend changes. Use Playwright and Firecrawl to capture live visual evidence from localhost or public URLs, then analyze for congruence with the implementation plan and design tokens. Make sure to use this skill after frontend changes are pushed and technical deployment gates have passed.
 ---
 
 # Visual OODA Loop

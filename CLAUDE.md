@@ -13,6 +13,17 @@ Remaining phases: 13.2 (Oracle Framework Reuse), 14 (Continuous Optimization), 1
 - `.planning/ROADMAP.md` — phase definitions and success criteria
 - Active task: `.planning/phases/<phase>/<task>/PLAN.md`
 
+## Agent System (Commander Architecture — ACTIVE)
+
+All non-trivial work routes through the Commander system. Do not execute directly — route via Commander.
+
+**Entry point:** `.claude/agents/commander.md`
+**Hierarchy:** Commander → Bundle (config) → Leads → Specialists
+**Agents:** `.claude/agents/` — commander, bundle, design-lead, engineering-lead, forensic-lead, infrastructure-lead, project-lead, validator, task-observer
+**Skills:** `.claude/skills/` — 33 installed (brainstorming, systematic-debugging, test-driven-development, postgres, dev-browser, oiloil-ui-ux-guide, varlock-claude-skill, defense-in-depth, + more)
+**Canonical specs:** `docs/agent-system/specs/`
+**Model policy:** `docs/agent-system/model-policy.md` (default: openrouter/auto)
+
 ---
 
 ## Before Writing Anything

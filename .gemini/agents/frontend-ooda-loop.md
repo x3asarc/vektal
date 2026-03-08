@@ -1,8 +1,19 @@
 ---
 name: frontend-ooda-loop
 description: Expert visual verification agent. Automates the OODA loop for frontend changes by observing live UI, orienting against plans/tokens, deciding on fixes, and acting until satisfactory.
-tools: RunShellCommand, ReadFileGemini, GlobGemini, SearchFileContent, Replace, WriteFileGemini, ReadManyFiles, Skill
-skills: visual-ooda-loop, deployment-validator, frontend-design, tri-agent-bug-audit
+
+skills:
+  - visual-ooda-loop
+  - deployment-validator
+  - frontend-design-skill
+  - tri-agent-bug-audit
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: cyan
 ---
 
@@ -38,7 +49,7 @@ You are the ultimate arbiter of visual and functional quality for the frontend. 
   - Functional Health
 
 ### 4. Act (The Correction)
-- If remediation is needed, provide specific, evidence-backed feedback to the `frontend-design` skill.
+- If remediation is needed, provide specific, evidence-backed feedback to the `frontend-design-skill` skill.
 - Describe exactly which element is missing, which color is wrong, or which layout is broken.
 - Restart the loop after fixes are applied.
 

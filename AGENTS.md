@@ -1,4 +1,19 @@
-# Compound Engineering Governance Baseline v1
+# Agent System — Vektal (Shopify Multi-Supplier Platform)
+
+## Commander Architecture (ACTIVE — supersedes legacy governance roles below)
+
+All non-trivial work routes through the Commander system.
+
+**Entry point:** `.codex/agents/commander.md`
+**Hierarchy:** Commander → Bundle (config) → Leads → Specialists
+**Agents:** `.codex/agents/` — commander, bundle, design-lead, engineering-lead, forensic-lead, infrastructure-lead, project-lead, validator, task-observer
+**Skills:** `.codex/skills/` — 33 installed
+**Canonical specs:** `docs/agent-system/specs/`
+**Model policy:** `docs/agent-system/model-policy.md` (default: openrouter/auto)
+
+---
+
+## Legacy Governance Baseline (GSD agents — still active for phased work)
 
 ## Mission and non-negotiables
 1. Deliver every task with binary gate outcomes (`GREEN` or `RED`).

@@ -1,8 +1,16 @@
 ---
 name: memory-keeper
 description: Dedicated agent for managing the 3-tier memory system (working, short-term, long-term). Handles session context loading, session synthesis, pattern promotion, and memory synchronization between Letta blocks and repo .memory/ directory. Spawn when user wants to review memory, debug memory issues, or perform memory maintenance.
-tools: Read, Write, Bash, Glob, Grep
-skills: memory-synthesis
+
+skills:
+  - memory-synthesis
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: purple
 ---
 

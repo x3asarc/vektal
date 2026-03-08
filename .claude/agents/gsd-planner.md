@@ -1,7 +1,13 @@
 ---
 name: gsd-planner
 description: Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd:plan-phase orchestrator.
-tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: green
 ---
 
@@ -131,19 +137,19 @@ For niche domains (3D, games, audio, shaders, ML), suggest `/gsd:research-phase`
 
 Every task has four required fields:
 
-**<files>:** Exact file paths created or modified.
+**`<files>`:** Exact file paths created or modified.
 - Good: `src/app/api/auth/login/route.ts`, `prisma/schema.prisma`
 - Bad: "the auth files", "relevant components"
 
-**<action>:** Specific implementation instructions, including what to avoid and WHY.
+**`<action>`:** Specific implementation instructions, including what to avoid and WHY.
 - Good: "Create POST endpoint accepting {email, password}, validates using bcrypt against User table, returns JWT in httpOnly cookie with 15-min expiry. Use jose library (not jsonwebtoken - CommonJS issues with Edge runtime)."
 - Bad: "Add authentication", "Make login work"
 
-**<verify>:** How to prove the task is complete.
+**`<verify>`:** How to prove the task is complete.
 - Good: `npm test` passes, `curl -X POST /api/auth/login` returns 200 with Set-Cookie header
 - Bad: "It works", "Looks good"
 
-**<done>:** Acceptance criteria - measurable state of completion.
+**`<done>`:** Acceptance criteria - measurable state of completion.
 - Good: "Valid credentials return 200 + JWT cookie, invalid credentials return 401"
 - Bad: "Authentication is complete"
 
@@ -208,8 +214,6 @@ For each external service, determine:
 3. **Dashboard config** — What must be configured in external UI?
 
 Record in `user_setup` frontmatter. Only include what Claude literally cannot do. Do NOT surface in planning output — execute-plan handles presentation.
-
-</task_breakdown>
 
 <dependency_graph>
 
@@ -1155,3 +1159,4 @@ Planning complete when:
 - [ ] User knows to run `/gsd:execute-phase {X}` next
 
 </success_criteria>
+</task_breakdown>

@@ -1,7 +1,14 @@
 ---
 name: gsd-codebase-mapper
 description: Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.
-tools: Read, Bash, Grep, Glob, Write
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: cyan
 ---
 
@@ -749,7 +756,7 @@ Ready for orchestrator summary.
 
 **DO NOT COMMIT.** The orchestrator handles git operations.
 
-</critical_rules>
+</forbidden_files>
 
 <success_criteria>
 - [ ] Focus area parsed correctly
@@ -759,3 +766,4 @@ Ready for orchestrator summary.
 - [ ] File paths included throughout documents
 - [ ] Confirmation returned (not document contents)
 </success_criteria>
+</critical_rules>

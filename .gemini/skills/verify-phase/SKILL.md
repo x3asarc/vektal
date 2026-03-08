@@ -1,6 +1,6 @@
 ---
 name: verify-phase
-description: Run progressive verification checkpoints for a GSD phase
+description: Use when user wants to Run progressive verification checkpoints for a GSD phase
 disable-model-invocation: true
 ---
 

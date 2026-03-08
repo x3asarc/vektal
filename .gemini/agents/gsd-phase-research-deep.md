@@ -1,7 +1,14 @@
 ---
 name: gsd-phase-research-deep
 description: Exhaustive multi-pass context reorganization research agent. Runs in parallel with gsd-phase-researcher and produces a deep companion report.
-tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
 color: teal
 ---
 
