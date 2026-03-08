@@ -260,115 +260,84 @@ Replaces using sonnet to write STATE.md updates and episode content.
 
 ## Agent Model Routing Table
 
-Commander selects model based on: Task Classifier output + Difficulty Estimator tier.
-Model is passed in context package. Escalation trigger is explicit condition.
+**Default for all subtasks: `openrouter/auto`**
+Only rows marked QUALITY FLOOR use an explicit model.
+Everything else: let OpenRouter route optimally.
 
-### @Commander (meta-routing + coordination)
+### @Commander
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Task classification | `classifier` | — | — |
-| Difficulty estimation | `difficulty` | — | — |
-| Standard routing decision | `haiku` | — | — |
-| Compound task CoT decomposition | `sonnet` | Novel architecture | `opus` |
-| Circuit breaker diagnostic | `sonnet` | — | — |
-| STATE.md write | `summarizer` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| All standard routing + UNDERSTAND | `auto` | Default |
+| Compound task CoT decomposition | `sonnet` floor | QUALITY FLOOR — decomposition quality determines all downstream |
+| Circuit breaker diagnostic | `sonnet` floor | QUALITY FLOOR — diagnostic must be accurate |
+| STATE.md write | `summarizer` (haiku) | Utility — auto is overkill for compression |
 
 ### @Design-Lead
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Tool selection (model vs dev-browser) | `tool-selector` | — | — |
-| Token extraction (vision input) | `vision` (sonnet-vision) | Multi-brand complex | `opus` |
-| Atomic/molecular design | `sonnet` | — | — |
-| UX quality review | `sonnet` | Accessibility audit | `opus` |
-| Frontend assembly | `sonnet-code` | — | — |
-| Mockup generation | `image-gen` | — | — |
-| E2E test writing | `codestral` | Complex async flows | `sonnet-code` |
-| Outcome schema validation | `json-validator` | — | — |
-| Outcome summarisation | `summarizer` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| All design + assembly + UX review | `auto` | Default |
+| Mockup generation | `image-gen` explicit | Requires image generation model — auto won't select it |
+| E2E test writing | `auto` | Default (auto routes to codestral-class) |
+| Outcome schema validation | `json-validator` (gpt4o-mini) | Utility |
+| Outcome summarisation | `summarizer` (haiku) | Utility |
 
 ### @Engineering-Lead
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Tool selection (model vs postgres/shell) | `tool-selector` | — | — |
-| Plan validation | `haiku` | — | — |
-| TDD test writing | `codestral` | Complex domain logic | `sonnet-code` |
-| GSD plan creation | `sonnet` | — | — |
-| GSD execution (tool-heavy) | `sonnet-tools` | Architectural deviation | `opus` |
-| Security review | `sonnet` | CRITICAL tier | `opus` |
-| Large codebase research | `gemini-long` | — | — |
-| Web-augmented research | `sonar-pro` | Needs reasoning + search | `sonar-reasoning-pro` |
-| Data verification (postgres) | `haiku` | — | — |
-| Outcome schema validation | `json-validator` | — | — |
-| Outcome summarisation | `summarizer` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| All plan + code + GSD execution | `auto` | Default |
+| Security review (CRITICAL tier) | `sonnet` floor | QUALITY FLOOR — miss = production vulnerability |
+| GSD execution (architectural deviation) | `opus` floor | QUALITY FLOOR — Rule 4 architectural decision |
+| Web-augmented research | `sonar-pro` explicit | Requires search-augmented model — auto won't select Sonar |
+| Web-grounded reasoning | `sonar-reasoning-pro` explicit | As above |
+| Outcome schema validation | `json-validator` (gpt4o-mini) | Utility |
+| Outcome summarisation | `summarizer` (haiku) | Utility |
 
 ### @Forensic-Lead
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Sentry intake | `haiku` | — | — |
-| Failure characterisation | `sonnet` | — | — |
-| Root cause tracing | `sonnet` | — | — |
-| ACH hypothesis generation | `sonnet` | — | — |
-| tri-agent-bug-audit (Neutral Mapper) | `sonnet` | — | — |
-| tri-agent-bug-audit (Bug Finder) | `sonnet-tools` | — | — |
-| tri-agent-bug-audit (Adversary) | `opus` | — | — |
-| tri-agent-bug-audit (Referee) | `opus` | Blast radius > 10 | `opus` + `o3` |
-| Episode write content | `summarizer` | — | — |
-| Outcome schema validation | `json-validator` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| Intake + characterisation + trace + ACH | `auto` | Default |
+| tri-audit Neutral Mapper | `auto` | Default |
+| tri-audit Bug Finder | `auto` | Default |
+| tri-audit Adversary | `opus` floor | QUALITY FLOOR — adversarial quality is the feature |
+| tri-audit Referee | `opus` floor | QUALITY FLOOR — final verdict, max scrutiny |
+| Episode write content | `summarizer` (haiku) | Utility |
+| Outcome schema validation | `json-validator` (gpt4o-mini) | Utility |
 
 ### @Infrastructure-Lead
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Aura health probe | `haiku` | — | — |
-| Deployment validation | `haiku` | — | — |
-| varlock security check | `haiku` | Secret detected | `sonnet` |
-| Improvement queue processing | `haiku` | — | — |
-| Pattern promotion write | `summarizer` | — | — |
-| Outcome schema validation | `json-validator` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| All health + sync + queue tasks | `auto` | Default |
+| varlock secret detection | `sonnet` floor | QUALITY FLOOR — secret miss = security incident |
+| Pattern promotion write | `summarizer` (haiku) | Utility |
+| Outcome schema validation | `json-validator` (gpt4o-mini) | Utility |
 
 ### @Project-Lead
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Compound decomposition | `sonnet` (planner prompt) | Cross-cutting architecture | `opus` |
-| Lead coordination | `haiku` | — | — |
-| Overall quality gate validation | `sonnet` | — | — |
-| Outcome aggregation schema | `json-validator` | — | — |
-
----
+| Subtask | Model | Note |
+|---|---|---|
+| All decomposition + coordination | `auto` | Default |
+| Compound CoT (cross-cutting architecture) | `sonnet` floor | QUALITY FLOOR — decomposition quality |
+| Outcome aggregation validation | `json-validator` (gpt4o-mini) | Utility |
 
 ### @Validator
 
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| Proposal review + CoT verdict | `sonnet` (critic prompt) | Governance/auth path | `opus` |
-| Blast radius Aura query | `haiku` | — | — |
-| Adversarial check | `sonnet` | — | — |
-| Rejection rationale write | `summarizer` | — | — |
+| Subtask | Model | Note |
+|---|---|---|
+| Standard proposal review + CoT | `sonnet` floor | QUALITY FLOOR — bad approval has downstream consequences |
+| Governance/auth proposals | `opus` floor | QUALITY FLOOR — highest stakes in the system |
+| Rejection rationale write | `summarizer` (haiku) | Utility |
 
----
+### task-observer (background — invoked by Infrastructure Lead)
 
-### task-observer (background)
-
-| Subtask | Model | Escalation trigger | Escalation model |
-|---|---|---|---|
-| TaskExecution outcome analysis | `haiku` | — | — |
-| ImprovementProposal writing | `sonnet` | Multi-agent impact | `sonnet` |
-| Cost/model performance analysis | `classifier` + `difficulty` | — | — |
+| Subtask | Model | Note |
+|---|---|---|
+| TaskExecution analysis + proposal writing | `auto` | Default |
+| ImprovementProposal content | `auto` | Default |
 
 ---
 
