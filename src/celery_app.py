@@ -82,6 +82,7 @@ except ModuleNotFoundError:  # pragma: no cover - fallback for minimal test envi
 from src.jobs.queueing import ALL_QUEUES, TASK_ROUTES
 from src.config.sentry_config import configure_sentry
 from src.core.sentry_metrics import count as sentry_count
+from src.core.graphiti_client import validate_graph_config
 
 # Worker process should report to the workers Sentry project DSN.
 configure_sentry(runtime="workers")
@@ -160,6 +161,12 @@ def debug_task(self):
     """Health task used by tests and smoke checks."""
     return {"task_id": self.request.id, "status": "ok"}
 
+
+# Validate graph credentials at worker startup.
+# CRITICAL-logs if GRAPH_ORACLE_ENABLED=true but NEO4J_PASSWORD/URI missing.
+# Blast radius: emit_episode, consistency_daemon, incremental_sync, query_templates,
+# search_expand_bridge, similarity_detector all silently return empty/None without these.
+validate_graph_config()
 
 app.autodiscover_tasks(["src.tasks"])
 

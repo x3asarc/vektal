@@ -36,6 +36,50 @@ except ImportError:
 T = TypeVar('T')
 
 
+def validate_graph_config() -> list[str]:
+    """
+    Validate that required graph credentials are present when the Oracle is enabled.
+
+    Call this at worker/app startup. Returns a list of missing variable names.
+    Logs a CRITICAL warning for each missing item — does NOT raise, preserving
+    the fail-open contract.
+
+    Usage (Celery worker init, Flask create_app, or CLI entry points):
+        from src.core.graphiti_client import validate_graph_config
+        validate_graph_config()  # logs CRITICAL if oracle enabled but misconfigured
+
+    Only audits when GRAPH_ORACLE_ENABLED=true. Silent when oracle is disabled.
+    """
+    if os.environ.get('GRAPH_ORACLE_ENABLED', 'false').lower() != 'true':
+        return []  # oracle disabled — no validation needed
+
+    _REQUIRED: dict[str, str] = {
+        'NEO4J_PASSWORD': 'Aura/Neo4j password — T1 config, no default',
+        'NEO4J_URI':      'Aura/Neo4j connection URI — T2 config, no default',
+    }
+
+    missing = []
+    for var, description in _REQUIRED.items():
+        if not os.environ.get(var):
+            missing.append(var)
+            logger.critical(
+                "GRAPH_ORACLE_ENABLED=true but %s is not set (%s). "
+                "All graph operations will silently return empty results. "
+                "Set the variable or disable GRAPH_ORACLE_ENABLED.",
+                var, description
+            )
+
+    if missing:
+        logger.critical(
+            "Graph Oracle misconfigured: %d required variable(s) missing: %s. "
+            "Blast radius: emit_episode, consistency_daemon, incremental_sync, "
+            "query_templates, search_expand_bridge, similarity_detector.",
+            len(missing), missing
+        )
+
+    return missing
+
+
 class LocalSentenceTransformerEmbedder(EmbedderClient if EmbedderClient else object):
     """
     Local sentence-transformers embedder for Graphiti.

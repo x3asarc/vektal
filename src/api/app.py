@@ -147,6 +147,13 @@ def create_openapi_app(config_object=None):
         app = create_openapi_app()
         app.run(debug=True, host='0.0.0.0', port=5000)
     """
+    # Validate graph credentials early — logs CRITICAL if oracle enabled but unconfigured.
+    # Placed here so both Flask process and Celery worker (which calls create_openapi_app)
+    # get the warning. get_graphiti_client already guards at call-time; this surfaces
+    # misconfiguration at startup rather than silently on the first graph call.
+    from src.core.graphiti_client import validate_graph_config
+    validate_graph_config()
+
     app = OpenAPI(
         __name__,
         info=info,
