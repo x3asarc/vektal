@@ -58,6 +58,11 @@ Layer 0 is never "called." It is always present.
 │                      long-term→Aura as :LongTermPattern nodes   │
 │  Model Policy      — OpenRouter broker, right model per task    │
 │                      see docs/agent-system/model-policy.md      │
+│  Meta-Routing     — tiny utility models on every request:       │
+│    classifier  → task domain (coding/design/forensic/infra)     │
+│    difficulty  → complexity tier (LOW/STANDARD/HIGH/CRITICAL)   │
+│    json-valid  → Lead outcome schema enforcement                │
+│    summarizer  → STATE.md + Aura episode writes                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -260,7 +265,10 @@ Aura + STATE.md on any platform at session start.
    Announce: MODE 1 (rules-based) or MODE 2 (graph-informed)
 
 2. UNDERSTAND
-   Parse the request.
+   [META-ROUTING — tiny models, near-zero cost]
+   Run Task Classifier (gpt4o-mini) → domain: coding/design/forensic/infra/compound
+   Run Difficulty Estimator (gpt4o-mini) → tier: LOW/STANDARD/HIGH/CRITICAL
+   Run Tool Selector (gpt4o-mini) → model or tool?
    Map to North Star: does this reduce MTTR or developer friction?
    For whom — developer (Graph 1) or end customer (Graph 2)?
    Check: is this a compound task (multiple domains)?
@@ -280,7 +288,10 @@ Aura + STATE.md on any platform at session start.
 4. RECEIVE
    Lead returns final outcome — ONE message only.
    Lead owns all internal loop iterations.
-   Commander receives:
+   [OUTPUT META-LAYER — runs before Commander processes result]
+   JSON Validator (gpt4o-mini) → validates outcome schema, fixes if malformed
+   Summarizer-Tiny (haiku) → compresses outcome for STATE.md + Aura episode write
+   Commander receives (validated + summarised):
      result, loop_count, quality_gate_passed,
      skills_used, affected_functions, state_update
 
@@ -808,6 +819,15 @@ proposals older than SLA to user at LOAD.
 ---
 
 ---
+
+### DD-09: Meta-Routing Classifier Accuracy
+**Question:** Is `gpt4o-mini` accurate enough as task classifier and difficulty estimator?
+**Why deferred:** No baseline established yet.
+**Trigger:** 50+ requests processed with classifier output logged in TaskExecution.
+**Evidence:** Cases where Commander overrode classifier output (indicates classifier error).
+**Action when triggered:** If error rate > 10% → refine classifier system prompt.
+If error rate > 20% → upgrade to `gpt4o` for classifier step.
+Infrastructure Lead applies update via ImprovementProposal queue.
 
 ### DD-08: Model Performance Calibration
 **Question:** Are the default models in model-policy.md actually optimal per task type?
