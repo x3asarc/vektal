@@ -66,10 +66,18 @@ def emit_intent_episode(record: IntentRecord) -> None:
     Args:
         record: The IntentRecord to emit.
     """
+    # Derive function_signature: module.entity_name — bridge key for (:Episode)-[:REFERS_TO]->(:Function)
+    _norm = record.file_path.replace('\\', '/').replace('.py', '')
+    if _norm.startswith('./'):
+        _norm = _norm[2:]
+    _module = _norm.replace('/', '.')
+    _fn_sig = f"{_module}.{record.entity_name}" if record.entity_name else _module
+
     payload = {
         'file_path': record.file_path,
         'entity_type': record.entity_type,
         'entity_name': record.entity_name,
+        'function_signature': _fn_sig,  # Task 10: bridge key for Graphiti→Neo4j link
         'intent': record.intent,
         'reasoning': record.reasoning,
         'alternatives': record.alternatives_considered,

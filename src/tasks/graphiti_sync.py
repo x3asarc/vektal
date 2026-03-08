@@ -136,7 +136,13 @@ def emit_episode(
     Args:
         episode_type: Episode type from EpisodeType enum values
         store_id: Store ID for multi-tenant isolation
-        payload: Episode payload dict with type-specific fields
+        payload: Episode payload dict with type-specific fields.
+            Graph bridge contract (Task 10): Developer-KG episode types MUST include
+            `function_signature` (format: "module.path.function_name") to enable
+            (:Episode)-[:REFERS_TO]->(:Function) bridge edges in Task 11.
+            Required for: CODE_INTENT (active), FAILURE_PATTERN (active),
+            BUG_ROOT_CAUSE_IDENTIFIED (inactive — add when implementing),
+            CONVENTION_ESTABLISHED (inactive — add when implementing).
         correlation_id: Optional correlation ID for lineage tracking
 
     Returns:
@@ -325,9 +331,13 @@ def sync_failure_journey(store_id: str) -> Dict[str, int]:
                     error_signature = hashlib.sha256(error_text.encode()).hexdigest()[:16]
 
                     # Prepare failure pattern episode payload
+                    # function_signature = module_path (best-effort; specific function
+                    # not extractable from FAILURE_JOURNEY.md traceback format)
+                    _mod = (current_entry["module_path"] or "").replace("/", ".").replace("\\", ".").replace(".py", "")
                     payload = {
                         "failure_type": "runtime_error",
                         "module_path": current_entry["module_path"],
+                        "function_signature": _mod,  # Task 10: bridge key
                         "error_signature": error_signature,
                         "occurrence_count": 1,
                         "entity_created_at": datetime.utcnow(),
