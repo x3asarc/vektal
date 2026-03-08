@@ -98,12 +98,14 @@ Use `lc-openrouter/<provider>/<model-id>` format in Letta.
 
 | Alias | OpenRouter ID | Tier | Best for |
 |---|---|---|---|
-| `sonar-large` | `perplexity/llama-3.1-sonar-large-128k-online` | STANDARD | Search + grounding — web results → coherent cited answers |
-| `sonar-medium` | `perplexity/llama-3.1-sonar-small-128k-online` | LOW | Extraction / compression — distill long pages into structured notes |
-| `sonar-small` | `perplexity/llama-3.1-sonar-small-128k-online` | LOW | Query rewriting — rewrite goals into search queries or tool calls |
+| `sonar-pro` | `perplexity/sonar-pro` | STANDARD | Search + grounding — web results → coherent cited answers. Best default for research. |
+| `sonar` | `perplexity/sonar` | LOW | Extraction / compression — distill pages into structured notes, query rewriting |
+| `sonar-reasoning` | `perplexity/sonar-reasoning` | HIGH | Web-grounded reasoning — search + think before answering |
+| `sonar-reasoning-pro` | `perplexity/sonar-reasoning-pro` | HIGH | Max Sonar — hardest web-grounded reasoning tasks |
 
-> Sonar Router and Sonar Planner are internal Perplexity models, not on OpenRouter.
-> Equivalent behavior: `gpt4o-mini` as task classifier + Commander routing table.
+> Sonar Router and Sonar Planner are internal Perplexity Computer orchestration models —
+> they are NOT the Sonar search API. No OpenRouter equivalent.
+> Our approximation: `gpt4o-mini` as task classifier + Commander routing table.
 
 ### Code-Specialised
 
@@ -232,7 +234,7 @@ Model is passed in context package. Escalation trigger is explicit condition.
 | GSD execution (tool-heavy) | `sonnet-tools` | Architectural deviation | `opus` |
 | Security review | `sonnet` | CRITICAL tier | `opus` |
 | Large codebase research | `gemini-long` | — | — |
-| Web-augmented research | `sonar-large` | Novel architecture | `gemini-pro` |
+| Web-augmented research | `sonar-pro` | Needs reasoning + search | `sonar-reasoning-pro` |
 | Data verification (postgres) | `haiku` | — | — |
 | Outcome schema validation | `json-validator` | — | — |
 | Outcome summarisation | `summarizer` | — | — |
@@ -344,7 +346,8 @@ MODEL_OPUS=anthropic/claude-opus-4
 MODEL_SONNET=anthropic/claude-sonnet-4-5
 MODEL_HAIKU=anthropic/claude-haiku-3-5
 MODEL_CODESTRAL=mistral/codestral-latest
-MODEL_SONAR=perplexity/llama-3.1-sonar-large-128k-online
+MODEL_SONAR=perplexity/sonar-pro
+MODEL_SONAR_REASONING=perplexity/sonar-reasoning-pro
 MODEL_GEMINI_LONG=google/gemini-pro-1-5
 MODEL_GPT4O=openai/gpt-4o
 MODEL_GPT4O_MINI=openai/gpt-4o-mini
