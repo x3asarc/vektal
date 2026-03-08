@@ -149,6 +149,133 @@ def _resolve_callee_full_name(
     return None
 
 
+from src.jobs.queueing import ALL_QUEUES, TASK_ROUTES
+
+_VALID_QUEUES = set(ALL_QUEUES)  # authoritative queue names from queueing.py
+_TASK_ROUTE_MAP: Dict[str, str] = {
+    name: cfg['queue'] for name, cfg in TASK_ROUTES.items()
+}
+
+
+def _extract_routes_from_file(file_path: str) -> List[Dict[str, Any]]:
+    """Extract @blueprint.route() decorated functions from a Python file."""
+    try:
+        source = Path(file_path).read_text(encoding='utf-8')
+    except UnicodeDecodeError:
+        try:
+            source = Path(file_path).read_text(encoding='latin-1')
+        except Exception:
+            return []
+    except Exception:
+        return []
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+
+    routes = []
+    module_name = _module_name_from_path(_normalize_path(file_path))
+
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for decorator in node.decorator_list:
+            if not isinstance(decorator, ast.Call):
+                continue
+            func = decorator.func
+            if not isinstance(func, ast.Attribute) or func.attr != 'route':
+                continue
+            blueprint = func.value.id if isinstance(func.value, ast.Name) else 'unknown'
+            # First positional arg is the URL template
+            url_template = None
+            if decorator.args and isinstance(decorator.args[0], ast.Constant):
+                url_template = str(decorator.args[0].value)
+            if url_template is None:
+                continue
+            http_methods = ['GET']
+            for kw in decorator.keywords:
+                if kw.arg == 'methods' and isinstance(kw.value, ast.List):
+                    http_methods = [
+                        elt.value for elt in kw.value.elts
+                        if isinstance(elt, ast.Constant)
+                    ]
+            routes.append({
+                'url_template': url_template,
+                'http_methods': http_methods,
+                'blueprint': blueprint,
+                'function_full_name': f"{module_name}.{node.name}",
+                'file_path': _normalize_path(file_path),
+            })
+    return routes
+
+
+def _extract_tasks_from_file(file_path: str) -> List[Dict[str, Any]]:
+    """Extract @app.task() decorated functions from a Python file."""
+    try:
+        source = Path(file_path).read_text(encoding='utf-8')
+    except UnicodeDecodeError:
+        try:
+            source = Path(file_path).read_text(encoding='latin-1')
+        except Exception:
+            return []
+    except Exception:
+        return []
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+
+    tasks = []
+    module_name = _module_name_from_path(_normalize_path(file_path))
+
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for decorator in node.decorator_list:
+            # Handle @app.task (no parens) or @app.task(...)
+            decorator_call = None
+            is_task = False
+            if isinstance(decorator, ast.Attribute) and decorator.attr == 'task':
+                is_task = True
+            elif isinstance(decorator, ast.Call):
+                func = decorator.func
+                if isinstance(func, ast.Attribute) and func.attr == 'task':
+                    is_task = True
+                    decorator_call = decorator
+            if not is_task:
+                continue
+
+            task_name = queue = priority = max_retries = None
+            if decorator_call:
+                for kw in decorator_call.keywords:
+                    if kw.arg == 'name' and isinstance(kw.value, ast.Constant):
+                        task_name = kw.value.value
+                    elif kw.arg == 'queue' and isinstance(kw.value, ast.Constant):
+                        queue = kw.value.value
+                    elif kw.arg == 'priority' and isinstance(kw.value, ast.Constant):
+                        priority = kw.value.value
+                    elif kw.arg == 'max_retries' and isinstance(kw.value, ast.Constant):
+                        max_retries = kw.value.value
+
+            if not task_name:
+                task_name = f"{module_name}.{node.name}"
+            # Resolve queue: decorator kwarg → TASK_ROUTES lookup → None
+            if not queue:
+                queue = _TASK_ROUTE_MAP.get(task_name)
+            if queue and queue not in _VALID_QUEUES:
+                queue = f"MISCONFIGURED:{queue}"
+
+            tasks.append({
+                'task_name': task_name,
+                'queue': queue,
+                'priority': priority,
+                'max_retries': max_retries,
+                'function_full_name': f"{module_name}.{node.name}",
+                'file_path': _normalize_path(file_path),
+            })
+    return tasks
+
+
 class Neo4jCodebaseSync:
     """Direct Neo4j sync for codebase knowledge graph."""
 
@@ -217,7 +344,86 @@ class Neo4jCodebaseSync:
             session.run("MATCH (n:Class) DETACH DELETE n")
             session.run("MATCH (n:Function) DETACH DELETE n")
             session.run("MATCH (n:PlanningDoc) DETACH DELETE n")
+            session.run("MATCH (n:APIRoute) DETACH DELETE n")
+            session.run("MATCH (n:CeleryTask) DETACH DELETE n")
+            session.run("MATCH (n:Queue) DETACH DELETE n")
             print("[OK] Existing graph cleared")
+
+    def sync_api_routes(self, routes: List[Dict[str, Any]]):
+        """Create APIRoute nodes and TRIGGERS edges to Function nodes."""
+        with self.driver.session() as session:
+            # Schema
+            session.run("CREATE CONSTRAINT apiroute_id_unique IF NOT EXISTS FOR (r:APIRoute) REQUIRE r.route_id IS UNIQUE")
+            for route in routes:
+                route_id = f"{route['blueprint']}:{route['url_template']}"
+                session.run("""
+                    MERGE (r:APIRoute {route_id: $route_id})
+                    SET r.url_template = $url_template,
+                        r.http_methods = $http_methods,
+                        r.blueprint = $blueprint,
+                        r.file_path = $file_path
+                """,
+                route_id=route_id,
+                url_template=route['url_template'],
+                http_methods=route['http_methods'],
+                blueprint=route['blueprint'],
+                file_path=route['file_path'])
+
+                session.run("""
+                    MATCH (r:APIRoute {route_id: $route_id})
+                    MATCH (f:Function {full_name: $fn})
+                    MERGE (r)-[:TRIGGERS]->(f)
+                """, route_id=route_id, fn=route['function_full_name'])
+
+        print(f"[OK] {len(routes)} API routes synced")
+
+    def sync_celery_tasks(self, tasks: List[Dict[str, Any]]):
+        """Create CeleryTask + Queue nodes, ROUTES_TO and QUEUED_ON edges."""
+        with self.driver.session() as session:
+            session.run("CREATE CONSTRAINT celery_task_name_unique IF NOT EXISTS FOR (t:CeleryTask) REQUIRE t.task_name IS UNIQUE")
+            session.run("CREATE CONSTRAINT queue_name_unique IF NOT EXISTS FOR (q:Queue) REQUIRE q.name IS UNIQUE")
+
+            # Ensure Queue nodes exist (all actual queues + default)
+            for q in list(_VALID_QUEUES) + ['default']:
+                session.run("MERGE (q:Queue {name: $name}) SET q.broker = 'redis'", name=q)
+
+            misconfigs = []
+            for task in tasks:
+                session.run("""
+                    MERGE (t:CeleryTask {task_name: $task_name})
+                    SET t.queue = $queue,
+                        t.priority = $priority,
+                        t.max_retries = $max_retries,
+                        t.file_path = $file_path
+                """,
+                task_name=task['task_name'],
+                queue=task['queue'],
+                priority=task['priority'],
+                max_retries=task['max_retries'],
+                file_path=task['file_path'])
+
+                # Function -> CeleryTask
+                session.run("""
+                    MATCH (f:Function {full_name: $fn})
+                    MATCH (t:CeleryTask {task_name: $task_name})
+                    MERGE (f)-[:ROUTES_TO]->(t)
+                """, fn=task['function_full_name'], task_name=task['task_name'])
+
+                # CeleryTask -> Queue
+                raw_queue = task.get('queue') or ''
+                if raw_queue.startswith('MISCONFIGURED:'):
+                    misconfigs.append(task['task_name'])
+                else:
+                    queue_name = raw_queue if raw_queue in _VALID_QUEUES else 'default'
+                    session.run("""
+                        MATCH (t:CeleryTask {task_name: $task_name})
+                        MATCH (q:Queue {name: $queue})
+                        MERGE (t)-[:QUEUED_ON]->(q)
+                    """, task_name=task['task_name'], queue=queue_name)
+
+        if misconfigs:
+            print(f"[WARN] {len(misconfigs)} tasks with unexpected queue: {misconfigs}")
+        print(f"[OK] {len(tasks)} Celery tasks synced")
 
     def sync_files(self, files: List[Dict[str, Any]]):
         """Create File nodes with embeddings."""
@@ -518,7 +724,7 @@ def main():
         syncer.clear_graph()
         print()
 
-        # Sync entities
+        # Sync static entities
         print("Syncing entities...")
         syncer.sync_files(result.files)
         syncer.sync_classes(result.classes)
@@ -526,6 +732,22 @@ def main():
         syncer.sync_planning_docs(result.planning_docs)
         syncer.sync_imports(result.files)
         syncer.sync_calls(result.functions)
+
+        # Task 6: Extract and sync APIRoutes + CeleryTasks
+        print("\nExtracting API routes and Celery tasks...")
+        all_routes: List[Dict[str, Any]] = []
+        all_tasks: List[Dict[str, Any]] = []
+        py_files = [
+            (f if isinstance(f, dict) else f.__dict__).get('path', '')
+            for f in result.files
+        ]
+        py_files = [p for p in py_files if p and p.endswith('.py') and Path(p).exists()]
+        for fp in py_files:
+            all_routes.extend(_extract_routes_from_file(fp))
+            all_tasks.extend(_extract_tasks_from_file(fp))
+
+        syncer.sync_api_routes(all_routes)
+        syncer.sync_celery_tasks(all_tasks)
 
         print("\n[OK] Sync complete!")
         print("\nVisualization queries:")
