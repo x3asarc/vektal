@@ -13,7 +13,7 @@ Edges:
   (:SkillDef)-[:IMPLEMENTS]->(:Function)    skill -> Python entry points
   (:HookDef)-[:RUNS_SCRIPT]->(:File)        hook -> codebase bridge
 """
-import hashlib, os, re, sys
+import hashlib, json, os, re, sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -29,13 +29,14 @@ AGENT_LEVELS = {          # 1=Commander 2=Lead 3=Specialist
     "commander": 1,
     "engineering-lead": 2, "design-lead": 2, "forensic-lead": 2,
     "infrastructure-lead": 2, "project-lead": 2,
-    "task-observer": 2, "validator": 2,
+    "task-observer": 2, "validator": 2, "bundle": 2,
 }
 AGENT_COLORS = {
     "commander": "gold",
     "engineering-lead": "blue", "design-lead": "purple",
     "forensic-lead": "red", "infrastructure-lead": "orange",
     "project-lead": "teal", "task-observer": "cyan", "validator": "green",
+    "bundle": "amber",
 }
 AGENT_PROVIDER = {
     "forensic-lead": "letta",     # delegates to Letta agent-745c61ec
@@ -45,7 +46,7 @@ AGENT_PROVIDER = {
 # Permanent = org chart relationship. Subordinate always reports to this supervisor.
 HIERARCHY: dict[str, list[str]] = {
     "commander":           ["engineering-lead", "infrastructure-lead", "design-lead",
-                            "project-lead", "forensic-lead", "task-observer"],
+                            "project-lead", "forensic-lead", "task-observer", "bundle"],
     "infrastructure-lead": ["validator"],
     "engineering-lead":    ["gsd-planner", "gsd-executor", "gsd-verifier",
                             "gsd-plan-checker", "gsd-integration-checker", "gsd-debugger"],
@@ -91,7 +92,132 @@ IMPLEMENTS: dict[str, list[str]] = {
     ],
 }
 
-# External skills not yet installed — stub nodes with tier/source metadata
+# ── Utility model manifest (model-policy.md + 2026 recommendations) ───────────
+# DEFAULT for all tasks: openrouter/auto
+# Quality floors: sonnet (Validator standard, Engineering CRITICAL, varlock),
+#                 opus  (Validator governance, Forensic adversary/referee)
+UTILITY_MODELS = {
+    "classifier":    "google/gemini-3.1-flash-lite",      # intent detection (2026)
+    "difficulty":    "google/gemini-3.1-flash-lite",      # tier classification (2026)
+    "tool_selector": "google/gemini-3.1-flash-lite",      # model vs tool decision (2026)
+    "json_validator":"mistralai/mistral-small-3.2",        # schema strictness (2026)
+    "summarizer":    "openai/gpt-5-nano",                  # STATE.md + episode compression (2026)
+}
+QUALITY_FLOORS = {
+    # (agent, subtask_type) → minimum model
+    ("validator",         "standard_review"): "anthropic/claude-sonnet-4-5",
+    ("validator",         "governance_auth"): "anthropic/claude-opus-4",
+    ("forensic-lead",     "tri_adversary"):   "anthropic/claude-opus-4",
+    ("forensic-lead",     "tri_referee"):     "anthropic/claude-opus-4",
+    ("commander",         "compound_cot"):    "anthropic/claude-sonnet-4-5",
+    ("engineering-lead",  "security_critical"):"anthropic/claude-sonnet-4-5",
+    ("infrastructure-lead","varlock"):         "anthropic/claude-sonnet-4-5",
+}
+
+# ── BundleTemplate seed data (initial project recipes for Aura) ───────────────
+# trigger_count=0 + is_template=False until task-observer graduates them.
+# model_assignments: openrouter/auto default; quality floors applied per QUALITY_FLOORS.
+BUNDLE_TEMPLATES: list[dict] = [
+    {
+        "name":        "product-enrichment-sprint",
+        "description": "Backend API + frontend UI for product enrichment features. "
+                       "Engineering Lead (API, tests) + Design Lead (tokens → atoms → visual gate).",
+        "domains":     ["engineering", "design"],
+        "leads":       ["engineering-lead", "design-lead"],
+        "model_assignments": json.dumps({
+            "engineering-lead": "openrouter/auto",
+            "design-lead":      "openrouter/auto",
+        }),
+        "budget_allocation": json.dumps({
+            "engineering-lead": 5,
+            "design-lead":      4,
+        }),
+        "skills_override": json.dumps({
+            "design-lead": ["oiloil-ui-ux-guide", "taste-to-token-extractor"],
+        }),
+        "compound_gate": "All tests pass + visual satisfaction ≥ 8/10 + no console errors",
+    },
+    {
+        "name":        "vendor-onboarding",
+        "description": "Integrate a new supplier vendor: scraper adapter + API endpoints + deployment validation.",
+        "domains":     ["engineering", "infrastructure"],
+        "leads":       ["engineering-lead", "infrastructure-lead"],
+        "model_assignments": json.dumps({
+            "engineering-lead":    "openrouter/auto",
+            "infrastructure-lead": "openrouter/auto",
+        }),
+        "budget_allocation": json.dumps({
+            "engineering-lead":    5,
+            "infrastructure-lead": 3,
+        }),
+        "skills_override": json.dumps({
+            "engineering-lead": ["postgres", "defense-in-depth"],
+        }),
+        "compound_gate": "All tests pass + deployment gate GREEN + varlock clean",
+    },
+    {
+        "name":        "bug-triage-and-fix",
+        "description": "Sequential: Forensic Lead investigates → confirmed root cause → "
+                       "Engineering Lead applies fix. Triggered by SentryIssue or bug report.",
+        "domains":     ["forensic", "engineering"],
+        "leads":       ["forensic-lead", "engineering-lead"],
+        "model_assignments": json.dumps({
+            "forensic-lead":   "openrouter/auto",      # tri-adversary/referee get opus floor via quality_floors
+            "engineering-lead":"openrouter/auto",
+        }),
+        "budget_allocation": json.dumps({
+            "forensic-lead":    5,
+            "engineering-lead": 4,
+        }),
+        "skills_override": json.dumps({
+            "forensic-lead": ["systematic-debugging", "root-cause-tracing", "tri-agent-bug-audit"],
+        }),
+        "compound_gate": "Root cause CONFIRMED confidence ≥ 0.7 + all tests pass after fix",
+    },
+    {
+        "name":        "infrastructure-audit",
+        "description": "Infrastructure health sweep: Aura probe + deployment gate + ImprovementProposal "
+                       "queue drain + task-observer pattern cycle. Typically scheduled maintenance.",
+        "domains":     ["infrastructure"],
+        "leads":       ["infrastructure-lead", "task-observer"],
+        "model_assignments": json.dumps({
+            "infrastructure-lead": "openrouter/auto",
+            "task-observer":       "openrouter/auto",
+        }),
+        "budget_allocation": json.dumps({
+            "infrastructure-lead": 3,
+            "task-observer":       1,
+        }),
+        "skills_override": json.dumps({
+            "infrastructure-lead": ["pico-warden", "varlock-claude-skill"],
+        }),
+        "compound_gate": "Backend GREEN + deployment GREEN + proposals queued + patterns synced",
+    },
+    {
+        "name":        "full-feature-sprint",
+        "description": "Full-stack feature: Engineering builds + Design implements UI + "
+                       "post-deploy forensic validation (optional if risk is HIGH/CRITICAL).",
+        "domains":     ["engineering", "design", "forensic"],
+        "leads":       ["engineering-lead", "design-lead", "forensic-lead"],
+        "model_assignments": json.dumps({
+            "engineering-lead": "openrouter/auto",
+            "design-lead":      "openrouter/auto",
+            "forensic-lead":    "openrouter/auto",    # adversary/referee get opus floor
+        }),
+        "budget_allocation": json.dumps({
+            "engineering-lead": 6,
+            "design-lead":      5,
+            "forensic-lead":    3,
+        }),
+        "skills_override": json.dumps({
+            "design-lead":    ["oiloil-ui-ux-guide"],
+            "forensic-lead":  ["systematic-debugging", "tri-agent-bug-audit"],
+        }),
+        "compound_gate": "All tests pass + visual ≥ 8/10 + no regressions + post-deploy probe GREEN",
+    },
+]
+
+# ── External skills not yet installed — stub nodes with tier/source metadata
 EXTERNAL_SKILLS: list[dict] = [
     # Tier 1 — install immediately
     {"name": "dev-browser",        "tier": 1, "platform": "claude", "skill_type": "plugin",
@@ -395,7 +521,7 @@ def dedup_agent_defs(session) -> int:
     # Build the set of spec-only agent_ids from the current scan
     spec_ids = [_sid("spec", name) for name in [
         "commander", "engineering-lead", "infrastructure-lead", "design-lead",
-        "project-lead", "forensic-lead", "task-observer", "validator",
+        "project-lead", "forensic-lead", "task-observer", "validator", "bundle",
     ]]
     # Strategy 1: platform='spec-only'
     r1 = session.run("""
@@ -486,8 +612,62 @@ def sync_long_term_patterns(session, patterns: list[dict]) -> int:
     return len(patterns)
 
 
+def sync_lesson_schema(session) -> None:
+    """Ensure :Lesson constraint exists. Lesson nodes are written at runtime by task-observer."""
+    session.run("CREATE CONSTRAINT lesson_id_unique IF NOT EXISTS "
+                "FOR (l:Lesson) REQUIRE l.lesson_id IS UNIQUE")
+    # Schema definition — nodes written by task-observer, read by Bundle at config time.
+    # Fields:
+    #   lesson_id         (string)  — uuid
+    #   pattern           (string)  — what failure pattern was observed
+    #   lesson            (string)  — the actionable takeaway for the Lead
+    #   applies_to_lead   (string)  — Lead name this lesson is for
+    #   applies_to_bundle (string)  — bundle template name, or null = global
+    #   confidence        (float)   — failure_count / total_runs_with_pattern
+    #   failure_count     (int)     — how many times observed
+    #   first_observed    (string)  — ISO timestamp
+    #   last_observed     (string)  — ISO timestamp
+    #   status            (string)  — "active" | "superseded" | "resolved"
+    # Edges:
+    #   (:Lesson)-[:APPLIES_TO]->(:AgentDef)       — which Lead
+    #   (:Lesson)-[:INFERRED_FROM]->(:TaskExecution) — evidence trail
+
+
+def sync_bundle_templates(session, templates: list[dict]) -> int:
+    """Write :BundleTemplate nodes to Aura — preserves existing trigger_count/scores."""
+    session.run("CREATE CONSTRAINT bundle_template_id_unique IF NOT EXISTS "
+                "FOR (bt:BundleTemplate) REQUIRE bt.template_id IS UNIQUE")
+    for t in templates:
+        tid = _sid("bundle", t["name"])
+        session.run("""
+            MERGE (bt:BundleTemplate {template_id: $tid})
+            SET bt.name               = $name,
+                bt.description        = $desc,
+                bt.domains            = $domains,
+                bt.leads              = $leads,
+                bt.model_assignments  = $model_assignments,
+                bt.budget_allocation  = $budget_allocation,
+                bt.skills_override    = $skills_override,
+                bt.compound_gate      = $compound_gate,
+                bt.trigger_count      = coalesce(bt.trigger_count, 0),
+                bt.last_quality_score = coalesce(bt.last_quality_score, 0.0),
+                bt.avg_loop_count     = coalesce(bt.avg_loop_count, 0.0),
+                bt.is_template        = coalesce(bt.is_template, false),
+                bt.created_at         = coalesce(bt.created_at, $now),
+                bt.updated_at         = $now
+        """, tid=tid, name=t["name"], desc=t["description"],
+             domains=t["domains"], leads=t["leads"],
+             model_assignments=t["model_assignments"],
+             budget_allocation=t["budget_allocation"],
+             skills_override=t["skills_override"],
+             compound_gate=t["compound_gate"],
+             now=_now_iso())
+    return len(templates)
+
+
 def sync_edges(session) -> dict[str, int]:
-    counts = {"level_under": 0, "spawns": 0, "uses_skill": 0, "implements": 0, "runs_script": 0}
+    counts = {"level_under": 0, "spawns": 0, "uses_skill": 0, "implements": 0,
+              "runs_script": 0, "routes_via": 0, "activates_lead": 0}
 
     # Clear all existing LEVEL_UNDER before recreating from authoritative HIERARCHY map.
     # This ensures stale edges from previous schema iterations are removed.
@@ -538,6 +718,39 @@ def sync_edges(session) -> dict[str, int]:
             if r:
                 counts["implements"] += 1
 
+    # ROUTES_VIA: Commander → Bundle (config routing)
+    r = session.run("""
+        MATCH (cmd:AgentDef {name: 'commander'}), (b:AgentDef {name: 'bundle'})
+        MERGE (cmd)-[:ROUTES_VIA]->(b)
+        RETURN 1 AS ok
+    """).data()
+    if r:
+        counts["routes_via"] += 1
+
+    # MANAGES: Bundle → BundleTemplate (Bundle owns all templates)
+    session.run("""
+        MATCH (b:AgentDef {name: 'bundle'})
+        MATCH (bt:BundleTemplate)
+        MERGE (b)-[:MANAGES]->(bt)
+    """)
+
+    # ACTIVATES_LEAD: BundleTemplate → AgentDef (each template activates its leads)
+    for t in BUNDLE_TEMPLATES:
+        for lead in t["leads"]:
+            r = session.run("""
+                MATCH (bt:BundleTemplate {name: $name}), (a:AgentDef {name: $lead})
+                MERGE (bt)-[:ACTIVATES_LEAD]->(a)
+                RETURN 1 AS ok
+            """, name=t["name"], lead=lead).data()
+            if r:
+                counts["activates_lead"] += 1
+
+    # TaskExecution schema update: ensure model-tracking properties exist as constraints
+    # (nodes are created at runtime by Commander — we just define the shape here via a comment)
+    # Fields: model_requested, model_used, utility_models_used, model_cost_usd,
+    #         escalation_triggered, escalation_reason, difficulty_tier
+    # These are written by Commander, read by task-observer. No MERGE needed here.
+
     return counts
 
 
@@ -562,20 +775,26 @@ def main():
             ns = sync_skill_defs(session, skills)
             nh = sync_hook_defs(session, hooks)
             np = sync_long_term_patterns(session, patterns)
+            nb = sync_bundle_templates(session, BUNDLE_TEMPLATES)
+            sync_lesson_schema(session)
             ec = sync_edges(session)
 
         with syncer.driver.session() as s:
             print(f"\n=== Aura verification ===")
             for label, q in [
-                (":AgentDef",       "MATCH (n:AgentDef) RETURN count(n)"),
-                (":SkillDef",       "MATCH (n:SkillDef) RETURN count(n)"),
-                (":HookDef",        "MATCH (n:HookDef) RETURN count(n)"),
-                (":LongTermPattern","MATCH (n:LongTermPattern) RETURN count(n)"),
-                ("LEVEL_UNDER",     "MATCH ()-[r:LEVEL_UNDER]->() RETURN count(r)"),
-                ("SPAWNS",          "MATCH ()-[r:SPAWNS]->() RETURN count(r)"),
-                ("USES_SKILL",      "MATCH ()-[r:USES_SKILL]->() RETURN count(r)"),
-                ("IMPLEMENTS",      "MATCH ()-[r:IMPLEMENTS]->() RETURN count(r)"),
-                ("RUNS_SCRIPT",     "MATCH ()-[r:RUNS_SCRIPT]->() RETURN count(r)"),
+                (":AgentDef",        "MATCH (n:AgentDef) RETURN count(n)"),
+                (":SkillDef",        "MATCH (n:SkillDef) RETURN count(n)"),
+                (":HookDef",         "MATCH (n:HookDef) RETURN count(n)"),
+                (":LongTermPattern", "MATCH (n:LongTermPattern) RETURN count(n)"),
+                (":BundleTemplate",  "MATCH (n:BundleTemplate) RETURN count(n)"),
+                (":Lesson",          "MATCH (n:Lesson) RETURN count(n)"),
+                ("LEVEL_UNDER",      "MATCH ()-[r:LEVEL_UNDER]->() RETURN count(r)"),
+                ("SPAWNS",           "MATCH ()-[r:SPAWNS]->() RETURN count(r)"),
+                ("USES_SKILL",       "MATCH ()-[r:USES_SKILL]->() RETURN count(r)"),
+                ("IMPLEMENTS",       "MATCH ()-[r:IMPLEMENTS]->() RETURN count(r)"),
+                ("RUNS_SCRIPT",      "MATCH ()-[r:RUNS_SCRIPT]->() RETURN count(r)"),
+                ("ROUTES_VIA",       "MATCH ()-[r:ROUTES_VIA]->() RETURN count(r)"),
+                ("ACTIVATES_LEAD",   "MATCH ()-[r:ACTIVATES_LEAD]->() RETURN count(r)"),
             ]:
                 c = s.run(q + " as c").single()["c"]
                 print(f"  {label:<20} {c}")

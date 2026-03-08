@@ -173,7 +173,181 @@ driver.close()
 
 ---
 
-## Part VI — Deferred Decision Triggers (DD flags)
+## Part VI — Lesson Inference (3× Failure Pattern → :Lesson Node)
+
+This is **Layer 3 learning** — distinct from ImprovementProposals (Layer 2).
+
+- **ImprovementProposal:** proposes a permanent change to a skill/agent FILE. Goes through Validator. Changes what an agent CAN do.
+- **Lesson:** injects context into the Lead's runtime context package. No file changes, no Validator. Changes what an agent is REMINDED to do in a specific situation.
+
+### Detection logic
+
+Group `quality_gate_passed = false` TaskExecutions by `(lead_invoked, skills_used_set)`. Look for correlation: which skills are **absent** in failures but **present** in successes, or which skills appear in the wrong **order** relative to failures.
+
+```python
+from collections import defaultdict
+
+# Group: for each (lead, frozenset(skills_used)) → pass/fail counts
+pattern_counts = defaultdict(lambda: {"pass": 0, "fail": 0, "te_ids": []})
+for te in executions:
+    lead = te.get("te.lead_invoked", "unknown")
+    skills = frozenset(te.get("te.skills_used") or [])
+    passed = te.get("te.quality_gate_passed", True)
+    key = (lead, skills)
+    pattern_counts[key]["pass" if passed else "fail"] += 1
+    if not passed:
+        pattern_counts[key]["te_ids"].append(te["te.task_id"])
+
+# Find: skills ABSENT in failures but PRESENT in passing runs
+# Cross-reference: which skills appear in passing runs for this lead?
+lead_passing_skill_sets = defaultdict(list)
+for (lead, skills), counts in pattern_counts.items():
+    if counts["pass"] > 0:
+        lead_passing_skill_sets[lead].extend(skills)
+
+lessons_to_write = []
+for (lead, fail_skills), counts in pattern_counts.items():
+    if counts["fail"] < 3:
+        continue  # threshold: 3 failures minimum
+    # Which skills appear in passing runs but NOT in this failure pattern?
+    passing_skills = set(lead_passing_skill_sets.get(lead, []))
+    missing_from_fails = passing_skills - fail_skills
+    if not missing_from_fails:
+        continue
+    for missing_skill in missing_from_fails:
+        pattern_str = f"{lead} fails quality gate when {missing_skill} is absent"
+        lesson_str  = (f"LESSON: {missing_skill} is present in all passing runs but absent in "
+                       f"{counts['fail']} failures. Always include {missing_skill} in {lead} runs.")
+        lessons_to_write.append({
+            "lead":          lead,
+            "pattern":       pattern_str,
+            "lesson":        lesson_str,
+            "failure_count": counts["fail"],
+            "confidence":    counts["fail"] / (counts["fail"] + counts["pass"]),
+            "te_ids":        counts["te_ids"][:5],
+        })
+```
+
+### Write :Lesson nodes and APPLIES_TO edges
+
+```python
+import uuid
+from datetime import datetime, timezone
+
+driver = GraphDatabase.driver(os.getenv("NEO4J_URI"),
+    auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
+with driver.session() as s:
+    # Check existing active lessons (don't duplicate)
+    existing = s.run("""
+        MATCH (l:Lesson)-[:APPLIES_TO]->(a:AgentDef)
+        WHERE l.status = 'active'
+        RETURN l.pattern as p
+    """).data()
+    existing_patterns = {r["p"] for r in existing}
+
+    for item in lessons_to_write:
+        if item["pattern"] in existing_patterns:
+            # Update last_observed + failure_count on existing lesson instead
+            s.run("""
+                MATCH (l:Lesson {pattern: $pattern})
+                SET l.failure_count = $count, l.last_observed = $now,
+                    l.confidence = $conf
+            """, pattern=item["pattern"], count=item["failure_count"],
+                 now=datetime.now(timezone.utc).isoformat(), conf=item["confidence"])
+            continue
+
+        lid = f"lesson-{uuid.uuid4().hex[:12]}"
+        now = datetime.now(timezone.utc).isoformat()
+        s.run("""
+            MERGE (l:Lesson {lesson_id: $lid})
+            SET l.pattern          = $pattern,
+                l.lesson           = $lesson,
+                l.applies_to_lead  = $lead,
+                l.confidence       = $confidence,
+                l.failure_count    = $failure_count,
+                l.status           = 'active',
+                l.first_observed   = $now,
+                l.last_observed    = $now
+        """, lid=lid, pattern=item["pattern"], lesson=item["lesson"],
+             lead=item["lead"], confidence=item["confidence"],
+             failure_count=item["failure_count"], now=now)
+        # APPLIES_TO edge
+        s.run("""
+            MATCH (l:Lesson {lesson_id: $lid}), (a:AgentDef {name: $lead})
+            MERGE (l)-[:APPLIES_TO]->(a)
+        """, lid=lid, lead=item["lead"])
+        # INFERRED_FROM edges (evidence trail)
+        for te_id in item["te_ids"]:
+            s.run("""
+                MATCH (l:Lesson {lesson_id: $lid})
+                OPTIONAL MATCH (te:TaskExecution {task_id: $te_id})
+                FOREACH (_ IN CASE WHEN te IS NOT NULL THEN [1] ELSE [] END |
+                    MERGE (l)-[:INFERRED_FROM]->(te)
+                )
+            """, lid=lid, te_id=te_id)
+driver.close()
+```
+
+### Lesson resolution — mark resolved when failure stops
+
+After writing lessons, check if any **active** lesson's failure pattern has NOT appeared in the last 10 executions. If so, mark `status='resolved'`:
+
+```python
+with driver.session() as s:
+    active_lessons = s.run("""
+        MATCH (l:Lesson {status: 'active'})-[:APPLIES_TO]->(a:AgentDef)
+        RETURN l.lesson_id as lid, l.pattern as pattern, a.name as lead
+    """).data()
+
+    for lesson in active_lessons:
+        # Has this lead had recent failures with the same pattern?
+        recent_failures = [te for te in executions[-10:]
+                           if te.get("te.lead_invoked") == lesson["lead"]
+                           and not te.get("te.quality_gate_passed", True)]
+        if not recent_failures:
+            # No recent failures for this lead — lesson may be resolved
+            # Only resolve if we have 5+ passing runs since last failure
+            s.run("""
+                MATCH (l:Lesson {lesson_id: $lid})
+                SET l.status = 'resolved', l.resolved_at = $now
+            """, lid=lesson["lid"], now=datetime.now(timezone.utc).isoformat())
+```
+
+### Also update BundleTemplate scores (task-observer owns these)
+
+```python
+with driver.session() as s:
+    # For each TaskExecution with a compound_task_id, update the matching BundleTemplate
+    bundle_executions = [te for te in executions if te.get("te.compound_task_id")]
+    for te in bundle_executions:
+        # Get the template associated with this compound run via the compound_task_id
+        s.run("""
+            MATCH (bt:BundleTemplate)
+            WHERE bt.name = $bundle_name
+            SET bt.trigger_count = coalesce(bt.trigger_count, 0) + 1,
+                bt.last_quality_score = (
+                    coalesce(bt.last_quality_score, 0.0) * coalesce(bt.trigger_count, 1) + $qgp
+                ) / (coalesce(bt.trigger_count, 1) + 1),
+                bt.avg_loop_count = (
+                    coalesce(bt.avg_loop_count, 0.0) * coalesce(bt.trigger_count, 1) + $loop
+                ) / (coalesce(bt.trigger_count, 1) + 1),
+                bt.is_template = CASE
+                    WHEN coalesce(bt.trigger_count, 0) + 1 >= 3
+                         AND bt.last_quality_score >= 0.7
+                    THEN true ELSE bt.is_template END,
+                bt.updated_at = $now
+        """,
+        bundle_name=te.get("te.bundle_template_used", ""),
+        qgp=1.0 if te.get("te.quality_gate_passed") else 0.0,
+        loop=te.get("te.loop_count", 1),
+        now=datetime.now(timezone.utc).isoformat())
+driver.close()
+```
+
+---
+
+## Part VII — Deferred Decision Triggers (DD flags)  
+*(formerly Part VI)*
 
 If any of these conditions are hit, flag in output contract `improvement_signals` for human review:
 
@@ -186,7 +360,7 @@ If any of these conditions are hit, flag in output contract `improvement_signals
 
 ---
 
-## Part VII — Input Contract (from Commander)
+## Part VIII — Input Contract (from Commander)
 
 ```json
 {
@@ -204,17 +378,17 @@ If any of these conditions are hit, flag in output contract `improvement_signals
 
 ---
 
-## Part VIII — Output Contract (to Commander)
+## Part IX — Output Contract (to Commander)
 
 ```json
 {
   "task_id": "uuid",
-  "result": "Observed 45 TaskExecutions. 2 degraded skills. 2 proposals written. 0 DD flags.",
+  "result": "Observed 45 TaskExecutions. 2 degraded skills. 2 proposals written. 1 lesson inferred. 0 DD flags.",
   "loop_count": 1,
   "quality_gate_passed": true,
   "skills_used": [],
   "affected_functions": [],
-  "state_update": "task-observer: 2 proposals queued for Validator. SkillDef scores updated.",
+  "state_update": "task-observer: 2 proposals queued for Validator. 1 lesson inferred for design-lead. SkillDef + BundleTemplate scores updated.",
   "improvement_signals": ["DD-01: loop_budget optimisation deferred — insufficient data"]
 }
 ```
@@ -223,7 +397,7 @@ If any of these conditions are hit, flag in output contract `improvement_signals
 
 ---
 
-## Part IX — Forbidden Patterns
+## Part X — Forbidden Patterns
 
 - Writing proposals for skills with < 3 execution samples (noise, not signal)
 - Duplicating proposals already in the open queue

@@ -199,12 +199,12 @@ Cost: near-zero per call. Purpose: make the big models usable at scale.
 
 | Alias | Equivalent | Purpose |
 |---|---|---|
-| `classifier` | `openai/gpt-4o-mini` | Task Classifier — "coding/design/forensic/infra/compound?" |
-| `difficulty` | `openai/gpt-4o-mini` | Difficulty Estimator — "LOW/STANDARD/HIGH/CRITICAL?" |
-| `tool-selector` | `openai/gpt-4o-mini` | "Model or tool? Browser/shell/DB/LLM?" |
-| `summarizer` | `anthropic/claude-haiku-3-5` | Summarizer-Tiny — 1-2 sentence TL;DRs for STATE.md, Aura episodes |
-| `formatter` | `openai/gpt-4o-mini` | Format-Transformer — convert raw response to target schema |
-| `json-validator` | `openai/gpt-4o-mini` | JSON Validator — fix malformed Lead outcome JSON before Commander parses |
+| `classifier` | `google/gemini-3.1-flash-lite` | Task Classifier — "coding/design/forensic/infra/compound?" (2026: lower latency, better native intent detection) |
+| `difficulty` | `google/gemini-3.1-flash-lite` | Difficulty Estimator — "LOW/STANDARD/HIGH/CRITICAL?" (2026: same rationale as classifier) |
+| `tool-selector` | `google/gemini-3.1-flash-lite` | "Model or tool? Browser/shell/DB/LLM?" (2026: within Lead execution) |
+| `summarizer` | `openai/gpt-5-nano` | Summarizer-Tiny — 1-2 sentence TL;DRs for STATE.md, Aura episodes (2026: haiku-4-5 is Reasoning-Light, overkill for compression) |
+| `formatter` | `google/gemini-3.1-flash-lite` | Format-Transformer — convert raw response to target schema |
+| `json-validator` | `mistralai/mistral-small-3.2` | JSON Validator — fix malformed Lead outcome JSON (2026: higher schema strictness for complex Shopify GraphQL payloads) |
 | `chain-optimizer` | task-observer (Aura-backed) | Chain Optimizer — learns from TaskExecution history, prunes steps |
 
 ---
@@ -213,7 +213,7 @@ Cost: near-zero per call. Purpose: make the big models usable at scale.
 
 ### Step 1: Task Classifier
 ```
-Model: classifier (gpt4o-mini)
+Model: classifier (google/gemini-3.1-flash-lite)       ← 2026 recommendation
 Input: user request text
 Output: { domain: "engineering|design|forensic|infra|compound", confidence: 0.0-1.0 }
 Cost: ~$0.0001 per call
@@ -222,7 +222,7 @@ Fallback: Commander applies priority rules table directly (MODE 1 behavior)
 
 ### Step 2: Difficulty Estimator
 ```
-Model: difficulty (gpt4o-mini)
+Model: difficulty (google/gemini-3.1-flash-lite)       ← 2026 recommendation
 Input: user request + domain classification
 Output: { tier: "LOW|STANDARD|HIGH|CRITICAL", reasoning: "string" }
 Cost: ~$0.0001 per call
@@ -231,7 +231,7 @@ Tiers map to model families (see Complexity Tiers table above)
 
 ### Step 3: Tool Selector (within Lead execution)
 ```
-Model: tool-selector (gpt4o-mini)
+Model: tool-selector (google/gemini-3.1-flash-lite)    ← 2026 recommendation
 Input: subtask description within Lead
 Output: { use: "model|browser|shell|db", model_if_llm: "alias" }
 Cost: ~$0.0001 per call
@@ -240,20 +240,21 @@ Used by: Engineering Lead (model vs postgres tool), Design Lead (model vs dev-br
 
 ### Step 4: JSON Validator (output layer)
 ```
-Model: json-validator (gpt4o-mini)
+Model: json-validator (mistralai/mistral-small-3.2)    ← 2026 recommendation
 Input: raw Lead outcome JSON + contract schema
 Output: { valid: bool, fixed_json: "string if invalid" }
 Cost: ~$0.0001 per call
 Runs after every Lead returns. Fixes malformed JSON before Commander parses.
+Higher schema strictness for complex Shopify GraphQL payloads.
 ```
 
 ### Step 5: Summarizer-Tiny (output layer)
 ```
-Model: summarizer (haiku)
+Model: summarizer (openai/gpt-5-nano)                  ← 2026 recommendation
 Input: full Lead outcome
 Output: { state_md_summary: "1-2 sentences", episode_content: "1 sentence for Aura" }
 Cost: ~$0.001 per call
-Replaces using sonnet to write STATE.md updates and episode content.
+haiku-4-5 is now Reasoning-Light — overkill for compression tasks.
 ```
 
 ---

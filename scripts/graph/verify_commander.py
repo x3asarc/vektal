@@ -35,7 +35,7 @@ with driver.session() as s:
     print("\n=== LEVEL_UNDER (Leads report to Commander) ===")
     under = s.run("MATCH (b:AgentDef)-[:LEVEL_UNDER]->(:AgentDef {name:'commander'}) RETURN b.name").data()
     under_names = [r["b.name"] for r in under]
-    check("count=6", len(under_names), 6)
+    check("count=7 (incl bundle)", len(under_names), 7)
 
     print("\n=== Engineering Lead hierarchy ===")
     el_spawns = s.run("MATCH (:AgentDef {name:'engineering-lead'})-[:SPAWNS]->(b) RETURN b.name").data()
@@ -88,7 +88,7 @@ with driver.session() as s:
         MATCH (cmd:AgentDef {name:'commander'})-[:SPAWNS]->(lead:AgentDef)
         RETURN count(DISTINCT lead) as c
     """).single()["c"]
-    check("Commander reaches 6 leads in 1 hop", reachable_leads, 6)
+    check("Commander reaches 7 leads in 1 hop (incl bundle)", reachable_leads, 7)
 
     reachable_skills = s.run("""
         MATCH (cmd:AgentDef {name:'commander'})-[:SPAWNS]->(:AgentDef)-[:USES_SKILL]->(sk:SkillDef)

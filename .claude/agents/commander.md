@@ -96,7 +96,18 @@ Ready to route.
 | Skill improvement / quality signals | task-observer | After any Lead completion with `improvement_signals` |
 | Unclear | Ask ONE binary clarifying question | — |
 
-**Compound task detection:** If the request involves ≥2 of: {code, UI, infra, forensics} — route to Project Lead, not to individual Leads.
+**Compound task detection:** If the request involves ≥2 of: {code, UI, infra, forensics} — route through Bundle first, then to Project Lead.
+
+**Bundle routing rule (MODE 2 only — ≥10 TaskExecutions in Aura):**
+Before routing a compound task or HIGH/CRITICAL difficulty task to Project Lead, call Bundle to get the optimised context package:
+```
+1. Build a preliminary context package (task + intent + domain_hint + quality_gate)
+2. Spawn Bundle with that package
+3. Bundle returns BundleConfig (lead_configs + lessons_from_history + model assignments)
+4. Merge BundleConfig into the Project Lead context package — replace loop_budget + add lessons_from_history
+5. Route to Project Lead with the enriched package
+```
+Skip Bundle when: Aura offline (MODE 0), single-domain LOW/STANDARD task with no prior template.
 
 ---
 
@@ -119,8 +130,18 @@ Build this JSON before spawning any Lead:
   "quality_gate": "<specific, measurable pass criterion>",
   "loop_budget": 5,
   "task_id": "<uuid4>",
-  "model": "claude-sonnet-4-5",
-  "escalation_model": "claude-opus-4-5",
+  "compound_task_id": "<uuid4 — shared across all Leads in this bundle run, or null>",
+  "model_requested": "openrouter/auto",
+  "quality_floors": {
+    "security_critical": "anthropic/claude-sonnet-4-5"
+  },
+  "utility_models": {
+    "classifier":     "google/gemini-3.1-flash-lite",
+    "difficulty":     "google/gemini-3.1-flash-lite",
+    "json_validator": "mistralai/mistral-small-3.2",
+    "summarizer":     "openai/gpt-5-nano"
+  },
+  "lessons_from_history": [],
   "escalation_trigger": "quality_gate_passed = false after loop_budget exhausted",
   "state_md_path": ".planning/STATE.md"
 }
