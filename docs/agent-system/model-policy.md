@@ -9,30 +9,99 @@ Frontier models are called rarely. Utility models run on every request.
 
 ## Architectural Pattern — Meta-Routing Layer
 
-Before any Lead executes, the Commander runs a lightweight meta-routing step.
-Tiny classifier models decide what the big models should do.
-This is how Perplexity Computer orchestrates 19 models efficiently.
+### Primary: openrouter/auto
+
+OpenRouter provides a built-in meta-model that does everything our manual
+classifier + difficulty estimator was going to do — trained on millions of
+requests, free routing overhead, returns which model was used.
+
+```
+ID:      openrouter/auto
+Context: 2,000,000 tokens
+Routing: $0 — you pay at the routed model's rate only
+Returns: model attribute in response → write to TaskExecution.model_used
+```
+
+**Model pool (as of 2026-03-08):**
+```
+anthropic/claude-haiku-4.5       anthropic/claude-sonnet-4.5
+anthropic/claude-sonnet-4.6      anthropic/claude-opus-4.6
+openai/gpt-5                     openai/gpt-5.1
+openai/gpt-5.2                   openai/gpt-5.2-pro
+openai/gpt-5-mini                openai/gpt-5-nano
+openai/gpt-oss-120b              google/gemini-2.5-flash-lite
+google/gemini-3-flash-preview    google/gemini-3-pro-preview
+google/gemini-3.1-pro-preview    deepseek/deepseek-r1
+mistralai/codestral-2508         mistralai/mistral-large
+mistralai/mistral-medium-3.1     mistralai/mistral-small-3.2-24b-instruct-2506
+meta-llama/llama-3.3-70b-instruct perplexity/sonar
+moonshotai/kimi-k2-thinking      moonshotai/kimi-k2.5
+qwen/qwen3-235b-a22b             minimax/minimax-m2.5
+x-ai/grok-3                      x-ai/grok-3-mini
+x-ai/grok-4                      z-ai/glm-5
+```
+
+This pool is maintained and updated by OpenRouter automatically.
+The model attribute returned is written to `TaskExecution.model_used`
+so we get full model tracking without building a classifier.
+
+### The Hybrid Rule
+
+```
+DEFAULT:  openrouter/auto        ← most tasks, let OpenRouter decide
+OVERRIDE: explicit model         ← only where a quality floor is non-negotiable
+```
+
+**Quality floors — explicit model required:**
+
+| Agent | Subtask | Minimum | Reason |
+|---|---|---|---|
+| @Validator | Proposal review + CoT | `sonnet` | Can't risk haiku — bad approvals have downstream consequences |
+| @Forensic-Lead | tri-audit adversary role | `opus` | Adversarial reasoning quality is the whole point |
+| @Forensic-Lead | tri-audit referee | `opus` | Final verdict must survive max scrutiny |
+| @Commander | Compound task CoT decomposition | `sonnet` | Decomposition quality determines all downstream routing |
+| @Engineering-Lead | Security review (CRITICAL tier) | `sonnet` | Security misses are catastrophic |
+| @Validator | Governance/auth proposals | `opus` | Highest stakes approval in the system |
+
+Everything else: `openrouter/auto`.
+
+### Aura Integration
+
+The `model` attribute from every OpenRouter response is written to Aura:
+```cypher
+(:TaskExecution {
+  model_used,          // what auto actually routed to
+  model_requested,     // "openrouter/auto" or explicit model
+  escalation_triggered // true if explicit override was used
+})
+```
+
+task-observer reads this to understand routing patterns over time.
+If auto consistently routes to expensive models for a task type →
+propose explicit model cap via ImprovementProposal queue.
+
+### Updated Flow
 
 ```
 Request arrives at Commander
   ↓
-[META-ROUTING LAYER — tiny models, always-on]
-  Step 1: Task Classifier    → what domain? (coding/design/forensic/infra/compound)
-  Step 2: Difficulty Est.    → complexity tier? (LOW / STANDARD / HIGH / CRITICAL)
-  Step 3: Tool Selector      → model or tool? (browser / shell / DB / LLM)
+[COMMANDER UNDERSTAND — uses openrouter/auto]
+  → Routes to optimal model for understanding + domain classification
+  → model attribute logged
   ↓
-[MODEL SELECTION — based on classifier + difficulty output]
-  Commander picks Lead + model from routing table below
+[COMMANDER ROUTES to Lead with context package]
+  model: "openrouter/auto"  ← default
+  OR explicit model if quality floor applies
   ↓
-[LEAD EXECUTES]
+[LEAD EXECUTES — openrouter/auto per subtask unless quality floor]
   ↓
-[OUTPUT LAYER — tiny models, always-on]
-  Step 4: JSON Validator     → Lead outcome schema-valid?
-  Step 5: Summarizer-Tiny    → compress outcome for STATE.md / Aura episode
+[OUTPUT LAYER — still needed, these are cheap mechanical tasks]
+  JSON Validator (gpt4o-mini) → schema enforcement
+  Summarizer-Tiny (haiku)     → STATE.md + Aura episode compression
 ```
 
-The big frontier models (Opus, GPT-5, Gemini Ultra) are called rarely.
-Utility models (classifier, estimator, validator, summarizer) run on every request.
+Note: JSON Validator and Summarizer-Tiny remain explicit — auto routing
+is overkill for pure format-fixing and compression tasks.
 
 ---
 
@@ -330,7 +399,7 @@ Model is passed in context package. Escalation trigger is explicit condition.
 ## .env Configuration
 
 ```env
-# OpenRouter (single key covers all models)
+# OpenRouter — single key covers all models including auto
 OPENROUTER_API_KEY=sk-or-...
 
 # Optional: per-Lead keys with spending caps set in OpenRouter dashboard
@@ -341,17 +410,18 @@ OPENROUTER_KEY_DESIGN=sk-or-...
 OPENROUTER_KEY_INFRA=sk-or-...
 OPENROUTER_KEY_VALIDATOR=sk-or-...
 
-# Model aliases (swap without touching specs)
-MODEL_OPUS=anthropic/claude-opus-4
-MODEL_SONNET=anthropic/claude-sonnet-4-5
-MODEL_HAIKU=anthropic/claude-haiku-3-5
-MODEL_CODESTRAL=mistral/codestral-latest
-MODEL_SONAR=perplexity/sonar-pro
-MODEL_SONAR_REASONING=perplexity/sonar-reasoning-pro
-MODEL_GEMINI_LONG=google/gemini-pro-1-5
-MODEL_GPT4O=openai/gpt-4o
-MODEL_GPT4O_MINI=openai/gpt-4o-mini
-MODEL_O3=openai/o3
+# Default model — auto routing for most tasks
+MODEL_DEFAULT=openrouter/auto
+
+# Quality floor overrides — explicit models where auto cannot be trusted
+MODEL_FLOOR_SONNET=anthropic/claude-sonnet-4-5   # minimum for Validator, security review
+MODEL_FLOOR_OPUS=anthropic/claude-opus-4-6        # minimum for Forensic adversary/referee, governance
+
+# Utility/glue models — explicit (auto is overkill for these)
+MODEL_UTILITY_VALIDATOR=openai/gpt-4o-mini        # JSON schema enforcement
+MODEL_UTILITY_SUMMARIZER=anthropic/claude-haiku-4-5 # STATE.md + episode compression
+MODEL_UTILITY_SONAR=perplexity/sonar-pro           # web-grounded research
+MODEL_UTILITY_SONAR_REASONING=perplexity/sonar-reasoning-pro
 ```
 
 ---
@@ -379,8 +449,9 @@ Trigger: 20+ TaskExecutions per Lead type with `model_used` + `quality_gate_pass
 Evidence: grouped by `model_used` per `task_type` in Aura.
 Action: task-observer proposes model policy updates.
 
-**DD-09: Meta-routing layer accuracy calibration**
-Question: Is `gpt4o-mini` accurate enough as a task classifier and difficulty estimator?
-Trigger: 50+ classifications logged in TaskExecution `utility_models_used`.
-Evidence: cases where Commander overrode classifier output (indicates classifier error).
-Action: refine classifier system prompt or upgrade to `gpt4o` if error rate > 10%.
+**DD-09: Auto routing cost control**
+Question: Is `openrouter/auto` routing to expensive models more than necessary?
+Trigger: 50+ TaskExecutions with `model_requested = "openrouter/auto"` in Aura.
+Evidence: distribution of `model_used` values — are expensive models being called for simple tasks?
+Action: if high-cost models appear > 20% of time on LOW-tier tasks → add explicit model cap
+for those task types via ImprovementProposal queue.
