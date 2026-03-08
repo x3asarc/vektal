@@ -2,9 +2,11 @@
 """Sync codebase entities directly to Neo4j for visualization."""
 
 import ast
+import hashlib
 import os
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from collections import defaultdict
 from typing import List, Dict, Any, Optional, Tuple, Set
@@ -19,6 +21,18 @@ from src.graph.file_parser import parse_python_file
 from src.core.embeddings import EMBEDDING_DIMENSION
 
 load_dotenv()
+
+_SENTINEL_DATE = "9999-12-31T00:00:00+00:00"  # used in graph as "EndDate IS NULL" proxy for legacy
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _checksum(*parts) -> str:
+    """Stable short checksum from string parts — used for SCD Type 2 change detection."""
+    raw = "|".join(str(p) for p in parts)
+    return hashlib.md5(raw.encode()).hexdigest()[:16]
 
 
 def _normalize_path(path: str) -> str:
@@ -338,7 +352,8 @@ class Neo4jCodebaseSync:
             print(f"[OK] Vector index created ({EMBEDDING_DIMENSION} dimensions)")
 
     def clear_graph(self):
-        """Clear all existing codebase nodes."""
+        """Full wipe — use only for fresh bootstrap, NOT for incremental syncs.
+        Incremental syncs use mark_deleted() instead."""
         with self.driver.session() as session:
             session.run("MATCH (n:File) DETACH DELETE n")
             session.run("MATCH (n:Class) DETACH DELETE n")
@@ -347,7 +362,45 @@ class Neo4jCodebaseSync:
             session.run("MATCH (n:APIRoute) DETACH DELETE n")
             session.run("MATCH (n:CeleryTask) DETACH DELETE n")
             session.run("MATCH (n:Queue) DETACH DELETE n")
-            print("[OK] Existing graph cleared")
+            print("[OK] Graph cleared (fresh bootstrap)")
+
+    def mark_deleted(self, current_files: Set[str], current_classes: Set[str],
+                     current_functions: Set[str]):
+        """SCD Type 2: close any entity not present in the current scan.
+        Sets EndDate on deleted nodes instead of removing them."""
+        now = _now_iso()
+        deleted = {'files': 0, 'classes': 0, 'functions': 0}
+        with self.driver.session() as session:
+            r = session.run("""
+                MATCH (f:File) WHERE f.EndDate IS NULL
+                  AND NOT f.path IN $paths
+                SET f.EndDate = $now
+                RETURN count(f) as c
+            """, paths=list(current_files), now=now)
+            deleted['files'] = r.single()['c']
+
+            r = session.run("""
+                MATCH (c:Class) WHERE c.EndDate IS NULL
+                  AND NOT c.full_name IN $names
+                SET c.EndDate = $now
+                RETURN count(c) as c
+            """, names=list(current_classes), now=now)
+            deleted['classes'] = r.single()['c']
+
+            r = session.run("""
+                MATCH (f:Function) WHERE f.EndDate IS NULL
+                  AND NOT f.full_name IN $names
+                SET f.EndDate = $now
+                RETURN count(f) as c
+            """, names=list(current_functions), now=now)
+            deleted['functions'] = r.single()['c']
+
+        total = sum(deleted.values())
+        if total:
+            print(f"[OK] Marked deleted: {deleted['files']} files, "
+                  f"{deleted['classes']} classes, {deleted['functions']} functions")
+        else:
+            print("[OK] No deletions detected")
 
     def sync_api_routes(self, routes: List[Dict[str, Any]]):
         """Create APIRoute nodes and TRIGGERS edges to Function nodes."""
@@ -426,13 +479,23 @@ class Neo4jCodebaseSync:
         print(f"[OK] {len(tasks)} Celery tasks synced")
 
     def sync_files(self, files: List[Dict[str, Any]]):
-        """Create File nodes with embeddings."""
+        """Create File nodes with embeddings (bi-temporal: StartDate/EndDate/checksum)."""
+        now = _now_iso()
         with self.driver.session() as session:
             for file in files:
                 file_dict = file if isinstance(file, dict) else file.__dict__
                 file_path = _normalize_path(file_dict.get('path', ''))
+                content_hash = file_dict.get('content_hash', '')
+                chk = content_hash or _checksum(file_path, file_dict.get('line_count', 0))
                 session.run("""
                     MERGE (f:File {path: $path})
+                    ON CREATE SET
+                        f.StartDate = $now, f.EndDate = null, f.checksum = $checksum
+                    ON MATCH SET
+                        f.StartDate = CASE WHEN coalesce(f.checksum,'') <> $checksum
+                                          THEN $now ELSE f.StartDate END,
+                        f.EndDate = null,
+                        f.checksum = $checksum
                     SET f.language = $language,
                         f.purpose = $purpose,
                         f.summary = $summary,
@@ -441,12 +504,12 @@ class Neo4jCodebaseSync:
                         f.embedding = $embedding,
                         f.exports = $exports
                 """,
-                path=file_path,
+                path=file_path, now=now, checksum=chk,
                 language=file_dict.get('language', ''),
                 purpose=file_dict.get('purpose') or file_dict.get('summary', ''),
                 summary=file_dict.get('summary', ''),
                 line_count=file_dict.get('line_count', 0),
-                content_hash=file_dict.get('content_hash', ''),
+                content_hash=content_hash,
                 embedding=file_dict.get('embedding', []),
                 exports=file_dict.get('exports', [])
                 )
@@ -459,9 +522,18 @@ class Neo4jCodebaseSync:
                 cls_dict = cls if isinstance(cls, dict) else cls.__dict__
                 file_path = _normalize_path(cls_dict.get('file_path', ''))
                 full_name = cls_dict.get('full_name') or f"{_module_name_from_path(file_path)}.{cls_dict.get('name', '')}"
-                # Create class node
+                chk = _checksum(full_name, cls_dict.get('line_start', 0), cls_dict.get('line_end', 0))
+                now = _now_iso()
+                # Create class node (bi-temporal)
                 session.run("""
                     MERGE (c:Class {full_name: $full_name})
+                    ON CREATE SET
+                        c.StartDate = $now, c.EndDate = null, c.checksum = $checksum
+                    ON MATCH SET
+                        c.StartDate = CASE WHEN coalesce(c.checksum,'') <> $checksum
+                                          THEN $now ELSE c.StartDate END,
+                        c.EndDate = null,
+                        c.checksum = $checksum
                     SET c.name = $name,
                         c.full_name = $full_name,
                         c.file_path = $file_path,
@@ -472,6 +544,7 @@ class Neo4jCodebaseSync:
                         c.methods = $methods,
                         c.embedding = $embedding
                 """,
+                now=now, checksum=chk,
                 full_name=full_name,
                 name=cls_dict.get('name', ''),
                 file_path=file_path,
@@ -502,9 +575,21 @@ class Neo4jCodebaseSync:
                 func_dict = func if isinstance(func, dict) else func.__dict__
                 file_path = _normalize_path(func_dict.get('file_path', ''))
                 full_name = func_dict.get('full_name') or f"{_module_name_from_path(file_path)}.{func_dict.get('name', '')}"
-                # Create function node
+                chk = _checksum(full_name,
+                               func_dict.get('line_start', 0),
+                               func_dict.get('line_end', 0),
+                               func_dict.get('is_async', False))
+                now = _now_iso()
+                # Create function node (bi-temporal)
                 session.run("""
                     MERGE (f:Function {full_name: $full_name})
+                    ON CREATE SET
+                        f.StartDate = $now, f.EndDate = null, f.checksum = $checksum
+                    ON MATCH SET
+                        f.StartDate = CASE WHEN coalesce(f.checksum,'') <> $checksum
+                                          THEN $now ELSE f.StartDate END,
+                        f.EndDate = null,
+                        f.checksum = $checksum
                     SET f.name = $name,
                         f.full_name = $full_name,
                         f.function_signature = $full_name,
@@ -517,6 +602,7 @@ class Neo4jCodebaseSync:
                         f.is_method = $is_method,
                         f.embedding = $embedding
                 """,
+                now=now, checksum=chk,
                 full_name=full_name,
                 name=func_dict.get('name', ''),
                 signature=func_dict.get('signature', ''),
@@ -719,12 +805,14 @@ def main():
 
     try:
         # Setup
+        fresh = os.getenv("GRAPH_SYNC_FRESH", "false").lower() == "true"
         syncer.create_schema()
         syncer.create_vector_index()
-        syncer.clear_graph()
+        if fresh:
+            syncer.clear_graph()
         print()
 
-        # Sync static entities
+        # Sync static entities (incremental, bi-temporal)
         print("Syncing entities...")
         syncer.sync_files(result.files)
         syncer.sync_classes(result.classes)
@@ -733,7 +821,22 @@ def main():
         syncer.sync_imports(result.files)
         syncer.sync_calls(result.functions)
 
-        # Task 6: Extract and sync APIRoutes + CeleryTasks
+        # Mark deleted entities (SCD Type 2)
+        current_files = {
+            _normalize_path((f if isinstance(f, dict) else f.__dict__).get('path', ''))
+            for f in result.files
+        }
+        current_classes = {
+            (c if isinstance(c, dict) else c.__dict__).get('full_name', '')
+            for c in result.classes
+        }
+        current_functions = {
+            (fn if isinstance(fn, dict) else fn.__dict__).get('full_name', '')
+            for fn in result.functions
+        }
+        syncer.mark_deleted(current_files, current_classes, current_functions)
+
+        # Extract and sync APIRoutes + CeleryTasks
         print("\nExtracting API routes and Celery tasks...")
         all_routes: List[Dict[str, Any]] = []
         all_tasks: List[Dict[str, Any]] = []
