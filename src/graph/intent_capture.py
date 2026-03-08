@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any
 
 from src.core.synthex_entities import EpisodeType
-from src.tasks.graphiti_sync import emit_episode
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +82,7 @@ def emit_intent_episode(record: IntentRecord) -> None:
     # Use Celery task to emit episode asynchronously
     # Signature: emit_episode(self, episode_type, store_id, payload, correlation_id=None)
     try:
+        from src.tasks.graphiti_sync import emit_episode  # lazy — avoids Celery/Redis import at module load
         emit_episode.delay(
             EpisodeType.CODE_INTENT.value,
             "codebase",

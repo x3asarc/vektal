@@ -1,0 +1,24 @@
+{
+  "skill_name": "frontend-deploy-debugger",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Next.js frontend works sometimes locally but Docker deploy keeps failing and ports are colliding. I need localhost and production URL both working.",
+      "expected_output": "Produces a layered debug report with fact sheet, classified root cause, minimal ordered fix steps, and explicit localhost/domain verification evidence.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Hetzner server is up, domain points there, but reverse proxy returns 502 while container looks running. Help me isolate this fast.",
+      "expected_output": "Identifies proxy/domain layer as primary suspect, checks upstream mapping/listen bind/firewall, and returns exact verification commands plus rollback.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I suspect Turbopack/Webpack mismatch and missing npm packages in Docker image. Give me the smallest safe fix plan.",
+      "expected_output": "Classifies app/container failure mode, enforces single bundler path, validates lockfile-driven install, and provides evidence-based gating.",
+      "files": []
+    }
+  ]
+}
+

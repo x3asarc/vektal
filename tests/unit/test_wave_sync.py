@@ -60,7 +60,7 @@ def test_repair_divergence_counts():
     assert result.dry_run is True
 
 
-@patch("src.graph.intent_capture.emit_episode")
+@patch("src.tasks.graphiti_sync.emit_episode")
 def test_capture_intent_queues_task(mock_emit):
     """Test that capture_intent calls emit_episode.delay."""
     record = IntentRecord(

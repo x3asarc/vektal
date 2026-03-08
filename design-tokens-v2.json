@@ -1,0 +1,55 @@
+{
+  "version": "2.0",
+  "theme_identity": "Forensic Dark OS",
+  "source": {
+    "input_type": "mixed",
+    "confidence": "high"
+  },
+  "tokens": {
+    "colors": {
+      "primitives": {
+        "brand": {
+          "500": "#3b82f6",
+          "600": "#2563eb"
+        },
+        "neutral": {
+          "900": "#111827",
+          "950": "#09090b",
+          "1000": "#000000"
+        }
+      },
+      "roles": {
+        "background": "{colors.primitives.neutral.950}",
+        "surface": "{colors.primitives.neutral.900}",
+        "text_primary": "#f8fafc",
+        "text_secondary": "#94a3b8",
+        "border": "rgba(59, 130, 246, 0.2)",
+        "border_strong": "rgba(59, 130, 246, 0.4)",
+        "brand_primary": "{colors.primitives.brand.500}",
+        "accent": "{colors.primitives.brand.500}"
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "layout": {
+        "page_padding": "2rem",
+        "grid_gap": "1.5rem"
+      }
+    },
+    "radius": {
+      "scale": {
+        "ui": "0.5rem"
+      }
+    },
+    "element_dna": {
+      "button": {
+        "font_weight": "700",
+        "glow": "0 0 12px rgba(59, 130, 246, 0.4)"
+      },
+      "panel": {
+        "inner_bg": "rgba(255, 255, 255, 0.02)",
+        "border_opacity": "0.4"
+      }
+    }
+  }
+}

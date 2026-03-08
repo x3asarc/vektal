@@ -2,17 +2,18 @@
   "event_counters": {
     "pre_tool": 5,
     "sentry_issue_pulled": 3,
-    "session_start": 18,
-    "pattern_recorded": 10,
-    "session_synthesis": 5
+    "session_start": 22,
+    "pattern_recorded": 15,
+    "session_synthesis": 13,
+    "task_complete": 1
   },
   "generated_from": "src.memory.materializers.build_long_term_index",
-  "last_updated": "2026-03-07T00:03:53Z",
+  "last_updated": "2026-03-08T00:58:28Z",
   "phase_summaries": [],
   "version": 1,
   "last_event": {
     "type": "session_synthesis",
     "source": "session-synthesize-script",
-    "timestamp": "2026-03-07T00:03:53Z"
+    "timestamp": "2026-03-08T00:58:28Z"
   }
 }

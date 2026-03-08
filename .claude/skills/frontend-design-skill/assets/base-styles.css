@@ -1,0 +1,80 @@
+/* assets/base-styles.css */
+/* A high-end Vanilla CSS reset and foundation for the Shopify Scraping Script frontend. */
+
+:root {
+  /* System-wide tokens from globals.css should be loaded here */
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+  --radius-xl: 1.5rem;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+}
+
+/* Premium Component Foundation */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  transition: transform 0.3s var(--transition-smooth), border-color 0.3s var(--transition-smooth);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.interactive-button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s var(--transition-smooth);
+  background: var(--primary);
+  color: white;
+}
+
+.interactive-button:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+.interactive-button:active {
+  transform: scale(0.98);
+}
+
+/* Typography Helpers */
+
+.text-gradient {
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stagger-load {
+  animation: slideUp 0.6s var(--transition-smooth) both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

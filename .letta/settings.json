@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash()"
+      "Bash()",
+      "Bash(python scripts/memory/sync_letta_memory.py --direction repo-to-letta)",
+      "Bash(python src/graph/mcp_server.py)",
+      "Bash(./venv/Scripts/python.exe src/graph/mcp_server.py)"
     ]
+  },
+  "mcpServers": {
+    "synthex-knowledge-graph": {
+      "command": "./venv/Scripts/python.exe",
+      "args": ["src/graph/mcp_server.py"],
+      "cwd": "C:\\Users\\Hp\\Documents\\Shopify Scraping Script",
+      "description": "Neo4j/Graphiti/Aura knowledge graph — primary context tool for forensic analysis. Tools: query_graph, get_dependencies, retrieve_intent, batch_query, batch_dependencies, search_tools, research_vendor, search_documentation"
+    }
   }
 }

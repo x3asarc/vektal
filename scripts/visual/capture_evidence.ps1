@@ -26,6 +26,15 @@ if (Test-Path $RoutesFile) {
     elseif ($json.PSObject.Properties.Name -contains "routes") { $routes = $json.routes }
 }
 
+# MANDATORY: Add Anchor Pages for consistency audit
+$anchors = @("/dashboard", "/search", "/chat", "/enrichment")
+foreach ($a in $anchors) {
+    if ($routes -notcontains $a) {
+        $routes += $a
+        Write-Host "[OODA] Adding Anchor Page: $a" -ForegroundColor Gray
+    }
+}
+
 Write-Host "[OODA] Capturing evidence for $($routes.Count) routes..." -ForegroundColor Cyan
 
 foreach ($route in $routes) {

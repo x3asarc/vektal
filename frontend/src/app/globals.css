@@ -1,6 +1,17 @@
 /* Fonts loaded via <link> tags in layout.tsx */
 
 :root {
+  --token-surface-panel: #0E0E0E;
+  --token-surface-card: #141417;
+  --token-surface-border: rgba(159, 122, 234, 0.15);
+  --token-surface-border-active: rgba(159, 122, 234, 0.4);
+  --token-text-heading: #f8fafc;
+  --token-text-body: #A0A0A0;
+  --token-brand-primary: #A78BFA;
+  --token-brand-warning: #f59e0b;
+  --token-brand-secondary: #8B5CF6;
+  --token-border-radius: 4px;
+  
   --bg: var(--token-surface-panel);
   --surface: var(--token-surface-panel);
   --card: var(--token-surface-card);
@@ -9,13 +20,18 @@
   --text: var(--token-text-heading);
   --muted: var(--token-text-body);
   --accent: var(--token-brand-primary);
-  --error: var(--token-brand-warning);
+  --error: #ef4444;
   --warning: var(--token-brand-warning);
-  --ok: var(--token-brand-secondary);
-  --radius-ui: var(--token-border-radius, 0);
-  --radius-pill: var(--token-border-radius, 0);
-  --radius-round: var(--token-border-radius, 0);
+  --ok: #10b981;
+  --radius-ui: var(--token-border-radius);
+  --radius-pill: 9999px;
+  --radius-round: 50%;
   --sidebar-width: 64px;
+
+  /* Forensic OS Shadow Primitives */
+  --shadow-forensic-inner: inset 1px 1px 3px rgba(0,0,0,0.6), inset -1px -1px 3px rgba(255,255,255,0.03);
+  --shadow-forensic-outer: 0 0 12px rgba(139, 92, 246, 0.25);
+  --shadow-forensic-glow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
 *,
