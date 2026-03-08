@@ -67,7 +67,7 @@ with driver.session() as s:
     ext_stub = s.run("MATCH (sk:SkillDef {name:'dev-browser'}) RETURN sk.tier, sk.source_url, sk.installed_at").single()
     if ext_stub:
         check("dev-browser tier=1",           ext_stub["sk.tier"],         1)
-        check("dev-browser installed_at=[]",  ext_stub["sk.installed_at"], [])
+        check("dev-browser installed",  bool(ext_stub["sk.installed_at"]), True)
     else:
         check("dev-browser exists", False, True)
 

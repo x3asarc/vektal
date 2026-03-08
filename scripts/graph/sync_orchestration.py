@@ -429,7 +429,7 @@ def scan_skill_defs() -> list[dict]:
     for ext in EXTERNAL_SKILLS:
         if ext["name"] not in existing_names:
             skills.append({
-                "skill_id":     _sid("ext", ext["name"]),
+                "skill_id":     _sid("skill", ext["name"]),  # unified key — same prefix as local installs
                 "name":         ext["name"],
                 "platform":     ext["platform"],
                 "skill_type":   ext["skill_type"],
@@ -562,6 +562,20 @@ def sync_agent_defs(session, agents: list[dict]) -> int:
 
 def sync_skill_defs(session, skills: list[dict]) -> int:
     session.run("CREATE CONSTRAINT skilldef_id_unique IF NOT EXISTS FOR (s:SkillDef) REQUIRE s.skill_id IS UNIQUE")
+    # Dedup: for each name with 2+ nodes, keep the installed copy (or one copy if all empty).
+    # Handles both: installed-vs-empty (delete empties) and empty-vs-empty (keep one).
+    session.run("""
+        MATCH (sk:SkillDef)
+        WITH sk.name AS name, collect(sk) AS nodes, count(*) AS cnt
+        WHERE cnt > 1
+        WITH name, nodes,
+             [n IN nodes WHERE size(n.installed_at) > 0] AS live,
+             [n IN nodes WHERE size(n.installed_at) = 0] AS stubs
+        UNWIND CASE WHEN size(live) > 0 THEN stubs
+                    ELSE stubs[1..]
+               END AS to_delete
+        DETACH DELETE to_delete
+    """)
     for s in skills:
         session.run("""
             MERGE (sd:SkillDef {skill_id: $skill_id})
