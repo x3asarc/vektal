@@ -66,3 +66,35 @@ All 12 sub-plans (15-01 through 15-11b) successfully executed and verified.
 - Created brutalist Dashboard UI (`CommandCenter`) with embedded Chat Dock.
 - Integrated Sentry SDK for development environment telemetry.
 - Published wave summaries (17.1-17.6) and final Phase 17 verification report.
+
+## Architecture Sessions (2026-03-07 — 2026-03-08) via Letta
+Work conducted through Letta agent (agent-745c61ec). No GSD phase executed.
+All artifacts committed to master (e1e8431).
+
+### Graph Schema Research
+- Aura baseline verified: 2,098 Function, 667 Class, 602 File, 469 PlanningDoc nodes.
+  CALLS graph (2,090 edges) confirmed live. Episodic layer empty (no episodes written yet).
+- Graphiti episode classification established: CODE_INTENT / BUG_ROOT_CAUSE_IDENTIFIED /
+  CONVENTION_ESTABLISHED → Developer KG. ENRICHMENT_OUTCOME / ORACLE_DECISION → Graph 2 (deferred).
+- `src/graph/intent_capture.py` lazy import fix applied (GREEN — test_wave_sync.py patched).
+- Research docs produced:
+  - `docs/graph/research-input.md` — Gemini v1 research
+  - `docs/graph/gemini-deep-research-analysis.md` — v1 analysis
+  - `docs/graph/research-input-v2.md` — Gemini v2 research (Graphiti-aware)
+  - `docs/graph/research-v2-analysis.md` — v2 analysis + implementation spec (BASIS FOR GRAPH SPRINT)
+
+### Agent System Architecture
+- Full workspace map completed: GSD, skills, agents, hooks, plugins, Letta skills inventoried.
+- Three-level Commander hierarchy designed: Commander → Leads → Specialists.
+- Layer 0 defined: Aura, Sentry, task-observer, Governance, North Star, STATE.md, LongTermPatterns.
+- Memory tier mapping: working→Letta, short-term→STATE.md, long-term→Aura (:LongTermPattern).
+- Docs produced:
+  - `docs/agent-system/resources-input.md` — raw resource dump
+  - `docs/agent-system/finetuned-resources.md` — filtered resource inventory (15 tools)
+  - `docs/agent-system/commander-architecture.md` — Commander design spec (LOCKED)
+
+### Next Actions
+1. Graph sprint tasks 1–6 (static layer: full re-sync, APIRoute, CeleryTask, EnvVar, Table, bi-temporal)
+2. Graph sprint tasks 7–12 (bridges: Graphiti, Sentry, indexes, validation)
+3. Build Commander + Lead agent files (`.claude/agents/`)
+4. Graph sprint task 13 (orchestration + memory layer: SkillDef, AgentDef, LongTermPattern nodes)

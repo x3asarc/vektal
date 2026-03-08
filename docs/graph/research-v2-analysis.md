@@ -441,6 +441,82 @@ Steps 9–10: Operational. Requires all prior steps.
 
 ---
 
+## Commander Integration Layer
+**Added 2026-03-08 — see `docs/agent-system/commander-architecture.md`**
+
+The Commander architecture requires additional node types in Aura beyond
+the static code graph. These are not part of the initial graph sprint
+(tasks 1–10) but must be planned for in the schema before indexes are
+finalised (task 9).
+
+### Additional Node Types
+
+```
+ORCHESTRATION DOMAIN (Commander + Leads)
+  :TaskExecution    task_id, task_type, lead_invoked, skills_used,
+                    loop_count, quality_gate_passed, friction_proxy,
+                    timestamp, triggered_by
+
+  :SkillDef         name, description, embedding, installed_at,
+                    tier, quality_score, trigger_count, source_url
+
+  :AgentDef         name, description, embedding, level,
+                    tools, color, provider
+
+  :HookDef          event, script, blocking, provider
+
+MEMORY DOMAIN (long-term project intelligence)
+  :LongTermPattern  name, title, source_file, promoted_at,
+                    hit_count, domain, embedding
+```
+
+### Additional Relationship Types
+
+```
+ORCHESTRATION LAYER
+  (TaskExecution)-[:USED_SKILL]->(:SkillDef)
+  (TaskExecution)-[:EXECUTED_BY]->(:AgentDef)
+  (TaskExecution)-[:AFFECTED]->(:Function)
+  (TaskExecution)-[:RESOLVED]->(:SentryIssue)
+  (AgentDef)-[:HAS_SKILL]->(:SkillDef)
+  (AgentDef)-[:LEVEL_UNDER]->(:AgentDef)
+  (HookDef)-[:RUNS_SCRIPT]->(:File)     ← bridges to static code graph
+
+MEMORY LAYER
+  (LongTermPattern)-[:APPLIES_TO]->(:Module)   ← optional, when pattern
+  (LongTermPattern)-[:APPLIES_TO]->(:Function)    is code-specific
+```
+
+### Implementation Timing
+
+These nodes are NOT in the current graph sprint (tasks 1–12).
+They are indexed AFTER:
+1. The Commander agent file is built (`.claude/agents/commander.md`)
+2. The Lead agent files are built
+3. The `.memory/long-term/` promotion pipeline is extended to write
+   to Aura as a final step
+
+Add as task 13 in the implementation sequence:
+**Task 13:** Index orchestration layer — write SkillDef, AgentDef,
+HookDef, TaskExecution schema + LongTermPattern nodes from
+`.memory/long-term/patterns/`. Add embeddings.
+
+### STATE.md as Mandatory Update Target
+
+STATE.md (`.planning/STATE.md`) is the execution source of truth.
+Every significant graph operation must update it — not just GSD sessions.
+
+**Update triggers for graph operations:**
+- Full re-sync completed → update node counts, last_sync timestamp
+- Bridge wired (Graphiti, Sentry) → note in STATE.md
+- Forensic playbook validation passed → note GREEN status
+- Commander integration layer indexed → note as operational
+
+The Commander enforces STATE.md updates after every Lead execution.
+The graph sync scripts must also write to STATE.md on completion.
+
+---
+
 ## What Is Explicitly Out of Scope
 
 The following are deferred to the future user-facing operational KG project:
