@@ -56,6 +56,8 @@ Layer 0 is never "called." It is always present.
 │  STATE.md          — execution source of truth                  │
 │  Memory Tiers      — working→Letta, short-term→STATE.md,        │
 │                      long-term→Aura as :LongTermPattern nodes   │
+│  Model Policy      — OpenRouter broker, right model per task    │
+│                      see docs/agent-system/model-policy.md      │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -438,6 +440,9 @@ Commander does not. This is correct separation of concerns.
 {
   "task": "description",
   "intent": "why — what friction does this remove?",
+  "model": "lc-openrouter/anthropic/claude-sonnet-4-5",
+  "escalation_model": "lc-openrouter/anthropic/claude-opus-4-5",
+  "escalation_trigger": "condition that warrants model escalation",
   "aura_context": {
     "affected_functions": [],
     "blast_radius": [],
@@ -603,6 +608,9 @@ Activates when SkillDef, AgentDef, LongTermPattern nodes are indexed.
   loop_count, quality_gate_passed,
   mttr_seconds,          // if SentryIssue resolved: resolution time
   friction_proxy,        // loop_count * duration (developer efficiency)
+  model_used,            // lc-openrouter model string
+  model_cost_usd,        // approximate cost from OpenRouter response
+  escalation_triggered,  // bool — was escalation model invoked?
   timestamp, triggered_by,
   status                 // 'completed' | 'circuit_breaker' | 'escalated'
 })
@@ -796,6 +804,18 @@ go stale before processing.
 **Evidence:** `created_at` vs `resolved_at` in ImprovementProposal nodes.
 **Action when triggered:** Set SLA. Commander surfaces unprocessed
 proposals older than SLA to user at LOAD.
+
+---
+
+---
+
+### DD-08: Model Performance Calibration
+**Question:** Are the default models in model-policy.md actually optimal per task type?
+**Why deferred:** Need real TaskExecution data with model_used + quality_gate_passed per task type.
+**Trigger:** 20+ TaskExecutions per Lead type with model tracking in Aura.
+**Evidence:** `avg(loop_count)` and `quality_gate_passed` rate grouped by `model_used` per `task_type`.
+**Action when triggered:** task-observer proposes model policy updates via ImprovementProposal queue.
+Validator reviews. Infrastructure Lead applies to model-policy.md + .env aliases.
 
 ---
 
