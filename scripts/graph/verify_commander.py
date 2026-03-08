@@ -63,7 +63,7 @@ with driver.session() as s:
 
     print("\n=== SkillDef schema richness ===")
     sk_sample = s.run("MATCH (sk:SkillDef) WHERE sk.tier IS NOT NULL RETURN count(sk) as c").single()["c"]
-    check("all skills have tier", sk_sample, 23)
+    check("all skills have tier", sk_sample, lambda c: c >= 23)
     ext_stub = s.run("MATCH (sk:SkillDef {name:'dev-browser'}) RETURN sk.tier, sk.source_url, sk.installed_at").single()
     if ext_stub:
         check("dev-browser tier=1",           ext_stub["sk.tier"],         1)

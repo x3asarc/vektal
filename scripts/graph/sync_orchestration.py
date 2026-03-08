@@ -66,7 +66,9 @@ USES_SKILL: dict[str, list[str]] = {
                            "defense-in-depth", "postgres", "finishing-a-development-branch",
                            "using-git-worktrees"],
     "design-lead":        ["frontend-design-skill", "dev-browser", "oiloil-ui-ux-guide",
-                           "visual-ooda-loop", "webapp-testing"],
+                           "visual-ooda-loop", "webapp-testing",
+                           "taste-to-token-extractor", "design-atoms", "design-molecules",
+                           "design-interactions", "frontend-deploy-debugger"],
     "forensic-lead":      ["systematic-debugging", "root-cause-tracing",
                            "tri-agent-bug-audit", "pico-warden"],
     "infrastructure-lead": ["pico-warden", "varlock-claude-skill"],
@@ -211,7 +213,7 @@ def scan_agent_defs() -> list[dict]:
                 agents.append({
                     "agent_id":           _sid("spec", name),
                     "name":               name,
-                    "platform":           AGENT_PROVIDER.get(name, "spec-only"),
+                    "platform":           "spec-only",   # always spec-only until a wrapper exists
                     "spec_path":          str(md.relative_to(PROJECT_ROOT)).replace("\\", "/"),
                     "description":        _first_line(text),
                     "has_canonical_spec": True,
@@ -226,8 +228,38 @@ def scan_skill_defs() -> list[dict]:
     skills: list[dict] = []
     existing_names: set[str] = set()
 
-    # Installed YAML skills
-    for yaml_file in (PROJECT_ROOT / ".claude" / "skills").glob("*.yaml"):
+    skills_root = PROJECT_ROOT / ".claude" / "skills"
+
+    # Subdirectory skills (SKILL.md pattern — the majority)
+    for skill_dir in skills_root.iterdir():
+        if not skill_dir.is_dir():
+            continue
+        skill_md = skill_dir / "SKILL.md"
+        if not skill_md.exists():
+            # try name-based SKILL.md (e.g. frontend-design-SKILL.md)
+            candidates = list(skill_dir.glob("*SKILL*.md"))
+            skill_md = candidates[0] if candidates else None
+        if not skill_md:
+            continue
+        text = skill_md.read_text(encoding="utf-8", errors="replace")
+        name = skill_dir.name
+        skills.append({
+            "skill_id":     _sid("skill", name),
+            "name":         name,
+            "platform":     "claude",
+            "skill_type":   "skill-dir",
+            "tier":         1,
+            "installed_at": ["claude"],
+            "quality_score": None,
+            "trigger_count": 0,
+            "source_url":   "",
+            "spec_path":    str(skill_md.relative_to(PROJECT_ROOT)).replace("\\", "/"),
+            "description":  _first_line(text)[:200],
+        })
+        existing_names.add(name)
+
+    # Installed YAML skills (legacy flat format)
+    for yaml_file in skills_root.glob("*.yaml"):
         text  = yaml_file.read_text(encoding="utf-8", errors="replace")
         name  = yaml_file.stem
         desc  = re.search(r"description:\s*(.+)", text)
@@ -353,15 +385,38 @@ def scan_long_term_patterns() -> list[dict]:
 # ── Syncer functions ──────────────────────────────────────────────────────────
 
 def dedup_agent_defs(session) -> int:
-    """Remove spec-only AgentDef nodes superseded by a platform wrapper with same name."""
-    r = session.run("""
+    """Remove spec-only AgentDef nodes superseded by a platform wrapper with same name.
+
+    Two strategies:
+    1. platform='spec-only' match (standard case)
+    2. agent_id prefix match for nodes where platform was incorrectly set
+       (forensic-lead bug: spec-only was indexed as 'letta' before this fix)
+    """
+    # Build the set of spec-only agent_ids from the current scan
+    spec_ids = [_sid("spec", name) for name in [
+        "commander", "engineering-lead", "infrastructure-lead", "design-lead",
+        "project-lead", "forensic-lead", "task-observer", "validator",
+    ]]
+    # Strategy 1: platform='spec-only'
+    r1 = session.run("""
         MATCH (spec:AgentDef {platform: 'spec-only'})
         MATCH (wrap:AgentDef {name: spec.name})
-        WHERE wrap.platform <> 'spec-only' AND elementId(wrap) <> elementId(spec)
+        WHERE elementId(wrap) <> elementId(spec)
         DETACH DELETE spec
         RETURN count(spec) AS removed
     """).single()
-    return r["removed"] if r else 0
+    removed1 = r1["removed"] if r1 else 0
+    # Strategy 2: known spec_ids that survived with wrong platform
+    r2 = session.run("""
+        UNWIND $ids AS sid
+        MATCH (spec:AgentDef {agent_id: sid})
+        MATCH (wrap:AgentDef {name: spec.name})
+        WHERE elementId(wrap) <> elementId(spec)
+        DETACH DELETE spec
+        RETURN count(spec) AS removed
+    """, ids=spec_ids).single()
+    removed2 = r2["removed"] if r2 else 0
+    return removed1 + removed2
 
 
 def sync_agent_defs(session, agents: list[dict]) -> int:
