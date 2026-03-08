@@ -154,10 +154,10 @@ class Neo4jCodebaseSync:
 
     def __init__(self):
         self.uri = os.getenv('NEO4J_URI')
-        self.user = os.getenv('NEO4J_USER')
+        self.user = os.getenv('NEO4J_USER') or os.getenv('NEO4J_USERNAME') or 'neo4j'
         self.password = os.getenv('NEO4J_PASSWORD')
 
-        if not all([self.uri, self.user, self.password]):
+        if not all([self.uri, self.password]):
             raise ValueError("NEO4J_URI, NEO4J_USER, and NEO4J_PASSWORD must be set in .env")
 
         self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
@@ -182,6 +182,7 @@ class Neo4jCodebaseSync:
             session.run("CREATE INDEX file_language IF NOT EXISTS FOR (f:File) ON (f.language)")
             session.run("CREATE INDEX class_name IF NOT EXISTS FOR (c:Class) ON (c.name)")
             session.run("CREATE INDEX function_name IF NOT EXISTS FOR (f:Function) ON (f.name)")
+            session.run("CREATE INDEX function_signature IF NOT EXISTS FOR (f:Function) ON (f.function_signature)")
 
             print("[OK] Schema and indexes created")
 
@@ -300,6 +301,7 @@ class Neo4jCodebaseSync:
                     MERGE (f:Function {full_name: $full_name})
                     SET f.name = $name,
                         f.full_name = $full_name,
+                        f.function_signature = $full_name,
                         f.signature = $signature,
                         f.file_path = $file_path,
                         f.purpose = $purpose,

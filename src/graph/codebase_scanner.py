@@ -170,7 +170,13 @@ def scan_codebase(root_path: str, config: ScanConfig) -> CodebaseScanResult:
 
             for filename in filenames:
                 file_path = os.path.join(root, filename)
-                rel_path = _normalize_rel_path(os.path.relpath(file_path, root_path))
+                # Skip Windows special device paths (e.g. \\.\nul) that break relpath
+                if file_path.startswith('\\\\.\\') or file_path.startswith('//./'):
+                    continue
+                try:
+                    rel_path = _normalize_rel_path(os.path.relpath(file_path, root_path))
+                except ValueError:
+                    continue
 
                 # Skip excluded patterns
                 if any(excl in rel_path for excl in config.exclude_patterns):
