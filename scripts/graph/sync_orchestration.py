@@ -41,16 +41,22 @@ AGENT_PROVIDER = {
     "forensic-lead": "letta",     # delegates to Letta agent-745c61ec
 }
 
-# Hierarchy: supervisor → [subordinates]  (LEVEL_UNDER + SPAWNS)
+# Permanent hierarchy: supervisor → [subordinates]  (LEVEL_UNDER + SPAWNS)
+# Permanent = org chart relationship. Subordinate always reports to this supervisor.
 HIERARCHY: dict[str, list[str]] = {
-    "commander":          ["engineering-lead", "infrastructure-lead", "design-lead",
-                           "project-lead", "forensic-lead", "task-observer"],
+    "commander":           ["engineering-lead", "infrastructure-lead", "design-lead",
+                            "project-lead", "forensic-lead", "task-observer"],
     "infrastructure-lead": ["validator"],
-    "engineering-lead":   ["gsd-planner", "gsd-executor", "gsd-verifier",
-                           "gsd-plan-checker", "gsd-integration-checker", "gsd-debugger"],
-    "design-lead":        ["design-architect"],
-    "project-lead":       ["engineering-lead", "design-lead",
-                           "forensic-lead", "infrastructure-lead"],
+    "engineering-lead":    ["gsd-planner", "gsd-executor", "gsd-verifier",
+                            "gsd-plan-checker", "gsd-integration-checker", "gsd-debugger"],
+    "design-lead":         ["design-architect"],
+}
+
+# Dynamic delegation only: spawner → [delegates]  (SPAWNS only, no LEVEL_UNDER)
+# These are task-time delegations, not permanent reporting lines.
+SPAWNS_ONLY: dict[str, list[str]] = {
+    "project-lead": ["engineering-lead", "design-lead", "forensic-lead", "infrastructure-lead"],
+    "commander":    [],  # Commander's dynamic routing handled by HIERARCHY already
 }
 
 # Agent → skills it uses  (USES_SKILL)
@@ -346,6 +352,18 @@ def scan_long_term_patterns() -> list[dict]:
 
 # ── Syncer functions ──────────────────────────────────────────────────────────
 
+def dedup_agent_defs(session) -> int:
+    """Remove spec-only AgentDef nodes superseded by a platform wrapper with same name."""
+    r = session.run("""
+        MATCH (spec:AgentDef {platform: 'spec-only'})
+        MATCH (wrap:AgentDef {name: spec.name})
+        WHERE wrap.platform <> 'spec-only' AND elementId(wrap) <> elementId(spec)
+        DETACH DELETE spec
+        RETURN count(spec) AS removed
+    """).single()
+    return r["removed"] if r else 0
+
+
 def sync_agent_defs(session, agents: list[dict]) -> int:
     session.run("CREATE CONSTRAINT agentdef_id_unique IF NOT EXISTS FOR (a:AgentDef) REQUIRE a.agent_id IS UNIQUE")
     for a in agents:
@@ -416,7 +434,11 @@ def sync_long_term_patterns(session, patterns: list[dict]) -> int:
 def sync_edges(session) -> dict[str, int]:
     counts = {"level_under": 0, "spawns": 0, "uses_skill": 0, "implements": 0, "runs_script": 0}
 
-    # LEVEL_UNDER + SPAWNS (hierarchy)
+    # Clear all existing LEVEL_UNDER before recreating from authoritative HIERARCHY map.
+    # This ensures stale edges from previous schema iterations are removed.
+    session.run("MATCH ()-[r:LEVEL_UNDER]->() DELETE r")
+
+    # LEVEL_UNDER + SPAWNS (permanent hierarchy)
     for supervisor, subordinates in HIERARCHY.items():
         for sub in subordinates:
             r = session.run("""
@@ -428,6 +450,15 @@ def sync_edges(session) -> dict[str, int]:
             if r:
                 counts["level_under"] += 1
                 counts["spawns"] += 1
+
+    # SPAWNS only (dynamic delegation — no LEVEL_UNDER, not a permanent reporting line)
+    for spawner, delegates in SPAWNS_ONLY.items():
+        for delegate in delegates:
+            session.run("""
+                MATCH (a:AgentDef {name: $sp}), (b:AgentDef {name: $dl})
+                MERGE (a)-[:SPAWNS]->(b)
+            """, sp=spawner, dl=delegate)
+            counts["spawns"] += 1
 
     # USES_SKILL
     for agent_name, skill_names in USES_SKILL.items():
@@ -470,6 +501,9 @@ def main():
     try:
         with syncer.driver.session() as session:
             na = sync_agent_defs(session, agents)
+            removed = dedup_agent_defs(session)
+            if removed:
+                print(f"  Deduped {removed} spec-only node(s) superseded by platform wrappers")
             ns = sync_skill_defs(session, skills)
             nh = sync_hook_defs(session, hooks)
             np = sync_long_term_patterns(session, patterns)
