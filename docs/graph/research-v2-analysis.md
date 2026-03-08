@@ -57,8 +57,9 @@ the two graph boundaries:
 | `ORACLE_DECISION` | User-facing KG | Platform decisions for a store |
 | `VENDOR_CATALOG_CHANGE` | User-facing KG | Supplier inventory events |
 | `USER_APPROVAL` | User-facing KG | User-triggered approval actions |
-| `FAILURE_PATTERN` | Ambiguous | Runtime errors about code but |
-| | | triggered by platform operations |
+| `FAILURE_PATTERN` | Developer KG | **DECIDED:** wire to :Function via bridge. |
+| | | Recurring Sentry failures are code-level findings. |
+| | | `(Episode {type:'FAILURE_PATTERN'})-[:REFERS_TO]->(:Function)` |
 
 **The bridge from Graphiti to the Developer KG connects ONLY:**
 - `CODE_INTENT` → `(:Function)` or `(:Module)`
@@ -368,7 +369,8 @@ RETURN f.function_signature,
 // Was there a CODE_INTENT episode recorded for a function before it started failing?
 MATCH (si:SentryIssue)-[:OCCURRED_IN]->(f:Function)
 MATCH (e:Episode {type: 'CODE_INTENT'})-[:REFERS_TO]->(f)
-WHERE e.timestamp < si.timestamp
+WHERE f.EndDate IS NULL
+  AND e.timestamp < si.timestamp
   AND duration.between(e.timestamp, si.timestamp).days <= 7
 RETURN si.issue_id, si.exception_type,
        e.content AS original_intent,
@@ -419,25 +421,98 @@ LIMIT 1
 
 ## Implementation Sequence
 
-Dependencies respected — no step assumes a capability from a later step.
+**Task numbering:** Tasks 5–13 map to the project todo list.
+Tasks 1–4 were planning/design (complete). Task 13 is the orchestration layer.
 
-| Step | What | Touches |
+Dependencies respected — no task assumes a capability from a later task.
+
+| Task | Step | What | Touches |
+|---|---|---|---|
+| **5** | 1 | Run full `sync_to_neo4j.py` — Class, Function, PlanningDoc, CALLS edges. Verify node counts against baseline (Function:2098, Class:667, File:602). | `sync_to_neo4j.py` |
+| **6** | 2 | Add `:APIRoute` + `:CeleryTask` via decorator AST extraction. Valid queues: `assistant.t1/t2/t3`, `scrape`, `ingest`. | Extend scanner |
+| **7** | 3 | Add `:EnvVar` + `DEPENDS_ON_CONFIG` via `os.getenv` AST visitor. Apply risk tier taxonomy (Vital/Operational/Functional/Contextual). | New visitor |
+| **8** | 4 | Add `:Table` + `ACCESSES` from SQLAlchemy `__tablename__` + ORM call AST analysis. | New mapper |
+| **9** | 5 | Replace `DETACH DELETE` with bi-temporal SCD Type 2. Add StartDate/EndDate to all static nodes. All queries must filter `WHERE x.EndDate IS NULL`. | Replace sync core |
+| **10** | 6 | Update episode emission sites — add `function_signature` to `CODE_INTENT`, `BUG_ROOT_CAUSE_IDENTIFIED`, `CONVENTION_ESTABLISHED`, `FAILURE_PATTERN` payloads. Pre-condition for Task 11. | `src/tasks/graphiti_sync.py` + emit sites |
+| **11** | 7 | Wire `(Episode)-[:REFERS_TO]->(Function/Module)` bridge. Includes FAILURE_PATTERN episodes (decided: Developer KG). | New sync step |
+| **11** | 8 | Extend `sentry_issue_puller.py` — write `(:SentryIssue)-[:OCCURRED_IN]->(:Function)`, `[:REPORTED_IN]->(:Module)`. Use temporal filter for bi-temporal function versions. | `scripts/observability/` |
+| **12** | 9 | Add composite indexes (see spec below). | Schema migration |
+| **12** | 10 | Validate with 5 Forensic Playbook queries + `prove_graph.py` (update for new schema). All 5 queries must return results. | Verification |
+| **13** | 11 | Index orchestration layer: SkillDef, AgentDef, HookDef, TaskExecution schema + LongTermPattern nodes from `.memory/long-term/patterns/`. Add ImprovementProposal schema. Add embeddings on SkillDef, AgentDef, LongTermPattern. | New indexer script |
+
+**Dependency chain:**
+```
+Task 5 (baseline sync)
+  → Tasks 6-8 (extend sync — can run sequentially in one pass)
+    → Task 9 (bi-temporal — wraps everything above)
+      → Task 10 (episode emission pre-condition)
+        → Task 11a (Graphiti bridge — requires Task 10)
+      → Task 11b (Sentry bridge — can run parallel with 11a)
+        → Task 12 (indexes + validation — requires all above)
+          → Task 13 (orchestration layer — requires Commander files built)
+```
+
+---
+
+## Composite Indexes (Task 12 Specification)
+
+Required indexes for Forensic Playbook query performance:
+
+```cypher
+// Current-state filter — used in every query
+CREATE INDEX function_active IF NOT EXISTS
+FOR (f:Function) ON (f.function_signature, f.EndDate);
+
+// Sentry issue lookup
+CREATE INDEX sentry_unresolved IF NOT EXISTS
+FOR (s:SentryIssue) ON (s.resolved, s.timestamp);
+
+// Episode bridge traversal
+CREATE INDEX episode_type_sig IF NOT EXISTS
+FOR (e:Episode) ON (e.type, e.function_signature);
+
+// EnvVar config lookup
+CREATE INDEX envvar_name IF NOT EXISTS
+FOR (e:EnvVar) ON (e.name);
+
+// Table access lookup
+CREATE INDEX table_name IF NOT EXISTS
+FOR (t:Table) ON (t.name);
+
+// APIRoute lookup
+CREATE INDEX apiroute_url IF NOT EXISTS
+FOR (a:APIRoute) ON (a.url_template);
+
+// TaskExecution model tracking (Commander layer)
+CREATE INDEX taskexec_type_model IF NOT EXISTS
+FOR (te:TaskExecution) ON (te.task_type, te.model_used);
+
+// LongTermPattern semantic search (domain filter before embedding)
+CREATE INDEX longterm_domain IF NOT EXISTS
+FOR (p:LongTermPattern) ON (p.domain, p.EndDate);
+
+// ImprovementProposal queue (Infrastructure Lead reads this every session)
+CREATE INDEX improvement_status IF NOT EXISTS
+FOR (ip:ImprovementProposal) ON (ip.status, ip.created_at);
+```
+
+---
+
+## Test Infrastructure
+
+Three existing scripts useful for validation (untracked, do not delete):
+
+| File | Purpose | Task |
 |---|---|---|
-| **1** | Run full `sync_to_neo4j.py` — Class, Function, PlanningDoc, CALLS edges | `sync_to_neo4j.py` |
-| **2** | Add `:APIRoute` + `:CeleryTask` via decorator AST extraction | Extend scanner |
-| **3** | Add `:EnvVar` + `DEPENDS_ON_CONFIG` via `os.getenv` AST visitor | New visitor |
-| **4** | Add `:Table` + `ACCESSES` from SQLAlchemy model analysis | New mapper |
-| **5** | Replace `DETACH DELETE` with bi-temporal SCD Type 2 versioning | Replace sync core |
-| **6** | Update `CODE_INTENT`, `BUG_ROOT_CAUSE_IDENTIFIED`, `CONVENTION_ESTABLISHED` episode emission to include `function_signature` in payload | `src/tasks/graphiti_sync.py` + emit sites |
-| **7** | Wire `(Episode)-[:REFERS_TO]->(Function)` bridge in sync | New sync step |
-| **8** | Extend `sentry_issue_puller.py` to write `(:SentryIssue)-[:OCCURRED_IN]->(:Function)` | `scripts/observability/` |
-| **9** | Add composite indexes for query performance | Schema migration |
-| **10** | Validate with the 5 Forensic Playbook queries against live Aura | Verification |
+| `prove_graph.py` | Sync Neo4j driver connection proof. Tests file→relationship queries. Update `target.summary` → `target.function_signature` for new schema. | Task 12 validation |
+| `test_graph_v2.py` | Tests `context_broker.get_context()` application layer with telemetry (`graph_used`, `fallback_reason`, snippets). | Post-sprint regression |
+| `test_graph_usage.py` | Same as above for different query string. | Post-sprint regression |
 
-Steps 1–5: Pure static graph. No dependencies on Graphiti or Sentry.
-Steps 6–7: Graphiti bridge. Requires Step 5 (versioning) to be complete.
-Steps 8: Sentry bridge. Can run in parallel with 6–7.
-Steps 9–10: Operational. Requires all prior steps.
+**Note on driver pattern:**
+Scripts (sync context): use `GraphDatabase.driver()` — fine, no event loop.
+Application code (Flask/Celery async context): use `AsyncGraphDatabase.driver()`.
+Do NOT use `src.graph.query_interface` via subprocess — known Celery/Redis
+asyncio incompatibility (see evidence locker for root cause).
 
 ---
 
@@ -454,20 +529,39 @@ finalised (task 9).
 ```
 ORCHESTRATION DOMAIN (Commander + Leads)
   :TaskExecution    task_id, task_type, lead_invoked, skills_used,
-                    loop_count, quality_gate_passed, friction_proxy,
-                    timestamp, triggered_by
+                    loop_count, quality_gate_passed,
+                    mttr_seconds,           // SentryIssue resolution time
+                    friction_proxy,         // loop_count * duration_seconds
+                    model_used,             // actual OpenRouter model routed to
+                    model_requested,        // "openrouter/auto" or explicit
+                    model_cost_usd,         // approximate cost from OpenRouter
+                    escalation_triggered,   // bool — was floor model invoked?
+                    difficulty_tier,        // LOW|STANDARD|HIGH|CRITICAL
+                    utility_models_used,    // ["json-validator","summarizer"]
+                    timestamp, triggered_by,
+                    status                  // 'completed'|'circuit_breaker'|'escalated'
 
   :SkillDef         name, description, embedding, installed_at,
                     tier, quality_score, trigger_count, source_url
 
-  :AgentDef         name, description, embedding, level,
-                    tools, color, provider
+  :AgentDef         name, description, embedding,
+                    level,    // 1=Commander,2=Lead,2.5=ProjectLead,3=Specialist
+                    tools, color, provider, version
 
   :HookDef          event, script, blocking, provider
 
+  :ImprovementProposal
+                    proposal_id, target, proposed_change, root_cause,
+                    evidence_ids,           // TaskExecution node IDs
+                    pattern_type,           // loop_overrun|quality_failure|model_escalation|dd_trigger
+                    significance,           // 0.0-1.0
+                    status,                 // 'queued'|'approved'|'rejected'|'applied'
+                    validator_notes, created_at, resolved_at
+
 MEMORY DOMAIN (long-term project intelligence)
   :LongTermPattern  name, title, source_file, promoted_at,
-                    hit_count, domain, embedding
+                    hit_count, domain, embedding,
+                    StartDate, EndDate      // bi-temporal — patterns can be superseded
 ```
 
 ### Additional Relationship Types
@@ -480,26 +574,27 @@ ORCHESTRATION LAYER
   (TaskExecution)-[:RESOLVED]->(:SentryIssue)
   (AgentDef)-[:HAS_SKILL]->(:SkillDef)
   (AgentDef)-[:LEVEL_UNDER]->(:AgentDef)
-  (HookDef)-[:RUNS_SCRIPT]->(:File)     ← bridges to static code graph
+  (HookDef)-[:RUNS_SCRIPT]->(:File)
+  (ImprovementProposal)-[:BASED_ON]->(:TaskExecution)
+  (ImprovementProposal)-[:TARGETS]->(:SkillDef)
 
 MEMORY LAYER
-  (LongTermPattern)-[:APPLIES_TO]->(:Module)   ← optional, when pattern
-  (LongTermPattern)-[:APPLIES_TO]->(:Function)    is code-specific
+  (LongTermPattern)-[:APPLIES_TO]->(:Module)
+  (LongTermPattern)-[:APPLIES_TO]->(:Function)
 ```
 
 ### Implementation Timing
 
-These nodes are NOT in the current graph sprint (tasks 1–12).
-They are indexed AFTER:
-1. The Commander agent file is built (`.claude/agents/commander.md`)
-2. The Lead agent files are built
-3. The `.memory/long-term/` promotion pipeline is extended to write
-   to Aura as a final step
+Task 13 is now in the implementation sequence above.
+Pre-conditions before Task 13 can run:
+1. Tasks 5–12 complete (static + bridge + observability layers all populated)
+2. Platform wrapper files built (`.claude/agents/commander.md` etc.)
+3. `.memory/long-term/` patterns directory has content to promote
 
-Add as task 13 in the implementation sequence:
-**Task 13:** Index orchestration layer — write SkillDef, AgentDef,
-HookDef, TaskExecution schema + LongTermPattern nodes from
-`.memory/long-term/patterns/`. Add embeddings.
+Task 13 script: new `scripts/graph/sync_orchestration_layer.py`
+Reads: `.claude/agents/`, `.claude/skills/`, `.memory/long-term/patterns/`
+Writes: SkillDef, AgentDef, HookDef, LongTermPattern nodes + ImprovementProposal schema
+Adds: embeddings on SkillDef.description, AgentDef.description, LongTermPattern.title
 
 ### STATE.md as Mandatory Update Target
 
