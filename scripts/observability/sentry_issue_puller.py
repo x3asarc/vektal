@@ -31,6 +31,77 @@ from src.graph.sentry_ingestor import FailureEvent, ingest_failure_event
 from src.memory.event_log import append_event
 from src.memory.event_schema import EventType, create_event
 
+# ── Task 11b: SentryIssue → Graph bridge helpers ─────────────────────────────
+def _cul_to_module(culprit: str) -> tuple[str, str | None]:
+    """Parse Sentry culprit into (module_dotted, function_name | None).
+    Examples:
+      'src/graph/sentry_ingestor.py in ingest_failure_event' → ('src.graph.sentry_ingestor', 'ingest_failure_event')
+      'src/core/graphiti_client.py'                          → ('src.core.graphiti_client', None)
+    """
+    fn_name: str | None = None
+    path = culprit.strip()
+    if " in " in path:
+        path, fn_name = path.rsplit(" in ", 1)
+        fn_name = fn_name.strip()
+    norm = path.replace("\\", "/").replace(".py", "")
+    if norm.startswith("./"):
+        norm = norm[2:]
+    module = norm.replace("/", ".")
+    return module, fn_name
+
+
+def _write_sentry_issue_to_graph(event: FailureEvent, driver) -> None:
+    """Write :SentryIssue node + OCCURRED_IN / REPORTED_IN edges to Aura.
+
+    Runs as best-effort after episode ingest — never blocks the ingest cycle.
+    Bi-temporal filter: only links to Function/File nodes with EndDate IS NULL.
+    """
+    try:
+        module_name, fn_name = _cul_to_module(event.culprit)
+        fn_sig = f"{module_name}.{fn_name}" if fn_name else None
+
+        with driver.session() as s:
+            # Upsert :SentryIssue node
+            s.run("""
+                MERGE (si:SentryIssue {issue_id: $issue_id})
+                SET si.title = $title,
+                    si.category = $category,
+                    si.culprit = $culprit,
+                    si.level = $level,
+                    si.timestamp = $ts,
+                    si.resolved = false,
+                    si.module_path = $module
+            """,
+            issue_id=event.event_id,
+            title=event.title,
+            category=event.category,
+            culprit=event.culprit,
+            level=event.level,
+            ts=event.timestamp,
+            module=module_name,
+            )
+
+            # [:OCCURRED_IN] → specific Function (if culprit has "in <function>")
+            if fn_sig:
+                s.run("""
+                    MATCH (si:SentryIssue {issue_id: $issue_id})
+                    MATCH (f:Function {function_signature: $sig})
+                    WHERE f.EndDate IS NULL
+                    MERGE (si)-[:OCCURRED_IN]->(f)
+                """, issue_id=event.event_id, sig=fn_sig)
+
+            # [:REPORTED_IN] → File node (module → file path)
+            file_path = module_name.replace(".", "/") + ".py"
+            s.run("""
+                MATCH (si:SentryIssue {issue_id: $issue_id})
+                MATCH (f:File) WHERE f.path ENDS WITH $file_path
+                  AND f.EndDate IS NULL
+                MERGE (si)-[:REPORTED_IN]->(f)
+            """, issue_id=event.event_id, file_path=file_path)
+
+    except Exception as e:
+        logger.debug("[SentryPuller] Graph write skipped: %s", e)
+
 logger = logging.getLogger(__name__)
 
 GRAPH_DIR = PROJECT_ROOT / ".graph"
@@ -351,12 +422,38 @@ async def run_ingestion_cycle(manual: bool = False) -> Dict[str, Any]:
     pull_result = await pull_sentry_issues(manual=manual)
     logger.info("[SentryPuller] Pulled %s event(s).", len(pull_result.events))
 
+    # Task 11b: acquire Neo4j driver once per cycle for SentryIssue graph writes
+    _graph_driver = None
+    try:
+        from neo4j import GraphDatabase
+        _neo4j_uri = os.getenv("NEO4J_URI")
+        _neo4j_user = os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME", "neo4j")
+        _neo4j_pwd = os.getenv("NEO4J_PASSWORD")
+        if _neo4j_uri and _neo4j_pwd:
+            _graph_driver = GraphDatabase.driver(_neo4j_uri, auth=(_neo4j_user, _neo4j_pwd))
+            # Ensure SentryIssue constraint exists
+            with _graph_driver.session() as s:
+                s.run("CREATE CONSTRAINT sentry_issue_id_unique IF NOT EXISTS "
+                      "FOR (si:SentryIssue) REQUIRE si.issue_id IS UNIQUE")
+    except Exception as e:
+        logger.debug("[SentryPuller] Graph driver init skipped: %s", e)
+
     ingested = 0
     for event in pull_result.events:
         _emit_issue_pulled_event(event)
         logger.info("[SentryPuller] [%s] %s", event.category, event.title)
         if await ingest_failure_event(event):
             ingested += 1
+        # Task 11b: write SentryIssue node + graph edges
+        if _graph_driver:
+            _write_sentry_issue_to_graph(event, _graph_driver)
+
+    if _graph_driver:
+        try:
+            _graph_driver.close()
+        except Exception:
+            pass
+
     if pull_result.error is None:
         _refresh_materialized_views()
     return {

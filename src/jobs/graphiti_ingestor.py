@@ -259,6 +259,31 @@ class GraphitiIngestor:
                 _is_episode_ingested(episode_id)  # Add to LRU cache
                 self._ingested_cache.add(episode_id)  # Add to local cache
                 logger.debug(f"Episode ingested successfully: {episode_id}")
+
+                # Task 11a — piggyback write: store function_signature as a top-level
+                # property on the Episodic node so the bridge query can use it directly.
+                # Only for Developer-KG episode types (not operational/user-facing ones).
+                _DEVELOPER_KG_TYPES = {
+                    "code_intent", "bug_root_cause_identified",
+                    "convention_established", "failure_pattern"
+                }
+                fn_sig = episode.get("function_signature")
+                ep_type = episode.get("episode_type", "")
+                ep_name = episode.get("correlation_id") or episode_id
+                if fn_sig and ep_type in _DEVELOPER_KG_TYPES:
+                    try:
+                        driver = getattr(self.client, "driver", None)
+                        if driver:
+                            with driver._driver.session() as s:
+                                s.run(
+                                    "MATCH (e:Episodic {name: $name}) "
+                                    "SET e.function_signature = $sig, "
+                                    "    e.episode_type = $ep_type",
+                                    name=ep_name, sig=fn_sig, ep_type=ep_type
+                                )
+                    except Exception as bridge_err:
+                        logger.debug(f"Bridge piggyback write skipped: {bridge_err}")
+
                 return True
             else:
                 logger.warning(f"Episode ingestion failed: {episode_id}")
