@@ -210,7 +210,11 @@ def _execute_query(driver, query: str, parameters: dict) -> List[dict]:
     async def _run_async():
         async with session:
             result = await session.run(query, **parameters)
-            return await result.data()
+            # result.data() might be a coroutine or might be a list
+            data = result.data()
+            if hasattr(data, '__await__'):
+                return await data
+            return data
 
     try:
         loop = asyncio.get_running_loop()

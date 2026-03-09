@@ -220,8 +220,17 @@ def query_graph(query: str, use_natural_language: bool = False, compact: bool = 
     # 1. Try direct template match by name
     if query in QUERY_TEMPLATES:
         result.template_used = query
-        result.data = execute_template(query, {})
-        result.success = True
+        # Don't call templates that require parameters without providing them
+        # execute_template now has defaults, but an empty file_path won't return useful results
+        try:
+            result.data = execute_template(query, {})
+            result.success = True
+        except Exception as e:
+            logger.warning(f"Failed to execute template {query} with empty params: {e}")
+            result.success = False
+            result.error = f"Template requires parameters: {e}"
+            return _finalize()
+
         if not result.data:
             fallback_paths = _filesystem_fallback_paths(query, {}, query)
             if fallback_paths:

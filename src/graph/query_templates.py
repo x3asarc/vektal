@@ -191,22 +191,57 @@ def _neo4j_temporarily_unavailable() -> bool:
     return time.time() < _NEO4J_UNAVAILABLE_UNTIL
 
 
+def _apply_default_params(template_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Apply default parameters for templates that require them.
+
+    Prevents "Expected parameter(s): file_path, limit, threshold" Neo4j errors
+    when templates are called with missing required parameters.
+    """
+    defaults = {
+        "similar_files": {"file_path": "", "limit": 5, "threshold": 0.6},
+        "imports": {"file_path": ""},
+        "imported_by": {"file_path": ""},
+        "impact_radius": {"file_path": ""},
+        "planning_context": {"file_path": ""},
+        "functions_in_file": {"file_path": ""},
+        "function_callers": {"function_name": ""},
+        "function_callees": {"function_name": ""},
+        "phase_code": {"phase": ""},
+        "similar_failures": {"root_cause_type": "", "limit": 10},
+        "top_conventions": {"limit": 5},
+        "long_term_patterns": {"limit": 10},
+        "recent_discrepancies": {"limit": 10},
+        "tool_search": {"query_embedding": [], "top_k": 10, "tier": None},
+        "tool_search_text": {"query": "", "top_k": 10, "tier": None},
+    }
+
+    if template_name in defaults:
+        # Merge params with defaults, params take precedence
+        return {**defaults[template_name], **params}
+
+    return params
+
+
 def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int = 2000) -> List[Dict[str, Any]]:
     """
     Execute a pre-built query template.
-    
+
     Args:
         template_name: Name of the template in QUERY_TEMPLATES.
         params: Parameters to inject into the Cypher query.
         timeout_ms: Execution timeout in milliseconds.
-        
+
     Returns:
         List of result dictionaries.
     """
     if template_name not in QUERY_TEMPLATES:
         logger.error(f"Template not found: {template_name}")
         return []
-        
+
+    # Apply default parameters for templates that require them
+    params = _apply_default_params(template_name, params)
+
     cypher = QUERY_TEMPLATES[template_name]
 
     def _records_to_dicts(records: Any) -> List[Dict[str, Any]]:
@@ -215,7 +250,12 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
             if isinstance(record, dict):
                 rows.append(record)
             elif hasattr(record, "data"):
-                rows.append(record.data())
+                data = record.data()
+                # Handle case where data() returns a coroutine (shouldn't happen in sync context, but be defensive)
+                if inspect.isawaitable(data):
+                    logger.warning("Encountered awaitable data() in sync context - skipping record")
+                    continue
+                rows.append(data)
         return rows
 
     def _run_async_with_timeout(coro: Any, timeout_seconds: float) -> List[Dict[str, Any]]:
