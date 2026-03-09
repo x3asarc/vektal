@@ -1,28 +1,85 @@
 {
+  "hooksConfig": {
+    "enabled": true,
+    "notifications": true
+  },
   "hooks": {
     "SessionStart": [
       {
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",
-            "command": "python .gemini/hooks/start-health-daemon.py"
+            "command": "python .gemini/hooks/start-health-daemon.py",
+            "name": "start-health-daemon"
           },
           {
             "type": "command",
-            "command": "python scripts/memory/session_start.py"
+            "command": "python scripts/memory/session_start.py",
+            "name": "session-start"
+          },
+          {
+            "type": "command",
+            "command": "node .gemini/hooks/gsd-check-update.js",
+            "name": "gsd-check-update"
+          },
+          {
+            "type": "command",
+            "command": "python .gemini/hooks/check-pending-improvements.py",
+            "name": "check-pending-improvements"
           }
         ]
       }
     ],
-    "PreToolUse": [
+    "BeforeTool": [
       {
-        "filter": {
-          "tool": "Bash"
-        },
+        "matcher": "run_shell_command",
         "hooks": [
           {
             "type": "command",
+            "command": "python scripts/governance/health_gate.py",
+            "name": "health-gate",
+            "blockOnFailure": false
+          },
+          {
+            "type": "command",
             "command": "python scripts/memory/pre_tool_update.py --provider gemini --session-key gemini-pretool --window-hint gemini",
+            "name": "pre-tool-update",
+            "blockOnFailure": false
+          }
+        ]
+      },
+      {
+        "matcher": "codebase_investigator|generalist",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/memory_pattern_primer.py",
+            "name": "memory-pattern-primer",
+            "blockOnFailure": false
+          }
+        ]
+      },
+      {
+        "matcher": "replace|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/graph_impact_advisor.py",
+            "name": "graph-impact-advisor",
+            "blockOnFailure": false
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "replace|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/test_recommender.py",
+            "name": "test-recommender",
             "blockOnFailure": false
           }
         ]
@@ -47,7 +104,7 @@
       "command": "cmd",
       "args": [
         "/c",
-        "npx",
+        "npx.cmd",
         "-y",
         "@upstash/context7-mcp"
       ],
