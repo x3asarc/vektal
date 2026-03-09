@@ -19,6 +19,52 @@ color: purple
 
 ---
 
+
+## ⏱ Step Budget (Enforced by Commander)
+
+Before doing anything else, check your context package for `step_budget` and `scope_tier`.
+Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps** for NANO.
+
+- **Count every tool call as 1 step.**
+- At 80% of budget: warn Commander in your output (`[BUDGET WARNING: X steps remaining]`)
+- At 100%: stop immediately, return partial output tagged `[BUDGET EXCEEDED — partial]`
+- Use **Aura graph queries first** for discovery. One Cypher query = 1 step, replaces up to 20 file reads.
+- No file-grep sweeps across the whole codebase. Read targeted files only.
+
+---
+
+## 🔍 Mandatory Aura Query (Step 1 — BEFORE any file reads)
+
+```python
+from dotenv import load_dotenv; load_dotenv()
+from neo4j import GraphDatabase
+import os, json
+
+driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
+keywords = CONTEXT_PACKAGE.get("keywords", ["page", "component"])
+with driver.session() as s:
+    # Frontend files matching task keywords
+    files = s.run(
+        "MATCH (f:File) WHERE f.path STARTS WITH 'frontend/' "
+        "AND any(kw IN $kw WHERE f.path CONTAINS kw) "
+        "RETURN f.path, f.module LIMIT 20", kw=keywords).data()
+    fps = [r["f.path"] for r in files]
+    # Functions defined in those files
+    fns = s.run(
+        "MATCH (fn:Function)-[:DEFINED_IN]->(f:File) WHERE f.path IN $fps "
+        "RETURN fn.function_signature, fn.name, f.path LIMIT 20", fps=fps).data()
+    # Design LongTermPatterns (conventions already established)
+    patterns = s.run(
+        "MATCH (lp:LongTermPattern) WHERE lp.domain = 'design' "
+        "RETURN lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
+print(json.dumps({"files": files, "functions": fns, "patterns": patterns}, indent=2))
+driver.close()
+```
+
+**Read only files returned above. Never grep frontend/ wholesale.**
+
+---
+
 ## Part I — Identity
 
 You are the Design Lead. You own everything the user sees. You do NOT implement — you conduct the atomic pipeline through specialist skills and loop until three quality gates pass: **technical correctness**, **UX quality**, and **visual satisfaction**.

@@ -68,14 +68,27 @@ Then execute the following task as Commander:
 
 ## Rules
 
-1. **Always read the agent .md file first** — the prompt must instruct the subagent to read its own spec
-2. **Commander for routing** — if unsure which Lead to use, invoke Commander and let it decide
-3. **Model selection** — follow `docs/agent-system/model-policy.md`:
+1. **Declare scope tier first** — ALWAYS state the tier + budget before spawning: `[SCOPE: RESEARCH | Budget: 2 Leads × 30 steps | ~10 min]`
+2. **Always read the agent .md file first** — the prompt must instruct the subagent to read its own spec
+3. **Commander for routing** — if unsure which Lead to use, invoke Commander and let it decide
+4. **Aura before file reads** — Commander must run Aura P-LOAD (Part III) before any Lead is spawned. Leads use Aura for discovery, not grep sweeps.
+5. **Model selection** — follow `docs/agent-system/model-policy.md`:
    - Default: `openrouter/auto`
    - Validator, security tasks: `claude-sonnet-4-5` minimum
    - Forensic adversary/referee: `claude-opus-4-5` minimum
-4. **Letta spawn advantage** — the Task tool shows a high-level overview to the user automatically. This is intentional — don't suppress it.
-5. **Pass STATE.md context** — always include current phase context from `.planning/STATE.md`
+6. **Letta spawn advantage** — the Task tool shows a high-level overview to the user automatically. This is intentional — don't suppress it.
+7. **Pass STATE.md context** — always include current phase context from `.planning/STATE.md`
+8. **Hard stop at budget** — if a Lead returns `[BUDGET EXCEEDED]`, do not re-spawn. Return partial output to human and ask for approval to continue.
+
+## Scope Tiers (from Commander Part XI)
+
+| Tier | Max Leads | Steps/Lead | Wall time |
+|---|---|---|---|
+| NANO | 1 | 10 | 2 min |
+| MICRO | 1 | 20 | 5 min |
+| STANDARD | 2 | 30 | 10 min |
+| COMPOUND | 3 | 40 | 20 min |
+| RESEARCH | 2 (read-only) | 30 | 10 min |
 
 ## Quick Invocation Template
 
