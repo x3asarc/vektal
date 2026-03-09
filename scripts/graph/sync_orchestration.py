@@ -23,6 +23,15 @@ load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
+# ── Letta agent IDs (loaded from .letta/agent-registry.json) ─────────────────
+# oracle's agent_defs block queries a.letta_agent_id — must be populated here.
+_registry_path = PROJECT_ROOT / ".letta" / "agent-registry.json"
+LETTA_AGENT_IDS: dict[str, str] = {}
+if _registry_path.exists():
+    _reg = json.loads(_registry_path.read_text(encoding="utf-8"))
+    LETTA_AGENT_IDS = {k: v["id"] for k, v in _reg.items()
+                       if isinstance(v, dict) and "id" in v}
+
 # ── Metadata tables (source: locked specs + finetuned-resources.md) ───────────
 
 AGENT_LEVELS = {          # 1=Commander 2=Lead 3=Specialist
@@ -223,12 +232,10 @@ EXTERNAL_SKILLS: list[dict] = [
     {"name": "dev-browser",        "tier": 1, "platform": "claude", "skill_type": "plugin",
      "source_url": "https://github.com/SawyerHood/dev-browser",
      "description": "Persistent browser state + agentic execution. Replaces fragile Playwright scripts."},
-    {"name": "agnix",              "tier": 1, "platform": "claude", "skill_type": "linter",
-     "source_url": "",
-     "description": "Agent config linter. 156 rules, auto-fix, LSP server. Validates SKILL.md files."},
-    {"name": "plugin-authoring",   "tier": 1, "platform": "claude", "skill_type": "guidance",
-     "source_url": "",
-     "description": "Authoritative guidance for Claude Code plugins with hook schema and plugin.json."},
+    {"name": "agnix",              "tier": 1, "platform": "claude", "skill_type": "binary",
+     "source_url": "https://github.com/avifenesh/agnix",
+     "description": "Agent config linter. 342 rules, auto-fix, LSP server. v0.16.1 installed at npm-global."},
+    # plugin-authoring removed — it IS skill-creator (locally installed as .claude/skills/skill-creator)
     {"name": "varlock-claude-skill","tier": 1, "platform": "claude", "skill_type": "security",
      "source_url": "",
      "description": "Secure env var management. Secrets never appear in sessions, terminals, logs."},
@@ -276,9 +283,9 @@ EXTERNAL_SKILLS: list[dict] = [
     {"name": "brainstorming",      "tier": 3, "platform": "claude", "skill_type": "intake",
      "source_url": "",
      "description": "Structure vague requests before Commander routing."},
-    {"name": "find-skills",        "tier": 3, "platform": "claude", "skill_type": "discovery",
+    {"name": "find-skills",        "tier": 3, "platform": "claude", "skill_type": "skill-dir",
      "source_url": "",
-     "description": "Discover and install agent skills from marketplace."},
+     "description": "Discover and install agent skills from marketplace. Installed globally at ~/.claude/skills/find-skills/"},
 ]
 
 # HookDef nodes (from .claude/settings.json)
@@ -552,11 +559,13 @@ def sync_agent_defs(session, agents: list[dict]) -> int:
             MERGE (ad:AgentDef {agent_id: $agent_id})
             SET ad.name = $name, ad.platform = $platform, ad.spec_path = $spec_path,
                 ad.description = $description, ad.has_canonical_spec = $hcs,
-                ad.canonical_spec_path = $csp, ad.level = $level, ad.color = $color
+                ad.canonical_spec_path = $csp, ad.level = $level, ad.color = $color,
+                ad.letta_agent_id = $letta_agent_id
         """, agent_id=a["agent_id"], name=a["name"], platform=a["platform"],
              spec_path=a["spec_path"], description=a.get("description", ""),
              hcs=a.get("has_canonical_spec", False), csp=a.get("canonical_spec_path", ""),
-             level=a.get("level", 3), color=a.get("color", ""))
+             level=a.get("level", 3), color=a.get("color", ""),
+             letta_agent_id=LETTA_AGENT_IDS.get(a["name"], ""))
     return len(agents)
 
 

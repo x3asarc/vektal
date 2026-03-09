@@ -471,6 +471,14 @@ BLOCKS = {
         "schema_task": None,
     },
 
+    # ── Advisory cross-domain blocks ─────────────────────────────────────
+    # These blocks return count=0 until specialized edge scripts are written:
+    #   cross_domain_env_coupling:   needs :USES (Function→EnvVar) + :DEFINED_IN
+    #   cross_domain_route_coupling: needs :CALLS_ROUTE (Function→APIRoute) + :DEFINED_IN
+    #   cross_domain_impact:         needs Function nodes + :DEFINED_IN + :CALLS (sync_to_neo4j.py)
+    # schema_task=None here — they are NOT blocked by a specific sprint task,
+    # they need NEW edge scripts that don't exist yet.
+
     "cross_domain_env_coupling": {
         "description": (
             "WHAT EnvVar nodes are consumed across domain boundaries — "
@@ -495,7 +503,7 @@ BLOCKS = {
             "ORDER BY risk DESC, env"
         ),
         "limit": 30,
-        "schema_task": 7,  # requires EnvVar nodes (Task 7) + USES edges
+        "schema_task": None,  # advisory: EnvVar nodes exist (Task 7 done); needs :USES edge script
     },
 
     # ── LAYER 0 — Commander LOAD ──────────────────────────────────────────
@@ -555,7 +563,7 @@ BLOCKS = {
             "RETURN method, route, route_file, cross_domain_callers, callers"
         ),
         "limit": 20,
-        "schema_task": 6,  # requires APIRoute nodes (Task 6) + CALLS_ROUTE edges
+        "schema_task": None,  # advisory: APIRoute nodes exist (Task 6 done); needs :CALLS_ROUTE edge script
     },
 
 }
