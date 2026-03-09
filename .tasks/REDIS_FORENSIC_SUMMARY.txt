@@ -1,0 +1,191 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                 FORENSIC ANALYSIS: REDIS/CELERY CONNECTION ISSUES            ║
+║                              Sentry Issues #101522185, #101522288            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ SYMPTOM                                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ • 713 events: "Connection to Redis lost: Retry (8/20)"                       │
+│ • 35 events: "Retry limit exceeded, Celery must be restarted"                │
+│ • Workers enter ZOMBIE state (log errors but don't exit)                     │
+│ • Docker never restarts → manual intervention required                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ROOT CAUSE                                                                    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ INCOMPLETE RESILIENCE CONFIG (src/celery_app.py)                             │
+│                                                                               │
+│ ✅ CORRECTLY CONFIGURED:                                                     │
+│   • broker_connection_retry=True                                             │
+│   • broker_transport_options with keepalive                                  │
+│   • socket_connect_timeout=5                                                 │
+│   • max_connections=50                                                       │
+│                                                                               │
+│ ❌ MISSING CRITICAL GAPS:                                                    │
+│   1. No exponential backoff tuning                                           │
+│      → Default: 2s, 4s, 8s... exhausts at 60s                                │
+│      → Redis downtime often exceeds this window                              │
+│                                                                               │
+│   2. No runtime reconnection guard                                           │
+│      → Only checks on worker_ready (startup)                                 │
+│      → Mid-execution failures → zombie workers                               │
+│                                                                               │
+│   3. No worker_shutdown cleanup                                              │
+│      → Half-closed sockets, resource leaks                                   │
+│                                                                               │
+│   4. Hardcoded keepalive (TCP_KEEPIDLE=120s)                                 │
+│      → Cloud LBs often close idle connections at 60s                         │
+│      → Mismatch causes silent failures                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ BLAST RADIUS (from Aura Graph Query)                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ WHO imports src/celery_app.py?                                               │
+│   → 20 files (API layer, job orchestration, all task modules)                │
+│                                                                               │
+│ WHAT tasks affected?                                                         │
+│   → 23 Celery tasks across 7 queues:                                         │
+│      • assistant.t1, assistant.t2  (AI inference)                            │
+│      • batch.t1, batch.t2, batch.t3  (scraping, enrichment)                  │
+│      • interactive.t2  (user-facing audits)                                  │
+│      • control  (cleanup, dispatch)                                          │
+│                                                                               │
+│ WHERE are related files?                                                     │
+│   → 19 files matching [redis, celery, config]                                │
+│      • src/celery_app.py                                                     │
+│      • src/graph/remediators/redis_remediator.py                             │
+│      • scripts/infra/redis_health_fixer.py                                   │
+│                                                                               │
+│ Cross-domain impact?                                                         │
+│   → NONE (all usage within src/ domain)                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ FAILURE SEQUENCE (Forensic Timeline)                                         │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│ 1. Redis becomes unavailable                                                 │
+│    ↓                                                                          │
+│ 2. Celery worker starts retry loop (20 attempts)                             │
+│    • Retry 1: wait 2s                                                        │
+│    • Retry 2: wait 4s                                                        │
+│    • Retry 3: wait 8s                                                        │
+│    • ...                                                                     │
+│    • Retry 8: wait 16s ← Sentry issue logs "Retry (8/20)"                   │
+│    • Total time: ~60s                                                        │
+│    ↓                                                                          │
+│ 3. Retry limit exhausted (Redis still down)                                  │
+│    ↓                                                                          │
+│ 4. Worker SHOULD exit → Docker restart                                       │
+│    BUT: worker_ready only checks startup, not runtime                        │
+│    ↓                                                                          │
+│ 5. Worker enters ZOMBIE state                                                │
+│    • Logs errors continuously                                                │
+│    • Never exits                                                             │
+│    • Docker never restarts                                                   │
+│    • 240+ failed attempts accumulate                                         │
+│    ↓                                                                          │
+│ 6. Manual intervention required                                              │
+│    • docker compose restart celery_worker                                    │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ RECOMMENDED FIXES (Priority Order)                                           │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│ FIX #1: Add Exponential Backoff Tuning                                       │
+│   Location: src/celery_app.py:131-167                                        │
+│   Change:                                                                     │
+│     broker_connection_interval_start=2    # Start 2s                         │
+│     broker_connection_interval_step=2     # +2s each retry                   │
+│     broker_connection_interval_max=30     # Cap at 30s                       │
+│   Impact: Retry window extends to ~300s (5 minutes)                          │
+│                                                                               │
+│ FIX #2: Add Runtime Health Check Task                                        │
+│   Location: src/celery_app.py (new beat task)                                │
+│   Change:                                                                     │
+│     @app.task(bind=True)                                                     │
+│     def _redis_health_check(self):                                           │
+│         try:                                                                 │
+│             app.connection().ensure_connection(max_retries=1, timeout=5)     │
+│         except Exception:                                                    │
+│             sys.exit(1)  # Exit for Docker restart                           │
+│   Schedule: Every 30s via beat_schedule                                      │
+│   Impact: Zombie workers auto-exit → Docker restarts                         │
+│                                                                               │
+│ FIX #3: Add Worker Shutdown Cleanup                                          │
+│   Location: src/celery_app.py (new signal handler)                           │
+│   Change:                                                                     │
+│     @worker_shutdown.connect                                                 │
+│     def _cleanup_connections(**kwargs):                                      │
+│         app.connection_pool.force_close_all()                                │
+│   Impact: Graceful cleanup, no resource leaks                                │
+│                                                                               │
+│ FIX #4: Make Keepalive Configurable                                          │
+│   Location: src/celery_app.py:140-144, .env                                  │
+│   Change:                                                                     │
+│     TCP_KEEPIDLE=int(os.getenv("REDIS_KEEPALIVE_IDLE", "60"))                │
+│   Impact: Cloud LB compatibility (default 60s vs 120s)                       │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ VERIFICATION PLAN                                                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│ 1. Integration Test (Manual)                                                 │
+│    $ docker compose stop redis                                               │
+│    $ sleep 60  # Wait for retry exhaustion                                   │
+│    $ docker compose logs celery_worker  # Should see exit                    │
+│    $ docker compose ps  # Should see restarting                              │
+│    $ docker compose start redis                                              │
+│    $ sleep 10                                                                │
+│    $ docker compose logs celery_worker  # Should see reconnection            │
+│                                                                               │
+│ 2. Sentry Monitoring (7 days)                                                │
+│    • Mark issues #101522185, #101522288 as resolved                          │
+│    • Monitor for 0 new "Connection to Redis lost" events                     │
+│    • Monitor for 0 new "Retry limit exceeded" events                         │
+│                                                                               │
+│ 3. Acceptance Criteria                                                       │
+│    ✓ Exponential backoff configured                                          │
+│    ✓ Runtime health check task in beat_schedule                              │
+│    ✓ worker_shutdown signal handler implemented                              │
+│    ✓ Keepalive env vars added to .env.example                                │
+│    ✓ Integration test passes                                                 │
+│    ✓ 7-day Sentry monitoring clean                                           │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ BUSINESS IMPACT                                                               │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│ Before Fix:                                                                   │
+│   • User chat timeouts during worker zombie state                            │
+│   • Background jobs stall (scraping, enrichment)                             │
+│   • Critical cron fails (audits, cleanup)                                    │
+│   • Manual restart required (ops burden)                                     │
+│   • 748 total failure events (713 + 35)                                      │
+│                                                                               │
+│ After Fix:                                                                    │
+│   • Auto-healing via Docker restart                                          │
+│   • Extended retry window (60s → 300s)                                       │
+│   • Cloud LB compatibility (60s keepalive)                                   │
+│   • Graceful shutdown cleanup                                                │
+│   • Expected: 0 events after 7-day monitoring                                │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ PRIORITY: P0 (Critical)                                                      ║
+║ RISK TIER: HIGH (affects all background job processing)                     ║
+║ ESTIMATED FIX TIME: 2-4 hours (implementation + testing)                    ║
+║ VERIFICATION TIME: 7 days (Sentry monitoring)                               ║
+║                                                                              ║
+║ NEXT ACTION: Route to Engineering Lead for implementation                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝

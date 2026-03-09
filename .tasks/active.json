@@ -1,0 +1,111 @@
+{
+  "1": {
+    "subject": "Read Aura backend config",
+    "description": "Check .graph/runtime-backend.json",
+    "activeForm": "Reading config",
+    "status": "in_progress",
+    "created_at": "2026-03-09T18:41:26.649453+00:00",
+    "updated_at": "2026-03-09T18:42:21.918231+00:00"
+  },
+  "2": {
+    "subject": "Verify Neo4j connection",
+    "description": "Test Aura connectivity",
+    "activeForm": "Testing connection",
+    "status": "pending",
+    "created_at": "2026-03-09T18:41:26.673566+00:00"
+  },
+  "3": {
+    "subject": "Report status",
+    "description": "Generate health summary",
+    "activeForm": "Generating report",
+    "status": "pending",
+    "created_at": "2026-03-09T18:41:26.703020+00:00"
+  },
+  "4": {
+    "subject": "Plan Aura health check workflow",
+    "description": "Analyze infrastructure health requirements and determine tasks",
+    "activeForm": "Planning health check breakdown",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.743538+00:00",
+    "updated_at": "2026-03-09T19:05:57.782538+00:00"
+  },
+  "5": {
+    "subject": "Check Aura backend manifest",
+    "description": "Read .graph/runtime-backend.json for backend state",
+    "activeForm": "Reading backend manifest",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.800332+00:00",
+    "updated_at": "2026-03-09T19:06:44.259841+00:00"
+  },
+  "6": {
+    "subject": "Verify Neo4j connectivity",
+    "description": "Test connection to Aura instance via bolt protocol",
+    "activeForm": "Testing Neo4j connection",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.819290+00:00",
+    "updated_at": "2026-03-09T19:08:08.337125+00:00"
+  },
+  "7": {
+    "subject": "Check health monitor daemon",
+    "description": "Verify if health monitor process is active",
+    "activeForm": "Checking daemon status",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.839428+00:00",
+    "updated_at": "2026-03-09T19:09:10.303972+00:00"
+  },
+  "8": {
+    "subject": "Review active issues",
+    "description": "Query graph for open Sentry issues and patterns",
+    "activeForm": "Reviewing issues",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.858908+00:00",
+    "updated_at": "2026-03-09T19:09:42.996613+00:00"
+  },
+  "9": {
+    "subject": "Generate health report",
+    "description": "Compile findings and recommendations",
+    "activeForm": "Generating report",
+    "status": "completed",
+    "created_at": "2026-03-09T19:05:57.879122+00:00",
+    "updated_at": "2026-03-09T19:10:35.976257+00:00"
+  },
+  "10": {
+    "subject": "Plan Aura health check",
+    "description": "Analyze what checks are needed",
+    "activeForm": "Planning health check",
+    "status": "pending",
+    "created_at": "2026-03-09T19:18:48.769817+00:00"
+  },
+  "11": {
+    "subject": "Plan Aura health check",
+    "description": "Analyze what checks are needed",
+    "activeForm": "Planning health check",
+    "status": "completed",
+    "created_at": "2026-03-09T19:19:11.643117+00:00",
+    "updated_at": "2026-03-09T19:19:11.670106+00:00"
+  },
+  "12": {
+    "subject": "Check Neo4j connectivity",
+    "description": "Test Bolt connection to Neo4j Aura",
+    "activeForm": "Testing Neo4j connection",
+    "status": "completed",
+    "created_at": "2026-03-09T19:19:11.692825+00:00",
+    "updated_at": "2026-03-09T19:21:04.948937+00:00"
+  },
+  "13": {
+    "subject": "Check runtime manifest",
+    "description": "Read .graph/runtime-backend.json status",
+    "activeForm": "Reading manifest",
+    "status": "completed",
+    "created_at": "2026-03-09T19:19:11.713252+00:00",
+    "updated_at": "2026-03-09T19:21:04.976165+00:00"
+  },
+  "14": {
+    "subject": "Generate health report",
+    "description": "Compile health status report",
+    "activeForm": "Generating report",
+    "status": "completed",
+    "created_at": "2026-03-09T19:19:11.734511+00:00",
+    "updated_at": "2026-03-09T19:21:33.723847+00:00"
+  }
+}
