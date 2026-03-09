@@ -550,4 +550,4 @@ function useVehicleControls(rigidBodyRef) {
 - File lives in phase directory: `.planning/phases/XX-name/{phase}-RESEARCH.md`
 - Referenced during planning workflow
 - plan-phase loads it automatically when present
-</Instances></sota_updates></Detailed></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll>
+</Instances></sota_updates></Detailed></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll></sota_updates></dont_hand_roll>

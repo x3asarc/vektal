@@ -1,4 +1,6 @@
 ---
+description: TODO - add skill description
+name: skill
 ---
 # Pico-Warden: Bootstrap Recovery Loop
 

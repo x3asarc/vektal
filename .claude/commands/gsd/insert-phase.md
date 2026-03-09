@@ -30,4 +30,4 @@ Arguments: $ARGUMENTS (format: <after-phase-number> <description>)
 <process>
 Preserve all validation gates (argument parsing, phase verification, decimal calculation, roadmap updates).
 </process>
-</after-phase-number></context></description></after></after>
+</after-phase-number></context></description></after>

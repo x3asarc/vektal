@@ -1,0 +1,11 @@
+{
+  "exclude": [
+    ".claude/commands/**",
+    ".claude/get-shit-done/**",
+    "archive/**",
+    "reports/**"
+  ],
+  "severity": {
+    "import_target_not_found": "warn"
+  }
+}

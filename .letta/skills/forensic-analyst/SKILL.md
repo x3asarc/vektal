@@ -1,4 +1,6 @@
 ---
+description: TODO - add skill description
+name: skill
 ---
 # Forensic Analyst Skill
 
