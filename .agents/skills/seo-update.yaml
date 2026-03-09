@@ -1,0 +1,164 @@
+name: seo-update
+description: Generate and update SEO content for Shopify products with conversational approval
+
+# Display information
+displayName: SEO Update
+shortDescription: Update product SEO - just paste a SKU, barcode, or URL
+
+# Instructions shown to Claude when the skill is invoked
+instructions: |
+  This skill provides a streamlined, conversational workflow for updating SEO content on Shopify products.
+
+  ## Simple Workflow
+
+  1. User provides an identifier (SKU, barcode, or product URL)
+  2. You fetch the product and generate SEO content
+  3. You display original vs. generated content side-by-side
+  4. User approves or rejects
+  5. If approved, you push to Shopify immediately
+
+  ## Step-by-Step Process
+
+  ### Step 1: Parse Identifier
+
+  The user will provide ONE of these:
+  - **SKU**: e.g., "ABC123", "2493"
+  - **Barcode**: e.g., "1234567890", "5998294510048"
+  - **Product URL**: e.g., "https://yourstore.myshopify.com/admin/products/123456"
+
+  Auto-detect which type it is:
+  - If it starts with http/https → extract product ID from URL
+  - If it's all digits (8+ chars) → likely barcode
+  - Otherwise → SKU
+
+  ### Step 2: Generate Content
+
+  Run the generation script:
+  ```bash
+  venv\Scripts\python.exe seo\generate_seo_quick.py --[TYPE] "[VALUE]" --output "data/temp_seo_approval.csv"
+  ```
+
+  Where [TYPE] is one of: `sku`, `barcode`, `title`
+
+  ### Step 3: Display for Approval
+
+  Read the generated CSV and present the content to the user in a clear, readable format:
+
+  ```
+  Product: [Product Title]
+  SKU: [SKU] | Barcode: [Barcode] | Vendor: [Vendor]
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  META TITLE (50-60 chars for SEO)
+
+  CURRENT:
+  [original_meta_title or product_title]
+
+  NEW:
+  [generated_meta_title]
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  META DESCRIPTION (155-160 chars for SEO)
+
+  CURRENT:
+  [original_meta_description]
+
+  NEW:
+  [generated_meta_description]
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PRODUCT DESCRIPTION
+
+  CURRENT:
+  [original_description_html - show first 500 chars if long]
+
+  NEW:
+  [generated_description_html - show first 500 chars if long]
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Validation: [validation_status] - [validation_notes]
+
+  Would you like to push these changes to Shopify? (yes/no)
+  ```
+
+  ### Step 4: Wait for Approval
+
+  User will respond with "yes", "no", or ask for modifications.
+
+  - If YES → Proceed to Step 5
+  - If NO → Abort and clean up temp CSV
+  - If asking for changes → Note that they should edit the CSV manually or request regeneration
+
+  ### Step 5: Push to Shopify
+
+  Modify the temp CSV to set approved=YES for the product, then push:
+
+  ```bash
+  # First, read the CSV and update approved column to YES
+  # Then push
+  venv\Scripts\python.exe seo\generate_seo_quick.py --push-csv "data/temp_seo_approval.csv"
+  ```
+
+  Show the push results to the user.
+
+  ### Step 6: Cleanup
+
+  After successful push or rejection, you can optionally clean up the temp CSV or keep it for records.
+
+  ## Handling CSV Updates for Approval
+
+  Before pushing, you MUST update the CSV file to set approved=YES. Here's how:
+
+  1. Read the CSV file: `data/temp_seo_approval.csv`
+  2. Parse it using Python or a script
+  3. Set the "approved" column value to "YES" for the row
+  4. Write the updated CSV back
+  5. Then run the push command
+
+  You can create a small Python script to do this, or use a bash script with sed/awk.
+
+  ## Example Interaction Flow
+
+  **User:** `/seo-update ABC123`
+
+  **You:**
+  - Run: `venv\Scripts\python.exe seo\generate_seo_quick.py --sku "ABC123" --output "data/temp_seo_approval.csv"`
+  - Read the CSV
+  - Display the comparison nicely formatted
+  - Ask: "Would you like to push these changes to Shopify?"
+
+  **User:** "yes"
+
+  **You:**
+  - Update CSV to set approved=YES
+  - Run: `venv\Scripts\python.exe seo\generate_seo_quick.py --push-csv "data/temp_seo_approval.csv"`
+  - Show results: "Successfully updated product [Title] on Shopify"
+
+  ## Important Notes
+
+  - Always use `venv\Scripts\python.exe` (not just "python")
+  - Create backups automatically (script does this)
+  - Show validation warnings if content doesn't meet SEO best practices
+  - Be conversational and helpful
+  - Format the comparison clearly so user can make informed decision
+  - If descriptions are very long (>1000 chars), show a preview and mention full content is available in CSV
+  - After push, mention the report location: `data/seo_push_report_[timestamp].md`
+
+  ## Error Handling
+
+  Common issues:
+  - "No products found" → Tell user the identifier wasn't found, ask them to verify
+  - "Authentication failed" → Check .env file
+  - Generation errors → Show the error from the script
+  - Push errors → Show the specific error from the push report
+
+# Schema for arguments
+arguments:
+  properties:
+    identifier:
+      type: string
+      description: Product identifier (SKU, barcode, or product URL)

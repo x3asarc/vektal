@@ -101,7 +101,7 @@ Commander feeds task-observer via TaskExecution writes. Additionally: Commander'
 | CMD-ROUTE-PROJECT-LEAD | Coordination | Spawn Project Lead for compound tasks | Execute |
 | CMD-VALIDATE-OUTCOME | Meta | Check quality_gate_passed, apply North Star test | — |
 | CMD-POSTMORTEM-HANDSHAKE | Coordination | Forward Lead outcome (Input Contract C) to Watson for PostMortem write | Execute |
-| CMD-WRITE-TASK-EXECUTION | Direct | Write :TaskExecution node to Aura | Write |
+| CMD-WRITE-TASK-EXECUTION | Direct | Write :TaskExecution node to Aura (via `scripts/graph/write_task_execution.py` helper) | Write |
 | CMD-UPDATE-STATE-MD | Direct | Write Commander-owned sections of STATE.md | Write |
 | CMD-CIRCUIT-BREAKER | Meta | Halt routing, escalate to human with full diagnostic | — |
 | CMD-CLARIFY | Coordination | Ask human one binary clarifying question | — |

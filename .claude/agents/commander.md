@@ -275,44 +275,48 @@ Write a `:TaskExecution` with `status: 'circuit_breaker'`. Do NOT retry autonomo
 
 ## Part VIII — TaskExecution Write (After Every Completed Lead Run)
 
+**Use the helper script `scripts/graph/write_task_execution.py` — it handles both TaskExecution node write and SkillDef.trigger_count updates in a single transaction.**
+
 ```python
-import uuid
-from datetime import datetime, timezone
-from neo4j import GraphDatabase
-import os
-from dotenv import load_dotenv
-load_dotenv()
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-with driver.session() as s:
-    s.run("""
-        MERGE (te:TaskExecution {task_id: $task_id})
-        SET te.task_type       = $task_type,
-            te.lead_invoked    = $lead_invoked,
-            te.quality_gate_passed = $qgp,
-            te.loop_count      = $loop_count,
-            te.skills_used     = $skills_used,
-            te.model_used      = $model_used,
-            te.created_at      = $created_at,
-            te.status          = $status
-    """,
-    task_id=str(uuid.uuid4()),
-    task_type="<engineering|design|forensic|infrastructure|compound>",
-    lead_invoked="<lead-name>",
-    qgp=True,
-    loop_count=3,
-    skills_used=["gsd-executor"],
-    model_used="claude-sonnet-4-5",
-    created_at=datetime.now(timezone.utc).isoformat(),
-    status="completed")
-driver.close()
+# Extract values from Lead outcome
+lead_outcome = LEAD_RESPONSE_JSON  # the JSON response from the Lead
+task_id = CONTEXT_PACKAGE["task_id"]
+task_type_map = {
+    "engineering-lead": "engineering",
+    "design-lead": "design",
+    "forensic-lead": "forensic",
+    "infrastructure-lead": "infrastructure",
+    "project-lead": "compound"
+}
+task_type = task_type_map.get(lead_outcome["lead_invoked"], "engineering")
+
+# Build the command
+cmd = [
+    sys.executable, "scripts/graph/write_task_execution.py",
+    "--task-id", task_id,
+    "--task-type", task_type,
+    "--lead", lead_outcome.get("lead_invoked", "engineering-lead"),
+    "--loop-count", str(lead_outcome.get("loop_count", 1)),
+    "--skills"] + lead_outcome.get("skills_used", []) + [
+    "--model", CONTEXT_PACKAGE.get("model_requested", "openrouter/auto"),
+    "--status", "circuit_breaker" if not lead_outcome.get("quality_gate_passed") else "completed",
+    "--difficulty", CONTEXT_PACKAGE.get("scope_tier_final", "MICRO")
+]
+
+if lead_outcome.get("quality_gate_passed"):
+    cmd.append("--passed")
+
+result = subprocess.run(cmd, capture_output=True, text=True)
+if result.returncode != 0:
+    print(f"[WARNING] TaskExecution write failed: {result.stderr}")
+else:
+    outcome = json.loads(result.stdout)
+    print(f"[OK] TaskExecution written. Skills updated: {outcome['skills_updated']}")
 ```
 
-Also update SkillDef.trigger_count for each skill used:
-```cypher
-MATCH (sk:SkillDef) WHERE sk.name IN $skills_used
-SET sk.trigger_count = coalesce(sk.trigger_count, 0) + 1
-```
+**Fallback (if script fails):** Inline Cypher write as backup — see canonical spec `docs/agent-system/specs/commander.md` Part VIII for raw Cypher pattern.
 
 ---
 

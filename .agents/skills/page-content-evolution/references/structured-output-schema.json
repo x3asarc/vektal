@@ -1,0 +1,239 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Page Content Evolution Output",
+  "type": "object",
+  "required": [
+    "run_id",
+    "base_url",
+    "scope_context",
+    "pages"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "base_url": {
+      "type": "string"
+    },
+    "scope_context": {
+      "type": "object",
+      "required": [
+        "current_phase",
+        "in_scope_summary",
+        "out_of_scope_summary"
+      ],
+      "properties": {
+        "current_phase": {
+          "type": "string"
+        },
+        "in_scope_summary": {
+          "type": "string"
+        },
+        "out_of_scope_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "page_id",
+          "route",
+          "evidence",
+          "current_state",
+          "gaps",
+          "recommendations"
+        ],
+        "properties": {
+          "page_id": {
+            "type": "string"
+          },
+          "route": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "object",
+            "required": [
+              "playwright_desktop_screenshot",
+              "playwright_mobile_screenshot",
+              "firecrawl_output_file"
+            ],
+            "properties": {
+              "playwright_desktop_screenshot": {
+                "type": "string"
+              },
+              "playwright_mobile_screenshot": {
+                "type": "string"
+              },
+              "firecrawl_output_file": {
+                "type": "string"
+              }
+            }
+          },
+          "current_state": {
+            "type": "object",
+            "required": [
+              "primary_ctas",
+              "secondary_actions",
+              "settings_options",
+              "filters",
+              "states_coverage"
+            ],
+            "properties": {
+              "primary_ctas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "secondary_actions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "settings_options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "filters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "states_coverage": {
+                "type": "object",
+                "required": [
+                  "loading",
+                  "empty",
+                  "error",
+                  "success"
+                ],
+                "properties": {
+                  "loading": {
+                    "type": "boolean"
+                  },
+                  "empty": {
+                    "type": "boolean"
+                  },
+                  "error": {
+                    "type": "boolean"
+                  },
+                  "success": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "type",
+                "user_value",
+                "complexity",
+                "dependencies",
+                "scope_decision",
+                "verification"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "button",
+                    "option",
+                    "content_block",
+                    "navigation",
+                    "state_feedback"
+                  ]
+                },
+                "user_value": {
+                  "type": "string"
+                },
+                "complexity": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ]
+                },
+                "dependencies": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "scope_decision": {
+                  "type": "string",
+                  "enum": [
+                    "in_scope",
+                    "phase_later",
+                    "reject"
+                  ]
+                },
+                "verification": {
+                  "type": "object",
+                  "required": [
+                    "scope_alignment",
+                    "technical_feasibility",
+                    "consistency_with_ia",
+                    "measurable_outcome"
+                  ],
+                  "properties": {
+                    "scope_alignment": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail"
+                      ]
+                    },
+                    "technical_feasibility": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail"
+                      ]
+                    },
+                    "consistency_with_ia": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail"
+                      ]
+                    },
+                    "measurable_outcome": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

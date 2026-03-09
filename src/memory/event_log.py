@@ -11,6 +11,7 @@ from typing import Any, Iterable, Iterator, Mapping
 
 from src.memory.event_schema import EventEnvelope, EventType, validate_event
 from src.memory.memory_manager import ensure_memory_layout, get_memory_paths
+from src.memory.text_sanitizer import sanitize_dict
 
 LOCK_TIMEOUT_SECONDS = 2.0
 LOCK_POLL_INTERVAL_SECONDS = 0.01
@@ -66,6 +67,8 @@ def append_event(
     started = time.perf_counter()
     event_dict = event.to_dict() if isinstance(event, EventEnvelope) else dict(event)
     validated = validate_event(event_dict)
+    # Sanitize to prevent Windows-1252 encoding issues
+    validated = sanitize_dict(validated)
 
     target = event_log_path_for_day(validated["created_at"][:10], root=root)
     target.parent.mkdir(parents=True, exist_ok=True)

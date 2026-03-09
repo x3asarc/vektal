@@ -11,6 +11,8 @@ import re
 import uuid
 from typing import Any
 
+from src.memory.text_sanitizer import sanitize_dict
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MEMORY_ROOT = REPO_ROOT / ".memory"
 
@@ -254,6 +256,8 @@ class ShortTermMemory:
         entry = {"timestamp": _utc_now_iso(), "type": event_type}
         if payload:
             entry.update(payload)
+        # Sanitize entry to prevent Windows-1252 encoding issues
+        entry = sanitize_dict(entry)
         target = self._daily_file()
         with target.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(entry, ensure_ascii=True) + "\n")

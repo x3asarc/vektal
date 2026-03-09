@@ -31,6 +31,32 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 - Use **Aura graph queries first** for discovery. One Cypher query = 1 step, replaces up to 20 file reads.
 - No file-grep sweeps across the whole codebase. Read targeted files only.
 
+### Optimization Protocol (Approved: ip-21771238d74c)
+
+**Target:** Reduce read-only audits from 27 steps to 15 steps (44% reduction).
+
+**Strategies:**
+1. **Parallel query execution** — batch independent Aura reads into single Python script with concurrent query execution
+2. **Health check caching** — cache Aura health results for 5 minutes within same session
+3. **Selective validation** — skip redundant verification steps on read-only operations
+
+**Step counter verification:**
+```python
+step_count = 0
+step_limit = CONTEXT_PACKAGE.get("step_budget", 30)
+
+def count_step(description):
+    global step_count
+    step_count += 1
+    if step_count >= step_limit * 0.8:
+        print(f"[BUDGET WARNING: {step_limit - step_count} steps remaining]")
+    if step_count >= step_limit:
+        raise Exception(f"[BUDGET EXCEEDED — partial]")
+    return step_count
+```
+
+**Rollback trigger:** If audit accuracy degrades (false negatives in health checks), revert to sequential pattern and log ImprovementProposal for investigation.
+
 ---
 
 ## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)

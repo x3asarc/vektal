@@ -126,3 +126,45 @@ Purpose: capture dead ends and hard lessons so future tasks do not repeat them.
 2. Failed Y: SNAPSHOT_CORRUPT: FileNotFoundError: .graph/local-snapshot.json missing (Culprit: src/graph/local_graph_store.py)
 3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
 4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-08 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: AURA_UNREACHABLE: Neo4jError: ServiceUnavailable (Aura Paused) (Culprit: src/core/graphiti_client.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-08 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: SNAPSHOT_CORRUPT: FileNotFoundError: .graph/local-snapshot.json missing (Culprit: src/graph/local_graph_store.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+</module>
+### 2026-03-09 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: AURA_UNREACHABLE: Neo4jError: ServiceUnavailable (Aura Paused) (Culprit: src/core/graphiti_client.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-09 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: SNAPSHOT_CORRUPT: FileNotFoundError: .graph/local-snapshot.json missing (Culprit: src/graph/local_graph_store.py)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-09 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: SystemExit: 1 (Culprit: src.api.v1.chat.routes in generate)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-09 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: IntegrityError: (psycopg.errors.NotNullViolation) null value in column "access_token_encrypted" of relation "shopify_stores" violates not-null constraint (Culprit: sqlalchemy.orm.session in _prepare_impl)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)
+
+### 2026-03-09 | 14.3-self-healing
+1. Tried X: Autonomous execution of knowledge graph tools.
+2. Failed Y: UNKNOWN: ProgrammingError: (psycopg.errors.UndefinedTable) relation "users" does not exist (Culprit: auth.login)
+3. Doing Z: Triggering autonomous remediator via orchestrate_healers.py
+4. Preventive rule added: none (automated ingestion)

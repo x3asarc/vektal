@@ -1,0 +1,29 @@
+[
+  {
+    "proposal_id": "ip-3b8797c656f9",
+    "title": "Add pre-flight validation before Commander spawn",
+    "severity": "high",
+    "description": "Commander spawn fails with \"classifyHandoffIfNeeded is not defined\" error, wasting 2-3 minutes before task execution. Add validation to check agent initialization before spawning.",
+    "evidence": "Session a100d23: Commander spawn immediate failure",
+    "target_component": "commander",
+    "created_at": "2026-03-09T16:57:08.659758+00:00"
+  },
+  {
+    "proposal_id": "ip-21771238d74c",
+    "title": "Optimize infrastructure audit execution (27 steps -> 15 target)",
+    "severity": "medium",
+    "description": "Read-only infrastructure audit uses 27/30 steps. Can be optimized by: (1) parallelizing Aura queries, (2) reducing redundant verification steps, (3) caching health check results.",
+    "evidence": "Session aee743c: 27 steps for read-only audit",
+    "target_component": "infrastructure-lead",
+    "created_at": "2026-03-09T16:57:08.746309+00:00"
+  },
+  {
+    "proposal_id": "ip-729c4e56a7e0",
+    "title": "Create skill for parallel Aura query execution",
+    "severity": "low",
+    "description": "Infrastructure audits execute Aura queries sequentially (oracle health, SentryIssue, ImprovementProposal). Create reusable skill to parallelize independent read queries, reducing audit time by 30-60s.",
+    "evidence": "Infrastructure audit pattern: sequential queries in all executions",
+    "target_component": "new-skill",
+    "created_at": "2026-03-09T16:57:08.819594+00:00"
+  }
+]
