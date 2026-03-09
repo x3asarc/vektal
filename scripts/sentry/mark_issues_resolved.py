@@ -30,7 +30,6 @@ FIXED_ISSUES = [
     100523035,  # Site reconnaissance async context manager
     100522706,  # EpisodeType validation
     100521805,  # JSON parsing in MCP server
-    100522712,  # OpenRouter API key validation
     # Redis/Celery resilience fixes (commit 81d9f8c) - 750 events
     101522185,  # Connection to Redis lost (713 events)
     101522288,  # Retry limit exceeded (35 events)
@@ -39,6 +38,9 @@ FIXED_ISSUES = [
     # JSON parsing robustness (commit 4f627cc) - 4 events
     101964370,  # API classification Extra data - flask (1 event)
     101960125,  # API classification Extra data - workers (3 events)
+    # OpenRouter error handling (commit 65ea28f) - 2 events
+    101961468,  # OpenRouter 404 Not Found (1 event)
+    100522712,  # OpenRouter 401 Unauthorized (1 event)
 ]
 
 BASE_URL = "https://sentry.io/api/0"
