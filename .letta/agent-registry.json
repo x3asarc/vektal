@@ -1,0 +1,52 @@
+{
+  "commander": {
+    "id": "agent-17b34ed8-3b70-486d-b794-b3a9fc2891fe",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "watson": {
+    "id": "agent-3547bcdb-93be-48be-b4c9-5917ec492f8e",
+    "model": "lc-openrouter/anthropic/claude-opus-4",
+    "status": "created"
+  },
+  "bundle": {
+    "id": "agent-7587b38d-1a13-4c7b-8d13-eb1a96f1af1b",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "engineering-lead": {
+    "id": "agent-96ae8a2e-2ff4-431f-8dae-aa775b14e5a5",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "design-lead": {
+    "id": "agent-8ddeb2a5-7b72-45fb-a0d8-b2313e2a5a46",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "forensic-lead": {
+    "id": "agent-22f85d3d-63ea-420f-89a5-522e16024172",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "infrastructure-lead": {
+    "id": "agent-c2ac96eb-7f4c-425d-9219-07eb58eae94a",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "project-lead": {
+    "id": "agent-40f05e64-c48c-4a64-b9aa-835b37f3a12a",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "task-observer": {
+    "id": "agent-68dae0cf-fee2-4315-8baa-c9b2b6789b95",
+    "model": "letta/auto",
+    "status": "created"
+  },
+  "validator": {
+    "id": "agent-37edc9bd-7f29-4fad-bcdc-5cd61f9fe444",
+    "model": "lc-openrouter/anthropic/claude-sonnet-4",
+    "status": "created"
+  }
+}
