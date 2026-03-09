@@ -132,6 +132,9 @@ def main() -> int:
     elapsed_ms = (time.perf_counter() - start_time) * 1000
     _log(f"INFO: Health gate check complete in {elapsed_ms:.2f}ms")
 
+    # Gemini CLI compatibility: Output allow decision
+    print(json.dumps({"decision": "allow"}))
+
     return 0  # ALWAYS succeed - never block
 
 

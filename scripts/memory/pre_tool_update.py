@@ -203,6 +203,9 @@ def main() -> int:
             peer_task = (peer.get("context") or {}).get("current_task") or "N/A"
             peer_cmd = (peer.get("context") or {}).get("last_command") or "N/A"
             print(f"[Memory] Peer active: {peer.get('session_id')} task={peer_task} cmd={peer_cmd}")
+        
+        # Gemini CLI compatibility: Output allow decision
+        print(json.dumps({"decision": "allow"}))
         return 0
     except Exception as exc:  # pragma: no cover - defensive best-effort hook
         print(f"[Memory] WARNING: pre-tool live sync failed: {exc}")

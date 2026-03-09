@@ -165,18 +165,29 @@ def main() -> int:
     """Main hook execution - always returns 0 (never blocks)."""
     start_time = time.perf_counter()
 
-    # Get file being edited from environment
-    edited_file = os.environ.get("CLAUDE_TOOL_FILE_PATH", "")
+    # Gemini CLI compatibility: Read stdin for tool_input
+    stdin_data = {}
+    if not sys.stdin.isatty():
+        try:
+            stdin_data = json.load(sys.stdin)
+        except Exception:
+            pass
+
+    # Get file being edited from stdin, environment, or args
+    tool_input = stdin_data.get("tool_input", {})
+    edited_file = tool_input.get("file_path") or tool_input.get("path") or os.environ.get("CLAUDE_TOOL_FILE_PATH", "")
     if not edited_file and len(sys.argv) > 1:
         edited_file = sys.argv[1]
 
     if not edited_file:
         _log("WARN: No file path provided, skipping")
+        print(json.dumps({"decision": "allow"}))
         return 0
 
     # Check if this is a high-risk file
     if not _is_high_risk(edited_file):
         _log(f"INFO: Skipping {edited_file} (not high-risk)")
+        print(json.dumps({"decision": "allow"}))
         return 0
 
     try:
@@ -195,10 +206,10 @@ def main() -> int:
             }
             _write_cache(cache)
 
-        # Format and output warning
+        # Format and output warning to stderr for Gemini CLI
         if impact:
             warning = _format_warning(edited_file, impact)
-            print(warning, flush=True)
+            print(warning, file=sys.stderr, flush=True)
 
         elapsed_ms = (time.perf_counter() - start_time) * 1000
         _log(f"INFO: Impact check complete in {elapsed_ms:.2f}ms ({len(impact)} dependents)")
@@ -207,6 +218,8 @@ def main() -> int:
         _log(f"ERROR: Unexpected failure: {exc}")
         # Still return 0 - never block
 
+    # Gemini CLI compatibility: Output allow decision
+    print(json.dumps({"decision": "allow"}))
     return 0
 
 
