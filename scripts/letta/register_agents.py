@@ -29,30 +29,36 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-# ── Model assignments ──────────────────────────────────────────────────────────
-# Keys must match the .md filename (without extension)
-# Models from docs/agent-system/model-rationale.md (Forensic Mapping v2.0)
-# All via lc-openrouter/* — routes through OPENROUTER_API_KEY, not Letta credits.
-# Research calls (Sonar/Tongyi) are made via direct OpenRouter API within execution,
-# not as the Letta base model — see .commands/agents.md for the research router pattern.
+# ── Model assignments (METADATA ONLY — not used for inference) ────────────────
+# ARCHITECTURE: Letta = memory store only. Inference = OpenRouter direct.
+# These model IDs are stored as labels on AgentDef nodes in Aura and in the
+# registry file. They document intent. They do NOT route inference calls.
+#
+# Inference happens when a CLI session invokes an agent:
+#   - Claude Code  → uses Anthropic / OpenRouter via OPENROUTER_API_KEY
+#   - Gemini CLI   → OPENAI_BASE_URL=https://openrouter.ai/api/v1
+#   - Codex        → OPENAI_BASE_URL=https://openrouter.ai/api/v1
+#
+# Source of truth: docs/agent-system/model-rationale.md
+# Confirmed real OpenRouter IDs used here (verified 2026-03-09).
 MODEL_MAP = {
     # High Court — Forensic Reasoning
-    "watson":              "lc-openrouter/anthropic/claude-opus-4.6",    # multi-step debugging, state persistence
+    "watson":              "anthropic/claude-opus-4-6",          # multi-step forensic reasoning (confirmed on OpenRouter)
     # Command Tier — Strategic Orchestration
-    "commander":           "lc-openrouter/x-ai/grok-4.1-fast",          # 2M+ context, agentic tool calling
-    "project-lead":        "lc-openrouter/google/gemini-3.1-pro-preview",# long-horizon stability, multi-day tasks
+    "commander":           "x-ai/grok-3",                        # 131K context, agentic (confirmed)
+    "project-lead":        "google/gemini-2.5-flash",            # long-horizon stability (upgrade to 2.5-pro when available)
     # Lead Tier — Production Execution
-    "engineering-lead":    "lc-openrouter/openai/gpt-5.3-codex",        # Terminal-Bench 2.0, CLI/SSH environments
-    "design-lead":         "lc-openrouter/moonshotai/kimi-k2.5",        # native multimodal, sees Shopify layouts
-    "infrastructure-lead": "lc-openrouter/z-ai/glm-5",                  # autonomous execution, multi-tenant isolation
-    "forensic-lead":       "lc-openrouter/deepseek/deepseek-v3.2",      # distinct training lineage, tie-breaker reasoning
+    "engineering-lead":    "openai/gpt-4o",                      # code quality, deterministic (upgrade to o3 when available)
+    "design-lead":         "moonshotai/kimi-k2.5",               # native multimodal, 262K context (confirmed)
+    "infrastructure-lead": "z-ai/glm-4.6",                       # 203K context, multi-tenant (confirmed; glm-5 when available)
+    "forensic-lead":       "deepseek/deepseek-v3.2",             # distinct lineage, adversarial (confirmed)
     # Guardian Tier — Validation & Logistics
-    "bundle":              "lc-openrouter/google/gemini-3-flash-preview",# near Pro-level at Flash speed, JSON gating
-    "task-observer":       "lc-openrouter/google/gemini-2.5-flash-lite", # $0.10/M telemetry specialist
-    "validator":           "lc-openrouter/openai/gpt-5-mini",           # different critique flavour, no systemic blind spots
+    "bundle":              "google/gemini-2.5-flash",            # near-Pro at flash speed (confirmed)
+    "task-observer":       "google/gemini-2.5-flash-lite",       # token-efficient telemetry (confirmed)
+    "validator":           "openai/gpt-4o-mini",                 # critique diversity (upgrade to gpt-5-mini when available)
     # GSD agents (used by Engineering Lead)
-    "gsd-planner":         "lc-openrouter/openai/gpt-5.3-codex",
-    "gsd-executor":        "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-planner":         "openai/gpt-4o",
+    "gsd-executor":        "openai/gpt-4o",
     "gsd-verifier":        "lc-openrouter/openai/gpt-5.3-codex",
     "gsd-plan-checker":    "lc-openrouter/openai/gpt-5.3-codex",
     "gsd-debugger":        "lc-openrouter/openai/gpt-5.3-codex",

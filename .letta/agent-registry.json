@@ -1,6 +1,6 @@
 {
-  "_note": "Models corrected 2025-03-09 by patch_agent_models.py to real OpenRouter IDs.",
-  "_env_vars": "LETTA_AGENT_*_ID vars written to .env for inter-agent messaging.",
+  "_note": "Letta = memory store only. Model fields are LABELS — not used for inference. Inference = OpenRouter direct via OPENROUTER_API_KEY. See docs/agent-system/model-rationale.md.",
+  "_env_vars": "LETTA_AGENT_*_ID vars written to .env for inter-agent messaging (Pico-Warden escalation etc).",
   "commander": {
     "id": "agent-d2e3b583-5d02-4e24-98d9-98930db87cea",
     "model": "lc-openrouter/x-ai/grok-4.1-fast",
