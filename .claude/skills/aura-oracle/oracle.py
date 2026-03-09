@@ -498,6 +498,39 @@ BLOCKS = {
         "schema_task": 7,  # requires EnvVar nodes (Task 7) + USES edges
     },
 
+    # ── LAYER 0 — Commander LOAD ──────────────────────────────────────────
+
+    "improvement_proposals": {
+        "description": "WHAT ImprovementProposals are queued — Commander reads at LOAD for Layer 0 check.",
+        "question": "WHAT",
+        "params_required": [],
+        "cypher": (
+            "MATCH (p:ImprovementProposal {status: 'queued'}) "
+            "RETURN p.proposal_id AS id, p.target AS target, "
+            "       p.proposed_change AS change, p.root_cause AS root_cause, "
+            "       p.sync_command AS sync_command, p.created_at AS created_at "
+            "ORDER BY p.created_at ASC"
+        ),
+        "limit": 10,
+        "schema_task": None,
+    },
+
+    "oracle_gaps_recent": {
+        "description": "WHEN have oracle blocks been returning empty results — Layer 0 substrate health check.",
+        "question": "WHEN",
+        "params_required": [],
+        "cypher": (
+            "MATCH (te:TaskExecution) "
+            "WHERE te.oracle_gaps IS NOT NULL AND size(te.oracle_gaps) > 0 "
+            "  AND te.created_at > datetime() - duration({days: 7}) "
+            "RETURN te.task_id AS task_id, te.oracle_gaps AS gaps, "
+            "       te.created_at AS ts "
+            "ORDER BY te.created_at DESC"
+        ),
+        "limit": 10,
+        "schema_task": None,
+    },
+
     "cross_domain_route_coupling": {
         "description": (
             "WHAT API routes are called by unexpected domains — "
@@ -573,13 +606,19 @@ DOMAIN_PROFILES = {
         "HOW":  ["data_access_chain", "route_to_function_chain", "cross_domain_impact"],
     },
     "project": {
+        # Used by: Commander LOAD (P-LOAD builder) + Project Lead
+        # Commander calls ask(domain="project") to build the P-LOAD object passed to Watson
         "WHO":  ["agent_defs"],
-        # Project Lead gets ALL cross-domain blocks — it owns the full picture
-        "WHAT": ["skill_defs", "agent_defs", "cross_domain_env_coupling",
-                 "cross_domain_route_coupling"],
+        # improvement_proposals: Commander checks queued proposals at LOAD (Layer 0)
+        # cross_domain_*: Project Lead's primary collision detector
+        "WHAT": ["skill_defs", "agent_defs", "improvement_proposals",
+                 "cross_domain_env_coupling", "cross_domain_route_coupling"],
         "WHERE":["files_by_prefix", "blast_radius"],
         "WHY":  ["long_term_patterns", "active_lessons", "planning_docs"],
-        "WHEN": ["task_execution_history", "bundle_template_history"],
+        # sentry_unresolved: Commander checks for active issues at LOAD (routing priority 2)
+        # oracle_gaps_recent: Commander surfaces substrate health gaps at LOAD (Layer 0)
+        "WHEN": ["task_execution_history", "bundle_template_history",
+                 "sentry_unresolved", "oracle_gaps_recent"],
         # cross_domain_impact is the Project Lead's primary collision detector
         "HOW":  ["full_call_chain", "cross_domain_impact", "cross_domain_route_coupling"],
     },
@@ -601,15 +640,20 @@ ALL_QUESTIONS = ["WHO", "WHAT", "WHERE", "WHY", "WHEN", "HOW"]
 # ══════════════════════════════════════════════════════════════════════════
 
 def _run_block(name: str, ctx: dict) -> dict:
-    """Execute a single block and return {block, count, data} or {block, skipped}."""
+    """Execute a single block and return {block, schema_task, count, data}.
+
+    schema_task is preserved in the return dict for gap detection:
+    - If schema_task is set AND count == 0, that is a GHOST_DATA signal.
+    - Watson's W-METADATA-DENSITY and task-observer's oracle gap detection both
+      rely on count=0 to identify un-indexed node types.
+    - No early-return for schema_task — let the query run and return real results.
+      Empty = the correct signal that the graph sprint hasn't run yet.
+    """
     block = BLOCKS.get(name)
     if not block:
-        return {"block": name, "error": "unknown block"}
+        return {"block": name, "schema_task": None, "error": "unknown block"}
 
-    # Check schema availability
-    task_req = block.get("schema_task")
-    if task_req:
-        return {"block": name, "skipped": f"requires graph sprint Task {task_req}", "data": []}
+    schema_task = block.get("schema_task")  # preserved for observability, NOT a skip guard
 
     # Build params — use context values matching required param names
     params = {}
@@ -628,10 +672,10 @@ def _run_block(name: str, ctx: dict) -> dict:
         driver = _get_driver()
         with driver.session() as s:
             data = s.run(cypher, **params).data()
-        return {"block": name, "question": block["question"],
+        return {"block": name, "schema_task": schema_task, "question": block["question"],
                 "description": block["description"], "count": len(data), "data": data}
     except Exception as e:
-        return {"block": name, "error": str(e), "data": []}
+        return {"block": name, "schema_task": schema_task, "error": str(e), "data": []}
 
 
 def ask(domain: str = None, question: str = None,
@@ -670,7 +714,30 @@ def ask(domain: str = None, question: str = None,
     else:
         return {"error": "Provide domain or blocks. Run with --list to see options."}
 
-    return {"domain": domain, "question": question, "context_keys": list(context.keys()), "results": results}
+    # ── Gap detection (T3 — oracle shortcoming loop) ──────────────────────
+    # Collect blocks where schema_task is set AND count == 0.
+    # These are the GHOST_DATA signals: node types that should exist but don't.
+    # Written to TaskExecution.oracle_gaps by Commander after Lead completes.
+    # task-observer reads oracle_gaps across TaskExecutions to generate ImprovementProposals.
+    gaps = []
+    flat = {}
+    if blocks:
+        flat = results
+    else:
+        for q_results in results.values():
+            if isinstance(q_results, dict):
+                flat.update(q_results)
+    for block_name, res in flat.items():
+        if isinstance(res, dict) and res.get("schema_task") and res.get("count", -1) == 0:
+            gaps.append({"block": block_name, "schema_task": res["schema_task"]})
+
+    return {
+        "domain": domain,
+        "question": question,
+        "context_keys": list(context.keys()),
+        "results": results,
+        "gaps": gaps,   # blocks with schema_task that returned 0 rows — GHOST_DATA signals
+    }
 
 
 def list_blocks() -> list:

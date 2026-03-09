@@ -67,31 +67,47 @@ P-LOAD → NANO check → spawn Watson (blind, parallel) → build RoutingDraft
 
 Run this at the start of **every** session before routing anything:
 
-### Step 1 — Aura Context Load
+### Step 1 — Aura Context Load (via aura-oracle)
+
+All graph reads go through aura-oracle — never raw Cypher.
+See: `docs/agent-system/commander-architecture-v2.md` — aura-oracle section.
+
 ```python
-# Run via: python -c "..."  or write to /tmp/cmd_load.py and execute
+# Write to /tmp/cmd_load.py and execute, or run inline
+import sys, json
+sys.path.insert(0, ".")
 from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-with driver.session() as s:
-    # Open SentryIssues
-    si = s.run("MATCH (si:SentryIssue) WHERE si.resolved = false RETURN si.issue_id, si.title, si.category, si.culprit ORDER BY si.timestamp DESC LIMIT 5").data()
-    # Recent LongTermPatterns
-    lp = s.run("MATCH (lp:LongTermPattern) RETURN lp.domain, lp.task_id, lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
-    # TaskExecution history
-    te = s.run("MATCH (te:TaskExecution) RETURN te.task_type, te.lead_invoked, te.quality_gate_passed, te.loop_count ORDER BY te.created_at DESC LIMIT 20").data()
-    # SkillDef quality scores
-    sk = s.run("MATCH (sk:SkillDef) WHERE sk.trigger_count > 0 RETURN sk.name, sk.quality_score, sk.trigger_count ORDER BY sk.trigger_count DESC LIMIT 10").data()
-    # ImprovementProposals pending
-    ip = s.run("MATCH (ip:ImprovementProposal) WHERE ip.status = 'pending' RETURN ip.proposal_id, ip.title, ip.created_at").data()
-driver.close()
-print("SentryIssues:", si)
-print("LongTermPatterns:", lp)
-print("TaskExecutions:", len(te))
-print("Skills:", sk)
-print("ImprovementProposals:", ip)
+from agents.skills.aura_oracle.oracle import ask
+
+# Extract keywords from the incoming task string
+keywords = []  # populate from task text before calling
+
+p_load_raw = ask(domain="project", context={
+    "domains": [],      # empty = all domains
+    "keywords": keywords,
+    "lead": "",         # all leads
+})
+
+# Flatten into P-LOAD structure for Commander + Watson
+results = p_load_raw.get("results", {})
+p_load = {
+    "sentry_issues":                 results.get("WHEN", {}).get("sentry_unresolved", {}).get("data", []),
+    "long_term_patterns":            results.get("WHY",  {}).get("long_term_patterns", {}).get("data", []),
+    "task_executions":               results.get("WHEN", {}).get("task_execution_history", {}).get("data", []),
+    "skill_quality":                 results.get("WHAT", {}).get("skill_defs", {}).get("data", []),
+    "improvement_proposals_pending": results.get("WHAT", {}).get("improvement_proposals", {}).get("data", []),
+    "oracle_gaps_recent":            results.get("WHEN", {}).get("oracle_gaps_recent", {}).get("data", []),
+    "bundle_template_history":       results.get("WHEN", {}).get("bundle_template_history", {}).get("data", []),
+    "agent_defs":                    results.get("WHAT", {}).get("agent_defs", {}).get("data", []),
+    "planning_docs":                 results.get("WHY",  {}).get("planning_docs", {}).get("data", []),
+}
+print(json.dumps({k: len(v) for k, v in p_load.items()}, indent=2))
 ```
+
+**Layer 0 checks after load:**
+1. If `oracle_gaps_recent` is non-empty → surface gap proposals to user (non-blocking)
+2. If `improvement_proposals_pending` contains `"graph-sprint"` targets → surface as priority action
+3. If `sentry_issues` non-empty → routing priority 2 (Forensic Lead)
 
 If Aura fails: **MODE 0**. Send Letta message to Pico-Warden: `"CRITICAL: Graph offline. MODE 0 active. Verify backend."`. Inform human. Route using rules only.
 

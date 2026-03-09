@@ -22,10 +22,11 @@ Surface improvement opportunities from real execution data so the system gets be
 1. Read recent TaskExecution nodes from Aura (since last observation run)
 2. Identify quality patterns: loop_count > budget, quality_gate_passed = false clusters, model escalation frequency, MTTR trends
 3. Identify skill/agent degradation signals: specific skills consistently appearing before quality gate failures
-4. Write ImprovementProposal nodes to Aura with root cause evidence and proposed change
-5. Update SkillDef.quality_score and SkillDef.trigger_count in Aura based on observations
-6. Flag Deferred Decision trigger conditions when thresholds are hit (DD-01 through DD-09)
-7. NEVER apply changes. Propose only. Validator approves. Infrastructure Lead applies.
+4. **Detect oracle gap patterns: blocks in oracle_gaps field appearing 3+ times in 14 days â†’ ImprovementProposal targeting graph sprint sync script** (v2 addition)
+5. Write ImprovementProposal nodes to Aura with root cause evidence and proposed change
+6. Update SkillDef.quality_score and SkillDef.trigger_count in Aura based on observations
+7. Flag Deferred Decision trigger conditions when thresholds are hit (DD-01 through DD-10)
+8. NEVER apply changes. Propose only. Validator approves. Infrastructure Lead applies.
 
 **Trigger mechanism:**
 Invoked by Infrastructure Lead as Step 4 of its standard session flow.
@@ -50,11 +51,12 @@ Utility-Based Agent. Maximises system-wide quality_gate_passed rate and minimise
 **Planning_Module:**
 Sequential analysis pass per invocation:
 1. Load TaskExecution nodes since last_run timestamp
-2. Identify patterns above significance threshold
-3. Cross-reference with existing open ImprovementProposals (avoid duplicates)
-4. Write new proposals for novel findings
-5. Update SkillDef quality scores
-6. Check Deferred Decision trigger conditions
+2. Identify quality patterns above significance threshold
+3. **Run oracle gap detection pass** (see Oracle Gap Pattern below)
+4. Cross-reference with existing open ImprovementProposals (avoid duplicates)
+5. Write new proposals for novel findings
+6. Update SkillDef quality scores
+7. Check Deferred Decision trigger conditions (DD-01 through DD-10)
 
 **Memory_Architecture:**
 - *Working:* `last_run` timestamp (read from Infrastructure Lead's health manifest or Aura).
@@ -79,6 +81,7 @@ Infrastructure Lead surfaces to human â†’ task-observer system prompt updated).
 | TO-LOAD-SKILLS | Direct | Read SkillDef nodes + current quality_score | Read |
 | TO-LOAD-OPEN-PROPOSALS | Direct | Read open ImprovementProposal nodes (avoid duplicates) | Read |
 | TO-ANALYSE-PATTERNS | Meta | Statistical pattern identification across execution data | â€” |
+| **TO-DETECT-ORACLE-GAPS** | **Meta** | **Count oracle_gaps field occurrences per block across recent TaskExecutions. Threshold: 3+ in 14 days â†’ ImprovementProposal.** | **â€”** |
 | TO-CHECK-DD-TRIGGERS | Meta | Check Deferred Decision trigger conditions against data | â€” |
 | TO-WRITE-PROPOSAL | Direct | Write ImprovementProposal node to Aura | Write |
 | TO-UPDATE-SKILL-SCORE | Direct | Update SkillDef.quality_score + trigger_count in Aura | Write |
@@ -242,3 +245,71 @@ PHASE 6 â€” RETURN
   Step 6.2: Return to Infrastructure Lead
   Artifact: observation_summary, ImprovementProposal nodes in Aura
 ```
+
+---
+
+## Appendix A: Oracle Gap Detection Pattern (v2 addition)
+
+**Source:** docs/agent-system/commander-architecture-v2.md — Layer 0 oracle shortcoming loop
+
+### What to detect
+
+TaskExecution.oracle_gaps is a list of {block, schema_task} dicts written by Commander
+when oracle blocks return count=0 with a schema_task set. These are GHOST_DATA signals
+from the cognitive substrate — node types that are expected but not indexed in Aura.
+
+### Detection query (run in PHASE 2)
+
+`cypher
+MATCH (te:TaskExecution)
+WHERE te.oracle_gaps IS NOT NULL AND size(te.oracle_gaps) > 0
+  AND te.created_at > datetime() - duration({days: 14})
+UNWIND te.oracle_gaps AS gap
+RETURN gap.block AS block_name,
+       gap.schema_task AS schema_task,
+       count(te) AS occurrence_count,
+       collect(te.task_id)[..5] AS evidence_ids
+ORDER BY occurrence_count DESC
+`
+
+**Threshold:** occurrence_count >= 3 within 14 days ? generate ImprovementProposal.
+
+### Block ? sync script mapping
+
+| Block(s) | Schema task | Sync script | Proposal target |
+|---|---|---|---|
+| pi_route_nodes, oute_to_function_chain, celery_task_nodes, cross_domain_route_coupling | 6 | python scripts/graph/sync_routes_tasks.py | graph-sprint:task-6 |
+| env_var_nodes, cross_domain_env_coupling | 7 | python scripts/graph/sync_envvars.py | graph-sprint:task-7 |
+| 	able_nodes, data_access_chain | 8 | python scripts/graph/sync_tables.py | graph-sprint:task-8 |
+| code_intent_episodes | 11 | python scripts/graph/sync_bridge.py | graph-sprint:task-11 |
+
+### ImprovementProposal format for oracle gaps
+
+`cypher
+MERGE (p:ImprovementProposal {proposal_id: })
+SET p.target           = "graph-sprint:task-6",
+    p.proposed_change  = "Run sync_routes_tasks.py — api_route_nodes returning 0 results in 5/7 recent tasks",
+    p.root_cause       = "Graph sprint Task 6 not completed. APIRoute + CeleryTask nodes not indexed.",
+    p.evidence_ids     = ["task-uuid-1", "task-uuid-2", "..."],
+    p.sync_command     = "python scripts/graph/sync_routes_tasks.py",
+    p.status           = "queued",
+    p.created_at       = datetime()
+`
+
+### False-positive guard (DD-10)
+
+Before writing a proposal, check: does the task_type of the flagged executions
+actually NEED this block's domain? A pure frontend task will never populate
+celery_task_nodes — that's expected, not a gap.
+
+`
+task_type IN ["code", "bug", "infrastructure", "compound"]?
+  ? oracle gap is real ? write proposal
+task_type IN ["design", "frontend"]?
+  ? check if the block's domain matches the task domain
+  ? if mismatch: skip (expected empty, not a gap)
+`
+
+If a proposal is rejected by Validator with reason domain_mismatch:
+? note which (block, task_type) pair was a false positive
+? refine threshold for that pair (DD-10 trigger)
