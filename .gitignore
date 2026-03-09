@@ -1,5 +1,6 @@
 # =============================================================================
 # Shopify Multi-Supplier Platform — .gitignore
+# Last reviewed: 2026-03-09
 # =============================================================================
 
 # --- Secrets & environment (NEVER commit) ---
@@ -85,7 +86,7 @@ Thumbs.db
 desktop.ini
 nul
 
-# --- Broken pip fragments found in root ---
+# --- Broken pip install fragments in root (junk files — delete them too) ---
 =3.1.0
 =4.0.0
 =42.0.0
@@ -105,7 +106,10 @@ quickcleanup/
 side-project/
 universal_vendor_scraper/
 .minimax/
-.agents/
+# NOTE: .agents/ is now TRACKED (removed from gitignore 2026-03-09)
+# Reason: multi-PC workflow — git pull on any machine gives full skill/oracle setup
+# .agents/skills/ is the canonical cross-platform skill location
+# Platform mirrors (.claude/, .codex/, .gemini/) stay for platform-specific entry points
 
 # --- Personal notes / scratch docs (not platform code) ---
 precisionworkspace.md
@@ -123,8 +127,9 @@ test-stripe-webhooks.bat
 setup-stripe-webhooks.bat
 STRIPE_WEBHOOK_SETUP.md
 
-# --- Temp dirs ---
+# --- Temp dirs and scratch files ---
 temp/
+temp_*.py
 .graph/
 .firecrawl/
 .tooling/external-tools-health.json
@@ -136,3 +141,15 @@ temp/
 # --- Archive backups ---
 archive/image_scraper_backup_*.py
 .aider*
+
+# --- OODA loop runtime artifacts (not platform code) ---
+# .ooda/dashboard_obs.html and .ooda/dashboard_obs.txt are already tracked (keep them)
+# All new .ooda/ files and frontend/.ooda/ are ignored going forward
+.ooda/*.txt
+.ooda/*.json
+frontend/.ooda/
+
+# --- Agent runtime / working memory (not platform code) ---
+# .memory/long-term/ and .memory/events/ are tracked (platform intelligence)
+# .memory/working/ is runtime session data — local only
+.memory/working/
