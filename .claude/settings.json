@@ -37,11 +37,6 @@
             "type": "command",
             "command": "python scripts/memory/pre_tool_update.py --provider claude --session-key claude-pretool --window-hint claude",
             "blockOnFailure": false
-          },
-          {
-            "type": "command",
-            "command": "python scripts/hooks/antigravity_notify.py --provider claude --source pre_tool_use --heartbeat --window-hint claude",
-            "blockOnFailure": false
           }
         ]
       },
@@ -57,9 +52,70 @@
             "blockOnFailure": true
           }
         ]
+      },
+      {
+        "filter": {
+          "tool": "Task"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/memory_pattern_primer.py",
+            "blockOnFailure": false
+          }
+        ]
+      },
+      {
+        "filter": {
+          "tool": "Edit"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/graph_impact_advisor.py",
+            "blockOnFailure": false
+          }
+        ]
+      },
+      {
+        "filter": {
+          "tool": "Write"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/graph_impact_advisor.py",
+            "blockOnFailure": false
+          }
+        ]
       }
     ],
-    "PostToolUse": []
+    "PostToolUse": [
+      {
+        "filter": {
+          "tool": "Edit"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/test_recommender.py",
+            "blockOnFailure": false
+          }
+        ]
+      },
+      {
+        "filter": {
+          "tool": "Write"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/test_recommender.py",
+            "blockOnFailure": false
+          }
+        ]
+      }
+    ]
   },
   "statusLine": {
     "type": "command",

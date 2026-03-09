@@ -78,11 +78,46 @@ Your commit will NOT happen. Fix the issues and try again.
 
 These are informational only and don't block anything.
 
-### 4. PostToolUse Hook (DISABLED)
-**Status:** Disabled due to Windows compatibility issues
-**Previous Purpose:** Auto-checkpoint after pytest runs
+### 4. Memory Pattern Primer (PreToolUse on Task)
+**Triggers:** Before Task tool spawns an agent
+**Script:** `scripts/hooks/memory_pattern_primer.py`
+**Blocks:** NO - Advisory only
 
-This was causing "write hook error" messages and has been removed.
+#### What It Does:
+1. Reads `.memory/long-term/index.json` for event counters
+2. Queries Neo4j for top 10 LongTermPattern nodes
+3. Injects accumulated wisdom into agent context
+4. Budget: 200ms max
+
+**Value:** Sub-agents get instant access to project patterns without re-discovery.
+
+### 5. Graph Impact Advisor (PreToolUse on Edit/Write)
+**Triggers:** Before editing high-risk files (`src/core/`, `src/api/`, `src/models/`, `src/graph/`, `src/assistant/`)
+**Script:** `scripts/hooks/graph_impact_advisor.py`
+**Blocks:** NO - Warning only
+
+#### What It Does:
+1. Checks if file is in high-risk category
+2. Queries Neo4j `impact_radius` (with 5-minute cache)
+3. Shows blast radius (direct + indirect dependents)
+4. Suggests relevant tests
+5. Budget: 500ms max
+
+**Value:** Prevents breaking changes by showing what depends on the file before edits.
+
+### 6. Test Recommender (PostToolUse on Edit/Write)
+**Triggers:** After editing source files in `src/` or `frontend/src/`
+**Script:** `scripts/hooks/test_recommender.py`
+**Blocks:** NO - Advisory only
+
+#### What It Does:
+1. Queries Neo4j for functions in edited file
+2. Queries Neo4j for function callers
+3. Maps affected files to test files
+4. Suggests targeted test commands
+5. Budget: 300ms max
+
+**Value:** Know exactly which tests to run instead of full suite (3s vs 5min).
 
 ## Bypassing the Hook (Emergency Only)
 
