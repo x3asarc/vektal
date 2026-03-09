@@ -30,42 +30,33 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 
 ---
 
-## 🔍 Mandatory Aura Query (Step 1 — BEFORE any investigation)
+## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)
 
-Aura is your primary evidence source. File reads are flashlight-only (verify, never discover).
+**Do NOT write raw Cypher.** Call aura-oracle with your domain. It composes the right queries.
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os, json
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-suspect = CONTEXT_PACKAGE["aura_context"].get("suspect_function", "")
-with driver.session() as s:
-    # Full inbound call chain to suspect
-    callers = s.run(
-        "MATCH (c:Function)-[:CALLS]->(f:Function) "
-        "WHERE f.function_signature CONTAINS $s AND f.EndDate IS NULL "
-        "RETURN c.function_signature, c.file_path LIMIT 20", s=suspect).data()
-    # Outbound call chain (what does suspect call)
-    callees = s.run(
-        "MATCH (f:Function)-[:CALLS*1..3]->(c:Function) "
-        "WHERE f.function_signature CONTAINS $s AND f.EndDate IS NULL "
-        "RETURN DISTINCT c.function_signature, c.file_path LIMIT 20", s=suspect).data()
-    # Open Sentry issues
-    issues = s.run(
-        "MATCH (si:SentryIssue) WHERE si.resolved=false "
-        "RETURN si.issue_id, si.title, si.category, si.culprit "
-        "ORDER BY si.timestamp DESC LIMIT 10").data()
-    # Failure patterns
-    patterns = s.run(
-        "MATCH (lp:LongTermPattern) WHERE lp.domain IN ['forensic','reliability'] "
-        "RETURN lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
-print(json.dumps({"callers": callers, "callees": callees, "sentry": issues, "patterns": patterns}, indent=2))
-driver.close()
+context = {"suspect": CONTEXT_PACKAGE["aura_context"].get("suspect_function",""), "fps": CONTEXT_PACKAGE["aura_context"].get("blast_radius",[])}
+
+result = subprocess.run(
+    [sys.executable, ".claude/skills/aura-oracle/oracle.py",
+     "--domain", "forensic",
+     "--context", json.dumps(context)],
+    capture_output=True, text=True
+)
+aura_data = json.loads(result.stdout)
+print(json.dumps(aura_data, indent=2))
+
+# aura_data["results"]["WHO"]   → callers, ownership
+# aura_data["results"]["WHAT"]  → functions, routes, issues
+# aura_data["results"]["WHERE"] → blast radius, file scope
+# aura_data["results"]["WHY"]   → intent, patterns, lessons
+# aura_data["results"]["WHEN"]  → execution history, failures
+# aura_data["results"]["HOW"]   → call chain, data flow
 ```
 
-**Build 3 ACH hypotheses from graph data. File reads only to verify a specific line.**
+**Use only the files listed in WHERE results. Add new questions to oracle.py BLOCKS — do not hardcode Cypher here.**
 
 ---
 

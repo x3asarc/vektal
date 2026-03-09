@@ -33,40 +33,33 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 
 ---
 
-## 🔍 Mandatory Aura Query (Step 1 — BEFORE any file reads)
+## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)
 
-Use the context package from Commander. One query replaces 20 grep calls.
+**Do NOT write raw Cypher.** Call aura-oracle with your domain. It composes the right queries.
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os, json
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-with driver.session() as s:
-    sigs = CONTEXT_PACKAGE["aura_context"].get("affected_functions", [])
-    # Blast radius: what does the affected code call?
-    blast = s.run(
-        "UNWIND $sigs AS sig "
-        "MATCH (f:Function {function_signature: sig})-[:CALLS*1..2]->(c:Function) "
-        "WHERE f.EndDate IS NULL AND c.EndDate IS NULL "
-        "RETURN DISTINCT c.function_signature AS fn, c.file_path AS fp LIMIT 20",
-        sigs=sigs).data()
-    files = list({r["fp"] for r in blast if r["fp"]})
-    # APIRoutes in scope
-    routes = s.run(
-        "MATCH (r:APIRoute)-[:DEFINED_IN]->(f:File) WHERE f.path IN $files "
-        "RETURN r.method, r.path, r.handler LIMIT 10", files=files).data()
-    # Open Sentry issues touching these files
-    issues = s.run(
-        "MATCH (si:SentryIssue) WHERE si.resolved=false "
-        "AND any(fp IN $files WHERE si.culprit CONTAINS fp) "
-        "RETURN si.issue_id, si.title, si.culprit LIMIT 5", files=files).data()
-print(json.dumps({"blast_radius": blast, "routes": routes, "issues": issues}, indent=2))
-driver.close()
+context = {"sigs": CONTEXT_PACKAGE["aura_context"].get("affected_functions",[]), "prefix": CONTEXT_PACKAGE.get("domain_hint","src/"), "keywords": CONTEXT_PACKAGE.get("keywords",[])}
+
+result = subprocess.run(
+    [sys.executable, ".claude/skills/aura-oracle/oracle.py",
+     "--domain", "engineering",
+     "--context", json.dumps(context)],
+    capture_output=True, text=True
+)
+aura_data = json.loads(result.stdout)
+print(json.dumps(aura_data, indent=2))
+
+# aura_data["results"]["WHO"]   → callers, ownership
+# aura_data["results"]["WHAT"]  → functions, routes, issues
+# aura_data["results"]["WHERE"] → blast radius, file scope
+# aura_data["results"]["WHY"]   → intent, patterns, lessons
+# aura_data["results"]["WHEN"]  → execution history, failures
+# aura_data["results"]["HOW"]   → call chain, data flow
 ```
 
-**Read ONLY files returned by blast radius. No whole-codebase grep.**
+**Use only the files listed in WHERE results. Add new questions to oracle.py BLOCKS — do not hardcode Cypher here.**
 
 ---
 

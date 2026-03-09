@@ -30,40 +30,33 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 
 ---
 
-## 🔍 Mandatory Aura Query (Step 1 — BEFORE planning anything)
+## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)
+
+**Do NOT write raw Cypher.** Call aura-oracle with your domain. It composes the right queries.
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os, json
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-task_types = CONTEXT_PACKAGE.get("task_types", [])
-with driver.session() as s:
-    # BundleTemplates relevant to task type (prior execution configs)
-    templates = s.run(
-        "MATCH (bt:BundleTemplate) WHERE bt.task_type IN $types "
-        "RETURN bt.name, bt.task_type, bt.last_quality_score, bt.trigger_count "
-        "ORDER BY bt.last_quality_score DESC LIMIT 5", types=task_types).data()
-    # Active Lessons (inferred failure patterns to avoid)
-    lessons = s.run(
-        "MATCH (l:Lesson) WHERE l.status='active' "
-        "RETURN l.pattern, l.recommendation, l.domain "
-        "ORDER BY l.created_at DESC LIMIT 10").data()
-    # Recent TaskExecution outcomes (what worked and what looped)
-    history = s.run(
-        "MATCH (te:TaskExecution) "
-        "RETURN te.task_type, te.lead_invoked, te.quality_gate_passed, te.loop_count "
-        "ORDER BY te.created_at DESC LIMIT 20").data()
-    # Architectural LongTermPatterns
-    arch = s.run(
-        "MATCH (lp:LongTermPattern) WHERE lp.domain='architecture' "
-        "RETURN lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
-print(json.dumps({"templates": templates, "lessons": lessons, "history": history, "arch": arch}, indent=2))
-driver.close()
+context = {"domains": CONTEXT_PACKAGE.get("task_domains",[]), "lead": ""}
+
+result = subprocess.run(
+    [sys.executable, ".claude/skills/aura-oracle/oracle.py",
+     "--domain", "project",
+     "--context", json.dumps(context)],
+    capture_output=True, text=True
+)
+aura_data = json.loads(result.stdout)
+print(json.dumps(aura_data, indent=2))
+
+# aura_data["results"]["WHO"]   → callers, ownership
+# aura_data["results"]["WHAT"]  → functions, routes, issues
+# aura_data["results"]["WHERE"] → blast radius, file scope
+# aura_data["results"]["WHY"]   → intent, patterns, lessons
+# aura_data["results"]["WHEN"]  → execution history, failures
+# aura_data["results"]["HOW"]   → call chain, data flow
 ```
 
-**Shape the plan from Lessons + BundleTemplate history. Do not re-discover what Aura already knows.**
+**Use only the files listed in WHERE results. Add new questions to oracle.py BLOCKS — do not hardcode Cypher here.**
 
 ---
 

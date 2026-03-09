@@ -38,9 +38,11 @@ Determine mode at session start based on Aura availability:
 
 | Mode | Condition | Routing strategy |
 |---|---|---|
-| **MODE 0** | Aura hard failure (connection refused / auth error) | Rules-based routing. Trigger Pico-Warden. Inform human. |
-| **MODE 1** | Aura available, <10 TaskExecution nodes | Priority rules table (see Part III). |
-| **MODE 2** | Aura available, ≥10 TaskExecution nodes | Query TaskExecution history → pick Lead with best `quality_gate_passed` rate. |
+| **MODE 0** | Aura hard failure (connection refused / auth error) | Rules-based routing. Trigger Pico-Warden. Skip Bundle. Inform human. |
+| **MODE 1** | Aura available (any execution count) | Always route through Bundle → then to Lead(s). |
+
+**Bundle runs on every task in MODE 1. No execution count threshold. No exceptions.**
+The flow is always: Commander → Bundle → Lead(s). Commander never routes to a Lead directly.
 
 ---
 
@@ -106,18 +108,130 @@ Ready to route.
 | Skill improvement / quality signals | task-observer | After any Lead completion with `improvement_signals` |
 | Unclear | Ask ONE binary clarifying question | — |
 
-**Compound task detection:** If the request involves ≥2 of: {code, UI, infra, forensics} — route through Bundle first, then to Project Lead.
+**Bundle runs on EVERY task. Always. No exceptions in MODE 1.**
 
-**Bundle routing rule (MODE 2 only — ≥10 TaskExecutions in Aura):**
-Before routing a compound task or HIGH/CRITICAL difficulty task to Project Lead, call Bundle to get the optimised context package:
 ```
-1. Build a preliminary context package (task + intent + domain_hint + quality_gate)
-2. Spawn Bundle with that package
-3. Bundle returns BundleConfig (lead_configs + lessons_from_history + model assignments)
-4. Merge BundleConfig into the Project Lead context package — replace loop_budget + add lessons_from_history
-5. Route to Project Lead with the enriched package
+Commander routing flow (MODE 1):
+1. Run P-LOAD (Aura context)
+2. Declare scope tier
+3. Build preliminary context package
+4. ★ PRE-BUNDLE REVIEW — second LLM challenges the context package (see Part IV-A)
+5. Revise context package if reviewer flagged anything
+6. Spawn Bundle → receive BundleConfig
+7. Merge BundleConfig into context package
+8. Route to Lead(s) with enriched package
 ```
-Skip Bundle when: Aura offline (MODE 0), single-domain LOW/STANDARD task with no prior template.
+
+**The only time Bundle is skipped: MODE 0 (Aura hard failure).**
+**The only time Pre-Bundle Review is skipped: scope tier NANO (not worth the overhead).**
+
+**Compound task detection:** If the request involves ≥2 of: {code, UI, infra, forensics} → Bundle will select Project Lead. Single-domain → Bundle selects the appropriate single Lead.
+
+---
+
+## Part IV-A — Pre-Bundle Review (Second Opinion)
+
+**Purpose:** Before handing off to Bundle, a second independent LLM reviews the context package and routing decision. It looks for what Commander missed, misclassified, or under-scoped. Commander must incorporate critical feedback before proceeding.
+
+**Model:** Use a model different from Commander's primary reasoning model to get genuine independent perspective.
+- Commander primary: `openrouter/auto`
+- Reviewer: `google/gemini-2.5-flash` (fast, independent, different reasoning path)
+- If Gemini unavailable: `anthropic/claude-haiku-4-5` (lightweight, different from primary)
+
+**Skip when:** scope_tier = NANO. Run for all other tiers.
+
+### Protocol
+
+```python
+import json, os
+from dotenv import load_dotenv
+load_dotenv()
+
+# The context package Commander has built so far
+context_package = { ... }  # populated from Part V
+
+REVIEW_PROMPT = f"""
+You are a second-opinion reviewer for an AI orchestration system. 
+A Commander agent has built the following routing decision and context package.
+Your job: challenge it. Find what's wrong, missing, or under-scoped.
+
+== TASK FROM HUMAN ==
+{human_task}
+
+== COMMANDER'S ROUTING DECISION ==
+Scope tier: {scope_tier}
+Lead(s) selected: {leads_selected}
+Domain hint: {context_package.get('domain_hint')}
+Quality gate: {context_package.get('quality_gate')}
+
+== CONTEXT PACKAGE ==
+{json.dumps(context_package, indent=2)}
+
+== YOUR REVIEW ==
+Answer these questions:
+1. Is the scope tier correct? Could this be NANO when STANDARD is needed, or vice versa?
+2. Is the right Lead selected? What domain does this task actually touch?
+3. Is the quality gate measurable and specific enough?
+4. Is there missing context (affected functions, blast radius, open issues) that Commander should have included?
+5. Is there a hidden risk Commander hasn't acknowledged?
+
+Respond in this exact format:
+VERDICT: APPROVED | REVISE
+FLAGS:
+- [flag 1 if any]
+- [flag 2 if any]
+REVISED_FIELDS:
+  scope_tier: [corrected value or null]
+  leads_selected: [corrected list or null]
+  quality_gate: [corrected string or null]
+  missing_context: [list of what to add or null]
+"""
+
+# Call reviewer model via OpenRouter API
+import urllib.request
+payload = json.dumps({
+    "model": "google/gemini-2.5-flash",
+    "messages": [{"role": "user", "content": REVIEW_PROMPT}],
+    "max_tokens": 500
+}).encode()
+
+req = urllib.request.Request(
+    "https://openrouter.ai/api/v1/chat/completions",
+    data=payload,
+    headers={
+        "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "vektal-commander"
+    }
+)
+with urllib.request.urlopen(req) as resp:
+    review = json.loads(resp.read())
+    review_text = review["choices"][0]["message"]["content"]
+
+print("=== PRE-BUNDLE REVIEW ===")
+print(review_text)
+```
+
+### On Receiving the Review
+
+| Verdict | Action |
+|---|---|
+| `APPROVED` | Proceed to Bundle immediately. Log `"pre_bundle_review": "APPROVED"` in context package. |
+| `REVISE` | Apply the `REVISED_FIELDS` that are non-null. Re-announce scope tier if changed. Then proceed to Bundle. |
+
+**Commander does NOT loop back to re-review after revising.** One revision maximum. The reviewer is advisory — Commander has final say. If a flag seems wrong, note it in the context package and proceed.
+
+### What to Log
+
+Add to context package before spawning Bundle:
+```json
+"pre_bundle_review": {
+  "verdict": "APPROVED | REVISE",
+  "flags": ["..."],
+  "revised_fields": {...},
+  "reviewer_model": "google/gemini-2.5-flash"
+}
+```
 
 ---
 

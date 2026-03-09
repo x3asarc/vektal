@@ -33,35 +33,33 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 
 ---
 
-## 🔍 Mandatory Aura Query (Step 1 — BEFORE any file reads)
+## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)
+
+**Do NOT write raw Cypher.** Call aura-oracle with your domain. It composes the right queries.
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os, json
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-keywords = CONTEXT_PACKAGE.get("keywords", ["page", "component"])
-with driver.session() as s:
-    # Frontend files matching task keywords
-    files = s.run(
-        "MATCH (f:File) WHERE f.path STARTS WITH 'frontend/' "
-        "AND any(kw IN $kw WHERE f.path CONTAINS kw) "
-        "RETURN f.path, f.module LIMIT 20", kw=keywords).data()
-    fps = [r["f.path"] for r in files]
-    # Functions defined in those files
-    fns = s.run(
-        "MATCH (fn:Function)-[:DEFINED_IN]->(f:File) WHERE f.path IN $fps "
-        "RETURN fn.function_signature, fn.name, f.path LIMIT 20", fps=fps).data()
-    # Design LongTermPatterns (conventions already established)
-    patterns = s.run(
-        "MATCH (lp:LongTermPattern) WHERE lp.domain = 'design' "
-        "RETURN lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
-print(json.dumps({"files": files, "functions": fns, "patterns": patterns}, indent=2))
-driver.close()
+context = {"prefix": "frontend/", "keywords": CONTEXT_PACKAGE.get("keywords",["page","component"])}
+
+result = subprocess.run(
+    [sys.executable, ".claude/skills/aura-oracle/oracle.py",
+     "--domain", "design",
+     "--context", json.dumps(context)],
+    capture_output=True, text=True
+)
+aura_data = json.loads(result.stdout)
+print(json.dumps(aura_data, indent=2))
+
+# aura_data["results"]["WHO"]   → callers, ownership
+# aura_data["results"]["WHAT"]  → functions, routes, issues
+# aura_data["results"]["WHERE"] → blast radius, file scope
+# aura_data["results"]["WHY"]   → intent, patterns, lessons
+# aura_data["results"]["WHEN"]  → execution history, failures
+# aura_data["results"]["HOW"]   → call chain, data flow
 ```
 
-**Read only files returned above. Never grep frontend/ wholesale.**
+**Use only the files listed in WHERE results. Add new questions to oracle.py BLOCKS — do not hardcode Cypher here.**
 
 ---
 

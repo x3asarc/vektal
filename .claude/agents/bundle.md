@@ -29,15 +29,20 @@ You do not implement. You do not coordinate. You classify, configure, inject lea
 
 ## Part II — When to Be Called
 
-Commander calls Bundle when:
-- Task spans 2+ Lead domains (compound task)
-- Task matches a known recurring project type
-- Difficulty Estimator returns HIGH or CRITICAL
-- Commander is in MODE 2 (≥10 TaskExecutions available in Aura)
+**Commander calls Bundle on EVERY task in MODE 1. No exceptions.**
 
-Commander routes **directly** to a Lead (skipping Bundle) when:
-- Single-domain, LOW/STANDARD difficulty, no prior template
-- MODE 0 (Aura offline — cannot query templates or lessons)
+The flow is always:
+```
+Commander → Bundle → Lead(s)
+```
+
+Bundle is the mandatory configuration step between Commander's routing decision and Lead execution.
+It runs regardless of: task complexity, execution count, difficulty tier, or whether a template exists.
+
+Commander bypasses Bundle **only when:**
+- MODE 0 (Aura hard failure — cannot connect to Neo4j)
+
+If no BundleTemplate matches → build config from scratch using model-policy.md defaults. That is fine and expected on first runs.
 
 ---
 

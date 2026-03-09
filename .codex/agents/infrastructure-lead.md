@@ -33,38 +33,33 @@ Default: **30 steps** for STANDARD/RESEARCH, **20 steps** for MICRO, **10 steps*
 
 ---
 
-## 🔍 Mandatory Aura Query (Step 1 — BEFORE any file reads)
+## 🔍 Mandatory Aura Query (Step 1 — via aura-oracle)
+
+**Do NOT write raw Cypher.** Call aura-oracle with your domain. It composes the right queries.
 
 ```python
-from dotenv import load_dotenv; load_dotenv()
-from neo4j import GraphDatabase
-import os, json
+import subprocess, json, sys
 
-driver = GraphDatabase.driver(os.getenv("NEO4J_URI"), auth=(os.getenv("NEO4J_USERNAME","neo4j"), os.getenv("NEO4J_PASSWORD")))
-with driver.session() as s:
-    # EnvVar nodes — names + risk tier only, NEVER values
-    env_vars = s.run(
-        "MATCH (e:EnvVar) RETURN e.name, e.risk_tier, e.file_path "
-        "ORDER BY e.risk_tier LIMIT 30").data()
-    # Infrastructure files in graph
-    infra_files = s.run(
-        "MATCH (f:File) WHERE f.path IN ["
-        "'docker-compose.yml','nginx/nginx.conf','Dockerfile.backend',"
-        "'Dockerfile.frontend','.env.example'] "
-        "OR f.path STARTS WITH 'src/config/' "
-        "RETURN f.path, f.module LIMIT 20").data()
-    # CeleryTask nodes
-    celery = s.run(
-        "MATCH (ct:CeleryTask) RETURN ct.name, ct.queue, ct.file_path LIMIT 10").data()
-    # Infra LongTermPatterns
-    patterns = s.run(
-        "MATCH (lp:LongTermPattern) WHERE lp.domain IN ['infrastructure','ops','deployment'] "
-        "RETURN lp.description ORDER BY lp.StartDate DESC LIMIT 5").data()
-print(json.dumps({"env_vars": env_vars, "infra_files": infra_files, "celery": celery, "patterns": patterns}, indent=2))
-driver.close()
+context = {"prefix": CONTEXT_PACKAGE.get("domain_hint","src/"), "keywords": ["docker","config","nginx","celery","worker"]}
+
+result = subprocess.run(
+    [sys.executable, ".claude/skills/aura-oracle/oracle.py",
+     "--domain", "infrastructure",
+     "--context", json.dumps(context)],
+    capture_output=True, text=True
+)
+aura_data = json.loads(result.stdout)
+print(json.dumps(aura_data, indent=2))
+
+# aura_data["results"]["WHO"]   → callers, ownership
+# aura_data["results"]["WHAT"]  → functions, routes, issues
+# aura_data["results"]["WHERE"] → blast radius, file scope
+# aura_data["results"]["WHY"]   → intent, patterns, lessons
+# aura_data["results"]["WHEN"]  → execution history, failures
+# aura_data["results"]["HOW"]   → call chain, data flow
 ```
 
-**Scope all changes to files returned above. No src/ tree sweeps.**
+**Use only the files listed in WHERE results. Add new questions to oracle.py BLOCKS — do not hardcode Cypher here.**
 
 ---
 
