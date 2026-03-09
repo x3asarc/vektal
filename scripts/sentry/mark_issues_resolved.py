@@ -48,13 +48,18 @@ HEADERS = {
 }
 
 def mark_resolved(issue_id: int) -> bool:
-    """Mark a Sentry issue as resolved."""
-    url = f"{BASE_URL}/issues/{issue_id}/"
+    """Mark a Sentry issue as resolved using bulk update endpoint."""
+    # Use organization bulk update endpoint which works better
+    org = "x3-solutions"
+    url = f"{BASE_URL}/organizations/{org}/issues/"
+
     try:
         with httpx.Client() as client:
+            # Bulk update endpoint with query parameter
             response = client.put(
                 url,
                 headers=HEADERS,
+                params={"id": issue_id},  # Query param to target specific issue
                 json={"status": "resolved"},
                 timeout=10.0
             )
