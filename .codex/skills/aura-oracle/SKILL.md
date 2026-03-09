@@ -92,6 +92,18 @@ result = ask(blocks=["calls_inbound", "sentry_unresolved", "failure_patterns"], 
 - `applies_to_lead` — [:APPLIES_TO]→AgentDef (for Lessons)
 - `refers_to_function` — [:REFERS_TO]→Function (Episode bridge)
 
+### HOW Blocks (Data Flow & Dependency Chains)
+- `full_call_chain` — full inbound + outbound call graph for a suspect function
+- `data_access_chain` — Function→ACCESSES→Table (what DB tables does this code touch) [Task 8]
+- `route_to_function_chain` — APIRoute→handler function chain [Task 6]
+
+### Cross-Domain Blocks (Gemini recommendation — the missing link)
+- `cross_domain_impact` — detects IMPORTS/CALLS crossing folder boundaries (frontend→src, billing→core, etc.) — #1 source of hidden regressions
+- `cross_domain_env_coupling` — EnvVar nodes consumed across domain boundaries — infra change silently breaks engineering [Task 7]
+- `cross_domain_route_coupling` — API routes called by unexpected domains — shared state / race condition detector [Task 6]
+
+**These three blocks are automatically included in project-lead (all three), engineering-lead, design-lead, forensic-lead, and infrastructure-lead profiles.**
+
 ### Filters
 - `active_only` — EndDate IS NULL
 - `path_prefix` — file path STARTS WITH $prefix

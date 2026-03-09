@@ -420,6 +420,111 @@ BLOCKS = {
         "schema_task": 6,
     },
 
+    # ── CROSS-DOMAIN (Gemini recommendation — Project Lead + Engineering Lead) ──
+
+    "cross_domain_impact": {
+        "description": (
+            "HOW does a change in one domain silently break another — "
+            "detects IMPORTS and CALLS relationships that cross folder/domain boundaries. "
+            "e.g. frontend/ → src/api/, src/config/ → src/billing/, src/ui/ → src/core/. "
+            "This is the #1 source of hidden regressions in multi-domain platforms."
+        ),
+        "question": "HOW",
+        "params_required": ["fps"],  # files being changed
+        "cypher": (
+            # Domain boundary map: anything crossing these prefixes is a cross-domain edge
+            "WITH ["
+            "  ['frontend/', 'src/'],"
+            "  ['src/api/', 'src/core/'],"
+            "  ['src/api/', 'src/tasks/'],"
+            "  ['src/billing/', 'src/core/'],"
+            "  ['src/billing/', 'src/models/'],"
+            "  ['src/graph/', 'src/api/'],"
+            "  ['src/config/', 'src/billing/'],"
+            "  ['src/config/', 'src/api/']"
+            "] AS boundary_pairs "
+            "UNWIND $fps AS changed_fp "
+            "MATCH (changed:File {path: changed_fp}) "
+            "MATCH (changed)-[:IMPORTS]->(dep:File) "
+            "WHERE any(pair IN boundary_pairs WHERE "
+            "  (changed_fp STARTS WITH pair[0] AND dep.path STARTS WITH pair[1]) OR "
+            "  (changed_fp STARTS WITH pair[1] AND dep.path STARTS WITH pair[0])) "
+            "RETURN changed_fp AS source_file, dep.path AS cross_domain_dep, "
+            "       'IMPORTS' AS relationship_type "
+            "UNION "
+            "UNWIND $fps AS changed_fp "
+            "MATCH (fn:Function)-[:DEFINED_IN]->(f:File {path: changed_fp}) "
+            "MATCH (fn)-[:CALLS]->(callee:Function)-[:DEFINED_IN]->(callee_f:File) "
+            "WHERE fn.EndDate IS NULL AND callee.EndDate IS NULL "
+            "AND any(pair IN ["
+            "  ['frontend/', 'src/'],"
+            "  ['src/api/', 'src/core/'],"
+            "  ['src/billing/', 'src/core/'],"
+            "  ['src/graph/', 'src/api/']"
+            "] WHERE "
+            "  (changed_fp STARTS WITH pair[0] AND callee_f.path STARTS WITH pair[1]) OR "
+            "  (changed_fp STARTS WITH pair[1] AND callee_f.path STARTS WITH pair[0])) "
+            "RETURN changed_fp AS source_file, callee_f.path AS cross_domain_dep, "
+            "       'CALLS' AS relationship_type"
+        ),
+        "limit": 40,
+        "schema_task": None,
+    },
+
+    "cross_domain_env_coupling": {
+        "description": (
+            "WHAT EnvVar nodes are consumed across domain boundaries — "
+            "detects when an Infrastructure change (new/removed EnvVar) "
+            "silently breaks Engineering functions in a different domain. "
+            "e.g. a billing EnvVar used in a graph function."
+        ),
+        "question": "WHAT",
+        "params_required": [],
+        "cypher": (
+            "MATCH (e:EnvVar)<-[:USES]-(fn:Function)-[:DEFINED_IN]->(f:File) "
+            "WHERE e.EndDate IS NULL AND fn.EndDate IS NULL "
+            "WITH e.name AS env, e.risk_tier AS risk, e.file_path AS defined_in, "
+            "     collect(DISTINCT f.path) AS used_in_files "
+            "WHERE size(used_in_files) > 0 "
+            "WITH env, risk, defined_in, used_in_files, "
+            "     [fp IN used_in_files WHERE "
+            "       NOT (defined_in IS NOT NULL AND fp STARTS WITH split(defined_in,'/')[0])] "
+            "     AS cross_domain_usages "
+            "WHERE size(cross_domain_usages) > 0 "
+            "RETURN env, risk, defined_in, cross_domain_usages "
+            "ORDER BY risk DESC, env"
+        ),
+        "limit": 30,
+        "schema_task": 7,  # requires EnvVar nodes (Task 7) + USES edges
+    },
+
+    "cross_domain_route_coupling": {
+        "description": (
+            "WHAT API routes are called by unexpected domains — "
+            "detects hidden coupling where frontend components call backend routes "
+            "that are also called by background workers, creating race conditions "
+            "or shared state dependencies. Flags API surface area shared across >1 domain."
+        ),
+        "question": "WHAT",
+        "params_required": [],
+        "cypher": (
+            "MATCH (r:APIRoute)-[:DEFINED_IN]->(rf:File) "
+            "MATCH (caller:Function)-[:CALLS_ROUTE]->(r) "
+            "MATCH (caller)-[:DEFINED_IN]->(cf:File) "
+            "WHERE rf.EndDate IS NULL "
+            "WITH r.method AS method, r.path AS route, rf.path AS route_file, "
+            "     collect(DISTINCT cf.path) AS caller_files, "
+            "     collect(DISTINCT caller.function_signature) AS callers "
+            "WITH method, route, route_file, caller_files, callers, "
+            "     [fp IN caller_files WHERE NOT fp STARTS WITH split(route_file,'/')[0]] "
+            "     AS cross_domain_callers "
+            "WHERE size(cross_domain_callers) > 0 "
+            "RETURN method, route, route_file, cross_domain_callers, callers"
+        ),
+        "limit": 20,
+        "schema_task": 6,  # requires APIRoute nodes (Task 6) + CALLS_ROUTE edges
+    },
+
 }
 
 
@@ -436,7 +541,8 @@ DOMAIN_PROFILES = {
         "WHERE":["blast_radius", "import_chain"],
         "WHY":  ["long_term_patterns", "active_lessons", "code_intent_episodes"],
         "WHEN": ["task_execution_history", "failure_timeline"],
-        "HOW":  ["full_call_chain", "data_access_chain", "route_to_function_chain"],
+        # cross_domain_impact: catches silent breaks when engineering touches shared boundaries
+        "HOW":  ["full_call_chain", "data_access_chain", "route_to_function_chain", "cross_domain_impact"],
     },
     "design": {
         "WHO":  ["file_owners"],
@@ -444,7 +550,8 @@ DOMAIN_PROFILES = {
         "WHERE":["files_by_prefix", "files_by_keywords"],
         "WHY":  ["long_term_patterns", "active_lessons", "planning_docs"],
         "WHEN": ["task_execution_history"],
-        "HOW":  ["full_call_chain"],
+        # cross_domain_impact: frontend changes that CALL or IMPORT backend utilities
+        "HOW":  ["full_call_chain", "cross_domain_impact"],
     },
     "forensic": {
         "WHO":  ["calls_inbound_deep", "file_owners"],
@@ -452,23 +559,29 @@ DOMAIN_PROFILES = {
         "WHERE":["blast_radius", "files_by_keywords", "import_chain"],
         "WHY":  ["long_term_patterns", "active_lessons", "code_intent_episodes"],
         "WHEN": ["failure_timeline", "task_execution_history"],
-        "HOW":  ["full_call_chain", "data_access_chain"],
+        # cross_domain_impact: regressions almost always originate at domain boundaries
+        "HOW":  ["full_call_chain", "data_access_chain", "cross_domain_impact"],
     },
     "infrastructure": {
         "WHO":  ["file_owners"],
-        "WHAT": ["env_var_nodes", "celery_task_nodes", "table_nodes", "api_route_nodes"],
+        # cross_domain_env_coupling: infra changes (EnvVars) that silently break engineering
+        "WHAT": ["env_var_nodes", "celery_task_nodes", "table_nodes", "api_route_nodes",
+                 "cross_domain_env_coupling"],
         "WHERE":["files_by_prefix", "files_by_keywords"],
         "WHY":  ["long_term_patterns", "active_lessons", "planning_docs"],
         "WHEN": ["failure_timeline", "task_execution_history"],
-        "HOW":  ["data_access_chain", "route_to_function_chain"],
+        "HOW":  ["data_access_chain", "route_to_function_chain", "cross_domain_impact"],
     },
     "project": {
         "WHO":  ["agent_defs"],
-        "WHAT": ["skill_defs", "agent_defs"],
-        "WHERE":["files_by_prefix"],
+        # Project Lead gets ALL cross-domain blocks — it owns the full picture
+        "WHAT": ["skill_defs", "agent_defs", "cross_domain_env_coupling",
+                 "cross_domain_route_coupling"],
+        "WHERE":["files_by_prefix", "blast_radius"],
         "WHY":  ["long_term_patterns", "active_lessons", "planning_docs"],
         "WHEN": ["task_execution_history", "bundle_template_history"],
-        "HOW":  ["full_call_chain"],
+        # cross_domain_impact is the Project Lead's primary collision detector
+        "HOW":  ["full_call_chain", "cross_domain_impact", "cross_domain_route_coupling"],
     },
     "bundle": {
         "WHO":  ["agent_defs"],
