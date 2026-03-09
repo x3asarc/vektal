@@ -122,11 +122,17 @@ Apply quality floors (non-negotiable — cannot be overridden by BundleTemplate 
 | @Engineering-Lead | Security review (CRITICAL) | `anthropic/claude-sonnet-4-5` |
 | @Infrastructure-Lead | varlock detection | `anthropic/claude-sonnet-4-5` |
 
-Budget defaults (from difficulty tier, if no template history):
-- CRITICAL → 6 loops per Lead
-- HIGH → 5
-- STANDARD → 4
-- LOW → 3
+Budget allocation — priority order:
+1. **Watson's `loop_budget_final`** (from Commander input) — use this as the per-Lead baseline if set
+2. **BundleTemplate `budget_allocation`** — if a promoted template exists AND Watson's budget is not set
+3. **Difficulty tier defaults** — fallback only when neither above is available:
+   - CRITICAL → 6 loops per Lead
+   - HIGH → 5
+   - STANDARD → 4
+   - LOW → 3
+
+**Watson's scope authority is binding.** If Watson set `loop_budget_final: 4` and the difficulty tier suggests 3, use 4.
+If `scope_tier_final` constrains the Lead count (e.g. NANO = single Lead only), enforce that constraint regardless of template.
 
 ### Step 5: Build BundleConfig
 
@@ -222,12 +228,27 @@ with driver.session() as s:
 
 ## Part IV — Input Contract (from Commander)
 
+**v2 note:** Commander now passes `scope_tier_final` and `loop_budget_final` from Watson's scope authority. Bundle MUST use these as the execution baseline — they take precedence over difficulty-tier defaults.
+
 ```json
 {
   "task": "string",
   "intent": "string",
   "domain_hint": "compound|engineering|design|forensic|infrastructure",
   "quality_gate": "string — compound quality gate Commander expects",
+  "scope_tier_proposed": "MICRO",
+  "scope_tier_final": "STANDARD",
+  "loop_budget_proposed": 2,
+  "loop_budget_final": 4,
+  "nano_bypass": false,
+  "watson_validation": {
+    "verdict": "REVISE",
+    "calibration_score": 0.0,
+    "calibration_label": "COLD_START",
+    "ghost_data_flags": [],
+    "accepted_flags": [],
+    "rejected_flags": []
+  },
   "aura_context": {
     "recent_task_executions": [],
     "relevant_long_term_patterns": []
@@ -235,6 +256,8 @@ with driver.session() as s:
   "budget_constraint": null
 }
 ```
+
+**NANO bypass:** If `nano_bypass: true` → skip Aura queries and template lookup. Return a minimal BundleConfig immediately with `loop_budget: 2`, single Lead from `domain_hint`, no lessons injection. Log the bypass.
 
 ---
 
@@ -246,8 +269,10 @@ Key fields Commander reads:
 - `compound_task_id` — used as the shared ID for all TaskExecution nodes in this bundle run
 - `leads` — which Leads to spawn
 - `lead_configs[lead].lessons_from_history` — injected directly into each Lead's context
-- `lead_configs[lead].loop_budget` — Lead's execution budget
+- `lead_configs[lead].loop_budget` — Lead's execution budget (derived from Watson's `loop_budget_final`)
 - `difficulty_tier` — logged to TaskExecution.difficulty_tier
+- `scope_tier_final` — echoed from Commander input, logged to TaskExecution for Watson's PostMortem
+- `watson_validation_summary` — condensed Watson challenge report, passed to Lead as context note
 
 ---
 

@@ -259,6 +259,8 @@ def show_registry():
     print(f"{'Agent':<25} {'ID':<45} {'Model':<45} Status")
     print("-" * 130)
     for name, data in sorted(registry.items()):
+        if name.startswith("_"):
+            continue
         print(f"{name:<25} {data['id']:<45} {data['model']:<45} {data.get('status','?')}")
 
 
