@@ -19,6 +19,13 @@ from typing import List, Dict, Any, Set
 import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+# Add project root to Python path for imports
+sys.path.insert(0, str(PROJECT_ROOT))
+
+# Set output encoding to UTF-8 for emoji support
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 LOG_PATH = PROJECT_ROOT / ".graph" / "test-recommender.log"
 
 

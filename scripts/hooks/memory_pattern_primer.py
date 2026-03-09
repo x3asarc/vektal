@@ -16,8 +16,16 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List
+import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+# Add project root to Python path for imports
+sys.path.insert(0, str(PROJECT_ROOT))
+
+# Set output encoding to UTF-8 for emoji support
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 LONG_TERM_INDEX_PATH = PROJECT_ROOT / ".memory" / "long-term" / "index.json"
 LOG_PATH = PROJECT_ROOT / ".graph" / "memory-primer.log"
 
