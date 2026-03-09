@@ -32,22 +32,31 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-def fetch_issue(issue_id: int) -> dict:
+def fetch_issue(issue_id: int, project_slug: str = "synthex-workers") -> dict:
     """Fetch detailed information about a Sentry issue."""
-    url = f"{BASE_URL}/issues/{issue_id}/"
+    # Try project-scoped endpoint first
+    url = f"{BASE_URL}/projects/x3-solutions/{project_slug}/issues/"
 
     try:
         with httpx.Client() as client:
-            response = client.get(url, headers=HEADERS, timeout=10.0)
+            response = client.get(
+                url,
+                headers=HEADERS,
+                params={"query": f"id:{issue_id}"},
+                timeout=10.0
+            )
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            if data:
+                return data[0]
+            return {}
     except Exception as e:
         print(f"Error fetching issue {issue_id}: {e}")
         return {}
 
-def fetch_latest_event(issue_id: int) -> dict:
+def fetch_latest_event(issue_id: int, project_slug: str = "synthex-workers") -> dict:
     """Fetch the latest event for an issue."""
-    url = f"{BASE_URL}/issues/{issue_id}/events/latest/"
+    url = f"{BASE_URL}/projects/x3-solutions/{project_slug}/issues/{issue_id}/events/latest/"
 
     try:
         with httpx.Client() as client:
