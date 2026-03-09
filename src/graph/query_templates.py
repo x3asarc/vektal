@@ -101,6 +101,13 @@ QUERY_TEMPLATES = {
         LIMIT $limit
     """,
 
+    "long_term_patterns": """
+        MATCH (lp:LongTermPattern)
+        RETURN lp.description as description, lp.domain as domain, lp.task_id as task_id, lp.created_at as created_at
+        ORDER BY lp.created_at DESC
+        LIMIT $limit
+    """,
+
     "recent_discrepancies": """
         MATCH (e:Episode {episode_type: 'graph_discrepancy'})
         RETURN e.query_text as query_text, e.paths as paths, e.created_at as created_at

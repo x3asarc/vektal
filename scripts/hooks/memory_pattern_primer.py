@@ -57,29 +57,10 @@ def _query_graph_patterns() -> List[Dict[str, Any]]:
     """Query Neo4j for LongTermPattern nodes."""
     try:
         # Import here to avoid startup cost when hook doesn't fire
-        from src.core.graphiti_client import get_graphiti_client
+        from src.graph.query_templates import execute_template
 
-        client = get_graphiti_client()
-        cypher = """
-            MATCH (lp:LongTermPattern)
-            RETURN lp.description as description,
-                   lp.domain as domain,
-                   lp.task_id as task_id,
-                   lp.created_at as created_at
-            ORDER BY lp.created_at DESC
-            LIMIT 10
-        """
-
-        # Run query with timeout
-        records = client.query(cypher, {}, timeout_ms=1000)
-
-        patterns = []
-        for record in records or []:
-            if hasattr(record, "data"):
-                patterns.append(record.data())
-            elif isinstance(record, dict):
-                patterns.append(record)
-
+        # Use execute_template with long_term_patterns query
+        patterns = execute_template("long_term_patterns", {"limit": 10}, timeout_ms=1000)
         return patterns
 
     except Exception as exc:
