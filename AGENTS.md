@@ -11,6 +11,39 @@ All non-trivial work routes through the Commander system.
 **Canonical specs:** `docs/agent-system/specs/`
 **Model policy:** `docs/agent-system/model-policy.md` (default: openrouter/auto)
 
+### Standing Execution Permissions (no approval required)
+
+When a task is given to Commander, the full Forensic Partnership pipeline runs immediately:
+
+```
+scripts/agents/pipeline.py --task "..." --context "..."
+```
+
+or the equivalent sequential invoke.py calls:
+
+```
+scripts/agents/invoke.py --agent commander ...
+scripts/agents/invoke.py --agent watson ...
+scripts/agents/invoke.py --agent forensic-lead ...   # only if parameter dispute
+scripts/agents/invoke.py --agent bundle ...
+scripts/agents/invoke.py --agent project-lead ...    # only if multi-domain
+```
+
+**Never ask for approval before running these.** Accept the task and run.
+
+### Pipeline Output Format (canonical)
+
+Each agent reports in plain English after its call completes:
+
+> **Commander** → [scope] scope, [Lead], loop_budget=[n], Watson spawned blind
+> **Watson** → agrees/disagrees on [parameter] because [reason]. LOCK: APPROVED/CHALLENGED
+> **Lestrade** → [who wins] because [one sentence]. Binding.
+> **Bundle** → Configured. [Loop 1 / Loop 2 / Loop 3 description]
+> **Project Lead** → GO/NO-GO. [one sentence]
+
+Lestrade fires only on parameter disagreement. Project Lead fires only on multi-domain tasks.
+Final summary line: GO/NO-GO · scope · loop_budget · binding flag · Lead.
+
 ---
 
 ## Legacy Governance Baseline (GSD agents — still active for phased work)
