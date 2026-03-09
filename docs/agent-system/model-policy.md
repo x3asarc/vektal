@@ -261,18 +261,18 @@ haiku-4-5 is now Reasoning-Light — overkill for compression tasks.
 
 ## Agent Model Routing Table
 
-**Default for all subtasks: `openrouter/auto`**
-Only rows marked QUALITY FLOOR use an explicit model.
-Everything else: let OpenRouter route optimally.
+> **v2.0 (2026-03-09):** Primary agent models now defined in `docs/agent-system/model-rationale.md`
+> (Forensic Mapping v2.0 — Deep Reasoning Edition). The table below documents subtask-level
+> quality floors which remain valid. Primary model column reflects model-rationale.md assignments.
 
-### @Commander
+### @Commander — `lc-openrouter/x-ai/grok-4.1-fast`
 
 | Subtask | Model | Note |
 |---|---|---|
-| All standard routing + UNDERSTAND | `auto` | Default |
-| Compound task CoT decomposition | `sonnet` floor | QUALITY FLOOR — decomposition quality determines all downstream |
-| Circuit breaker diagnostic | `sonnet` floor | QUALITY FLOOR — diagnostic must be accurate |
-| STATE.md write | `summarizer` (haiku) | Utility — auto is overkill for compression |
+| All standard routing + UNDERSTAND | primary (grok-4.1-fast) | Default |
+| Compound task CoT decomposition | primary minimum | 2M context handles full blast radius |
+| Circuit breaker diagnostic | primary minimum | |
+| STATE.md write | `summarizer` (haiku) | Utility — compression only |
 
 ### @Design-Lead
 
@@ -409,6 +409,22 @@ Approximate via prompt engineering:
 | Claude Critic (internal fine-tune) | `sonnet` + adversarial system prompt (Validator) |
 | Chain Optimizer | task-observer (Aura-backed, not LLM-only) |
 | Sonar Safety | `haiku` + safety system prompt / varlock skill |
+
+---
+
+## Research Engine (v2026.3)
+
+Two models for research subtasks — called via direct OpenRouter API within execution,
+not as Letta base models. See `.commands/agents.md` for the full router pattern.
+
+| Model | OpenRouter ID | Use when | Cost |
+|---|---|---|---|
+| Tongyi DeepResearch | `alibaba/tongyi-deepresearch-30b-a3b` | Exhaustive: 100 sequential tool calls, background agents, long-horizon reports | $0.02–0.08 / 10 min |
+| Sonar Deep Research | `perplexity/sonar-deep-research` | Fast: real-time web, citations, unblocking a sprint | $2/M + $5/1k searches |
+
+**Rule:** `urgency="high"` → Sonar. `urgency="low"` → Tongyi.
+
+Agents with research subtasks: Engineering Lead (web research), Forensic Lead (evidence sourcing).
 
 ---
 

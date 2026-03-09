@@ -31,23 +31,31 @@ HEADERS = {
 
 # ── Model assignments ──────────────────────────────────────────────────────────
 # Keys must match the .md filename (without extension)
+# Models from docs/agent-system/model-rationale.md (Forensic Mapping v2.0)
+# All via lc-openrouter/* — routes through OPENROUTER_API_KEY, not Letta credits.
+# Research calls (Sonar/Tongyi) are made via direct OpenRouter API within execution,
+# not as the Letta base model — see .commands/agents.md for the research router pattern.
 MODEL_MAP = {
-    "commander":          "letta/auto",
-    "watson":             "lc-openrouter/anthropic/claude-opus-4",
-    "bundle":             "letta/auto",
-    "engineering-lead":   "letta/auto",
-    "design-lead":        "letta/auto",
-    "forensic-lead":      "letta/auto",
-    "infrastructure-lead": "letta/auto",
-    "project-lead":       "letta/auto",
-    "task-observer":      "letta/auto",
-    "validator":          "lc-openrouter/anthropic/claude-sonnet-4",
-    # GSD agents (used by Leads)
-    "gsd-planner":        "letta/auto",
-    "gsd-executor":       "letta/auto",
-    "gsd-verifier":       "letta/auto",
-    "gsd-plan-checker":   "letta/auto",
-    "gsd-debugger":       "letta/auto",
+    # High Court — Forensic Reasoning
+    "watson":              "lc-openrouter/anthropic/claude-opus-4.6",    # multi-step debugging, state persistence
+    # Command Tier — Strategic Orchestration
+    "commander":           "lc-openrouter/x-ai/grok-4.1-fast",          # 2M+ context, agentic tool calling
+    "project-lead":        "lc-openrouter/google/gemini-3.1-pro-preview",# long-horizon stability, multi-day tasks
+    # Lead Tier — Production Execution
+    "engineering-lead":    "lc-openrouter/openai/gpt-5.3-codex",        # Terminal-Bench 2.0, CLI/SSH environments
+    "design-lead":         "lc-openrouter/moonshotai/kimi-k2.5",        # native multimodal, sees Shopify layouts
+    "infrastructure-lead": "lc-openrouter/z-ai/glm-5",                  # autonomous execution, multi-tenant isolation
+    "forensic-lead":       "lc-openrouter/deepseek/deepseek-v3.2",      # distinct training lineage, tie-breaker reasoning
+    # Guardian Tier — Validation & Logistics
+    "bundle":              "lc-openrouter/google/gemini-3-flash-preview",# near Pro-level at Flash speed, JSON gating
+    "task-observer":       "lc-openrouter/google/gemini-2.5-flash-lite", # $0.10/M telemetry specialist
+    "validator":           "lc-openrouter/openai/gpt-5-mini",           # different critique flavour, no systemic blind spots
+    # GSD agents (used by Engineering Lead)
+    "gsd-planner":         "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-executor":        "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-verifier":        "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-plan-checker":    "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-debugger":        "lc-openrouter/openai/gpt-5.3-codex",
 }
 
 # Agents to register by default (core system — not GSD utilities)
