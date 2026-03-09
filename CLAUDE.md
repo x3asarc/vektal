@@ -5,8 +5,9 @@
 ## What This Is
 
 Multi-tenant SaaS platform automating Shopify product management for craft/hobby stores (8+ vendors,
-4,000+ SKUs). Production: Bastelschachtel.at. **Phase 13.2 of 15. 95/106 plans complete.**
-Remaining phases: 13.2 (Oracle Framework Reuse), 14 (Continuous Optimization), 15 (Self-Healing).
+4,000+ SKUs). Production: Bastelschachtel.at. **Phase 17 COMPLETE. All v1.0 phases done.**
+Current work: Architecture research (graph schema, agent system design via Letta).
+Next: Future production refinement (dokploy-e2e deployment, native LLM capability).
 
 **Read first on every session:**
 - `.planning/STATE.md` — current phase, gate status, last completed work

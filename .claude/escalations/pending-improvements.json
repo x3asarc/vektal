@@ -1,12 +1,1 @@
-[
-  {
-    "timestamp": "2026-02-20T09:58:30.606132",
-    "phase": "test",
-    "plan": "test-04",
-    "root_cause": "missing_dependency:sentry-sdk",
-    "proposed_fix": "Add sentry-sdk to requirements.txt",
-    "confidence": 0.4,
-    "reason": "Checks failed or confidence too low (40%)",
-    "status": "pending"
-  }
-]
+[]
