@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -438,11 +439,30 @@ class RootCauseClassifier:
         return str(payload["choices"][0]["message"]["content"])
 
     def _parse_llm_json(self, raw: str) -> dict[str, Any]:
+        """Parse JSON from LLM response, handling extra text after JSON."""
         text = (raw or "").strip()
         if text.startswith("```"):
             text = re.sub(r"^```(?:json)?\s*", "", text)
             text = re.sub(r"\s*```$", "", text)
-        return json.loads(text)
+
+        try:
+            # Try standard parsing first (fast path)
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            # If "Extra data" error, try parsing just the first JSON object
+            if "Extra data" in str(e):
+                try:
+                    decoder = json.JSONDecoder()
+                    obj, idx = decoder.raw_decode(text)
+                    # Log warning about extra text (for debugging)
+                    extra = text[idx:].strip()
+                    if extra:
+                        print(f"Warning: LLM returned extra text after JSON: {extra[:100]}", file=sys.stderr)
+                    return obj
+                except (json.JSONDecodeError, ValueError):
+                    pass  # Fall through to original error
+            # Re-raise original error if we can't recover
+            raise
 
     def _truncate_traceback(self, traceback: str, last_n_lines: int = 8) -> str:
         lines = (traceback or "").splitlines()
