@@ -45,6 +45,52 @@ app context via `tests/api/conftest.py`. Without it, SQLAlchemy sessions are uni
 **Applied:** All governance contract tests inherit from `api` conftest scope.
 **Status:** Applied.
 
+### 2026-03-09 | Substrate activation / Forensic Partnership live test
+
+**Learning 1 — Letta is memory-only. Never inference.**
+Firing Commander via `POST /v1/agents/{id}/messages` (Letta REST API) is wrong.
+Letta = memory blocks + `send_message` for Pico-Warden. Inference = OpenRouter direct.
+Agent execution happens in the CLI (Claude Code, Gemini CLI, Codex) not in Letta.
+**Applied:** `model-rationale.md` v3.0 rewritten. `register_agents.py` MODEL_MAP labeled metadata-only. `scripts/agents/invoke.py` created as the correct inference path. `.env` wired with `OPENAI_BASE_URL`, `ANTHROPIC_BASE_URL` → OpenRouter.
+**Status:** Applied. Rule candidate for AGENTS.md.
+
+**Learning 2 — Letta Cloud model proxy has a limited synced allowlist.**
+`lc-openrouter/` prefix and BYOK `openrouter-letta/` prefix both validate model IDs against Letta's own synced registry. `claude-opus-4-6`, `grok-4.1`, etc. return 404 even with a valid BYOK key. Direct OpenRouter bypasses this entirely.
+**Applied:** `scripts/agents/invoke.py` calls OpenRouter directly — no Letta proxy.
+**Status:** Applied.
+
+**Learning 3 — YAML `description: >` block scalar with routing keywords breaks Claude Code agent init.**
+Commander failed at spawn with `classifyHandoffIfNeeded is not defined`. Root cause: multi-line `description: >` containing "spawn Watson", "Bundle → Lead", "routes" triggered Claude Code's handoff classification before the runtime was ready. `infrastructure-lead.md` (single flat line description) spawned fine. Fix: flatten description to one line, remove routing flow keywords.
+**Applied:** All 4 platform `commander.md` files updated. Pattern: keep agent description to one flat sentence describing role, not flow.
+**Status:** Applied. Watch for same pattern in watson.md if it ever fails at init.
+
+**Learning 4 — Hook `filter: {tool: "Edit/Write"}` doesn't apply in subagent/Commander contexts in Letta Code.**
+`filter: {tool: "Bash"}` works correctly. `filter: {tool: "Edit"}` and `filter: {tool: "Write"}` do not — hooks fired for every tool call (Read, Glob, Grep). Evidence: `impact-advisor.log` flooded with "No file path provided, skipping". Fix: self-filter inside the script by reading `tool_name` from stdin.
+**Applied:** `graph_impact_advisor.py` and `test_recommender.py` now self-filter via `stdin_data.get("tool_name")`. Config-level filter kept but not relied upon.
+**Status:** Applied. Rule: never rely solely on settings.json filter — always self-filter in script.
+
+**Learning 5 — Gemini rewrites settings files to its own schema without `blockOnFailure`.**
+Gemini converted `.gemini/settings.json` from Claude format (`PreToolUse`/`filter`) to Gemini format (`BeforeTool`/`matcher`) but omitted `blockOnFailure: false` on all hooks. Result: hook crashes surfaced as loud errors in Claude Code sessions. Also left `debug_stdin.py` as a permanent hook (was a debug artifact).
+**Applied:** `blockOnFailure: false` added to all Gemini hooks. `debug_stdin.py` removed.
+**Rule:** After any Gemini session that touches settings, verify `blockOnFailure: false` is present on all BeforeTool/AfterTool hooks.
+**Status:** Applied.
+
+**Learning 6 — Gemini's cross-CLI hook improvements are worth keeping.**
+Gemini added stdin reading + stderr redirect + `{"decision":"allow"}` stdout to `graph_impact_advisor.py` and `test_recommender.py`. These changes are correct and make hooks work across Claude Code, Gemini CLI, and Codex. Claude Code ignores the stdout decision; Gemini needs it.
+**Applied:** Changes committed as `feat(hooks): add Gemini CLI compatibility`.
+**Status:** Applied. Gemini should be allowed to improve shared scripts.
+
+**Learning 7 — Watson is agentic; invoke.py is single-turn. Pre-seed oracle context.**
+Watson's first run via `invoke.py` tried to spawn Bash tool calls (hallucinated `/home/user/repos/...` paths). Fix: pass live oracle state + Aura DB state in `--context`. Watson then reasoned correctly without needing tools. For true multi-turn Watson execution, invoke.py needs a conversation loop or use CLI subagent spawn.
+**Applied:** Second Watson call pre-seeded oracle context. Clean ChallengeReport produced.
+**Rule:** For agentic agents (Watson, Commander) in invoke.py: always pre-seed context. Tell the agent explicitly "No tool calls. Reason from context provided."
+**Status:** Applied.
+
+**Learning 8 — Lestrade is genuinely useful, not cosmetic.**
+First real arbitration: Commander proposed loop_budget=2, Watson proposed 3 (COLD_START advisory, overridable). Lestrade (DeepSeek lineage) ruled loop_budget=3 BINDING. Rationale: cold-start write to live DB with unknown idempotency — contingency loop is prudent containment, not inefficiency. Different reasoning lineage produced a different and correct answer.
+**Applied:** loop_budget=3 accepted into BundleConfig.
+**Status:** Applied. Lestrade should be invoked on any parameter disagreement, not just full deadlocks.
+
 ---
 
 ## Promotion Candidates (hit count ≥ 2 = promote to AGENTS.md)
