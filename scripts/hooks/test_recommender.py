@@ -147,13 +147,21 @@ def main() -> int:
     """Main hook execution - always returns 0 (never blocks)."""
     start_time = time.perf_counter()
 
-    # Gemini CLI compatibility: Read stdin for tool_input
+    # Read stdin once (cross-CLI: Claude Code, Gemini CLI, Codex all pass context here)
     stdin_data = {}
     if not sys.stdin.isatty():
         try:
             stdin_data = json.load(sys.stdin)
         except Exception:
             pass
+
+    # Self-filter: only run for Edit/Write tool calls.
+    # Config-level filter (settings.json) may not work in all CLI/subagent contexts.
+    tool_name = stdin_data.get("tool_name", "")
+    if tool_name and tool_name not in ("Edit", "Write", "str_replace_based_edit_tool",
+                                       "create_file", "replace", "write_file"):
+        print(json.dumps({"decision": "allow"}))
+        return 0
 
     # Get file being edited from stdin, environment, or args
     tool_input = stdin_data.get("tool_input", {})
