@@ -312,13 +312,13 @@ services:
 
   # ===========================================
   # Next.js Frontend
-  # Direct access: http://localhost:3000 (debug only)
+  # Direct access: http://localhost:3001 (debug only)
   # Full implementation in Phase 7
   # ===========================================
   frontend:
     image: node:20-slim
     ports:
-      - "${NEXTJS_PORT:-3000}:3000"
+      - "${NEXTJS_PORT:-3001}:3000"
     volumes:
       - ./frontend:/app
       # Prevent overwriting node_modules and .next
