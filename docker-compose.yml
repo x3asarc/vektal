@@ -318,7 +318,7 @@ services:
   frontend:
     image: node:20-slim
     ports:
-      - "${NEXTJS_PORT:-3001}:3000"
+      - "3001:3000"
     volumes:
       - ./frontend:/app
       # Prevent overwriting node_modules and .next
