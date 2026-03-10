@@ -11,8 +11,11 @@ WORKDIR /app
 # Install system dependencies for Python packages
 # Some packages (Pillow, lxml) need these build tools
 # Use HTTPS for Debian mirrors (HTTP/80 is blocked in some environments)
-RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list \
-    && sed -i 's|http://security.debian.org|https://security.debian.org|g' /etc/apt/sources.list \
+RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+        sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources; \
+    elif [ -f /etc/apt/sources.list ]; then \
+        sed -i 's|http://|https://|g' /etc/apt/sources.list; \
+    fi \
     && apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
