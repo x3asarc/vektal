@@ -3,18 +3,18 @@
     "pre_tool": 414,
     "sentry_issue_pulled": 5,
     "sentry_issue_routed": 714,
-    "session_start": 20,
+    "session_start": 22,
     "pattern_recorded": 1,
     "session_synthesis": 1,
     "session_end": 1
   },
   "generated_from": "src.memory.materializers.build_long_term_index",
-  "last_updated": "2026-03-10T22:53:48Z",
+  "last_updated": "2026-03-10T23:11:45Z",
   "phase_summaries": [],
   "version": 1,
   "last_event": {
     "type": "session_start",
     "source": "session-start-hook",
-    "timestamp": "2026-03-10T22:53:48Z"
+    "timestamp": "2026-03-10T23:11:45Z"
   }
 }
