@@ -4,6 +4,10 @@ import { FieldCoverageMatrix } from './FieldCoverageMatrix';
 import { ChatWorkspace } from '../../chat/components/ChatWorkspace';
 import { Button } from '../../../components/ui/Button';
 import { Panel } from '../../../components/ui/Panel';
+import { OperationalErrorCard } from "@/components/OperationalErrorCard";
+import { apiRequest, ApiClientError } from "@/lib/api/client";
+import { stableDiagnosticId } from "@/lib/diagnostics";
+import type { NormalizedApiError } from "@/shared/contracts";
 
 interface DashboardData {
   total_skus: number;
@@ -26,23 +30,42 @@ export const CommandCenter: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [storeRequired, setStoreRequired] = useState(false);
+  const [error, setError] = useState<NormalizedApiError | null>(null);
 
   useEffect(() => {
     const fetchSummary = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/v1/ops/dashboard/summary');
-        if (response.status === 401) {
-          setIsUnauthorized(true);
-          throw new Error('AUTH_REQUIRED');
-        }
-        if (!response.ok) {
-          throw new Error('FETCH_FAILED');
-        }
-        const result = await response.json();
+        setIsUnauthorized(false);
+        setStoreRequired(false);
+        setError(null);
+        const result = await apiRequest<DashboardData>('/api/v1/ops/dashboard/summary');
         setData(result);
-      } catch (err: any) {
-        console.error("Dashboard fetch error:", err.message);
+      } catch (err: unknown) {
+        if (err instanceof ApiClientError) {
+          if (err.normalized.status === 401) {
+            setIsUnauthorized(true);
+            return;
+          }
+          if (err.normalized.status === 409) {
+            setStoreRequired(true);
+            return;
+          }
+          setError(err.normalized);
+          return;
+        }
+        const detail = err instanceof Error ? err.message : "Dashboard request failed.";
+        setError({
+          type: "urn:frontend:dashboard-error",
+          title: "Dashboard request failed",
+          status: 0,
+          detail,
+          fieldErrors: {},
+          scope: "global",
+          severity: "degrading",
+          canRetry: true,
+        });
       } finally {
         setLoading(false);
       }
@@ -70,6 +93,43 @@ export const CommandCenter: React.FC = () => {
             AUTHENTICATE_SESSION
           </Button>
         </Panel>
+      </div>
+    );
+  }
+
+  if (storeRequired) {
+    return (
+      <div className="page-wrap h-full flex items-center justify-center bg-[var(--surface-void)]">
+        <Panel className="max-w-md w-full p-8 text-center border-amber-400/40">
+          <div className="w-12 h-12 border border-amber-400/50 flex items-center justify-center mx-auto mb-6">
+            <span className="material-symbols-rounded text-amber-300 filled-icon">storefront</span>
+          </div>
+          <h2 className="page-title !text-sm mb-4">STORE_CONNECTION_REQUIRED</h2>
+          <p className="page-subtitle !text-[10px] mb-8 leading-relaxed">
+            Connect a Shopify store to unlock dashboard telemetry and ingest metrics.
+          </p>
+          <Button
+            onClick={() => window.location.href = '/onboarding'}
+            className="w-full"
+            variant="primary"
+          >
+            OPEN_ONBOARDING
+          </Button>
+        </Panel>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-wrap h-full flex items-center justify-center bg-[var(--surface-void)]">
+        <OperationalErrorCard
+          title={error.title}
+          detail={error.detail}
+          diagnosticId={stableDiagnosticId(error.detail)}
+          retryLabel="Retry dashboard"
+          onRetry={() => window.location.reload()}
+        />
       </div>
     );
   }
