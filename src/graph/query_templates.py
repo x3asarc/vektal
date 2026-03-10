@@ -242,6 +242,21 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
     # Apply default parameters for templates that require them
     params = _apply_default_params(template_name, params)
 
+    # Validate required parameters (issue 101549138)
+    # Templates with required file_path should not execute with empty string
+    required_file_path_templates = {
+        "similar_files", "imports", "imported_by", "impact_radius",
+        "planning_context", "functions_in_file"
+    }
+    if template_name in required_file_path_templates and not params.get("file_path"):
+        logger.warning(f"Template {template_name} requires file_path but got empty value")
+        return []
+
+    # Templates with required function_name
+    if template_name in {"function_callers", "function_callees"} and not params.get("function_name"):
+        logger.warning(f"Template {template_name} requires function_name but got empty value")
+        return []
+
     cypher = QUERY_TEMPLATES[template_name]
 
     def _records_to_dicts(records: Any) -> List[Dict[str, Any]]:
@@ -338,8 +353,8 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         if _runtime_backend_mode() == "local_snapshot" and not force_probe:
             raise RuntimeError("Runtime backend pinned to local_snapshot")
 
-        if _neo4j_temporarily_unavailable():
-            raise RuntimeError("Neo4j temporarily unavailable in this runtime")
+        # Backoff check moved to top of execute_template() for cleaner flow
+        # This code path should only be reached if force_probe=true
 
         uris = _neo4j_uri_candidates()
         user = os.environ.get("NEO4J_USER", "neo4j")
@@ -378,6 +393,11 @@ def execute_template(template_name: str, params: Dict[str, Any], timeout_ms: int
         graph_enabled = os.environ.get("GRAPH_ORACLE_ENABLED", "false").lower() == "true"
 
         if runtime_mode == "local_snapshot" and not force_probe:
+            return _execute_local_template_fallback(template_name, params)
+
+        # If Neo4j is in backoff period, skip connection attempts and use fallback immediately
+        if _neo4j_temporarily_unavailable() and not force_probe:
+            logger.debug(f"Neo4j in backoff period, using local fallback for template {template_name}")
             return _execute_local_template_fallback(template_name, params)
 
         if prefer_sync and graph_enabled:

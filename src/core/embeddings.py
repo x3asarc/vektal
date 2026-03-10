@@ -1,5 +1,5 @@
 """
-Vector embedding generation for codebase knowledge graph.
+Vector embedding generation for codebase knowledge graph. (Gemini Hook Test)
 
 Uses sentence-transformers (local, free) for semantic similarity search.
 Embeddings stored IN Neo4j (not separate vector DB) for integrated graph+vector queries.

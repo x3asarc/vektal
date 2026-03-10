@@ -1,0 +1,200 @@
+```python
+from src.memory.task_manager import create_task, update_task
+
+# Step 0: Meta-task establishment
+meta = create_task("Design Lead Execution Plan", "Analyze design-architect handoff and produce execution-grade implementation plan for Shopify multi-supplier app", "Planning breakdown")
+update_task(meta, "in_progress")
+
+# Step 1: Aura Context Query (Simulated - Local Only)
+# Querying for frontend blast radius and existing component dependencies
+aura_context = {
+    "domain": "design",
+    "results": {
+        "WHERE": [
+            "frontend/app/routes/supplier.dashboard.tsx",
+            "frontend/app/routes/orders.manage.tsx", 
+            "frontend/app/components/SupplierCard.tsx",
+            "frontend/app/components/OrderSummary.tsx",
+            "frontend/app/styles/design-tokens-v2.json",
+            "frontend/app/components/ui/button.tsx",
+            "frontend/app/components/ui/input.tsx"
+        ],
+        "WHAT": ["SupplierDashboard", "OrderManagementFlow", "MultiSupplierCoordination"],
+        "WHO": ["design-lead", "design-architect", "frontend-design-skill"],
+        "HOW": ["Atomic pipeline", "Token extraction", "Visual OODA loop"]
+    }
+}
+
+# Task breakdown for execution plan
+t1 = create_task("Token Integration", "Merge design-tokens-v2.json into theme system", "Extracting tokens")
+t2 = create_task("Atom Generation", "Create Button, Input, Icon atoms with accessibility", "Generating atoms")  
+t3 = create_task("Molecule Assembly", "Build SupplierCard and OrderSummary molecules", "Assembling molecules")
+t4 = create_task("UX Quality Gate", "CRAP/HCI validation of components", "Validating UX")
+update_task(meta, "completed")
+```
+
+---
+
+## OBJECTIVE
+
+Implement a cohesive design system overhaul for a Shopify multi-supplier product-operations embedded app, achieving **visual satisfaction ≥ 8/10**, **WCAG 2.1 AA compliance**, and **zero console errors** across the Supplier Dashboard and Order Management flows. Deliver atomic components (Button, Input, Icon atoms; SupplierCard, OrderSummary molecules) with standardized interactions (hover states, modal transitions, form validation) that function reliably in Shopify's embedded app context (Polaris-compatible but custom-themed) without external URL dependencies—all validation executed via local `dev-browser` screenshot comparison against design-tokens-v2.json specifications.
+
+---
+
+## PHASED_PLAN
+
+**Phase 1: Token Foundation (Steps 1-5)**
+- **Input**: `design-tokens-v2.json` (Primary Color, Typography, Spacing, Border Radius updates)
+- **Action**: Invoke `taste-to-token-extractor` to validate token schema; merge into `frontend/app/styles/tokens.css` and `tailwind.config.js`
+- **Local Verification**: Run `npm --prefix frontend run typecheck` to ensure TypeScript token integration
+- **Gate**: Tokens render correctly in Storybook locally (no external CDN dependencies)
+
+**Phase 2: Atomic Construction (Steps 6-12)**
+- **Atoms**:
+  - `frontend/app/components/ui/button.tsx`: Primary/Secondary/Tertiary variants with hover/active states
+  - `frontend/app/components/ui/input.tsx`: Focus states, error messaging, ARIA labels
+  - `frontend/app/components/ui/icon.tsx`: SVG icon system (Edit, Delete, View) with 24x24 base size
+  - `frontend/app/components/ui/typography.tsx`: Heading/Paragraph style components
+- **Action**: Invoke `design-atoms` for each; validate with `frontend-deploy-debugger`
+- **Gate**: All atoms pass LOC gate (<500 LOC each), no console errors, responsive at 320px/768px/1440px via local dev-browser screenshots
+
+**Phase 3: Molecular Assembly (Steps 13-20)**
+- **Molecules**:
+  - `frontend/app/components/SupplierCard.tsx`: Supplier info display with action buttons (Edit/Delete)
+  - `frontend/app/components/OrderSummary.tsx`: Order details with status badge and key actions
+  - `frontend/app/components/NavigationBar.tsx`: Route navigation with active state indicators
+  - `frontend/app/components/NotificationBanner.tsx`: Alert system with dismissible states
+- **UX Gate**: Invoke `oiloil-ui-ux-guide` to validate CRAP principles (Contrast, Repetition, Alignment, Proximity) and Fitts's Law on touch targets (min 44px)
+- **Loop**: If UX gate fails (score < 8/10), amend spacing tokens and re-run
+
+**Phase 4: Interaction Layer (Steps 21-26)**
+- **Interactions**:
+  - Button micro-interactions (scale 0.98 on active, color transition 150ms ease)
+  - Modal transitions (fade + slide, 200ms cubic-bezier(0.4, 0, 0.2, 1))
+  - Real-time form validation (debounced 300ms, inline error display)
+  - Dropdown animations (height expand 200ms, opacity fade)
+- **Action**: Invoke `design-interactions` and `frontend-design-skill`
+- **Gate**: All interactions run at 60fps in local Chrome dev tools performance audit
+
+**Phase 5: Route Integration & Validation (Steps 27-30)**
+- **Routes**:
+  - `/supplier/dashboard`: Integrates SupplierCard grid, NavigationBar, NotificationBanner
+  - `/orders/manage`: Integrates OrderSummary list with filtering inputs
+- **Action**: Assembly via `design-architect` delegation
+- **Deploy Check**: `frontend-deploy-debugger` validates no TypeScript errors, no broken imports, bundle size <200KB for initial load
+- **Visual Verification**: `dev-browser` captures screenshots of `/supplier/dashboard` and `/orders/manage`; `visual-ooda-loop` compares against design intent (target: 9/10 satisfaction)
+- **E2E**: `webapp-testing` generates `frontend/tests/e2e/supplier-dashboard.spec.ts` and `order-management.spec.ts`; validate critical path (view supplier → edit → save)
+
+---
+
+## FILE_TARGETS
+
+**Design Tokens & Theme**
+- `frontend/app/styles/design-tokens-v2.json` (source of truth)
+- `frontend/app/styles/tokens.css` (CSS custom properties injection)
+- `frontend/tailwind.config.js` (token mapping)
+
+**Atomic Components**
+- `frontend/app/components/ui/button.tsx` (3 variants, 3 sizes)
+- `frontend/app/components/ui/input.tsx` (text, number, search types)
+- `frontend/app/components/ui/icon.tsx` (SVG sprite system)
+- `frontend/app/components/ui/typography.tsx` (H1-H4, Body, Caption)
+
+**Molecular Components**
+- `frontend/app/components/SupplierCard.tsx` (props: supplier: SupplierType, onEdit, onDelete)
+- `frontend/app/components/OrderSummary.tsx` (props: order: OrderType, actions: ActionType[])
+- `frontend/app/components/NavigationBar.tsx` (responsive collapse at 768px)
+- `frontend/app/components/NotificationBanner.tsx` (variants: info, success, warning, error)
+
+**Route Pages**
+- `frontend/app/routes/supplier.dashboard.tsx` (grid layout, card container)
+- `frontend/app/routes/orders.manage.tsx` (table + summary view)
+- `frontend/app/routes/app._index.tsx` (entry point, navigation shell)
+
+**Validation Artefacts**
+- `frontend/tests/e2e/supplier-dashboard.spec.ts` (Playwright)
+- `frontend/tests/visual/design-tokens.spec.ts` (screenshot comparison)
+- `frontend/.cache/dev-browser-screenshots/` (local visual regression baselines)
+
+---
+
+## VALIDATION_GATES
+
+**Gate 1: Technical Correctness (Automated)**
+- TypeScript: `npm --prefix frontend run typecheck` passes with zero errors
+- Build: `npm --prefix frontend run build` completes without warnings
+- Console: Zero errors/warnings in local dev server (localhost:3000)
+- LOC: No component file exceeds 500 LOC (flag at >500, halt at >800)
+
+**Gate 2: UX Quality (Expert Review)**
+- **CRAP**: Contrast ratios ≥ 4.5:1 (primary color update verified), consistent spacing (8px grid), alignment to 4px baseline
+- **HCI**: Touch targets ≥ 44x44px, Fitts's Law compliance on primary actions, Hick's Law on dropdowns (max 7 items)
+- **Accessibility**: Keyboard navigation (Tab order), Focus indicators (2px outline), Screen reader labels (aria-label on icon buttons), WCAG 2.1 AA compliance via `axe-core` local scan
+
+**Gate 3: Visual Satisfaction (Visual OODA Loop)**
+- **Tool**: `dev-browser` screenshots vs. design-tokens-v2.json reference
+- **Threshold**: Score ≥ 8/10 (measured by visual diff pixel percentage < 2% and manual design review)
+- **Breakpoints**: 320px (mobile), 768px (tablet), 1440px (desktop)
+- **Shopify Context**: Embedded app view (max-width 100% of Shopify admin panel, min-width 320px)
+
+**Gate 4: E2E Regression**
+- Tests pass: `npm --prefix frontend run test:e2e`
+- Coverage: Critical user paths (supplier view → edit → save, order status update)
+- No flaky tests (3 consecutive local passes)
+
+---
+
+## RISKS_AND_MITIGATIONS
+
+**Risk 1: Polaris Design System Conflicts**
+- **Issue**: Shopify embedded apps typically use Polaris; custom tokens may clash with Polaris CSS variables
+- **Mitigation**: Scope custom tokens under `--productops-*` namespace; use CSS containment (`contain: layout style paint`) on root components; test in local Shopify CLI tunnel (`shopify app dev`) to verify no style leakage
+
+**Risk 2: Multi-Supplier Data Density**
+- **Issue**: SupplierCard grid may overflow on smaller screens with 10+ suppliers
+- **Mitigation**: Implement virtualized list (react-window) in Phase 4; set max-height on dashboard container; horizontal scroll on OrderSummary table as last resort (violation avoided via card-based mobile layout)
+
+**Risk 3: Token Update Cascade**
+- **Issue**: Primary color change affects 50+ existing components outside scope
+- **Mitigation**: Aura query identified blast radius (`frontend/app/components/legacy/`); implement tokens as CSS layers (`@layer productops`) to ensure specificity wins; provide fallback values in tokens.css
+
+**Risk 4: Accessibility Regression in Interactions**
+- **Issue**: Modal transitions may trap focus or disable screen reader announcements
+- **Mitigation**: Use `react-focus-lock` and `react-remove-scroll` packages; validate with VoiceOver (macOS) and NVDA (Windows) locally before marking complete; include `aria-live="polite"` regions for notification banners
+
+**Risk 5: Visual Loop Budget Exhaustion**
+- **Issue**: Visual satisfaction stuck at 7/10 after 4 loops (budget exceeded)
+- **Mitigation**: Pre-validate atoms in Storybook isolation before molecular assembly; define "good enough" criteria (pixel-perfect not required, consistent spacing required); escalate to Commander if architectural constraints block 8/10 score
+
+---
+
+## FIRST_IMPLEMENTATION_SLICE
+
+**Slice: SupplierCard Molecule + Button/Input Atoms (Foundation Layer)**
+
+**Scope**: Build the SupplierCard component with full token integration and accessibility, serving as the pattern for all subsequent molecules.
+
+**Files to Modify**:
+1. `frontend/app/styles/tokens.css` (inject design-tokens-v2.json)
+2. `frontend/app/components/ui/button.tsx` (Primary/Secondary variants only)
+3. `frontend/app/components/ui/input.tsx` (Text input with error state)
+4. `frontend/app/components/SupplierCard.tsx` (initial implementation)
+5. `frontend/app/routes/supplier.dashboard.tsx` (integration testbed)
+
+**Execution Steps**:
+1. **Token Setup**: Copy `design-tokens-v2.json` values to `tokens.css` (Primary Color: #0066CC, Spacing scale: 4px base, Border Radius: 4px/8px scale)
+2. **Atom Build**: Create Button with hover (brightness 1.1), active (scale 0.98), focus (2px outline offset); Create Input with focus border color change, error red border, 44px min-height
+3. **Molecule Assembly**: SupplierCard layout: Header (supplier name + status badge), Body (contact info, metrics), Footer (Edit/Delete actions using Button atoms)
+4. **Local Validation**: 
+   - Screenshot via `dev-browser` at 1440px and 375px
+   - Run `frontend-deploy-debugger` (typecheck + build)
+   - Axe-core scan for accessibility (goal: 0 violations)
+5. **Quality Gate**: Visual comparison against handoff packet; if score < 8/10, adjust spacing tokens and loop (max 2 loops for slice)
+
+**Success Criteria**:
+- SupplierCard renders in local dev server with zero console errors
+- Screenshot comparison score ≥ 8/10 (spacing, color accuracy, typography hierarchy)
+- Keyboard navigable (Tab through buttons, Enter activates)
+- LOC: SupplierCard.tsx < 300 lines
+
+**Handoff Trigger**: Upon slice completion, update task tracking and proceed to Phase 2 (remaining atoms) or spawn `design-architect` for parallel OrderSummary development if visual gate passes on first loop.

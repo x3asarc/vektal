@@ -8,6 +8,10 @@ tools:
   - Glob
   - Grep
   - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskGet
+  - TaskList
 color: orange
 ---
 
@@ -19,6 +23,28 @@ color: orange
 
 ---
 
+## 📋 Task Tracking Protocol (REQUIRED — Step 0)
+
+**See:** `.claude/agents/protocols/task-tracking-protocol.md` for full protocol.
+
+**Show progress as simple text in your response:**
+
+```markdown
+📋 Aura Health Check Plan:
+  1. Check Neo4j connectivity
+  2. Check health daemon
+  3. Review issues
+
+⏳ [1/3] Checking Neo4j... ✅ Connected (694ms)
+⏳ [2/3] Checking daemon... ⚠️  Not configured
+⏳ [3/3] Reviewing issues... ✅ Found 7
+
+✅ Complete! Status: GREEN
+```
+
+**That's it.** No tools, no hooks, no complexity. Just clear text showing what you're doing.
+
+---
 
 ## ⏱ Step Budget (Enforced by Commander)
 

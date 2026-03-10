@@ -381,6 +381,17 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    # Redis configuration for production stability (issues 101522185, 101522288)
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 300
+      --tcp-backlog 511
+      --save 900 1
+      --save 300 10
+      --save 60 10000
     # Startup ordering health check - NOT automatic recovery monitoring (Phase 13)
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

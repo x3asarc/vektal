@@ -456,14 +456,34 @@ def _search_tools_handler(query: str, tier: int | None = None, top_k: int = 3) -
     tools = []
     for record in results:
         try:
+            # Validate record has required fields
+            if not isinstance(record, dict) or "schema" not in record:
+                logger.warning(f"Skipping invalid tool record: missing schema field")
+                continue
+
             # record["schema"] is the full schema stored in ToolNode
-            schema = json.loads(record["schema"]) if isinstance(record["schema"], str) else record["schema"]
+            schema_raw = record["schema"]
+            if isinstance(schema_raw, str):
+                try:
+                    schema = json.loads(schema_raw)
+                except json.JSONDecodeError as e:
+                    logger.error(f"JSON parse error for tool {record.get('name', 'unknown')}: {e}")
+                    continue
+            else:
+                schema = schema_raw
+
             input_schema = schema.get("inputSchema") if isinstance(schema, dict) and "inputSchema" in schema else schema
-            input_examples = (
-                json.loads(record["examples"])
-                if isinstance(record["examples"], str)
-                else (record["examples"] or [])
-            )
+
+            # Parse examples with validation
+            examples_raw = record.get("examples")
+            if isinstance(examples_raw, str):
+                try:
+                    input_examples = json.loads(examples_raw)
+                except json.JSONDecodeError as e:
+                    logger.error(f"JSON parse error for tool examples {record.get('name', 'unknown')}: {e}")
+                    input_examples = []
+            else:
+                input_examples = examples_raw or []
             tools.append(
                 {
                     "name": record["name"],

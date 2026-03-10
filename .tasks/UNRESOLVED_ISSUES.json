@@ -1,0 +1,82 @@
+[
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101977220",
+    "title": "OSError: [Errno 22] Invalid argument",
+    "culprit": "runpy in _run_code",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-09T19:35:12.892398Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101965435",
+    "title": "RuntimeError: ",
+    "culprit": "__main__ in <module>",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-09T18:17:32.629291Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101549134",
+    "title": "Error executing template similar_files: Neo4j temporarily unavailable in this runtime",
+    "culprit": "",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-07T23:05:01.945715Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101549138",
+    "title": "Error executing Neo4j query: {code: Neo.ClientError.Statement.ParameterMissing} {message: Expected parameter(s): file_path, limit, threshold}",
+    "culprit": "",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-07T23:05:01.928655Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101549129",
+    "title": "Failed to search similar entities: Task <Task pending name='Task-58' coro=<_execute_query.<locals>._run_async() running at C:\\Users\\Hp\\Documents\\Shopify Scraping Script\\src\\core\\embeddings.py:211> cb=[_run_until_complete_cb() at C:\\Users\\Hp\\AppData\\Loca...",
+    "culprit": "",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-07T23:05:00.053245Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101522296",
+    "title": "Error executing template imports: Neo4j temporarily unavailable in this runtime",
+    "culprit": "",
+    "count": "2",
+    "level": "error",
+    "lastSeen": "2026-03-07T23:00:21.544050Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "101522291",
+    "title": "Error executing Neo4j query: Task <Task pending name='Task-48' coro=<wait_for() running at C:\\Users\\Hp\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\asyncio\\tasks.py:520> cb=[_run_until_complete_cb() at C:\\Users\\Hp\\AppData\\Local\\Programs\\Python\\Python312\\...",
+    "culprit": "",
+    "count": "2",
+    "level": "error",
+    "lastSeen": "2026-03-07T23:00:20.882715Z"
+  },
+  {
+    "project": "synthex-workers",
+    "project_slug": "synthex-workers",
+    "issue_id": "100522741",
+    "title": "Handler error: Test error",
+    "culprit": "",
+    "count": "1",
+    "level": "error",
+    "lastSeen": "2026-03-03T19:50:16.777177Z"
+  }
+]

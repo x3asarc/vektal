@@ -156,8 +156,6 @@ class SiteReconnaissance:
         if not _check_playwright():
             raise RuntimeError("Playwright not available")
 
-        from playwright.async_api import async_playwright
-
         # Normalize domain URL
         if not domain_url.startswith('http'):
             domain_url = f"https://{domain_url}"
@@ -181,6 +179,7 @@ class SiteReconnaissance:
         has_lazy_loading = False
 
         try:
+            from playwright.async_api import async_playwright
             async with async_playwright() as p:
                 browser = await p.chromium.launch(
                     headless=self.headless,

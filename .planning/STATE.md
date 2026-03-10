@@ -59,13 +59,14 @@ All 12 sub-plans (15-01 through 15-11b) successfully executed and verified.
 - 2026-03-04: Completed Phase 15.1 execution plans 01-04 and published required governance reports (GREEN).
 - 2026-03-06: Completed Phase 17 execution plans 17.1-17.6; Sentry dev-integration verified; Phase summary and verification reports published (GREEN).
 
-## Recent Session Summary (2026-03-06)
-- Implemented Phase 17: Product Data Command Center + Chat-First Product Ops.
-- Extended `Product` model with completeness scoring and forensic field tracking.
-- Implemented secure Shopify Webhook receiver and periodic Reconciliation Poller.
-- Created brutalist Dashboard UI (`CommandCenter`) with embedded Chat Dock.
-- Integrated Sentry SDK for development environment telemetry.
-- Published wave summaries (17.1-17.6) and final Phase 17 verification report.
+## Recent Session Summary (2026-03-09)
+- Implemented TaskExecution node logging in Commander agent.
+- Created `scripts/graph/write_task_execution.py` helper script for writing TaskExecution nodes to Aura.
+- Updated `.claude/agents/commander.md` Part VIII with implementation using helper script.
+- Updated `docs/agent-system/specs/commander.md` to reference helper script.
+- Verified TaskExecution writes: 3 test nodes created, SkillDef.trigger_count updates working.
+- Created documentation: `scripts/graph/README_TASK_EXECUTION.md`.
+- Status: Commander can now write TaskExecution nodes after every Lead completion (Flow 1 Phase 6 Step 6.1).
 
 ## Architecture Sessions (2026-03-07 — 2026-03-08) via Letta
 Work conducted through Letta agent (agent-745c61ec). No GSD phase executed.

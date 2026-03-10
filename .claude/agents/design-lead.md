@@ -8,6 +8,10 @@ tools:
   - Glob
   - Grep
   - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskGet
+  - TaskList
 color: purple
 ---
 
@@ -19,6 +23,30 @@ color: purple
 
 ---
 
+## 📋 Task Tracking Protocol (REQUIRED — Step 0)
+
+**IMMEDIATE FIRST ACTION:**
+```python
+from src.memory.task_manager import create_task, update_task
+
+# Step 1: Meta-task
+meta = create_task("Plan work breakdown", "Analyze design requirements", "Planning breakdown")
+update_task(meta, "in_progress")
+# ... decide what tasks are needed ...
+update_task(meta, "completed")
+
+# Step 2: Create tasks
+t1 = create_task("Extract design tokens", "...", "Extracting tokens")
+t2 = create_task("Generate atomic components", "...", "Generating atoms")
+t3 = create_task("Visual verification", "...", "Verifying")
+
+# Step 3: Execute
+update_task(t1, "in_progress") → work → update_task(t1, "completed")
+```
+
+**Why:** User sees your plan, then watches progress. If you skip this, user has no visibility.
+
+---
 
 ## ⏱ Step Budget (Enforced by Commander)
 

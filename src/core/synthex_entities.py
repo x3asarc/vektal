@@ -335,6 +335,9 @@ def create_episode_payload(
     Returns:
         Dict with episode_type, store_id, entity_created_at, and kwargs
 
+    Raises:
+        ValueError: If episode_type is not a valid EpisodeType enum member
+
     Example:
         >>> payload = create_episode_payload(
         ...     EpisodeType.ORACLE_DECISION,
@@ -344,6 +347,21 @@ def create_episode_payload(
         ...     reason_codes=["no_conflicts"]
         ... )
     """
+    # Validate episode_type is a valid enum member
+    if isinstance(episode_type, str):
+        try:
+            episode_type = EpisodeType(episode_type)
+        except ValueError:
+            valid_types = ", ".join([e.value for e in EpisodeType])
+            raise ValueError(
+                f"'{episode_type}' is not a valid EpisodeType. "
+                f"Valid types are: {valid_types}"
+            )
+    elif not isinstance(episode_type, EpisodeType):
+        raise ValueError(
+            f"episode_type must be an EpisodeType enum member, got {type(episode_type)}"
+        )
+
     payload = {
         'episode_type': episode_type.value,
         'store_id': store_id,

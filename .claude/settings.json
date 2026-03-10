@@ -1,4 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Task(*)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -57,13 +68,7 @@
         "filter": {
           "tool": "Task"
         },
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python scripts/hooks/memory_pattern_primer.py",
-            "blockOnFailure": false
-          }
-        ]
+        "hooks": []
       },
       {
         "filter": {

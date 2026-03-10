@@ -5,6 +5,10 @@ tools:
   - Read
   - Bash
   - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskGet
+  - TaskList
 color: red
 ---
 
@@ -16,6 +20,30 @@ color: red
 
 ---
 
+## 📋 Task Tracking Protocol (REQUIRED — Step 0)
+
+**IMMEDIATE FIRST ACTION:**
+```python
+from src.memory.task_manager import create_task, update_task
+
+# Step 1: Meta-task
+meta = create_task("Plan work breakdown", "Analyze incident/bug", "Planning breakdown")
+update_task(meta, "in_progress")
+# ... decide investigation approach ...
+update_task(meta, "completed")
+
+# Step 2: Create tasks
+t1 = create_task("Query Aura for context", "...", "Querying Aura")
+t2 = create_task("Trace root cause", "...", "Tracing")
+t3 = create_task("Route resolution", "...", "Routing")
+
+# Step 3: Execute
+update_task(t1, "in_progress") → work → update_task(t1, "completed")
+```
+
+**Why:** User sees your plan, then watches progress. If you skip this, user has no visibility.
+
+---
 
 ## ⏱ Step Budget (Enforced by Commander)
 

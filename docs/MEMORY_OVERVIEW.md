@@ -1,6 +1,6 @@
 # Memory Overview
 
-**Generated:** 2026-03-07T12:46:37Z
+**Generated:** 2026-03-10T18:03:10Z
 
 ## High-Level Summary
 
@@ -13,20 +13,22 @@
 ### Working Memory (Session Cache)
 - **Location:** `.memory/working/`
 - **Scope:** Current session (<24 hours)
-- **Recent Sessions:** 1
+- **Recent Sessions:** 5
 
 #### Recent Working Files:
-- `.memory/working/session-88bc829b.json`
+- `.memory/working/session-claude-test.json`
+- `.memory/working/session-gemini-gemini-pretool.json`
+- `.memory/working/session-test-test-session-2.json`
 
 ### Short-Term Memory (Daily Activity)
 - **Location:** `.memory/short-term/`
 - **Scope:** Last 30 days
-- **Files:** 5 days of activity
+- **Files:** 7 days of activity
 
 #### Recent Days:
-- `.memory/short-term/2026-03-05.jsonl`
-- `.memory/short-term/2026-03-06.jsonl`
-- `.memory/short-term/2026-03-07.jsonl`
+- `.memory/short-term/2026-03-08.jsonl`
+- `.memory/short-term/2026-03-09.jsonl`
+- `.memory/short-term/2026-03-10.jsonl`
 
 ### Long-Term Memory (Project Knowledge)
 - **Location:** `.memory/long-term/`
@@ -38,6 +40,7 @@
 #### Patterns (Success):
 - `.memory/long-term/patterns/success/pattern-agent-definitions-in-claude-agents-with-yaml-frontmatter-for-configuration.md`
 - `.memory/long-term/patterns/success/pattern-anchor-pages-search-chat-enrichment-serve-as-the-visual-dna-source-of-truth-for-the-ooda-loop.md`
+- `.memory/long-term/patterns/success/pattern-aura-oracle-universal-read-gateway-writes-stay-direct-cypher.md`
 - `.memory/long-term/patterns/success/pattern-combined-use-of-playwright-screenshots-and-firecrawl-scrapes-provides-high-fidelity-visual-evidence.md`
 - `.memory/long-term/patterns/success/pattern-cross-platform-skills-agents-should-be-copied-to-claude-gemini-codex-directories-for-universal-availability.md`
 - `.memory/long-term/patterns/success/pattern-gemini-model-correctly-inherits-cross-platform-memory-system.md`
@@ -50,6 +53,7 @@
 - `.memory/long-term/patterns/success/pattern-runshellcommand-replaces-bash-in-gemini-toolset.md`
 - `.memory/long-term/patterns/success/pattern-scripted-congruence-analysis-between-plan-md-tokens-and-live-ui-ensures-objective-satisfaction-scores.md`
 - `.memory/long-term/patterns/success/pattern-skills-should-have-scripts-in-scripts-subdirectory-for-progressive-disclosure.md`
+- `.memory/long-term/patterns/success/pattern-verify-parent-delegation-before-app-layer-debugging-during-frontdoor-incidents.md`
 - `.memory/long-term/patterns/success/task-pattern-phase-17-dashboard-remediation.md`
 
 #### Patterns (Anti-patterns):

@@ -1,0 +1,124 @@
+# Frontdoor Probe
+timestamp_utc=2026-03-10T11:27:22.7811335+01:00
+domain=app.vektal.systems
+expected_ipv4=54.38.220.85
+expected_ipv6=
+
+## Local DNS A
+{
+    "Name":  "app.vektal.systems",
+    "Type":  1,
+    "TTL":  3600,
+    "Section":  1,
+    "IPAddress":  "94.23.162.163",
+    "NameHost":  null
+}
+
+## Local DNS AAAA
+{
+    "Name":  "app.vektal.systems",
+    "Type":  6,
+    "TTL":  1477,
+    "Section":  2,
+    "IPAddress":  null,
+    "NameHost":  null,
+    "PrimaryServer":  "ns1.emailverification.info"
+}
+
+## nslookup A via 1.1.1.1
+Non-authoritative answer:
+System.Management.Automation.RemoteException
+Server:  one.one.one.one
+Address:  1.1.1.1
+
+Name:    app.vektal.systems
+Address:  94.23.162.163
+
+
+## nslookup AAAA via 1.1.1.1
+Server:  one.one.one.one
+Address:  1.1.1.1
+
+Name:    app.vektal.systems
+
+
+## nslookup A via 8.8.8.8
+Non-authoritative answer:
+System.Management.Automation.RemoteException
+Server:  dns.google
+Address:  8.8.8.8
+
+Name:    app.vektal.systems
+Address:  54.38.220.85
+
+
+## nslookup AAAA via 8.8.8.8
+Server:  dns.google
+Address:  8.8.8.8
+
+Name:    app.vektal.systems
+
+
+## nslookup A via 9.9.9.9
+*** Request to dns9.quad9.net timed-out
+System.Management.Automation.RemoteException
+Server:  dns9.quad9.net
+Address:  9.9.9.9
+
+DNS request timed out.
+    timeout was 2 seconds.
+DNS request timed out.
+    timeout was 2 seconds.
+
+## nslookup AAAA via 9.9.9.9
+*** Request to UnKnown timed-out
+System.Management.Automation.RemoteException
+DNS request timed out.
+    timeout was 2 seconds.
+Server:  UnKnown
+Address:  9.9.9.9
+
+DNS request timed out.
+    timeout was 2 seconds.
+DNS request timed out.
+    timeout was 2 seconds.
+
+## DoH A (Cloudflare)
+curl: (35) schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS (0x8009030E) - No credentials are available in the security package
+
+## DoH AAAA (Cloudflare)
+curl: (35) schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS (0x8009030E) - No credentials are available in the security package
+
+## DoH A (Google)
+curl: (35) schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS (0x8009030E) - No credentials are available in the security package
+
+## DoH AAAA (Google)
+curl: (35) schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS (0x8009030E) - No credentials are available in the security package
+
+## curl default /
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2206 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/
+
+## curl default /health
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2164 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/health
+
+## curl default /chat
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2165 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/chat
+
+## curl -4 /health
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2234 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/health
+
+## curl -6 /health
+curl: (6) Could not resolve host: app.vektal.systems code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/health
+
+## curl --resolve IPv4 /health
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2149 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/health
+
+## curl --resolve IPv4 /chat
+curl: (7) Failed to connect to app.vektal.systems port 443 after 2164 ms: Could not connect to server code=000 remote_ip= tls_verify=0 url=https://app.vektal.systems/chat
+
+## Gate
+Interpretation rules:
+1) If default /health remote_ip is not expected server IP, DNS/routing is wrong.
+2) If default fails but --resolve IPv4 passes, client resolver path is stale/cached.
+3) If both default and --resolve fail, origin/nginx/frontend stack is unhealthy.
+4) If IPv6 path shows old host while IPv4 is correct, stale AAAA is the cause.

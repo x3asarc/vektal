@@ -40,6 +40,12 @@
     ]
   },
   "mcpServers": {
+    "stitch": {
+      "command": "./venv/Scripts/python.exe",
+      "args": [
+        "scripts/mcp/start_stitch_mcp.py"
+      ]
+    },
     "synthex-knowledge-graph": {
       "command": "./venv/Scripts/python.exe",
       "args": [

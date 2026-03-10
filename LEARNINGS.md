@@ -160,3 +160,8 @@ First real arbitration: Commander proposed loop_budget=2, Watson proposed 3 (COL
 **Outcome:** FAILED
 **Actions:** pip_install_sentry-sdk, install_exception
 **Message:** Installation exception: 
+
+### 2026-03-10 | NanoFixer: neo4j_health
+**Outcome:** SUCCESS
+**Actions:** neo4j_connection_probe, connection_attempt_1, graphiti_client_validated, connection_success
+**Message:** Neo4j connection restored on attempt 1/3

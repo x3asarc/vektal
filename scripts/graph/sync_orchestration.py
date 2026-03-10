@@ -768,11 +768,13 @@ def sync_edges(session) -> dict[str, int]:
             if r:
                 counts["activates_lead"] += 1
 
-    # TaskExecution schema update: ensure model-tracking properties exist as constraints
-    # (nodes are created at runtime by Commander — we just define the shape here via a comment)
-    # Fields: model_requested, model_used, utility_models_used, model_cost_usd,
-    #         escalation_triggered, escalation_reason, difficulty_tier
-    # These are written by Commander, read by task-observer. No MERGE needed here.
+    # TaskExecution nodes: written at runtime by Commander via scripts/graph/write_task_execution.py
+    # Called in Flow 1 Phase 6 Step 6.1 (docs/agent-system/specs/commander.md)
+    # Schema: task_id, task_type, lead_invoked, quality_gate_passed, loop_count,
+    #         skills_used, model_used, model_requested, utility_models_used,
+    #         escalation_triggered, escalation_reason, difficulty_tier, created_at, status
+    # Read by: task-observer (ImprovementProposal validation), Watson (PostMortem feedback)
+    # No constraint needed here — created by write_task_execution.py helper
 
     return counts
 
