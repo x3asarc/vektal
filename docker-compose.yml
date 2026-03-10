@@ -294,10 +294,8 @@ services:
       celery -A src.celery_app flower
       --port=5555
       --persistent=True
-      --db=/data/flower.db
+      --db=/tmp/flower.db
       --basic_auth=${FLOWER_BASIC_AUTH:-admin:admin}
-    volumes:
-      - flower_data:/data
     depends_on:
       redis:
         condition: service_healthy
@@ -441,8 +439,6 @@ volumes:
     name: shopify_backend_uploads
   backend_data:
     name: shopify_backend_data
-  flower_data:
-    name: shopify_flower_data
   neo4j_data:
     name: shopify_neo4j_data
   neo4j_logs:
