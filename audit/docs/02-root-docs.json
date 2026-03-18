@@ -1,0 +1,30 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "root_docs": [
+      "README.md",
+      "INDEX.md",
+      "MASTER_MAP.md",
+      "FOLDER_SUMMARIES.md",
+      "CONTEXT_LINK_MAP.md",
+      "AGENT_START_HERE.md",
+      "DIRECTORY_STRUCTURE.md",
+      "KNOWLEDGE_GRAPH.md",
+      "MEMORY_OVERVIEW.md",
+      "PROJECT_SUMMARY.md",
+      "NEXT_PHASE_PLAN.md",
+      "FRONTDOOR_DEPLOY_CHECKLIST.md"
+    ],
+    "purpose": "Core project documentation and navigation"
+  }
+}

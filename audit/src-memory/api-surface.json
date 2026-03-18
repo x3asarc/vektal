@@ -1,0 +1,41 @@
+{
+  "folder_path": "src-memory",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-memory"
+  },
+  "summary": {
+    "module_name": "src-memory",
+    "primary_responsibility": "Multi-tier memory management"
+  },
+  "api_surface": {
+    "public_functions": [
+      "get_memory_paths()",
+      "ensure_memory_layout()",
+      "WorkingMemory",
+      "ShortTermMemory",
+      "LongTermMemory",
+      "append_event()",
+      "iter_events()",
+      "event_log_path_for_day()",
+      "create_task()",
+      "update_task()",
+      "list_tasks()"
+    ],
+    "public_classes": [
+      "WorkingMemory",
+      "ShortTermMemory",
+      "LongTermMemory",
+      "MemoryPaths"
+    ],
+    "decorators": [],
+    "routes": [],
+    "telemetry": []
+  }
+}

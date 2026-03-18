@@ -1,0 +1,39 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "import_chain": {
+    "internal_imports": [
+      "src.models", "src.models.user",
+      "src.billing.stripe_client",
+      "src.auth.email_verification",
+      "src.auth.email_sender",
+      "src.core.secrets"
+    ],
+    "external_imports": [
+      "stripe", "flask", "flask.Blueprint", "flask_bcrypt",
+      "requests", "datetime", "os", "re"
+    ],
+    "reverse_dependencies": [
+      "src.auth.login (email availability check)",
+      "frontend (plan listing)"
+    ],
+    "dependency_graph": {
+      "depth": 2,
+      "entry_points": ["checkout.py", "webhooks.py", "subscription.py"],
+      "leaf_modules": ["stripe_client.py"]
+    }
+  }
+}

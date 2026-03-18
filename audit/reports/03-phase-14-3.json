@@ -1,0 +1,19 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:03Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "phase_14_3_count": 8,
+    "subtasks_covered": "14.3-06, 14.3-07",
+    "report_types": ["self-check.md", "review.md", "structure-audit.md", "integrity-audit.md"],
+    "purpose": "Phase 14.3 continuation task reports"
+  }
+}

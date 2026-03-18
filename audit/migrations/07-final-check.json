@@ -1,0 +1,20 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:07Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "audit_complete": true,
+    "total_files": 22,
+    "all_present": true,
+    "integrity_check": "PASS",
+    "phases_covered": ["0", "1", "6", "8", "10", "11", "12", "13", "14.2", "15", "17"]
+  }
+}

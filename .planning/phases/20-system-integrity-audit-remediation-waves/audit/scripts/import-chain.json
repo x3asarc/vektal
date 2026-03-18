@@ -1,0 +1,44 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "external_libs": [
+      "neo4j",
+      "shopify",
+      "requests",
+      "click",
+      "sqlalchemy",
+      "psycopg2",
+      "redis",
+      "pandas"
+    ],
+    "src_imports": [
+      "src/graph/",
+      "src/memory/",
+      "src/models/",
+      "src/core/"
+    ],
+    "external_apis": [
+      "Neo4j",
+      "Shopify Admin API",
+      "Sentry API",
+      "Redis",
+      "Hetzner API",
+      "Perplexity API"
+    ]
+  },
+  "summary": {
+    "external_lib_count": 8,
+    "src_imports": 4
+  }
+}

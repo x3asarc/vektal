@@ -1,0 +1,51 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "api_surface": {
+    "public_functions": [
+      "validate_email()",
+      "validate_password()",
+      "create_checkout_session()",
+      "get_tier_price_id()",
+      "get_tier_from_price_id()",
+      "upgrade_subscription()",
+      "downgrade_subscription()",
+      "cancel_pending_downgrade()",
+      "cancel_subscription()",
+      "verify_stripe_signature()",
+      "stripe_webhook()",
+      "handle_checkout_completed()",
+      "handle_subscription_updated()",
+      "handle_subscription_deleted()",
+      "handle_payment_failed()",
+      "handle_invoice_paid()"
+    ],
+    "public_classes": [],
+    "decorators": [],
+    "routes": [
+      "GET /billing/plans",
+      "POST /billing/create",
+      "POST /billing/check-email",
+      "GET /billing/success",
+      "GET /billing/cancelled",
+      "POST /billing/webhooks/stripe",
+      "POST /billing/upgrade",
+      "POST /billing/downgrade",
+      "POST /billing/cancel"
+    ],
+    "telemetry": ["current_app.logger for all webhook events"]
+  }
+}

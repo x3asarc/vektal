@@ -1,0 +1,74 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": ["dynamic imports", "edge runtime code"],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend for agent dashboard and Shopify integration",
+    "key_components": [
+      "AppShell", "Sidebar", "GlobalPendingIndicator", "ChatSurface",
+      "ForensicShell", "SearchWorkspace", "JobsWorkspace", "EnrichmentWorkspace"
+    ],
+    "files_in_unit": "100+ TypeScript/TSX files",
+    "estimated_loc": 15000,
+    "key_areas": [
+      "app/ - Next.js App Router pages",
+      "features/ - Feature modules (search, jobs, enrichment, resolution, onboarding, settings)",
+      "shell/ - App shell and layout components",
+      "lib/ - Utilities (api, auth, query, diagnostics)",
+      "shared/ - Shared contracts and types",
+      "state/ - Zustand stores"
+    ]
+  },
+  "ownership": {
+    "primary_owner": "frontend-team",
+    "domain": "ui",
+    "language": "typescript",
+    "framework": "Next.js + React + Zustand + TanStack Query",
+    "external_dependencies": ["next", "react", "zustand", "@tanstack/react-query"]
+  },
+  "key_apis": {
+    "exported_functions": [
+      "apiRequest()", "ApiClientError", "normalizeProblemDetails()",
+      "getRedirectForRoute()", "resolveSafeRedirect()",
+      "readGuardFlags()", "setGuardFlags()"
+    ],
+    "entry_points": ["frontend/src/app/layout.tsx", "frontend/src/shell/components/AppShell.tsx"]
+  },
+  "data_stores": {
+    "client_state": ["Zustand stores: drafts-store, ui-prefs-store, pending-store"],
+    "server_state": ["TanStack Query"]
+  },
+  "security_notes": [
+    "DEV_AUTH_BYPASS env var for dev only",
+    "Auth guard flags stored in memory",
+    "API errors normalized via problem-details RFC"
+  ],
+  "integration_points": [
+    "backend API via /api/v1/*",
+    "auth guards for route protection",
+    "session-flags for auth state"
+  ],
+  "async_surface": {
+    "async_functions": ["fetchGuardStateFromBackend()"],
+    "sync_only": false,
+    "notes": "React components use async data fetching via TanStack Query"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "NEXT_PUBLIC_API_BASE_URL",
+      "NEXT_PUBLIC_DEV_AUTH_BYPASS"
+    ],
+    "defaults": {
+      "api_base_url": "same-origin (via Next.js rewrites)"
+    }
+  }
+}

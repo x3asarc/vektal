@@ -1,0 +1,31 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true
+  },
+  "sqlalchemy_models": [
+    {"file": "src/core/evolution/observer.py", "model": "Product"}
+  ],
+  "query_patterns": [],
+  "session_usage": [
+    {"file": "src/core/evolution/observer.py", "pattern": "from src.models.product import Product"}
+  ],
+  "direct_model_imports": [
+    {"file": "src/core/evolution/observer.py", "imports": ["src.models.product.Product"]}
+  ],
+  "indirect_access_via": [
+    "src.api.v1.products.*",
+    "src.tasks.shopify_sync",
+    "src.jobs.finalizer"
+  ],
+  "summary": {
+    "direct_model_access_count": 1,
+    "indirect_access_count": 3,
+    "risk_level": "low"
+  }
+}

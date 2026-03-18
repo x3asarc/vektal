@@ -1,0 +1,60 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["import-graph-analysis", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "cross_domain_coupling": [
+    {
+      "target_unit": "src/api",
+      "coupling_type": "delegation",
+      "files": ["src/app.py"],
+      "patterns": ["create_openapi_app()"]
+    },
+    {
+      "target_unit": "src/jobs",
+      "coupling_type": "celery-integration",
+      "files": ["src/celery_app.py"],
+      "patterns": ["ALL_QUEUES", "TASK_ROUTES", "send_task"]
+    },
+    {
+      "target_unit": "src/tasks",
+      "coupling_type": "celery-tasks",
+      "files": ["src/celery_app.py"],
+      "patterns": ["@app.task decorators"]
+    },
+    {
+      "target_unit": "src/core",
+      "coupling_type": "utility-dependency",
+      "files": ["src/app.py", "src/celery_app.py"],
+      "patterns": ["get_graphiti_client", "sentry_metrics", "secrets"]
+    },
+    {
+      "target_unit": "src/config",
+      "coupling_type": "configuration",
+      "files": ["src/app.py", "src/celery_app.py"],
+      "patterns": ["sentry_config", "session_config", "email_config"]
+    }
+  ],
+  "inbound_coupling": [
+    {
+      "source_unit": "src/api",
+      "coupling_type": "optional-import",
+      "files": ["app.py"]
+    },
+    {
+      "source_unit": "src/tasks",
+      "coupling_type": "celery-import",
+      "files": ["celery_app.py"]
+    }
+  ],
+  "summary": {
+    "outbound_coupling_count": 5,
+    "inbound_coupling_count": 2,
+    "coupling_complexity": "high"
+  }
+}

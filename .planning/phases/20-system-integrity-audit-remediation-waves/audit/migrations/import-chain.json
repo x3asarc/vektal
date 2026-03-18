@@ -1,0 +1,45 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "external_libs": [
+      "alembic",
+      "sqlalchemy"
+    ],
+    "src_imports": [
+      "src/models/User",
+      "src/models/ShopifyStore",
+      "src/models/Vendor",
+      "src/models/Product",
+      "src/models/Job"
+    ],
+    "coupled_models": [
+      "User",
+      "ShopifyStore",
+      "Vendor",
+      "Product",
+      "Job",
+      "EnrichmentProfile",
+      "ResolutionTask",
+      "SandboxRun",
+      "RemedyTemplate",
+      "GraphitiSnapshot",
+      "ToolInputExample"
+    ]
+  },
+  "summary": {
+    "external_lib_count": 2,
+    "src_imports": 5,
+    "models_affected": 12
+  }
+}

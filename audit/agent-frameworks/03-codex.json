@@ -1,0 +1,43 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:09:03Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "agent-frameworks"
+  },
+  "summary": {
+    "source": ".codex",
+    "components": [
+      "settings.json",
+      "preToolUseHook.sh",
+      "learnings.md",
+      "SESSION_PRIMER_TEMPLATE.md",
+      "skills/aura-oracle",
+      "skills/review-implementing",
+      "skills/verify-phase",
+      "skills/visual-ooda-loop",
+      "skills/deep-research",
+      "skills/brainstorming",
+      "skills/finishing-a-development-branch",
+      "skills/webapp-testing",
+      "skills/test-fixing",
+      "skills/dev-browser",
+      "skills/varlock-claude-skill",
+      "skills/postgres",
+      "skills/using-git-worktrees",
+      "skills/test-driven-development",
+      "skills/systematic-debugging",
+      "skills/taste-to-token-extractor",
+      "skills/page-content-evolution",
+      "skills/tri-agent-bug-audit",
+      "skills/skill-creator",
+      "skills/frontend-design-skill",
+      "skills/quality-loop.yaml"
+    ]
+  }
+}

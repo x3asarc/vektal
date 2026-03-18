@@ -1,0 +1,29 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "access_pattern": "read_only",
+    "read_by": [
+      ".claude/hooks/",
+      "agents",
+      "scripts/context/"
+    ],
+    "write_by": [],
+    "note": "docs/ is documentation - read-only content"
+  },
+  "summary": {
+    "read_count": 3,
+    "write_count": 0,
+    "is_data_store": false
+  }
+}

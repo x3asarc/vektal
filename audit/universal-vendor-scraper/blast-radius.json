@@ -1,0 +1,25 @@
+{
+  "folder_path": "universal-vendor-scraper",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "low",
+    "contract_satisfied": false,
+    "known_blind_spots": ["no files found"],
+    "canonical_prefix": "universal-vendor-scraper"
+  },
+  "summary": {
+    "module_name": "universal-vendor-scraper",
+    "status": "directory-empty-or-not-found",
+    "note": "No files found at universal_vendor_scraper/**/*.{js,json}"
+  },
+  "blast_radius": {
+    "impact_scope": "unknown",
+    "affected_capabilities": [],
+    "failure_modes": [],
+    "contained_by": [],
+    "contained_impact": "unknown - no source files to analyze"
+  }
+}

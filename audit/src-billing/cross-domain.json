@@ -1,0 +1,48 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "cross_domain": {
+    "inbound_dependencies": [
+      "Stripe (external payment provider)"
+    ],
+    "outbound_dependencies": [
+      "src.models.user (user creation/updates)",
+      "src.auth.email_verification (new user verification)",
+      "src.auth.email_sender (welcome emails)"
+    ],
+    "data_flows": [
+      {
+        "from": "Stripe",
+        "to": "webhooks.py",
+        "direction": "event",
+        "data_type": "checkout.session.completed, subscription.*, invoice.*"
+      },
+      {
+        "from": "webhooks.py",
+        "to": "src.auth.email_sender",
+        "direction": "trigger",
+        "data_type": "new user verification"
+      }
+    ],
+    "shared_state": [
+      "User model (stripe_customer_id, stripe_subscription_id, tier)"
+    ],
+    "isolation_boundaries": [
+      "Stripe isolated via webhook signature verification",
+      "User state changes via db.session (transactional)"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "import_chain": {
+    "internal_imports": [
+      "@/lib/api/*", "@/lib/auth/*", "@/lib/query/*",
+      "@/shell/components/*", "@/features/*/components/*",
+      "@/features/*/hooks/*", "@/shared/contracts/*",
+      "@/state/*"
+    ],
+    "external_imports": [
+      "react", "next", "zustand", "@tanstack/react-query",
+      "lucide-react", "clsx"
+    ],
+    "reverse_dependencies": [],
+    "dependency_graph": {
+      "depth": 3,
+      "entry_points": ["app/layout.tsx", "shell/components/AppShell.tsx"],
+      "leaf_modules": ["lib/utils", "shared/contracts"]
+    }
+  }
+}

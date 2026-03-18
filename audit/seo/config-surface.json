@@ -1,0 +1,38 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "GEMINI_API_KEY",
+      "SHOP_DOMAIN",
+      "API_VERSION",
+      "SHOPIFY_CLIENT_ID",
+      "SHOPIFY_CLIENT_SECRET"
+    ],
+    "default_values": {
+      "api_version": "2024-01",
+      "model_id": "gemini-2.5-flash",
+      "rate_limit_delay_seconds": 0.5,
+      "temperature": 0.7,
+      "max_tokens": 1000
+    },
+    "secrets_required": [
+      "GEMINI_API_KEY",
+      "SHOPIFY_CLIENT_ID",
+      "SHOPIFY_CLIENT_SECRET"
+    ]
+  }
+}

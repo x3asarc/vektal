@@ -1,0 +1,32 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "api_routes": [
+    {"file": "src/graph/mcp_server.py", "type": "MCP protocol handlers", "endpoints": "MCP tool handlers"}
+  ],
+  "fastapi_components": [
+    {"file": "src/graph/mcp_server.py", "pattern": "FastAPI app with MCP tools"},
+    {"file": "src/graph/mcp_response_metadata.py", "pattern": "Response metadata enrichment"}
+  ],
+  "mcp_tools": [
+    {"name": "query_graph", "purpose": "Query the knowledge graph"},
+    {"name": "query_codebase", "purpose": "Query codebase structure"},
+    {"name": "batch_dependencies", "purpose": "Batch dependency queries"},
+    {"name": "batch_query", "purpose": "Batch graph queries"},
+    {"name": "research_vendor", "purpose": "Research vendor information"},
+    {"name": "search_documentation", "purpose": "Search documentation"}
+  ],
+  "note": "src/graph uses MCP (Model Context Protocol) instead of traditional REST routes",
+  "summary": {
+    "route_count": 6,
+    "protocol": "MCP",
+    "surface_type": "mcp-server"
+  }
+}

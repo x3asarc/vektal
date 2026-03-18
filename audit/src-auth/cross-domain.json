@@ -1,0 +1,50 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication and authorization"
+  },
+  "cross_domain": {
+    "inbound_dependencies": [
+      "src.billing.webhooks (user creation triggers verification)",
+      "frontend (decorator usage in routes)"
+    ],
+    "outbound_dependencies": [
+      "src.models.user",
+      "src.models.shopify",
+      "src.core.secrets"
+    ],
+    "data_flows": [
+      {
+        "from": "src.billing.webhooks",
+        "to": "src.auth.email_verification",
+        "direction": "trigger",
+        "data_type": "new user email"
+      },
+      {
+        "from": "oauth.py",
+        "to": "ShopifyStore model",
+        "direction": "write",
+        "data_type": "encrypted access token"
+      }
+    ],
+    "shared_state": [
+      "User model (database)",
+      "Flask session"
+    ],
+    "isolation_boundaries": [
+      "Auth state isolated per user via session",
+      "OAuth tokens scoped per user/store"
+    ]
+  }
+}

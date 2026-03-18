@@ -1,0 +1,21 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "early_migrations": [
+      "e6eec7532bd6_initial_schema_users_stores_vendors_.py",
+      "3c9b2f7d5a1e_add_auth_fields_and_oauth_attempts.py",
+      "4d8f6b9c2e1a_add_user_api_version_fields.py"
+    ],
+    "purpose": "Foundation schema migrations (Phase 0-1)"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "pentart_db.py": {
+      "severity": "critical",
+      "impact": "Database access for all pentart products breaks",
+      "affected_units": [
+        "src/enrichment/",
+        "scripts/"
+      ]
+    },
+    "generate_product_tags.py": {
+      "severity": "high",
+      "impact": "Product tag generation for SEO breaks",
+      "affected_units": [
+        "src/enrichment/",
+        "config/product_quality_rules.yaml"
+      ]
+    },
+    "add_product_image.py": {
+      "severity": "high",
+      "impact": "Product image additions to Shopify break",
+      "affected_units": [
+        "src/enrichment/"
+      ]
+    },
+    "enrich_product_logistics.py": {
+      "severity": "high",
+      "impact": "HS code and country of origin enrichment breaks",
+      "affected_units": [
+        "config/product_quality_rules.yaml"
+      ]
+    }
+  },
+  "summary": {
+    "critical_files": 1,
+    "high_impact_files": 3,
+    "total_affected_units": 5
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication and authorization"
+  },
+  "import_chain": {
+    "internal_imports": [
+      "src.models", "src.models.user", "src.models.shopify", "src.models.oauth_attempt",
+      "src.core.secrets", "src.auth.email_verification", "src.auth.email_sender"
+    ],
+    "external_imports": [
+      "flask", "flask.Blueprint", "flask.request", "flask_login", "requests",
+      "tenacity", "datetime", "os", "functools.wraps"
+    ],
+    "reverse_dependencies": [
+      "src.billing.webhooks (via email functions)",
+      "frontend (auth decorators)"
+    ],
+    "dependency_graph": {
+      "depth": 3,
+      "entry_points": ["login.py", "oauth.py"],
+      "leaf_modules": ["email_sender.py", "email_verification.py"]
+    }
+  }
+}

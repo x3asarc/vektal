@@ -1,0 +1,24 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "thread_safety": "Stripe SDK is thread-safe",
+    "concurrency_model": "wsgi sync workers; webhooks processed sequentially",
+    "notes": "No async/await used; all Stripe SDK calls are synchronous"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "api_surface": {
+    "is_config_dir": true,
+    "no_api_endpoints": true,
+    "consumed_as_config": true,
+    "config_keys": {
+      "vendor_configs_yaml": {
+        "default": ["country_of_origin", "default_weight", "filename_pattern", "alt_text_template", "hs_code_default", "vision_ai", "keyword_categories", "scraper"],
+        "vendors": ["pentart", "aistcraft", "ciao_bella", "itd", "stamperia", "prima", "bastelschachtel", "paperdesigns"],
+        "category_keywords": ["paint", "rice paper", "napkin", "canvas", "brush", "medium", "varnish"]
+      },
+      "image_processing_rules_yaml": {
+        "defaults": ["image_format", "transparency", "square_conversion", "square_method", "target_size", "alt_text_language", "min_images_per_product", "ideal_images_per_product"],
+        "vision_ai": ["enabled", "provider", "model", "use_for", "fallback", "cache"],
+        "naming": ["strategy", "primary", "shared", "image_types", "sanitization"],
+        "alt_text": ["language", "max_length", "primary_template", "shared_template", "include", "exclude"],
+        "upload": ["staged_uploads", "simple_upload", "preparation"],
+        "positioning": ["primary", "shared", "reorder"],
+        "transformation": ["always", "formats", "dimensions"],
+        "deletion": ["default_policy", "allow_deletion_when", "pre_deletion_checks", "never_delete"],
+        "organization": ["categories", "distribution"],
+        "data_plans": ["seo_plan", "vision_analysis"],
+        "vendor_overrides": ["pentart", "default"],
+        "workflow": ["step_1_identify", "step_2_filename", "step_3_alt_text", "step_4_transform", "step_5_upload", "step_6_position", "step_7_cleanup"],
+        "error_handling": ["vision_api_failure", "upload_failure", "filename_collision", "budget_exceeded"],
+        "logging": ["level", "log_file", "log_events", "metrics"]
+      },
+      "product_quality_rules_yaml": {
+        "required_fields": ["sku", "barcode", "country_of_origin", "hs_code", "weight", "vendor", "product_type", "title", "description_html", "images", "seo_title", "seo_description", "tags", "collections"],
+        "recommended_fields": ["variant_options", "compare_at_price"],
+        "scoring": ["required_fields", "recommended_fields"],
+        "vendor_rules": ["Pentart", "Bastelschachtel"]
+      }
+    }
+  },
+  "summary": {
+    "total_config_keys": 80,
+    "vendors_configured": 9,
+    "categories": 7
+  }
+}

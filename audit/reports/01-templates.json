@@ -1,0 +1,23 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "templates_count": 4,
+    "template_files": [
+      "self-check.template.md",
+      "review.template.md",
+      "structure-audit.template.md",
+      "integrity-audit.template.md"
+    ],
+    "purpose": "Standard report templates for phase completion"
+  }
+}

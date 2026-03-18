@@ -1,0 +1,36 @@
+{
+  "folder_path": "src-memory",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-memory"
+  },
+  "summary": {
+    "module_name": "src-memory",
+    "primary_responsibility": "Multi-tier memory management"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "AI_MEMORY_ROOT"
+    ],
+    "default_values": {
+      "memory_root": ".memory",
+      "working_max_age_hours": 24,
+      "short_term_days_to_keep": 30,
+      "event_lock_timeout_seconds": 2.0
+    },
+    "paths_configurable": [
+      ".memory/events",
+      ".memory/working",
+      ".memory/short-term",
+      ".memory/long-term",
+      ".tasks/active.json"
+    ],
+    "no_secrets_required": true
+  }
+}

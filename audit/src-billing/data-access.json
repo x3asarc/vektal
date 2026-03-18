@@ -1,0 +1,38 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "data_access": {
+    "read_operations": [
+      "User.query.filter_by(email)",
+      "User.query.get(user_id)",
+      "stripe.Subscription.retrieve()"
+    ],
+    "write_operations": [
+      "db.session.add(user) for new registrations",
+      "db.session.commit for tier/status updates",
+      "stripe.Subscription.modify for plan changes"
+    ],
+    "data_persistence": {
+      "users": "User model (stripe_customer_id, stripe_subscription_id, tier)",
+      "stripe": "Stripe handles card data externally"
+    },
+    "sensitive_data_handling": [
+      "Card data NEVER stored in app (handled by Stripe)",
+      "Password hash stored in Stripe metadata (pre-hashed with bcrypt)",
+      "Stripe customer IDs stored for API lookups"
+    ]
+  }
+}

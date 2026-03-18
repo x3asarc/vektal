@@ -1,0 +1,55 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration", "import-graph-analysis"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "direct_imports": {
+    "internal": [
+      "src.api.core.errors",
+      "src.api.core.rate_limit",
+      "src.api.core.versioning",
+      "src.api.core.pagination",
+      "src.config.sentry_config",
+      "src.core.sentry_metrics",
+      "src.models",
+      "src.core.graphiti_client",
+      "src.database"
+    ],
+    "external": [
+      "flask",
+      "flask_cors",
+      "flask_limiter",
+      "marshmallow",
+      "werkzeug"
+    ]
+  },
+  "transitive_imports_depth_1": {
+    "src.api.v1.products": ["src.api.core.errors", "src.models", "src.core.shopify_resolver"],
+    "src.api.v1.chat": ["src.api.core.errors", "src.models", "src.core.chat.router"],
+    "src.api.v1.jobs": ["src.api.core.errors", "src.models", "src.tasks.*"]
+  },
+  "blast_radius_files": [
+    "src/api/app.py",
+    "src/api/__init__.py",
+    "src/api/v1/products/*",
+    "src/api/v1/chat/*",
+    "src/api/v1/jobs/*"
+  ],
+  "impact_score": "high",
+  "critical_dependencies": [
+    "src/api/app.py",
+    "src/api/__init__.py",
+    "src/api/core/errors.py"
+  ],
+  "summary": {
+    "direct_import_count": 9,
+    "transitive_import_count": 6,
+    "impacted_modules": 5,
+    "change_propagation_risk": "high"
+  }
+}

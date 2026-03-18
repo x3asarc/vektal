@@ -1,0 +1,27 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "subdirectory": "agent-system",
+    "file_count": 20,
+    "key_files": [
+      "commander-architecture.md",
+      "commander-architecture-v2.md",
+      "spec-doc.md",
+      "model-policy.md",
+      "model-rationale.md",
+      "finetuned-resources.md",
+      "resources-input.md"
+    ],
+    "specs": ["commander.md", "validator.md", "bundle.md", "watson.md", "project-lead.md", "infrastructure-lead.md", "forensic-lead.md", "engineering-lead.md", "design-lead.md", "task-observer.md"]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "folder_path": "ops",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "ops",
+    "canonical_surface": "ops",
+    "related_critical_surfaces": [
+      ".planning/ROADMAP.md",
+      "scripts/governance/"
+    ],
+    "matched_file_count": 8,
+    "direct_file_count": 8
+  },
+  "matched_files": [
+    "ops/STRUCTURE_SPEC.md",
+    "ops/governance/roles/builder.md",
+    "ops/governance/roles/context-curator.md",
+    "ops/governance/roles/integrity-warden.md",
+    "ops/governance/roles/phase-manager.md",
+    "ops/governance/roles/README.md",
+    "ops/governance/roles/reviewer.md",
+    "ops/governance/roles/structure-guardian.md"
+  ],
+  "ownership_summary": {
+    "governance_roles": [
+      "ops/governance/roles/builder.md",
+      "ops/governance/roles/context-curator.md",
+      "ops/governance/roles/integrity-warden.md",
+      "ops/governance/roles/phase-manager.md",
+      "ops/governance/roles/README.md",
+      "ops/governance/roles/reviewer.md",
+      "ops/governance/roles/structure-guardian.md"
+    ],
+    "counts": {
+      "total": 8,
+      "governance": 7
+    }
+  },
+  "summary": {
+    "file_count": 8,
+    "purpose": "Governance roles, structure contracts, and ops infrastructure definitions"
+  }
+}

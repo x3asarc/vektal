@@ -1,0 +1,25 @@
+{
+  "folder_path": "ops",
+  "generated_at": "2026-03-18T00:05:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "ops"
+  },
+  "summary": {
+    "subdirectory": "governance/roles",
+    "role_definitions": [
+      "phase-manager.md",
+      "builder.md",
+      "reviewer.md",
+      "structure-guardian.md",
+      "integrity-warden.md",
+      "context-curator.md"
+    ],
+    "purpose": "Role-based governance definitions"
+  }
+}

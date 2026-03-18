@@ -1,0 +1,69 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "api_surface": {
+    "is_agent_config_dir": true,
+    "no_http_endpoints": true,
+    "agent_endpoints_touched": [
+      "Neo4j via src/graph/",
+      "PostgreSQL via src/models/",
+      "Shopify API",
+      "Letta server API",
+      "Claude Code MCP"
+    ],
+    "skill_pattern": "SKILL.md files define domain-specific capabilities loaded by agent frameworks",
+    "agent_specs": {
+      ".codex/": [
+        "commander.md",
+        "bundle.md",
+        "watson.md",
+        "forensic-lead.md",
+        "engineering-lead.md",
+        "design-lead.md",
+        "infrastructure-lead.md",
+        "project-lead.md",
+        "validator.md",
+        "task-observer.md"
+      ],
+      ".letta/": [
+        "commander.md",
+        "bundle.md",
+        "watson.md",
+        "forensic-lead.md",
+        "engineering-lead.md",
+        "design-lead.md",
+        "infrastructure-lead.md",
+        "project-lead.md",
+        "validator.md",
+        "task-observer.md"
+      ],
+      ".gemini/": [
+        "commander.md",
+        "bundle.md",
+        "watson.md",
+        "forensic-lead.md",
+        "engineering-lead.md",
+        "design-lead.md",
+        "infrastructure-lead.md",
+        "project-lead.md",
+        "validator.md",
+        "task-observer.md"
+      ]
+    }
+  },
+  "summary": {
+    "skill_files": 193,
+    "agent_specs": 117,
+    "frameworks": 5
+  }
+}

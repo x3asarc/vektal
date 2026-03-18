@@ -67,8 +67,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 14.1: Neo4j-Vector-Hybrid-RAG Enhancement (INSERTED)** `[developer-facing]` - Upgrade graph from passive store to MCP-accessible hybrid RAG engine
 - [x] **Phase 14.2: Tool Calling 2.0 Integration (INSERTED)** `[developer-facing]` - Optimize MCP/tool call semantics (batching, deferred loading, schema examples)
 - [x] **Phase 14.3: Graph Availability + Sync Reliability (INSERTED)** `[developer-facing]` - Guarantee Aura-first graph availability with local Neo4j and snapshot fallback
-- [x] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring, performance optimization, cost reduction
+- [x] **Phase 15: Self-Healing & Runtime Optimization** `[developer-facing]` - Autonomous refactoring and performance optimization
 - [x] **Phase 16: Agent Context OS (INSERTED)** `[developer-facing]` - Always-fresh onboarding context, graph-first broker, and live memory governance
+- [x] **Phase 17: Product Data Command Center + Chat-First Product Ops** `[user-facing]` - Real-time sync, catalog health scoring, and forensic rollback
+- [x] **Phase 20: System Integrity Audit Remediation Waves (AMENDMENT)** `[developer-facing]` - Complete codebase audit: 22 units × 8 surfaces = 176 JSON files
 
 ### Future Phases
 

@@ -1,0 +1,35 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "env_vars": [
+    {"file": "src/api/app.py", "vars": ["CORS_ORIGINS", "SENTRY_DSN", "SESSION_REDIS", "FLASK_ENV", "VERSION"]},
+    {"file": "src/api/__init__.py", "vars": ["CORS_ORIGINS"]},
+    {"file": "src/api/core/rate_limit.py", "vars": ["REDIS_URL", "RATELIMIT_ENABLED", "RATELIMIT_STORAGE_URI"]},
+    {"file": "src/api/v1/shopify/webhooks.py", "vars": ["SHOPIFY_API_SECRET"]},
+    {"file": "src/api/v1/chat/routes.py", "vars": ["GEMINI_API_KEY", "GEMINI_TEXT_MODEL", "OPENROUTER_API_KEY", "OPENROUTER_TEXT_MODEL", "OPENROUTER_TEXT_FALLBACK_MODEL", "ENABLE_GEMINI_FALLBACK"]}
+  ],
+  "config_patterns": [
+    {"file": "src/api/app.py", "pattern": "app.config.get()"},
+    {"file": "src/api/core/rate_limit.py", "pattern": "RateLimiter configuration"},
+    {"file": "src/api/core/versioning.py", "pattern": "API versioning hooks"}
+  ],
+  "critical_env_vars": [
+    "SENTRY_DSN",
+    "CORS_ORIGINS",
+    "SESSION_REDIS",
+    "GEMINI_API_KEY",
+    "OPENROUTER_API_KEY"
+  ],
+  "summary": {
+    "env_var_count": 15,
+    "config_file_count": 4,
+    "secret_count": 4
+  }
+}

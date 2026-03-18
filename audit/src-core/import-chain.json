@@ -1,0 +1,46 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["AST-parsing", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "import_chain": {
+    "inbound": [
+      {"source": "src.graph.planning_linker", "imports": ["src.core.codebase_entities", "src.core.synthex_entities"]},
+      {"source": "src.graph.codebase_scanner", "imports": ["src.core.codebase_entities", "src.core.embeddings", "src.core.summary_generator"]},
+      {"source": "src.graph.query_templates", "imports": ["src.core.graphiti_client"]},
+      {"source": "src.graph.root_cause_classifier", "imports": ["src.core.memory_loader", "src.core.graphiti_client", "src.core.synthex_entities"]},
+      {"source": "src.graph.query_interface", "imports": ["src.core.embeddings", "src.core.synthex_entities"]},
+      {"source": "src.graph/mcp_server.py", "imports": ["src.core.embeddings"]},
+      {"source": "src.graph/intent_capture.py", "imports": ["src.core.synthex_entities"]},
+      {"source": "src/jobs/graphiti_ingestor.py", "imports": ["src.core.graphiti_client", "src.core.codebase_entities", "src.core.synthex_entities"]},
+      {"source": "src/tasks/graphiti_sync.py", "imports": ["src.core.graphiti_client", "src.core.synthex_entities"]},
+      {"source": "src/api/v1/shopify/webhooks.py", "imports": ["src.core.evolution.observer"]},
+      {"source": "src/core/evolution/observer.py", "imports": ["src.models.product"]}
+    ],
+    "outbound": [
+      {"target": "src.graph.backend_resolver", "type": "conditional"},
+      {"target": "src.api.app", "type": "optional"},
+      {"target": "src.api.core", "type": "optional"}
+    ]
+  },
+  "cross_prefix_imports": [
+    {"from": "src/core", "to": "src/graph", "pattern": "backend_resolver.runtime_backend_mode"},
+    {"from": "src/core", "to": "src/models", "pattern": "Product, db"},
+    {"from": "src/core", "to": "src/config", "pattern": "sentry_config"}
+  ],
+  "external_imports": [
+    "openai", "anthropic", "requests", "shopify",
+    "playwright", "graphiti", "celery", "redis"
+  ],
+  "summary": {
+    "inbound_count": 11,
+    "outbound_count": 3,
+    "cross_prefix_count": 3,
+    "external_count": 8
+  }
+}

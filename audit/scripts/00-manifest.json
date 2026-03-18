@@ -1,0 +1,36 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:06:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "scripts"
+  },
+  "summary": {
+    "total_files": 100,
+    "type": "automation-scripts",
+    "subdirs": [
+      "graph",
+      "mcp",
+      "shopify",
+      "sentry",
+      "hooks",
+      "memory",
+      "letta",
+      "observability",
+      "verification",
+      "tools",
+      "visual",
+      "governance",
+      "infra",
+      "harness",
+      "daemons",
+      "deploy"
+    ],
+    "purpose": "Operational automation and maintenance scripts"
+  }
+}

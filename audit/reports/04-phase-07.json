@@ -1,0 +1,19 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:04Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "phase_07_count": 10,
+    "subtasks_covered": "07.1, 07.2",
+    "report_types": ["self-check.md", "review.md", "structure-audit.md", "integrity-audit.md"],
+    "purpose": "Phase 07 governance baseline task reports"
+  }
+}

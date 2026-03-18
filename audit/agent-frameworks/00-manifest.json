@@ -1,0 +1,25 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:09:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "agent-frameworks"
+  },
+  "summary": {
+    "total_files": 100,
+    "type": "agent-framework-configurations",
+    "combined_sources": [
+      ".agents",
+      ".claude",
+      ".codex",
+      ".gemini",
+      ".letta"
+    ],
+    "purpose": "Multi-agent framework configurations, skills, and agent definitions"
+  }
+}

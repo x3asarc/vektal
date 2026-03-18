@@ -1,0 +1,32 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "celery_tasks_dispatched": [
+    {"file": "src/api/v1/shopify/webhooks.py", "task": "src.tasks.shopify_sync.process_webhook_task"},
+    {"file": "src/api/v1/chat/routes.py", "task": "src.tasks.chat_bulk.bulk_chat_task"},
+    {"file": "src/api/v1/jobs/routes.py", "tasks": "Job management tasks"},
+    {"file": "src/api/v1/products/enrichment.py", "task": "Product enrichment tasks"}
+  ],
+  "task_dispatch_patterns": [
+    {"pattern": "send_task", "files": ["app.py", "v1/*/routes.py"]},
+    {"pattern": "delay()", "files": ["v1/*/routes.py"]},
+    {"pattern": "apply_async()", "files": ["v1/*/routes.py"]}
+  ],
+  "async_responses": [
+    {"file": "src/api/core/sse.py", "pattern": "Server-Sent Events for real-time updates"},
+    {"file": "src/api/jobs/events.py", "pattern": "Job status streaming"}
+  ],
+  "note": "src/api dispatches Celery tasks but does not define task decorators",
+  "summary": {
+    "celery_task_count": 4,
+    "task_dispatch_sites": 4,
+    "surface_type": "task-dispatcher"
+  }
+}

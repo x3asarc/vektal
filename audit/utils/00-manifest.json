@@ -1,0 +1,32 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:02:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "utils"
+  },
+  "summary": {
+    "total_files": 14,
+    "type": "utility-modules",
+    "file_list": [
+      "pentart_db.py",
+      "generate_product_tags.py",
+      "add_product_image.py",
+      "find_product_image.py",
+      "create_shopify_redirect.py",
+      "fix_product_handles.py",
+      "enrich_product_logistics.py",
+      "categorize_product.py",
+      "assign_collections.py",
+      "display_seo_comparison.py",
+      "approve_seo_csv.py",
+      "__init__.py"
+    ],
+    "purpose": "Shopify product management and enrichment utilities"
+  }
+}

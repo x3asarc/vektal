@@ -1,0 +1,20 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:07Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "audit_complete": true,
+    "total_test_files": 100,
+    "all_present": true,
+    "integrity_check": "PASS",
+    "subdirs_covered": 9
+  }
+}

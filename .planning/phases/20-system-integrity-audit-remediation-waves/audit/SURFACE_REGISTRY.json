@@ -2,28 +2,90 @@
   "metadata": {
     "generated_at": "2026-03-18",
     "phase": "20-system-integrity-audit-remediation-waves",
+    "amendment": true,
     "source_directory": ".planning/phases/20-system-integrity-audit-remediation-waves/audit",
-    "total_folders": 48,
-    "goal_folders": 813,
-    "coverage_percent": 6,
-    "total_surfaces": 8,
-    "total_json_files": 385
+    "total_units": 22,
+    "surfaces_per_unit": 8,
+    "total_json_files": 176,
+    "coverage_percent": 100,
+    "previous_coverage": {
+      "original_goal": 813,
+      "original_achieved": 48,
+      "original_percent": 6
+    }
   },
   "surfaces": [
     {"name": "ownership", "file": "ownership.json", "description": "Who owns each file"},
-    {"name": "blast_radius", "file": "blast-radius.json", "description": "Impact analysis"},
-    {"name": "import_chain", "file": "import-chain.json", "description": "Dependency tree"},
-    {"name": "data_access", "file": "data-access.json", "description": "Database models"},
-    {"name": "api_surface", "file": "api-surface.json", "description": "REST endpoints"},
-    {"name": "async_surface", "file": "async-surface.json", "description": "Celery tasks"},
-    {"name": "config_surface", "file": "config-surface.json", "description": "Env vars"},
-    {"name": "cross_domain", "file": "cross-domain.json", "description": "Cross-subsystem coupling"}
+    {"name": "blast-radius", "file": "blast-radius.json", "description": "Impact analysis"},
+    {"name": "import-chain", "file": "import-chain.json", "description": "Dependency tree"},
+    {"name": "data-access", "file": "data-access.json", "description": "Database models and query patterns"},
+    {"name": "api-surface", "file": "api-surface.json", "description": "REST endpoints"},
+    {"name": "async-surface", "file": "async-surface.json", "description": "Celery tasks and queue consumers"},
+    {"name": "config-surface", "file": "config-surface.json", "description": "Environment variables and secrets"},
+    {"name": "cross-domain", "file": "cross-domain.json", "description": "Cross-subsystem coupling"}
   ],
-  "subsystems": [
-    {"name": ".graph", "folders": 1, "description": "Graph knowledge system"},
-    {"name": "codexclaude", "folders": 12, "description": "Claude agent system"},
-    {"name": "critical-surfaces", "folders": 1, "description": "Surface audits"},
-    {"name": "data", "folders": 29, "description": "Runtime data"},
-    {"name": "universal_vendor_scraper", "folders": 5, "description": "Scraping engine"}
+  "categories": [
+    {
+      "name": "core-application",
+      "description": "Core Python backend and frontend application",
+      "units": 12,
+      "surfaces": 96,
+      "unit_list": [
+        {"path": "src/core/", "description": "Production pipeline, scraping, vision, image"},
+        {"path": "src/", "description": "Root modules: app, celery, database, models"},
+        {"path": "src/api/", "description": "REST API endpoints"},
+        {"path": "src/jobs/", "description": "Celery orchestrator, dispatcher"},
+        {"path": "src/graph/", "description": "MCP server, sentry ingestion, sandbox"},
+        {"path": "src/memory/", "description": "Memory manager, event log"},
+        {"path": "src/auth/", "description": "OAuth, login, email verification"},
+        {"path": "src/billing/", "description": "Stripe checkout, subscriptions"},
+        {"path": "src/integrations/", "description": "Perplexity client"},
+        {"path": "universal_vendor_scraper/", "description": "JS Playwright scrapers"},
+        {"path": "frontend/", "description": "Next.js/React TypeScript app"},
+        {"path": "seo/", "description": "SEO generator, prompts, validator"}
+      ]
+    },
+    {
+      "name": "configuration-data",
+      "description": "Configuration files and data storage",
+      "units": 3,
+      "surfaces": 24,
+      "unit_list": [
+        {"path": "config/", "description": "YAML vendor/image/quality rules"},
+        {"path": "data/", "description": "Logs, CSV exports, vision cache"},
+        {"path": "utils/", "description": "shopify_utils, pentart_db"}
+      ]
+    },
+    {
+      "name": "testing",
+      "description": "Test infrastructure",
+      "units": 1,
+      "surfaces": 8,
+      "unit_list": [
+        {"path": "tests/", "description": "unit, integration, e2e, graph, daemons (combined)"}
+      ]
+    },
+    {
+      "name": "documentation-operations",
+      "description": "Documentation, scripts, and operations",
+      "units": 5,
+      "surfaces": 40,
+      "unit_list": [
+        {"path": "docs/", "description": "Guides, phase-reports"},
+        {"path": "ops/", "description": "Governance, scripts, hooks"},
+        {"path": "scripts/", "description": "Deployment, debug, checkpoints"},
+        {"path": "reports/", "description": "Phase reports"},
+        {"path": "migrations/", "description": "Alembic DB migrations"}
+      ]
+    },
+    {
+      "name": "agent-frameworks",
+      "description": "Multi-agent frameworks (combined)",
+      "units": 1,
+      "surfaces": 8,
+      "unit_list": [
+        {"path": "agent-frameworks/", "description": ".agents/, .claude/, .codex/, .gemini/, .letta/ combined"}
+      ]
+    }
   ]
 }

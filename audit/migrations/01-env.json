@@ -1,0 +1,18 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "file": "migrations/env.py",
+    "type": "alembic-environment",
+    "purpose": "Alembic migration environment configuration"
+  }
+}

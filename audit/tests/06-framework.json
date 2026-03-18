@@ -1,0 +1,19 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "test_framework": "pytest",
+    "conftest_files": ["tests/__init__.py", "tests/unit/__init__.py", "tests/integration/__init__.py", "tests/jobs/__init__.py"],
+    "init_files_count": 4,
+    "test_patterns": ["test_*.py"]
+  }
+}

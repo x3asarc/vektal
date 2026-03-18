@@ -1,0 +1,28 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "operational_docs": [
+      "SCRAPER_STRATEGY.md",
+      "IMAGE_VERIFICATION_SYSTEM.md",
+      "IMAGE_PROCESSING_FRAMEWORK.md",
+      "IMAGE_FINDING_SYSTEM.md",
+      "PAYLOAD_SCHEMA.md",
+      "QA_CHECKLIST.md",
+      "RALPH_WIGGUM_INTEGRATION.md",
+      "CRITICAL_BUG_FIX.md",
+      "investigation-notes.md",
+      "pretooluse-hook-system.md",
+      "health-daemon-system.md"
+    ]
+  }
+}

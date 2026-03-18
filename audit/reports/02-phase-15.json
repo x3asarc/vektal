@@ -1,0 +1,19 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "phase_15_count": 50,
+    "subtasks_covered": "15-01 through 15-11b",
+    "report_types": ["self-check.md", "review.md", "structure-audit.md", "integrity-audit.md"],
+    "purpose": "Phase 15 agent-context-os task reports"
+  }
+}

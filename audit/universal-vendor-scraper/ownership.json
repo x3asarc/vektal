@@ -1,0 +1,50 @@
+{
+  "folder_path": "universal-vendor-scraper",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "low",
+    "contract_satisfied": false,
+    "known_blind_spots": ["no files found at universal_vendor_scraper/**/*.{js,json}"],
+    "canonical_prefix": "universal-vendor-scraper"
+  },
+  "summary": {
+    "module_name": "universal-vendor-scraper",
+    "primary_responsibility": "Vendor scraping automation (structure unknown)",
+    "key_classes": [],
+    "files_in_unit": [],
+    "file_count": 0,
+    "estimated_loc": 0,
+    "status": "directory-empty-or-not-found"
+  },
+  "ownership": {
+    "primary_owner": "unknown",
+    "domain": "scraping",
+    "language": "javascript/json",
+    "framework": "unknown",
+    "external_dependencies": []
+  },
+  "key_apis": {
+    "exported_functions": [],
+    "entry_points": []
+  },
+  "data_stores": {
+    "memory": [],
+    "external": []
+  },
+  "security_notes": [
+    "CAUTION: no files found to audit"
+  ],
+  "integration_points": [],
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "notes": "unknown - no source files found"
+  },
+  "config_surface": {
+    "environment_variables": [],
+    "defaults": {}
+  }
+}

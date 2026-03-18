@@ -1,0 +1,28 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:03Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "guides_count": 10,
+    "key_guides": [
+      "QUICK_START.md",
+      "DOCKER_QUICKSTART.md",
+      "DOCKER_SECRETS.md",
+      "PRODUCT_CREATION_GUIDE.md",
+      "ORCHESTRATOR_QUICK_START.md",
+      "ORCHESTRATOR_INTEGRATION_EXAMPLE.md",
+      "SEO_QUICK_START.md",
+      "SEO_SKILL_GUIDE.md",
+      "CRITICAL_SAFEGUARDS.md"
+    ],
+    "purpose": "User and developer guides"
+  }
+}

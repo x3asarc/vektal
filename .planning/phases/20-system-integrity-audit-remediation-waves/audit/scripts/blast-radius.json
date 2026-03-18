@@ -1,0 +1,37 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "graph_sync_scripts": {
+      "severity": "high",
+      "impact": "Neo4j graph desyncs from codebase - governance gates fail"
+    },
+    "governance_scripts": {
+      "severity": "critical",
+      "impact": "Phase gates, risk tier checks, context OS gates break"
+    },
+    "deploy_scripts": {
+      "severity": "critical",
+      "impact": "Frontend/Hetzner deployment breaks"
+    },
+    "context_scripts": {
+      "severity": "medium",
+      "impact": "ContextCurator loses folder summaries"
+    }
+  },
+  "summary": {
+    "critical": 2,
+    "high": 2,
+    "medium": 1
+  }
+}

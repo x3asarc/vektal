@@ -1,0 +1,62 @@
+{
+  "folder_path": "src-integrations",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-integrations"
+  },
+  "summary": {
+    "module_name": "src-integrations",
+    "primary_responsibility": "External AI API integrations for research automation",
+    "key_classes": ["PerplexityClient"],
+    "files_in_unit": ["perplexity_client.py"],
+    "file_count": 1,
+    "estimated_loc": 70
+  },
+  "ownership": {
+    "primary_owner": "integrations-system",
+    "domain": "external-apis",
+    "language": "python",
+    "framework": "httpx async client",
+    "external_dependencies": ["httpx", "lru_cache"]
+  },
+  "key_apis": {
+    "exported_functions": [
+      "PerplexityClient.search()",
+      "get_perplexity_client()"
+    ],
+    "entry_points": [
+      "src/integrations/perplexity_client.py"
+    ]
+  },
+  "data_stores": {
+    "external": ["Perplexity AI API"]
+  },
+  "security_notes": [
+    "API key passed via header (Bearer token)",
+    "No API key stored in code (env var only)",
+    "Timeout set to prevent hanging"
+  ],
+  "integration_points": [
+    "src.jobs (research tasks)"
+  ],
+  "async_surface": {
+    "async_functions": ["PerplexityClient.search()"],
+    "sync_only": false,
+    "notes": "Uses httpx.AsyncClient for non-blocking API calls"
+  },
+  "config_surface": {
+    "environment_variables": ["PERPLEXITY_API_KEY"],
+    "defaults": {
+      "base_url": "https://api.perplexity.ai",
+      "timeout": 30.0,
+      "max_tokens": 1000,
+      "temperature": 0.2
+    }
+  }
+}

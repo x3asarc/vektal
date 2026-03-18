@@ -1,0 +1,36 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "sqlalchemy_models": [
+    {"file": "src/jobs/finalizer.py", "models": ["Product", "Job", "IngestChunk"]},
+    {"file": "src/jobs/orchestrator.py", "models": ["Job"]},
+    {"file": "src/jobs/checkpoints.py", "models": ["Job"]},
+    {"file": "src/jobs/graphiti_ingestor.py", "models": ["GraphitiEpisode"]}
+  ],
+  "query_patterns": [
+    {"file": "src/jobs/finalizer.py", "pattern": "Product.query.filter_by", "count": 1},
+    {"file": "src/jobs/finalizer.py", "pattern": "Job.query.filter_by.with_for_update", "count": 1},
+    {"file": "src/jobs/finalizer.py", "pattern": "IngestChunk.query.filter", "count": 1},
+    {"file": "src/jobs/checkpoints.py", "pattern": "Job.query", "count": 2}
+  ],
+  "session_usage": [
+    {"file": "src/jobs/finalizer.py", "pattern": "db.session.commit", "count": 4},
+    {"file": "src/jobs/orchestrator.py", "pattern": "db.session operations"}
+  ],
+  "direct_model_imports": [
+    {"file": "src/jobs/finalizer.py", "imports": ["src.models.Product", "src.models.Job", "src.models.IngestChunk"]},
+    {"file": "src/jobs/orchestrator.py", "imports": ["src.models.Job"]}
+  ],
+  "summary": {
+    "direct_model_access_count": 4,
+    "indirect_access_count": 0,
+    "risk_level": "high"
+  }
+}

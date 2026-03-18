@@ -1,0 +1,38 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config",
+    "canonical_surface": "config",
+    "related_critical_surfaces": ["src/core", "universal_vendor_scraper"],
+    "matched_file_count": 4,
+    "direct_file_count": 4
+  },
+  "matched_files": [
+    "config/vendor_configs.yaml",
+    "config/image_processing_rules.yaml",
+    "config/product_quality_rules.yaml",
+    "config/vendors/_template.yaml"
+  ],
+  "ownership_summary": {
+    "primary_owner": "src/core/product_quality_orchestrator.py",
+    "consumers": [
+      "src/core/product_quality_orchestrator.py",
+      "src/scraping/scraper.py",
+      "universal_vendor_scraper/"
+    ],
+    "vendor_count": 8
+  },
+  "summary": {
+    "file_count": 4,
+    "yaml_files": ["vendor_configs.yaml", "image_processing_rules.yaml", "product_quality_rules.yaml", "vendors/_template.yaml"],
+    "vendors_configured": ["default", "pentart", "aistcraft", "ciao_bella", "itd", "stamperia", "prima", "bastelschachtel", "paperdesigns"],
+    "drives_behavior": ["image naming", "alt text generation", "scraping URLs", "product quality rules", "vision AI settings"]
+  }
+}

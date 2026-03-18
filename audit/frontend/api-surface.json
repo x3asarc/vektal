@@ -1,0 +1,45 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "api_surface": {
+    "public_functions": [
+      "apiRequest()",
+      "normalizeProblemDetails()",
+      "readGuardFlags()",
+      "setGuardFlags()",
+      "getRedirectForRoute()",
+      "resolveSafeRedirect()"
+    ],
+    "public_classes": ["ApiClientError"],
+    "decorators": [],
+    "routes": [
+      "app/page.tsx (root)",
+      "app/(app)/dashboard/page.tsx",
+      "app/(app)/search/page.tsx",
+      "app/(app)/jobs/page.tsx",
+      "app/(app)/jobs/[id]/page.tsx",
+      "app/(app)/chat/page.tsx",
+      "app/(app)/enrichment/page.tsx",
+      "app/(app)/settings/page.tsx",
+      "app/(app)/onboarding/page.tsx",
+      "app/(auth)/auth/login/page.tsx",
+      "app/(auth)/auth/verify/page.tsx",
+      "app/approvals/page.tsx",
+      "app/health/route.ts"
+    ],
+    "telemetry": ["diagnostics.ts"]
+  }
+}

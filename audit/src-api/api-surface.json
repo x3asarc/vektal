@@ -1,0 +1,41 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "api_routes": [
+    {"file": "src/api/app.py", "endpoint": "/health", "methods": ["GET"], "handler": "health_check"},
+    {"file": "src/api/app.py", "endpoint": "/doctor", "methods": ["GET"], "handler": "doctor_check"},
+    {"file": "src/api/core/rate_limit.py", "endpoint": "/api/products", "methods": ["GET"], "handler": "rate_limit_demo"},
+    {"file": "src/api/v1/products/core.py", "endpoints": "Multiple product CRUD routes"},
+    {"file": "src/api/v1/products/bulk.py", "endpoints": "Bulk operations routes"},
+    {"file": "src/api/v1/products/enrichment.py", "endpoints": "Enrichment job routes"},
+    {"file": "src/api/v1/products/lineage.py", "endpoints": "Product lineage/history routes"},
+    {"file": "src/api/v1/chat/routes.py", "endpoints": "Chat session routes"},
+    {"file": "src/api/v1/jobs/routes.py", "endpoints": "Job management routes"},
+    {"file": "src/api/v1/ops/routes.py", "endpoints": "Ops dashboard routes"},
+    {"file": "src/api/v1/vendors/routes.py", "endpoints": "Vendor management routes"},
+    {"file": "src/api/v1/shopify/webhooks.py", "endpoints": "Shopify webhook receivers"},
+    {"file": "src/api/v1/resolution/routes.py", "endpoints": "Resolution routes"}
+  ],
+  "blueprints": [
+    {"name": "products_bp", "prefix": "/api/v1/products"},
+    {"name": "chat_bp", "prefix": "/api/v1/chat"},
+    {"name": "jobs_bp", "prefix": "/api/v1/jobs"},
+    {"name": "vendors_bp", "prefix": "/api/v1/vendors"},
+    {"name": "ops_bp", "prefix": "/api/v1/ops"},
+    {"name": "resolution_bp", "prefix": "/api/v1/resolution"}
+  ],
+  "route_decorators": ["@app.route", "@bp.route", "@router."],
+  "auth_decorators": ["@login_required", "@require_vendor"],
+  "summary": {
+    "route_count": 50,
+    "blueprint_count": 6,
+    "surface_type": "flask-rest-api"
+  }
+}

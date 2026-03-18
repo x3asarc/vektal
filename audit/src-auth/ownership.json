@@ -1,0 +1,76 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication, authorization, OAuth integration, and email verification",
+    "key_classes": ["Blueprint-based auth routes"],
+    "files_in_unit": ["login.py", "oauth.py", "email_verification.py", "email_sender.py", "decorators.py"],
+    "file_count": 5,
+    "estimated_loc": 1400
+  },
+  "ownership": {
+    "primary_owner": "auth-system",
+    "domain": "security",
+    "language": "python",
+    "framework": "Flask + Flask-Login",
+    "external_dependencies": ["flask", "flask_login", "requests", "tenacity"]
+  },
+  "key_apis": {
+    "exported_functions": [
+      "verify_token()",
+      "generate_verification_token()",
+      "generate_verification_url()",
+      "send_verification_email()",
+      "send_welcome_email()",
+      "requires_tier()",
+      "email_verified_required()",
+      "active_account_required()"
+    ],
+    "entry_points": [
+      "src/auth/login.py",
+      "src/auth/oauth.py"
+    ]
+  },
+  "data_stores": {
+    "database": ["User model via db.session"],
+    "session": ["Flask session + cookies"]
+  },
+  "security_notes": [
+    "Password comparison uses bcrypt timing-safe comparison",
+    "OAuth state tokens generated with os.urandom",
+    "CSRF protection via state parameter",
+    "Email tokens have 1-hour expiration",
+    "Rate limiting TODO for verification resend"
+  ],
+  "integration_points": [
+    "src.models.user",
+    "src.models.shopify",
+    "src.models.oauth_attempt",
+    "src.core.secrets"
+  ],
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "notes": "OAuth token exchange uses requests library (sync)"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "SHOPIFY_CLIENT_ID", "SHOPIFY_CLIENT_SECRET",
+      "APP_URL", "FRONTEND_URL", "EMAIL_*", "SMTP_*"
+    ],
+    "defaults": {
+      "app_url": "http://localhost:5000",
+      "frontend_url": "http://localhost:3000"
+    }
+  }
+}

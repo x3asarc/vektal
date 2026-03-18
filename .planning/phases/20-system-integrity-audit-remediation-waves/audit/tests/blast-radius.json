@@ -1,0 +1,47 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "conftest_py": {
+      "severity": "critical",
+      "impact": "All pytest fixtures break - entire test suite fails to run",
+      "affected_units": [
+        "tests/unit/",
+        "tests/integration/",
+        "tests/graph/",
+        "tests/jobs/"
+      ]
+    },
+    "tests/unit/": {
+      "severity": "medium",
+      "impact": "Unit-level regression guards break - src/core/ changes go untested"
+    },
+    "tests/integration/": {
+      "severity": "high",
+      "impact": "Integration tests against real services break - DATABASE_URL, Shopify API tested"
+    },
+    "tests/graph/": {
+      "severity": "high",
+      "impact": "Graphiti/Neo4j integration tests break"
+    },
+    "tests/jobs/": {
+      "severity": "high",
+      "impact": "Job queue and dispatch tests break"
+    }
+  },
+  "summary": {
+    "critical": 1,
+    "high": 3,
+    "medium": 1
+  }
+}

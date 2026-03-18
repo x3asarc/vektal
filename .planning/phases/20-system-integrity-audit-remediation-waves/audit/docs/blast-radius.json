@@ -1,0 +1,42 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "INDEX_md": {
+      "severity": "high",
+      "impact": "Primary documentation entry point broken - agents lose navigation"
+    },
+    "MASTER_MAP_md": {
+      "severity": "high",
+      "impact": "ContextCurator loses canonical context map"
+    },
+    "AGENT_START_HERE_md": {
+      "severity": "medium",
+      "impact": "New agent onboarding broken"
+    },
+    "agent_system_specs": {
+      "severity": "high",
+      "impact": "Commander architecture specs change - agent behavior changes"
+    },
+    "phase_reports": {
+      "severity": "low",
+      "impact": "Historical record - read only"
+    }
+  },
+  "summary": {
+    "critical": 0,
+    "high": 3,
+    "medium": 1,
+    "low": 1
+  }
+}

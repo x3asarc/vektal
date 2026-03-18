@@ -1,0 +1,27 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "subdirectory": "unit",
+    "file_count": 50,
+    "key_areas": [
+      "memory_system",
+      "sentry_integration",
+      "context_broker",
+      "enrichment",
+      "scraping_engine",
+      "ai_inference",
+      "config_validation"
+    ],
+    "purpose": "Unit tests for isolated component functionality"
+  }
+}

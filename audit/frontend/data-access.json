@@ -1,0 +1,39 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "data_access": {
+    "read_operations": [
+      "apiRequest() - GET operations",
+      "TanStack Query cache reads",
+      "Zustand store reads"
+    ],
+    "write_operations": [
+      "apiRequest() - POST/PUT/PATCH operations",
+      "Zustand store mutations",
+      "TanStack Query cache updates"
+    ],
+    "data_persistence": {
+      "api": "backend via /api/v1/*",
+      "client_state": "Zustand (memory)",
+      "query_cache": "TanStack Query (memory)"
+    },
+    "sensitive_data_handling": [
+      "No credentials stored client-side",
+      "Session handled via cookies (httpOnly)",
+      "Auth state in memory via guard flags"
+    ]
+  }
+}

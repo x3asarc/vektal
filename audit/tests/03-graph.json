@@ -1,0 +1,27 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:03Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "subdirectory": "graph",
+    "file_count": 10,
+    "key_areas": [
+      "task_execution",
+      "sentry_integration",
+      "sentry_feedback",
+      "tool_search",
+      "template_extraction",
+      "sandbox_verifier",
+      "runtime_optimizer"
+    ],
+    "purpose": "Graph-backed functionality tests"
+  }
+}

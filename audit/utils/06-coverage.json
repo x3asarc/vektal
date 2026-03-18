@@ -1,0 +1,18 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:02:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "utils"
+  },
+  "summary": {
+    "module_count": 14,
+    "test_coverage": "referenced by integration tests",
+    "import_relationships": "pentart_db.py is foundation module"
+  }
+}

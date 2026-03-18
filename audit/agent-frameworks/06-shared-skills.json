@@ -1,0 +1,42 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:09:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "agent-frameworks"
+  },
+  "summary": {
+    "shared_skills_count": 33,
+    "shared_skills": [
+      "aura-oracle",
+      "review-implementing",
+      "verify-phase",
+      "visual-ooda-loop",
+      "deep-research",
+      "brainstorming",
+      "finishing-a-development-branch",
+      "deployment-validator",
+      "webapp-testing",
+      "test-fixing",
+      "defense-in-depth",
+      "root-cause-tracing",
+      "dev-browser",
+      "varlock-claude-skill",
+      "postgres",
+      "using-git-worktrees",
+      "test-driven-development",
+      "systematic-debugging",
+      "taste-to-token-extractor",
+      "page-content-evolution",
+      "tri-agent-bug-audit",
+      "simplify",
+      "skill-creator"
+    ],
+    "cross_framework_consistency": "high"
+  }
+}

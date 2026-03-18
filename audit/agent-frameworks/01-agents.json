@@ -1,0 +1,51 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:09:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "agent-frameworks"
+  },
+  "summary": {
+    "source": ".agents",
+    "components": [
+      "skills/aura-oracle",
+      "skills/review-implementing",
+      "skills/visual-ooda-loop",
+      "skills/deep-research",
+      "skills/brainstorming",
+      "skills/verify-phase",
+      "skills/frontend-deploy-debugger",
+      "skills/finishing-a-development-branch",
+      "skills/deployment-validator",
+      "skills/webapp-testing",
+      "skills/test-fixing",
+      "skills/defense-in-depth",
+      "skills/root-cause-tracing",
+      "skills/dev-browser",
+      "skills/varlock-claude-skill",
+      "skills/oiloil-ui-ux-guide",
+      "skills/postgres",
+      "skills/using-git-worktrees",
+      "skills/test-driven-development",
+      "skills/systematic-debugging",
+      "skills/design-interactions",
+      "skills/design-molecules",
+      "skills/design-atoms",
+      "skills/taste-to-token-extractor",
+      "skills/frontend-design-skill",
+      "skills/page-content-evolution",
+      "skills/deployment-validator",
+      "skills/tri-agent-bug-audit",
+      "skills/simplify",
+      "skills/gsd",
+      "skills/skill-creator",
+      "skills/firecrawl",
+      "issues"
+    ]
+  }
+}

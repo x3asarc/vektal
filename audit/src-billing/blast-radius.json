@@ -1,0 +1,34 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "blast_radius": {
+    "impact_scope": "payment processing, user account creation, subscription lifecycle",
+    "affected_capabilities": [
+      "New user registration",
+      "Subscription upgrades/downgrades",
+      "Account suspension from payment failure",
+      "Reactivation on successful payment"
+    ],
+    "failure_modes": [
+      "Webhook replay attack possible (TODO: Redis deduplication)",
+      "Stripe API outage causes checkout failures",
+      "Invalid webhook secret causes all webhooks to fail",
+      "Database rollback during webhook processing"
+    ],
+    "contained_by": ["Stripe PCI DSS compliance", "webhook signature verification"],
+    "contained_impact": "financial data handled by Stripe; app only handles metadata"
+  }
+}

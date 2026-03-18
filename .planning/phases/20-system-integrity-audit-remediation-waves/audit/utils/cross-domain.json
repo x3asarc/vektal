@@ -1,0 +1,37 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "reads_from": [
+      "config/",
+      "src/models/",
+      "data/"
+    ],
+    "writes_to": [
+      "Shopify API",
+      "PostgreSQL",
+      "data/exports/"
+    ],
+    "consumed_by": [
+      "scripts/",
+      "src/enrichment/",
+      "src/scraping/",
+      "frontend/"
+    ]
+  },
+  "summary": {
+    "reader_count": 3,
+    "writer_count": 3,
+    "crosses_boundary": true
+  }
+}

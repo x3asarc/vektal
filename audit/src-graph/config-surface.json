@@ -1,0 +1,36 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "env_vars": [
+    {"file": "src/graph/local_graph_store.py", "vars": ["LOCAL_GRAPH_SNAPSHOT_TTL_SECONDS", "LOCAL_GRAPH_SNAPSHOT_DISK_TTL_SECONDS", "LOCAL_GRAPH_SNAPSHOT_CACHE_PATH"]},
+    {"file": "src/graph/query_templates.py", "vars": ["NEO4J_URI", "NEO4J_URI_FALLBACKS", "NEO4J_UNAVAILABLE_BACKOFF_SECONDS", "NEO4J_USER", "NEO4J_PASSWORD", "NEO4J_CONNECT_TIMEOUT_SECONDS", "GRAPH_FORCE_NEO4J_PROBE", "GRAPH_TEMPLATE_PREFER_SYNC", "GRAPH_ORACLE_ENABLED"]},
+    {"file": "src/graph/root_cause_classifier.py", "vars": ["ROOT_CAUSE_CLASSIFIER_MODEL", "OPENROUTER_API_KEY"]},
+    {"file": "src/graph/query_interface.py", "vars": ["GRAPH_DISABLE_ASYNC_EMIT", "GRAPH_DISABLE_EPISODE_EMIT_ON_FALLBACK"]},
+    {"file": "src/graph/infra_probe.py", "vars": ["NEO4J_AURA_HOSTNAME", "NEO4J_USER", "NEO4J_PASSWORD", "NEO4J_LOCAL_HOST", "NEO4J_LOCAL_PORT"]},
+    {"file": "src/graph/remediators/neo4j_health_remediator.py", "vars": ["NEO4J_URI", "NEO4J_URI_FALLBACKS", "NEO4J_USER", "NEO4J_PASSWORD"]}
+  ],
+  "config_patterns": [
+    {"file": "src/graph/backend_resolver.py", "pattern": "Runtime backend mode resolution"},
+    {"file": "src/graph/convention_checker.py", "pattern": "Convention loading"},
+    {"file": "src/graph/remediation_registry.py", "pattern": "Remediator registration"}
+  ],
+  "critical_env_vars": [
+    "NEO4J_URI",
+    "NEO4J_PASSWORD",
+    "NEO4J_USER",
+    "GRAPH_ORACLE_ENABLED",
+    "OPENROUTER_API_KEY"
+  ],
+  "summary": {
+    "env_var_count": 20,
+    "config_file_count": 5,
+    "secret_count": 4
+  }
+}

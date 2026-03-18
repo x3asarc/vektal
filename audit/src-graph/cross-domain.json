@@ -1,0 +1,70 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["import-graph-analysis", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "cross_domain_coupling": [
+    {
+      "target_unit": "src/core",
+      "coupling_type": "core-services",
+      "files": ["codebase_scanner.py", "query_interface.py", "mcp_server.py", "root_cause_classifier.py", "planning_linker.py", "embeddings.py", "graphiti_client.py"],
+      "patterns": ["get_graphiti_client", "generate_embedding", "MemoryLoader", "codebase_entities", "synthex_entities"]
+    },
+    {
+      "target_unit": "src/tasks",
+      "coupling_type": "graphiti-emit",
+      "files": ["intent_capture.py", "query_interface.py"],
+      "patterns": ["emit_episode to graphiti_sync"]
+    },
+    {
+      "target_unit": "src/memory",
+      "coupling_type": "memory-access",
+      "files": ["root_cause_classifier.py"],
+      "patterns": ["MemoryLoader"]
+    },
+    {
+      "target_unit": "src/assistant",
+      "coupling_type": "assistant-integration",
+      "files": ["root_cause_classifier.py"],
+      "patterns": ["SessionPrimer"]
+    },
+    {
+      "target_unit": "src/models",
+      "coupling_type": "sandbox-persistence",
+      "files": ["sandbox_persistence.py", "sentry_feedback_loop.py"],
+      "patterns": ["SandboxRun model"]
+    }
+  ],
+  "inbound_coupling": [
+    {
+      "source_unit": "src/core/embeddings.py",
+      "coupling_type": "runtime-backend-mode",
+      "files": ["backend_resolver.py"]
+    },
+    {
+      "source_unit": "src/core/graphiti_client.py",
+      "coupling_type": "graphiti-client",
+      "files": ["backend_resolver.py"]
+    },
+    {
+      "source_unit": "src/tasks/graphiti_sync.py",
+      "coupling_type": "episode-emission",
+      "files": ["query_templates.py", "query_interface.py"]
+    },
+    {
+      "source_unit": "src/api/app.py",
+      "coupling_type": "optional-import",
+      "files": ["mcp_server.py"]
+    }
+  ],
+  "summary": {
+    "outbound_coupling_count": 5,
+    "inbound_coupling_count": 4,
+    "coupling_complexity": "high"
+  }
+}

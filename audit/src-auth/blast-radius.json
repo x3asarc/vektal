@@ -1,0 +1,35 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication and authorization"
+  },
+  "blast_radius": {
+    "impact_scope": "all protected endpoints and user identity management",
+    "affected_capabilities": [
+      "User login/logout",
+      "Session management",
+      "Email verification flow",
+      "Shopify OAuth connection",
+      "All tier-gated features"
+    ],
+    "failure_modes": [
+      "Bcrypt failure causes login lockout",
+      "OAuth webhook failure prevents store connection",
+      "Email service failure blocks verification",
+      "Session hijacking if secrets leaked"
+    ],
+    "contained_by": ["Flask session security", "bcrypt library"],
+    "contained_impact": "critical auth bypass possible if bcrypt compromised"
+  }
+}

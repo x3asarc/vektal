@@ -1,0 +1,24 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "subdirectories": ["tasks", "integrations"],
+    "tasks_count": 5,
+    "integrations_count": 5,
+    "key_areas": [
+      "graphiti_sync",
+      "batch_emission",
+      "research_fallback"
+    ],
+    "purpose": "Task orchestration and external integration tests"
+  }
+}

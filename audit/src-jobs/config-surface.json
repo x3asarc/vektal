@@ -1,0 +1,36 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "env_vars": [
+    {"file": "src/jobs/finalizer.py", "vars": ["PHASE6_FINALIZER_MODE"]}
+  ],
+  "config_patterns": [
+    {"file": "src/jobs/queueing.py", "pattern": "Queue definitions and task routes"},
+    {"file": "src/jobs/orchestrator.py", "pattern": "Job type configurations"},
+    {"file": "src/jobs/metrics.py", "pattern": "Metrics collection configuration"}
+  ],
+  "critical_env_vars": [
+    "PHASE6_FINALIZER_MODE"
+  ],
+  "queue_configurations": [
+    {"name": "default", "purpose": "General tasks"},
+    {"name": "assistant.t1", "purpose": "Tier 1 assistant tasks"},
+    {"name": "assistant.t2", "purpose": "Tier 2 assistant tasks"},
+    {"name": "assistant.t3", "purpose": "Tier 3 assistant tasks"},
+    {"name": "scrape.t1", "purpose": "Tier 1 scraping tasks"},
+    {"name": "scrape.t2", "purpose": "Tier 2 scraping tasks"},
+    {"name": "scrape.t3", "purpose": "Tier 3 scraping tasks"}
+  ],
+  "summary": {
+    "env_var_count": 1,
+    "config_file_count": 5,
+    "queue_count": 7
+  }
+}

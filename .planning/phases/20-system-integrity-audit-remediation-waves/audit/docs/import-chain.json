@@ -1,0 +1,34 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "is_documentation": true,
+    "no_python_imports": true,
+    "referenced_by": [
+      ".claude/",
+      ".codex/",
+      ".gemini/",
+      ".letta/",
+      "AGENTS.md"
+    ],
+    "references": [
+      "src/core/",
+      "config/",
+      "ops/"
+    ]
+  },
+  "summary": {
+    "is_leaf": true,
+    "consumers": 5
+  }
+}

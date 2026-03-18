@@ -1,0 +1,27 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "api_surface": {
+    "is_migration_dir": true,
+    "alembic_commands": [
+      "alembic upgrade head",
+      "alembic downgrade -1",
+      "alembic revision --autogenerate"
+    ],
+    "no_http_endpoints": true
+  },
+  "summary": {
+    "alembic_commands": 3,
+    "is_alembic_dir": true
+  }
+}

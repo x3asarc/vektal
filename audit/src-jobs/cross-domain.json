@@ -1,0 +1,65 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["import-graph-analysis", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "cross_domain_coupling": [
+    {
+      "target_unit": "src/core",
+      "coupling_type": "graphiti-integration",
+      "files": ["src/jobs/graphiti_ingestor.py"],
+      "patterns": ["get_graphiti_client", "EpisodeType", "create_episode_payload"]
+    },
+    {
+      "target_unit": "src/graph",
+      "coupling_type": "graphiti-usage",
+      "files": ["src/jobs/graphiti_ingestor.py"],
+      "patterns": ["GraphitiIngestor processes code events into graph"]
+    },
+    {
+      "target_unit": "src/models",
+      "coupling_type": "job-state",
+      "files": ["src/jobs/orchestrator.py", "src/jobs/finalizer.py", "src/jobs/checkpoints.py"],
+      "patterns": ["Job, Product, IngestChunk models"]
+    },
+    {
+      "target_unit": "src/tasks",
+      "coupling_type": "celery-dispatch",
+      "files": ["src/jobs/dispatcher.py", "src/jobs/queueing.py"],
+      "patterns": ["send_task to Celery queues"]
+    },
+    {
+      "target_unit": "src/celery_app",
+      "coupling_type": "celery-config",
+      "files": ["src/jobs/queueing.py"],
+      "patterns": ["TASK_ROUTES, ALL_QUEUES"]
+    }
+  ],
+  "inbound_coupling": [
+    {
+      "source_unit": "src/celery_app",
+      "coupling_type": "celery-import",
+      "files": ["celery_app.py"]
+    },
+    {
+      "source_unit": "src/tasks",
+      "coupling_type": "job-completion",
+      "files": ["control.py - finalize_job, cancel_job"]
+    },
+    {
+      "source_unit": "src/api/v1/jobs",
+      "coupling_type": "job-management",
+      "files": ["routes.py"]
+    }
+  ],
+  "summary": {
+    "outbound_coupling_count": 5,
+    "inbound_coupling_count": 3,
+    "coupling_complexity": "medium-high"
+  }
+}

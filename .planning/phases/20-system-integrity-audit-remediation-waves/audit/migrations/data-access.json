@@ -1,0 +1,40 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "access_pattern": "schema_mutation",
+    "writes_to": [
+      "PostgreSQL"
+    ],
+    "affected_tables": [
+      "users",
+      "shopify_stores",
+      "vendors",
+      "products",
+      "jobs",
+      "enrichment_profiles",
+      "resolution_tasks",
+      "sandbox_runs",
+      "remedy_templates",
+      "graphiti_snapshots",
+      "tool_input_examples"
+    ],
+    "env_vars": [
+      "DATABASE_URL"
+    ]
+  },
+  "summary": {
+    "tables_affected": 11,
+    "is_schema_mutating": true
+  }
+}

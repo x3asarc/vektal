@@ -1,0 +1,37 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "sqlalchemy_models": [
+    {"file": "src/api/v1/shopify/webhooks.py", "models": ["ShopifyStore", "ShopifyCredential", "Product", "ProductChangeEvent"]},
+    {"file": "src/api/v1/products/mappers.py", "models": ["Product", "ShopifyStore"]},
+    {"file": "src/api/v1/products/lineage.py", "models": ["Product", "ProductChangeEvent"]},
+    {"file": "src/api/v1/products/enrichment.py", "models": ["ProductEnrichmentRun"]},
+    {"file": "src/api/v1/ops/dashboard.py", "models": ["ShopifyStore", "Product"]},
+    {"file": "src/api/v1/chat/routes.py", "models": ["ChatSession", "ChatAction"]}
+  ],
+  "query_patterns": [
+    {"file": "src/api/v1/shopify/webhooks.py", "pattern": ".query.filter_by", "count": 3},
+    {"file": "src/api/v1/products/*.py", "pattern": ".query.*", "count": 12},
+    {"file": "src/api/v1/chat/routes.py", "pattern": "db.session.commit", "count": 8}
+  ],
+  "session_usage": [
+    {"file": "src/api/v1/products/*.py", "pattern": "db.session.add/commit", "frequency": "high"},
+    {"file": "src/api/v1/chat/routes.py", "pattern": "db.session.add/commit", "frequency": "high"}
+  ],
+  "direct_model_imports": [
+    {"file": "src/api/v1/shopify/webhooks.py", "imports": ["src.models.ShopifyStore", "src.models.ShopifyCredential", "src.models.Product", "src.models.ProductChangeEvent"]},
+    {"file": "src/api/v1/products/mappers.py", "imports": ["src.models.Product", "src.models.ShopifyStore"]}
+  ],
+  "summary": {
+    "direct_model_access_count": 6,
+    "indirect_access_count": 0,
+    "risk_level": "high"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "settings_files": [
+      ".claude/settings.json",
+      ".codex/settings.json",
+      ".gemini/settings.json",
+      ".letta/settings.json"
+    ],
+    "hooks": [
+      ".claude/plugins/ralph-wiggum/hooks/hooks.json"
+    ],
+    "SKILL_md_pattern": "Standard skill structure: description, trigger phrases, action blocks, workflow steps",
+    "agent_spec_pattern": "Commander architecture: Commander > Bundle > Watson > Lestrade > Leads",
+    "env_vars": [
+      "SESSION_BOOTSTRAP_SCRIPT",
+      "AGENTS_MEMORY_SYNC",
+      "CLAUDE_CODE_PROVIDER",
+      "OPENROUTER_API_KEY",
+      "CLAUDE_API_KEY",
+      "GEMINI_API_KEY",
+      "LETTA_SERVER_URL"
+    ]
+  },
+  "summary": {
+    "settings_files": 4,
+    "hook_files": 1,
+    "skill_pattern_shared": true
+  }
+}

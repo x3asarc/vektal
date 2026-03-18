@@ -1,0 +1,18 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config"
+  },
+  "summary": {
+    "yaml_validity": "all-valid",
+    "required_fields_present": true,
+    "schema_compliance": "complete"
+  }
+}

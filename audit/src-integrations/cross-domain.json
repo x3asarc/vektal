@@ -1,0 +1,40 @@
+{
+  "folder_path": "src-integrations",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-integrations"
+  },
+  "summary": {
+    "module_name": "src-integrations",
+    "primary_responsibility": "External AI API integrations"
+  },
+  "cross_domain": {
+    "inbound_dependencies": [],
+    "outbound_dependencies": ["Perplexity AI (external)"],
+    "data_flows": [
+      {
+        "from": "src.jobs",
+        "to": "PerplexityClient",
+        "direction": "request",
+        "data_type": "research query string"
+      },
+      {
+        "from": "PerplexityClient",
+        "to": "src.jobs",
+        "direction": "response",
+        "data_type": "AI-generated answer with citations"
+      }
+    ],
+    "shared_state": [],
+    "isolation_boundaries": [
+      "API key scoped to Perplexity only",
+      "No shared memory between integrations"
+    ]
+  }
+}

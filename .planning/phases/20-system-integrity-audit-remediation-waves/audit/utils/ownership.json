@@ -1,0 +1,64 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "utils",
+    "canonical_surface": "utils",
+    "related_critical_surfaces": [
+      "src/enrichment",
+      "src/scraping",
+      "scripts"
+    ],
+    "matched_file_count": 12,
+    "direct_file_count": 12
+  },
+  "matched_files": [
+    "pentart_db.py",
+    "generate_product_tags.py",
+    "add_product_image.py",
+    "find_product_image.py",
+    "create_shopify_redirect.py",
+    "fix_product_handles.py",
+    "enrich_product_logistics.py",
+    "categorize_product.py",
+    "assign_collections.py",
+    "display_seo_comparison.py",
+    "approve_seo_csv.py",
+    "__init__.py"
+  ],
+  "ownership_summary": {
+    "shopify_helpers": [
+      "pentart_db.py"
+    ],
+    "product_enrichment": [
+      "generate_product_tags.py",
+      "categorize_product.py",
+      "assign_collections.py",
+      "enrich_product_logistics.py"
+    ],
+    "image_operations": [
+      "add_product_image.py",
+      "find_product_image.py"
+    ],
+    "seo_operations": [
+      "display_seo_comparison.py",
+      "approve_seo_csv.py"
+    ],
+    "shopify_operations": [
+      "create_shopify_redirect.py",
+      "fix_product_handles.py"
+    ]
+  },
+  "summary": {
+    "file_count": 12,
+    "purpose": "CLI utilities for product enrichment, SEO, image ops, and Shopify management"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["AST-parsing", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "import_chain": {
+    "inbound": [
+      {"source": "src/api/app.py", "imports": ["src.database", "src.models", "src.config.*", "src.core.*"]},
+      {"source": "src/tasks/*.py", "imports": ["src.celery_app", "src.core.*", "src.models"]},
+      {"source": "src/celery_app.py", "imports": ["src.jobs.queueing", "src.config.*", "src.core.*"]}
+    ],
+    "outbound": [
+      {"target": "src/api", "type": "dependency", "files": ["app.py"]},
+      {"target": "src/jobs", "type": "dependency", "files": ["celery_app.py"]},
+      {"target": "src/tasks", "type": "dependency", "files": ["celery_app.py"]},
+      {"target": "src/core", "type": "dependency", "files": ["app.py", "celery_app.py"]},
+      {"target": "src/config", "type": "dependency", "files": ["app.py", "celery_app.py"]},
+      {"target": "src/models", "type": "dependency", "files": ["app.py", "database.py"]}
+    ]
+  },
+  "cross_prefix_imports": [
+    {"from": "src/app.py", "to": "src/api/app.py", "pattern": "create_openapi_app"},
+    {"from": "src/app.py", "to": "src/database.py", "pattern": "configure_app, db"},
+    {"from": "src/app.py", "to": "src/core/image_scraper.py", "pattern": "scrape_product_info, ShopifyClient"},
+    {"from": "src/celery_app.py", "to": "src/jobs/queueing.py", "pattern": "ALL_QUEUES, TASK_ROUTES"},
+    {"from": "src/celery_app.py", "to": "src/config/sentry_config.py", "pattern": "configure_sentry"}
+  ],
+  "external_imports": [
+    "flask", "flask_login", "werkzeug", "requests", "pandas",
+    "celery", "kombu", "sqlalchemy", "dotenv", "hmac", "hashlib"
+  ],
+  "summary": {
+    "inbound_count": 3,
+    "outbound_count": 6,
+    "cross_prefix_count": 5,
+    "external_count": 10
+  }
+}

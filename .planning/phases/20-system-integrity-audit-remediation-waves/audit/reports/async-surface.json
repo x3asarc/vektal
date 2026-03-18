@@ -1,0 +1,22 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "async_surface": {
+    "is_output_dir": true,
+    "no_async_operations": true,
+    "note": "reports/ is static markdown output"
+  },
+  "summary": {
+    "async_operations": 0
+  }
+}

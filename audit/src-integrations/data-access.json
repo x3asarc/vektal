@@ -1,0 +1,30 @@
+{
+  "folder_path": "src-integrations",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-integrations"
+  },
+  "summary": {
+    "module_name": "src-integrations",
+    "primary_responsibility": "External AI API integrations"
+  },
+  "data_access": {
+    "read_operations": [
+      "Perplexity AI API (chat completions endpoint)"
+    ],
+    "write_operations": [],
+    "data_persistence": {
+      "external_api": "Perplexity AI"
+    },
+    "sensitive_data_handling": [
+      "API key not stored in code",
+      "Bearer token in request header"
+    ]
+  }
+}

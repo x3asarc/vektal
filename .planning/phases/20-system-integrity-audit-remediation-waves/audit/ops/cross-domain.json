@@ -1,0 +1,38 @@
+{
+  "folder_path": "ops",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "referenced_by": [
+      "scripts/governance/",
+      "AGENTS.md",
+      ".claude/"
+    ],
+    "references": [
+      ".planning/ROADMAP.md",
+      "STANDARDS.md"
+    ],
+    "key_docs": [
+      "ops/governance/roles/builder.md",
+      "ops/governance/roles/context-curator.md",
+      "ops/governance/roles/integrity-warden.md",
+      "ops/governance/roles/phase-manager.md",
+      "ops/governance/roles/README.md",
+      "ops/governance/roles/reviewer.md",
+      "ops/governance/roles/structure-guardian.md"
+    ]
+  },
+  "summary": {
+    "consumers": 3,
+    "crosses_boundary": true
+  }
+}

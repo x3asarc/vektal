@@ -1,0 +1,81 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing, subscription management, and checkout flow",
+    "key_classes": ["StripeClient functions"],
+    "files_in_unit": ["checkout.py", "routes.py", "stripe_client.py", "subscription.py", "webhooks.py"],
+    "file_count": 5,
+    "estimated_loc": 900
+  },
+  "ownership": {
+    "primary_owner": "billing-system",
+    "domain": "payments",
+    "language": "python",
+    "framework": "Flask + Stripe SDK",
+    "external_dependencies": ["stripe", "flask", "flask_bcrypt"]
+  },
+  "key_apis": {
+    "exported_functions": [
+      "create_checkout_session()",
+      "get_tier_price_id()",
+      "get_tier_from_price_id()",
+      "upgrade_subscription()",
+      "downgrade_subscription()",
+      "cancel_pending_downgrade()",
+      "cancel_subscription()",
+      "verify_stripe_signature()",
+      "handle_checkout_completed()"
+    ],
+    "entry_points": [
+      "src/billing/checkout.py",
+      "src/billing/routes.py",
+      "src/billing/webhooks.py"
+    ]
+  },
+  "data_stores": {
+    "database": ["User model via db.session"],
+    "external": ["Stripe API (PCI DSS compliant)"]
+  },
+  "security_notes": [
+    "Webhook signature verification required",
+    "Password hashed with bcrypt before stored in metadata",
+    "Stripe handles all card data (no raw PCI data in app)",
+    "Idempotency via user lookup in webhook"
+  ],
+  "integration_points": [
+    "src.models.user",
+    "src.auth.email_verification",
+    "src.auth.email_sender",
+    "src.core.secrets"
+  ],
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "notes": "All Stripe operations synchronous via stripe SDK"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "STRIPE_PRICE_TIER_1",
+      "STRIPE_PRICE_TIER_2",
+      "STRIPE_PRICE_TIER_3"
+    ],
+    "defaults": {
+      "price_tier_1": "price_tier1_monthly",
+      "price_tier_2": "price_tier2_monthly",
+      "price_tier_3": "price_tier3_monthly"
+    }
+  }
+}

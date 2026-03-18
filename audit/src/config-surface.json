@@ -1,0 +1,33 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "env_vars": [
+    {"file": "src/app.py", "vars": ["SHOPIFY_API_KEY", "SHOPIFY_CLIENT_ID", "SHOPIFY_CLIENT_SECRET", "SHOPIFY_API_SCOPES", "API_VERSION", "APP_URL"]},
+    {"file": "src/celery_app.py", "vars": ["CELERY_BROKER_URL", "CELERY_RESULT_BACKEND", "AUDIT_DISPATCH_INTERVAL_SECONDS", "JOB_RETENTION_SWEEP_SECONDS", "JOB_RETENTION_DAYS", "REDIS_KEEPALIVE_IDLE", "REDIS_KEEPALIVE_INTERVAL", "REDIS_KEEPACNT"]}
+  ],
+  "config_patterns": [
+    {"file": "src/app_factory.py", "pattern": "Flask app factory pattern"},
+    {"file": "src/database.py", "pattern": "SQLAlchemy configuration"}
+  ],
+  "critical_env_vars": [
+    "SHOPIFY_API_KEY",
+    "SHOPIFY_CLIENT_SECRET",
+    "CELERY_BROKER_URL",
+    "CELERY_RESULT_BACKEND"
+  ],
+  "secret_patterns": [
+    {"file": "src/core/secrets.py", "pattern": "get_secret function"}
+  ],
+  "summary": {
+    "env_var_count": 16,
+    "config_file_count": 4,
+    "secret_count": 3
+  }
+}

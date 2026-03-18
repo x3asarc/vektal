@@ -1,0 +1,30 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "reference_docs_count": 5,
+    "key_docs": [
+      "FRAMEWORK_QUICK_REFERENCE.md",
+      "hybrid_naming_example.md",
+      "README_VISION_AI.md",
+      "VERIFICATION_CHECKLIST.md"
+    ],
+    "legacy_docs_count": 5,
+    "key_docs_legacy": [
+      "phase1-PLAN.md",
+      "phase1-CONTEXT.md",
+      "SolutionContextProfile.md",
+      "IMPLEMENTATION_SUMMARY.md",
+      "PENTART_PRODUCTS_SUMMARY.md"
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "blast_radius": {
+    "impact_scope": "user-facing dashboard and all client interactions",
+    "affected_capabilities": [
+      "User authentication flow",
+      "Search workspace",
+      "Jobs tracking and observation",
+      "Product enrichment",
+      "Resolution/approval workflow",
+      "Onboarding wizard",
+      "Settings management"
+    ],
+    "failure_modes": [
+      "API client failure breaks all data fetching",
+      "Auth guard misconfiguration causes infinite redirects",
+      "Zustand store corruption causes UI state loss",
+      "TanStack Query cache invalidation bugs"
+    ],
+    "contained_by": ["error boundaries", "apiRequest error handling", "guard state preservation"],
+    "contained_impact": "localized to UI; backend isolation prevents data corruption"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config"
+  },
+  "summary": {
+    "cross_reference": {
+      "vendor_configs_yaml_referenced_by": [
+        "tests/integration/test_vendor_yaml_integration.py"
+      ],
+      "image_processing_rules_yaml_referenced_by": [
+        "docs/IMAGE_PROCESSING_FRAMEWORK.md"
+      ],
+      "product_quality_rules_yaml_referenced_by": [
+        "docs/implementation/PRODUCT_QUALITY_ORCHESTRATOR.md"
+      ]
+    }
+  }
+}

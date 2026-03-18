@@ -1,0 +1,32 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "integration_tests": {
+      "DATABASE_URL": "PostgreSQL test database",
+      "SHOPIFY_SHOP_URL": "Shopify test store"
+    },
+    "unit_tests": {
+      "mocked_db": true,
+      "mocked_shopify": true
+    },
+    "graph_tests": {
+      "NEO4J_URI": "Neo4j test database"
+    }
+  },
+  "summary": {
+    "env_vars_used": 3,
+    "integration_tests": 15,
+    "unit_tests": 48
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "folder_path": "ops",
+  "generated_at": "2026-03-18T00:05:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "ops"
+  },
+  "summary": {
+    "canonical_artifacts": [
+      ".planning/ROADMAP.md",
+      ".planning/STATE.md",
+      "STANDARDS.md",
+      "ops/STRUCTURE_SPEC.md",
+      "docs/MASTER_MAP.md",
+      "FAILURE_JOURNEY.md"
+    ]
+  }
+}

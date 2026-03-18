@@ -1,0 +1,55 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration",
+      "import-graph-analysis",
+      "phase20-wave1-audit"
+    ],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src",
+    "canonical_surface": "src",
+    "related_critical_surfaces": ["src/core", "src/api", "src/jobs", "src/graph", "src/tasks"],
+    "matched_file_count": 8,
+    "direct_file_count": 8
+  },
+  "matched_files": [
+    "src/__init__.py",
+    "src/app.py",
+    "src/celery_app.py",
+    "src/database.py",
+    "src/app_factory.py",
+    "src/ai_bot_server.py",
+    "src/bot_server.py"
+  ],
+  "root_level_subdirs": [
+    "src/api",
+    "src/jobs",
+    "src/graph",
+    "src/tasks",
+    "src/memory",
+    "src/auth",
+    "src/config",
+    "src/models",
+    "src/assistant"
+  ],
+  "inbound_imports": [
+    "src/api/app.py",
+    "src/api/v1/*",
+    "src/tasks/*",
+    "src/celery_app.py"
+  ],
+  "inbound_references": [],
+  "summary": {
+    "inbound_importer_count": 4,
+    "inbound_referrer_count": 0,
+    "owned_function_count": 0,
+    "root_file_count": 8,
+    "subdirectory_count": 9
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:04:04Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "docs"
+  },
+  "summary": {
+    "implementation_docs_count": 5,
+    "key_docs": [
+      "PRODUCT_QUALITY_ORCHESTRATOR.md",
+      "IMPLEMENTATION_SUMMARY.md",
+      "PENTART_IMPLEMENTATION.md"
+    ],
+    "phase_reports_count": 3,
+    "key_reports": [
+      "FINAL_SUMMARY_PHASE_2.md",
+      "PHASE_2_COMPLETE.md",
+      "TASK_1_VENDOR_CONFIG_SUMMARY.md"
+    ]
+  }
+}

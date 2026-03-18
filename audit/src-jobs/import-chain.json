@@ -1,0 +1,38 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["AST-parsing", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "import_chain": {
+    "inbound": [
+      {"source": "src/celery_app.py", "imports": ["src.jobs.queueing"]},
+      {"source": "src/tasks/*.py", "imports": ["src.jobs.finalizer"]},
+      {"source": "src/api/v1/jobs/*", "imports": ["src.jobs.*"]}
+    ],
+    "outbound": [
+      {"target": "src/core", "type": "dependency", "files": ["graphiti_ingestor.py", "checkpoints.py"]},
+      {"target": "src/models", "type": "dependency", "files": ["orchestrator.py", "finalizer.py", "checkpoints.py"]},
+      {"target": "src/celery_app.py", "type": "celery-broker", "files": ["queueing.py", "dispatcher.py"]}
+    ]
+  },
+  "cross_prefix_imports": [
+    {"from": "src/jobs/graphiti_ingestor.py", "to": "src/core/graphiti_client.py", "pattern": "get_graphiti_client"},
+    {"from": "src/jobs/graphiti_ingestor.py", "to": "src/core/codebase_entities.py", "pattern": "FileEntity, ClassEntity, FunctionEntity"},
+    {"from": "src/jobs/graphiti_ingestor.py", "to": "src/core/synthex_entities.py", "pattern": "EpisodeType, create_episode_payload"},
+    {"from": "src/jobs/queueing.py", "to": "src/celery_app.py", "pattern": "Celery app import"}
+  ],
+  "external_imports": [
+    "celery", "sqlalchemy", "redis"
+  ],
+  "summary": {
+    "inbound_count": 3,
+    "outbound_count": 3,
+    "cross_prefix_count": 4,
+    "external_count": 3
+  }
+}

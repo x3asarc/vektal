@@ -1,0 +1,39 @@
+{
+  "folder_path": "src-memory",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-memory"
+  },
+  "summary": {
+    "module_name": "src-memory",
+    "primary_responsibility": "Multi-tier memory management"
+  },
+  "import_chain": {
+    "internal_imports": [
+      "src.memory.text_sanitizer",
+      "src.memory.event_schema",
+      "src.models",
+      "src.core.secrets"
+    ],
+    "external_imports": [
+      "json", "pathlib.Path", "datetime", "dataclasses", "uuid", "re", "os"
+    ],
+    "reverse_dependencies": [
+      "scripts/memory/session_start.py",
+      "scripts/memory/session_end.py",
+      "scripts/memory/task_complete.py",
+      "scripts/memory/phase_complete.py"
+    ],
+    "dependency_graph": {
+      "depth": 2,
+      "entry_points": ["memory_manager.py", "event_log.py", "task_manager.py"],
+      "leaf_modules": ["text_sanitizer.py"]
+    }
+  }
+}

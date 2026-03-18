@@ -1,0 +1,40 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "api_surface": {
+    "shopify_endpoints": [
+      "admin/api/products.json",
+      "admin/api/customers.json",
+      "admin/api/assets.json"
+    ],
+    "sentry_endpoints": [
+      "/api/0/projects/",
+      "/api/0/issues/"
+    ],
+    "neo4j_operations": [
+      "CREATE",
+      "MERGE",
+      "MATCH",
+      "SET",
+      "DELETE"
+    ],
+    "deploy_endpoints": [
+      "Hetzner Cloud API"
+    ]
+  },
+  "summary": {
+    "api_endpoints_touched": 6,
+    "graph_operations": 5,
+    "is_cli_toolkit": true
+  }
+}

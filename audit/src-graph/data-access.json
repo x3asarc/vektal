@@ -1,0 +1,35 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true
+  },
+  "sqlalchemy_models": [
+    {"file": "src/graph/sandbox_persistence.py", "models": ["SandboxRun"]},
+    {"file": "src/graph/sentry_feedback_loop.py", "models": ["SandboxRun"]}
+  ],
+  "query_patterns": [
+    {"file": "src/graph/sentry_feedback_loop.py", "pattern": "SandboxRun.query.filter", "count": 1}
+  ],
+  "session_usage": [
+    {"file": "src/graph/sandbox_persistence.py", "pattern": "db.session.add, db.session.commit"}
+  ],
+  "direct_model_imports": [
+    {"file": "src/graph/sandbox_persistence.py", "imports": ["src.models.SandboxRun"]}
+  ],
+  "neo4j_access": [
+    {"file": "src/graph/local_graph_store.py", "pattern": "Neo4j connection management"},
+    {"file": "src/graph/query_interface.py", "pattern": "Graphiti client for Neo4j"},
+    {"file": "src/graph/query_templates.py", "pattern": "Neo4j query templates"}
+  ],
+  "note": "src/graph primarily uses Neo4j via Graphiti client, with limited SQLAlchemy usage for sandbox persistence",
+  "summary": {
+    "direct_model_access_count": 1,
+    "neo4j_access_count": 3,
+    "risk_level": "low"
+  }
+}

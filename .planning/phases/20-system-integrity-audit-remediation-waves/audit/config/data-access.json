@@ -1,0 +1,27 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "access_pattern": "read_only_at_startup",
+    "read_by": [
+      "src/core/product_quality_orchestrator.py",
+      "src/scraping/scraper.py"
+    ],
+    "write_by": [],
+    "env_vars_related": ["DATA_DIR", "CONFIG_DIR"],
+    "note": "config/ is configuration data, not runtime data storage"
+  },
+  "summary": {
+    "read_count": 2,
+    "write_count": 0,
+    "is_data_store": false
+  }
+}

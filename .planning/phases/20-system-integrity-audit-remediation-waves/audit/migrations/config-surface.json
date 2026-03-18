@@ -1,0 +1,32 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "env_vars": [
+      "DATABASE_URL"
+    ],
+    "alembic_ini": [
+      "script_location",
+      "sqlalchemy.url",
+      "prepend_sys_path"
+    ],
+    "alembic_env_py": [
+      "config.set_main_option",
+      "target_metadata"
+    ]
+  },
+  "summary": {
+    "env_var_count": 1,
+    "alembic_config_files": 2
+  }
+}

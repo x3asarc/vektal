@@ -1,0 +1,56 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:09:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "agent-frameworks"
+  },
+  "summary": {
+    "source": ".claude",
+    "components": [
+      "settings.json",
+      "settings.local.json",
+      "commands/gsd/*.md",
+      "skills/*/SKILL.md",
+      "metrics/*/*.json",
+      "plugins/ralph-wiggum",
+      "PROGRESSIVE_VERIFICATION_QUICKSTART.md",
+      "MVP_IMPLEMENTATION_COMPLETE.md",
+      "SESSION_PRIMER_TEMPLATE.md"
+    ],
+    "commands": [
+      "audit-milestone",
+      "quick",
+      "verify-work",
+      "plan-milestone-gaps",
+      "execute-phase",
+      "compound-execute",
+      "help",
+      "new-project",
+      "progress",
+      "remove-phase",
+      "new-milestone",
+      "discuss-phase",
+      "plan-phase",
+      "complete-milestone",
+      "set-profile",
+      "research-phase",
+      "update",
+      "settings",
+      "resume-work",
+      "reapply-patches",
+      "pause-work",
+      "map-codebase",
+      "list-phase-assumptions",
+      "join-discord",
+      "debug",
+      "check-todos",
+      "add-todo"
+    ]
+  }
+}

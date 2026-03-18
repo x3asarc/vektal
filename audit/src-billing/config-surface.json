@@ -1,0 +1,36 @@
+{
+  "folder_path": "src-billing",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-billing"
+  },
+  "summary": {
+    "module_name": "src-billing",
+    "primary_responsibility": "Stripe payment processing"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "STRIPE_PRICE_TIER_1",
+      "STRIPE_PRICE_TIER_2",
+      "STRIPE_PRICE_TIER_3",
+      "APP_URL"
+    ],
+    "default_values": {
+      "price_tier_1": "price_tier1_monthly",
+      "price_tier_2": "price_tier2_monthly",
+      "price_tier_3": "price_tier3_monthly"
+    },
+    "secrets_required": [
+      "STRIPE_SECRET_KEY (critical)",
+      "STRIPE_WEBHOOK_SECRET (critical)"
+    ]
+  }
+}

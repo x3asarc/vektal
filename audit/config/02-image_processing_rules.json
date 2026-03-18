@@ -1,0 +1,20 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config"
+  },
+  "summary": {
+    "file": "config/image_processing_rules.yaml",
+    "type": "image-rules",
+    "purpose": "Rules for image processing, validation, and optimization",
+    "size_bytes": 0,
+    "last_modified": "2026-03-17"
+  }
+}

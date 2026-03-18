@@ -1,0 +1,32 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "initial_schema": {
+      "severity": "critical",
+      "impact": "User, ShopifyStore, Vendor tables break - entire app fails"
+    },
+    "phase_migrations": {
+      "severity": "high",
+      "impact": "Feature-specific tables break - enrichment, jobs, graph features fail"
+    },
+    "env_py": {
+      "severity": "critical",
+      "impact": "Migration runner breaks - cannot apply or rollback"
+    }
+  },
+  "summary": {
+    "critical": 2,
+    "high": 1
+  }
+}

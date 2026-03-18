@@ -1,0 +1,20 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "phase_6_migrations": [
+      "b7d5c4a9e8f1_phase6_ingest_chunks_audit_checkpoints.py"
+    ],
+    "migration_patterns": ["gXXXX_XX_*.py", "pXX_XX_*.py", "fXXXX_*.py"],
+    "alembic_compliance": true
+  }
+}

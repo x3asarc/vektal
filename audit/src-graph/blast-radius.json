@@ -1,0 +1,66 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration", "import-graph-analysis"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "direct_imports": {
+    "internal": [
+      "src.core.codebase_entities",
+      "src.core.embeddings",
+      "src.core.summary_generator",
+      "src.core.graphiti_client",
+      "src.core.synthex_entities",
+      "src.core.memory_loader",
+      "src.graph.backend_resolver",
+      "src.graph.local_graph_store",
+      "src.graph.convention_checker"
+    ],
+    "external": [
+      "neo4j",
+      "openai",
+      "anthropic",
+      "fastapi",
+      "pydantic",
+      "redis",
+      "docker"
+    ]
+  },
+  "transitive_imports_depth_1": {
+    "src/graph/mcp_server.py": ["src.graph.convention_checker", "src.graph.batch_handlers", "src.graph.query_interface"],
+    "src/graph/codebase_scanner.py": ["src.core.codebase_entities", "src.core.embeddings", "src.graph.file_parser"],
+    "src/graph/sentry_ingestor.py": ["src.core.sentry_client"]
+  },
+  "blast_radius_files": [
+    "src/core/embeddings.py",
+    "src/core/graphiti_client.py",
+    "src/tasks/graphiti_sync.py",
+    "src/api/app.py",
+    "src/memory/*"
+  ],
+  "impact_score": "critical",
+  "critical_dependencies": [
+    "src/graph/mcp_server.py",
+    "src/graph/query_interface.py",
+    "src/graph/backend_resolver.py",
+    "src/graph/local_graph_store.py",
+    "src/graph/convention_checker.py"
+  ],
+  "mcp_server_blast_radius": {
+    "if_mcp_server_changes": [
+      "All MCP client integrations break",
+      "Frontend graph queries break",
+      "Codebase analysis features break"
+    ]
+  },
+  "summary": {
+    "direct_import_count": 9,
+    "transitive_import_count": 6,
+    "impacted_modules": 10,
+    "change_propagation_risk": "critical"
+  }
+}

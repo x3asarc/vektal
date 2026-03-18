@@ -1,0 +1,60 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["import-graph-analysis", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "cross_domain_coupling": [
+    {
+      "target_unit": "src/core",
+      "coupling_type": "domain-logic",
+      "files": ["v1/products/*", "v1/chat/*", "v1/shopify/webhooks.py"],
+      "patterns": ["ShopifyResolver", "SchemaObserver", "sentry_metrics"]
+    },
+    {
+      "target_unit": "src/tasks",
+      "coupling_type": "task-dispatch",
+      "files": ["v1/shopify/webhooks.py", "v1/chat/routes.py", "v1/jobs/*"],
+      "patterns": ["process_webhook_task", "bulk_chat_task", "job tasks"]
+    },
+    {
+      "target_unit": "src/models",
+      "coupling_type": "orm-access",
+      "files": ["v1/products/*", "v1/chat/*", "v1/shopify/*"],
+      "patterns": ["Product", "ShopifyStore", "ChatSession", "Job"]
+    },
+    {
+      "target_unit": "src/jobs",
+      "coupling_type": "job-monitoring",
+      "files": ["api/jobs/events.py", "v1/jobs/*"],
+      "patterns": ["Job events", "Job status"]
+    },
+    {
+      "target_unit": "src/graph",
+      "coupling_type": "optional-graph",
+      "files": ["app.py"],
+      "patterns": ["validate_graph_config"]
+    }
+  ],
+  "inbound_coupling": [
+    {
+      "source_unit": "src/app.py",
+      "coupling_type": "delegation",
+      "files": ["app.py", "__init__.py"]
+    },
+    {
+      "source_unit": "src/graph/mcp_server.py",
+      "coupling_type": "optional-import",
+      "files": ["app.py"]
+    }
+  ],
+  "summary": {
+    "outbound_coupling_count": 5,
+    "inbound_coupling_count": 2,
+    "coupling_complexity": "medium"
+  }
+}

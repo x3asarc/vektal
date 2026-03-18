@@ -1,0 +1,46 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "cross_domain": {
+    "inbound_dependencies": [],
+    "outbound_dependencies": [
+      "backend API (/api/v1/*)",
+      "Shopify (via backend proxy)"
+    ],
+    "data_flows": [
+      {
+        "from": "frontend",
+        "to": "backend",
+        "direction": "request/response",
+        "data_type": "JSON via apiRequest()"
+      },
+      {
+        "from": "backend",
+        "to": "frontend",
+        "direction": "guard state",
+        "data_type": "AuthState, OAuthStatus"
+      }
+    ],
+    "shared_state": [
+      "session cookie (httpOnly)",
+      "TanStack Query cache (memory)"
+    ],
+    "isolation_boundaries": [
+      "Frontend state isolated per browser tab",
+      "Auth guards enforced client and server"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "folder_path": "src/api",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["AST-parsing", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "import_chain": {
+    "inbound": [
+      {"source": "src/app.py", "imports": ["src.api.app"]},
+      {"source": "src/api/__init__.py", "imports": ["src.api.core.*", "src.api.v1.*"]},
+      {"source": "src/api/v1/*", "imports": ["src.api.core.errors", "src.models", "src.core.*"]}
+    ],
+    "outbound": [
+      {"target": "src/core", "type": "dependency", "files": ["app.py", "v1/products/*", "v1/chat/*"]},
+      {"target": "src/models", "type": "dependency", "files": ["v1/products/*", "v1/chat/*", "v1/shopify/*"]},
+      {"target": "src/config", "type": "dependency", "files": ["app.py"]},
+      {"target": "src/tasks", "type": "optional-dependency", "files": ["v1/jobs/*"]},
+      {"target": "src/database", "type": "dependency", "files": ["app.py"]}
+    ]
+  },
+  "cross_prefix_imports": [
+    {"from": "src/api/app.py", "to": "src/config/sentry_config.py", "pattern": "configure_sentry"},
+    {"from": "src/api/app.py", "to": "src/core/sentry_metrics.py", "pattern": "count, gauge"},
+    {"from": "src/api/app.py", "to": "src/database.py", "pattern": "db"},
+    {"from": "src/api/app.py", "to": "src/core/graphiti_client.py", "pattern": "validate_graph_config"},
+    {"from": "src/api/v1/shopify/webhooks.py", "to": "src/core/evolution/observer.py", "pattern": "SchemaObserver"},
+    {"from": "src/api/v1/products/lineage.py", "to": "src/core/shopify_resolver.py", "pattern": "ShopifyResolver"},
+    {"from": "src/api/v1/chat/routes.py", "to": "src/tasks/chat_bulk.py", "pattern": "bulk_chat_task"}
+  ],
+  "external_imports": [
+    "flask", "flask_login", "flask_cors", "flask_limiter",
+    "marshmallow", "werkzeug", "requests"
+  ],
+  "summary": {
+    "inbound_count": 3,
+    "outbound_count": 5,
+    "cross_prefix_count": 7,
+    "external_count": 7
+  }
+}

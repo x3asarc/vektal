@@ -1,0 +1,24 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation"
+  },
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "thread_safety": "CLI tool, single-threaded execution",
+    "concurrency_model": "Sequential processing with rate limiting (0.5s sleep between updates)",
+    "notes": "No async/await; uses requests library for HTTP calls"
+  }
+}

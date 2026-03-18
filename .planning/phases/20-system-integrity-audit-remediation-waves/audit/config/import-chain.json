@@ -1,0 +1,27 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "config_is_leaf": true,
+    "consumed_by": [
+      "src/core/product_quality_orchestrator.py",
+      "src/scraping/scraper.py",
+      "universal_vendor_scraper/"
+    ],
+    "no_external_imports": true,
+    "consumption_method": "yaml.load() / yaml.safe_load()"
+  },
+  "summary": {
+    "is_leaf": true,
+    "consumers_count": 3,
+    "external_libs": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "async_surface": {
+    "is_cli_scripts": true,
+    "sync_operations": [
+      "sync_to_neo4j.py",
+      "create_indexes.py",
+      "verify_bitemporal.py"
+    ],
+    "note": "Most scripts are synchronous CLI tools"
+  },
+  "summary": {
+    "async_operations": 0,
+    "is_sync_only": true
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "generated_by": [
+      "GSD workflow",
+      ".claude/commands/"
+    ],
+    "consumed_by": [
+      "memory-synthesis skill",
+      "ContextCurator"
+    ],
+    "references": [
+      ".planning/ROADMAP.md",
+      "ops/STRUCTURE_SPEC.md"
+    ]
+  },
+  "summary": {
+    "producers": 2,
+    "consumers": 2,
+    "crosses_boundary": true
+  }
+}

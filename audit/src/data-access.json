@@ -1,0 +1,29 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "sqlalchemy_models": [],
+  "query_patterns": [
+    {"file": "src/app.py", "pattern": "ShopifyStore.query.filter_by", "line": 65}
+  ],
+  "session_usage": [
+    {"file": "src/app.py", "pattern": "db.session usage via models"}
+  ],
+  "direct_model_imports": [
+    {"file": "src/app.py", "imports": ["src.models.User", "src.models.ShopifyStore", "src.models.Job", "src.models.JobResult", "src.models.Vendor", "src.models.VendorCatalogItem"]}
+  ],
+  "orm_setup": [
+    {"file": "src/database.py", "pattern": "SQLAlchemy app initialization"}
+  ],
+  "summary": {
+    "direct_model_access_count": 1,
+    "indirect_access_count": 0,
+    "risk_level": "medium"
+  }
+}

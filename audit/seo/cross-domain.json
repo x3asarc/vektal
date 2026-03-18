@@ -1,0 +1,44 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation"
+  },
+  "cross_domain": {
+    "inbound_dependencies": [],
+    "outbound_dependencies": [
+      "Google Gemini API",
+      "Shopify Admin API"
+    ],
+    "data_flows": [
+      {
+        "from": "seo_generator.py",
+        "to": "Gemini API",
+        "direction": "request/response",
+        "data_type": "product data -> SEO content"
+      },
+      {
+        "from": "seo_generator.py",
+        "to": "Shopify API",
+        "direction": "read product, write SEO",
+        "data_type": "GraphQL queries/mutations"
+      }
+    ],
+    "shared_state": [],
+    "isolation_boundaries": [
+      "Each API isolated by separate client",
+      "Shopify credentials scoped to store",
+      "Gemini credentials scoped to Google Cloud project"
+    ]
+  }
+}

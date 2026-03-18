@@ -1,0 +1,35 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "celery_tasks": [
+    {"file": "src/celery_app.py", "task_name": "src.celery_app.health_check_t1", "queue": "default"},
+    {"file": "src/celery_app.py", "task_name": "src.celery_app.health_check_t2", "queue": "default"}
+  ],
+  "celery_configuration": [
+    {"file": "src/celery_app.py", "config": "broker_url", "env": "CELERY_BROKER_URL"},
+    {"file": "src/celery_app.py", "config": "result_backend", "env": "CELERY_RESULT_BACKEND"},
+    {"file": "src/celery_app.py", "config": "task_routes", "source": "src.jobs.queueing.TASK_ROUTES"},
+    {"file": "src/celery_app.py", "config": "beat_schedule", "envs": ["AUDIT_DISPATCH_INTERVAL_SECONDS", "JOB_RETENTION_SWEEP_SECONDS"]}
+  ],
+  "queues_defined": [
+    {"name": "default"},
+    {"name": "assistant.t1"},
+    {"name": "assistant.t2"},
+    {"name": "assistant.t3"},
+    {"name": "scrape.t1"},
+    {"name": "scrape.t2"},
+    {"name": "scrape.t3"}
+  ],
+  "summary": {
+    "celery_task_count": 2,
+    "queue_count": 7,
+    "surface_type": "celery-configuration"
+  }
+}

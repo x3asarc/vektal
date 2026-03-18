@@ -1,0 +1,29 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:06:01Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "scripts"
+  },
+  "summary": {
+    "graph_scripts_count": 40,
+    "key_operations": [
+      "sync_to_neo4j.py",
+      "sync_orchestration.py",
+      "sync_tables.py",
+      "sync_envvars.py",
+      "sync_routes_tasks.py",
+      "sync_codebase.py",
+      "init_codebase_schema.py",
+      "bootstrap_graph_backend.py",
+      "create_indexes.py",
+      "check_indexes.py"
+    ],
+    "purpose": "Neo4j graph backend synchronization and maintenance"
+  }
+}

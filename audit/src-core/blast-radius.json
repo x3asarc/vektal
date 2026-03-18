@@ -1,0 +1,61 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration", "import-graph-analysis"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "direct_imports": {
+    "internal": [
+      "src.core.graphiti_client",
+      "src.core.synthex_entities",
+      "src.core.embeddings",
+      "src.core.config.generator",
+      "src.core.sentry_metrics"
+    ],
+    "external": [
+      "openai",
+      "anthropic",
+      "requests",
+      "playwright",
+      "sqlalchemy",
+      "shopify",
+      "celery",
+      "graphiti"
+    ]
+  },
+  "transitive_imports_depth_1": {
+    "src.graph.backend_resolver": ["src.graph.query_templates", "src.core.embeddings"],
+    "src.api.app": ["src.api.core.errors", "src.config.sentry_config"],
+    "src.jobs.graphiti_ingestor": ["src.core.graphiti_client", "src.core.codebase_entities"]
+  },
+  "transitive_imports_depth_2": {
+    "src.graph.query_templates": ["src.core.graphiti_client", "src.graph.convention_checker"],
+    "src.graph.convention_checker": ["src.core.embeddings"]
+  },
+  "blast_radius_files": [
+    "src/graph/mcp_server.py",
+    "src/graph/query_interface.py",
+    "src/graph/codebase_scanner.py",
+    "src/jobs/graphiti_ingestor.py",
+    "src/tasks/graphiti_sync.py",
+    "src/api/v1/shopify/webhooks.py",
+    "src/api/app.py",
+    "src/celery_app.py"
+  ],
+  "impact_score": "high",
+  "critical_dependencies": [
+    "src.core.graphiti_client",
+    "src.core.embeddings",
+    "src.core.synthex_entities"
+  ],
+  "summary": {
+    "direct_import_count": 6,
+    "transitive_import_count": 8,
+    "impacted_modules": 8,
+    "change_propagation_risk": "high"
+  }
+}

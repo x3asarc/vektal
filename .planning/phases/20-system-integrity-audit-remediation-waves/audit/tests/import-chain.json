@@ -1,0 +1,46 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "test_fixtures": [
+      "conftest.py (pytest fixtures)"
+    ],
+    "tested_units": [
+      "src/core/",
+      "src/enrichment/",
+      "src/scraping/",
+      "src/graph/",
+      "src/memory/",
+      "src/jobs/"
+    ],
+    "external_test_libs": [
+      "pytest",
+      "pytest-asyncio",
+      "httpx",
+      "fakeredis",
+      "pytest-mock"
+    ],
+    "tested_models": [
+      "src/models/User",
+      "src/models/ShopifyStore",
+      "src/models/Vendor",
+      "src/models/Product",
+      "src/models/Job"
+    ]
+  },
+  "summary": {
+    "tested_units": 6,
+    "test_libs": 5,
+    "tested_models": 5
+  }
+}

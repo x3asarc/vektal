@@ -1,0 +1,23 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config"
+  },
+  "summary": {
+    "total_files": 3,
+    "file_list": [
+      "config/vendor_configs.yaml",
+      "config/image_processing_rules.yaml",
+      "config/product_quality_rules.yaml"
+    ],
+    "file_types": ["yaml"],
+    "purpose": "Configuration files for vendor management, image processing, and product quality validation"
+  }
+}

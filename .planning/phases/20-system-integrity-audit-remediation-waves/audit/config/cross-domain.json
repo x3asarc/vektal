@@ -1,0 +1,28 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "reads_config": [
+      {"unit": "src/core/product_quality_orchestrator.py", "keys_used": ["product_quality_rules", "vendor_configs"]},
+      {"unit": "src/scraping/scraper.py", "keys_used": ["vendor_configs", "image_processing_rules"]},
+      {"unit": "universal_vendor_scraper/", "keys_used": ["vendor_configs"]},
+      {"unit": "src/enrichment/vision_ai.py", "keys_used": ["image_processing_rules"]}
+    ],
+    "writes_config": [],
+    "env_vars": ["CONFIG_DIR"],
+    "external_dependencies": []
+  },
+  "summary": {
+    "reader_count": 4,
+    "writer_count": 0,
+    "crosses_boundary": true
+  }
+}

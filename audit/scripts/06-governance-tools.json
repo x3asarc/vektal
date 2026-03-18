@@ -1,0 +1,33 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:06:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "scripts"
+  },
+  "summary": {
+    "governance_tools": [
+      "risk_tier_gate.py",
+      "risk_tier_gate_enforce.py",
+      "sha_gate.py",
+      "validate_governance.py"
+    ],
+    "verification_tools": [
+      "final_checks.py",
+      "final_verification.py",
+      "forensic_verify.py",
+      "verify_phase_14_2_comprehensive.py"
+    ],
+    "observability_tools": [
+      "test_sentry_flow.py",
+      "test_sentry_graph_write.py",
+      "ensure_sentry_worker.py",
+      "migrate_metrics_to_graph.py"
+    ]
+  }
+}

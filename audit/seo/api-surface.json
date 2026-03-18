@@ -1,0 +1,39 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation"
+  },
+  "api_surface": {
+    "public_functions": [
+      "SEOContentGenerator",
+      "ProductFetcher",
+      "ProductUpdater",
+      "ShopifyClient",
+      "SEOValidator",
+      "SYSTEM_INSTRUCTION",
+      "get_product_prompt()",
+      "get_quick_prompt()"
+    ],
+    "public_classes": [
+      "SEOContentGenerator",
+      "ProductFetcher",
+      "ProductUpdater",
+      "ShopifyClient",
+      "SEOValidator"
+    ],
+    "decorators": [],
+    "routes": [],
+    "telemetry": ["print statements for CLI feedback"]
+  }
+}

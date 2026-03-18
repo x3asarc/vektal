@@ -1,0 +1,42 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "configuration_keys": {
+      "vendor_configs_yaml": {
+        "top_level_keys": ["default", "pentart", "aistcraft", "ciao_bella", "itd", "stamperia", "prima", "bastelschachtel", "paperdesigns", "category_keywords"],
+        "vendor_sub_keys": ["country_of_origin", "default_weight", "filename_pattern", "alt_text_template", "hs_code_default", "hs_code_map", "keyword_categories", "scraper"],
+        "scraper_sub_keys": ["enabled", "base_url", "search_url", "fallback_to_database"],
+        "vision_ai_keys": ["enabled", "fallback_template", "max_retries", "timeout_seconds"]
+      },
+      "image_processing_rules_yaml": {
+        "top_level_keys": ["version", "updated", "defaults", "vision_ai", "naming", "alt_text", "upload", "positioning", "transformation", "deletion", "organization", "data_plans", "vendor_overrides", "workflow", "error_handling", "logging"],
+        "defaults_keys": ["image_format", "transparency", "square_conversion", "square_method", "target_size", "alt_text_language", "min_images_per_product", "ideal_images_per_product"],
+        "image_types": ["packshot", "groupshot", "detail", "lifestyle"],
+        "transformation_always": ["convert_to_square", "ensure_transparency", "optimize_size"],
+        "format_keys": ["png", "jpg", "webp"],
+        "workflow_steps": ["step_1_identify", "step_2_filename", "step_3_alt_text", "step_4_transform", "step_5_upload", "step_6_position", "step_7_cleanup"]
+      },
+      "product_quality_rules_yaml": {
+        "top_level_keys": ["required_fields", "recommended_fields", "scoring", "vendor_rules"],
+        "required_field_keys": ["sku", "barcode", "country_of_origin", "hs_code", "weight", "vendor", "product_type", "title", "description_html", "images", "seo_title", "seo_description", "tags", "collections"],
+        "repair_scripts": ["search_barcode.py", "utils/enrich_product_logistics.py", "utils/categorize_product.py", "seo/generate_seo_quick.py", "utils/find_product_image.py", "utils/generate_product_tags.py", "utils/assign_collections.py"]
+      }
+    },
+    "total_config_keys": 80,
+    "env_vars_pointing_here": []
+  },
+  "summary": {
+    "yaml_files": 4,
+    "total_keys": 80,
+    "repair_scripts": 7
+  }
+}

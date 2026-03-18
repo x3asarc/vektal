@@ -1,0 +1,33 @@
+{
+  "folder_path": "ops",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "STRUCTURE_SPEC_md": {
+      "severity": "high",
+      "impact": "StructureGuardian loses canonical placement contract"
+    },
+    "governance/roles/": {
+      "severity": "critical",
+      "impact": "PhaseManager, Builder, Reviewer role contracts break - governance gates fail"
+    },
+    "governance/roles/phase-manager_md": {
+      "severity": "critical",
+      "impact": "All phase gate decisions break"
+    }
+  },
+  "summary": {
+    "critical": 1,
+    "high": 2,
+    "total_affected_units": 8
+  }
+}

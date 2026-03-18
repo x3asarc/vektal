@@ -1,0 +1,33 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "env_vars": [
+    {"file": "src/core/llm_client.py", "vars": ["OPENROUTER_API_KEY", "OPENROUTER_TEXT_MODEL", "OPENROUTER_TEXT_FALLBACK_MODEL"]},
+    {"file": "src/core/embeddings.py", "vars": ["GRAPH_EMBEDDINGS_FORCE_HASH", "GRAPH_EMBEDDINGS_LOCAL_SNAPSHOT_HASH", "GRAPH_EMBEDDINGS_OFFLINE", "GRAPH_EMBEDDINGS_HASH_FALLBACK"]},
+    {"file": "src/core/graphiti_client.py", "vars": ["GRAPH_ORACLE_ENABLED", "NEO4J_URI", "NEO4J_URI_FALLBACKS", "NEO4J_CONNECT_TIMEOUT_SECONDS", "NEO4J_UNAVAILABLE_BACKOFF_SECONDS", "NEO4J_USER", "NEO4J_PASSWORD", "OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENROUTER_BASE_URL"]},
+    {"file": "src/core/shopify_resolver.py", "vars": ["SHOP_DOMAIN", "API_VERSION"]},
+    {"file": "src/core/sentry_client.py", "vars": ["SENTRY_AUTH_TOKEN", "SENTRY_ORG_SLUG", "SENTRY_PROJECT_SLUG", "SENTRY_API_BASE_URL", "SENTRY_DSN", "SENTRY_WORKERS_DSN"]}
+  ],
+  "config_patterns": [
+    {"file": "src/core/config/*.py", "pattern": "loader.py - YAML config loading"}
+  ],
+  "critical_env_vars": [
+    "OPENROUTER_API_KEY",
+    "NEO4J_URI",
+    "NEO4J_PASSWORD",
+    "SENTRY_DSN",
+    "GRAPH_ORACLE_ENABLED"
+  ],
+  "summary": {
+    "env_var_count": 18,
+    "config_file_count": 5,
+    "secret_count": 5
+  }
+}

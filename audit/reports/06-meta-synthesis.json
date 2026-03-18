@@ -1,0 +1,27 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:06Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "meta_reports": [
+      "journey-synthesis-template.md",
+      "journey-synthesis-13-15.md",
+      "journey-synthesis-14-16.md",
+      "phase16-verification-proof-latest.json",
+      "phase16-verification-full-2026-03-03.json",
+      "governance-validation-runbook-2026-02-12.md",
+      "governance-baseline-implementation-report-2026-02-12.md",
+      "playwright-*.json",
+      "playwright-*.png"
+    ],
+    "playwright_traces_count": 8
+  }
+}

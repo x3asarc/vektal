@@ -1,0 +1,24 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "design_reports": [
+      "identity_reanchoring_report.md",
+      "identity_proof_report.md",
+      "nano_banana_audit_v2.md"
+    ],
+    "system_reports": [
+      "openrouter_probe.json"
+    ],
+    "purpose": "Design verification and system analysis reports"
+  }
+}

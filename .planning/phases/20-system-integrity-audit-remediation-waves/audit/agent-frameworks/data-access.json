@@ -1,0 +1,44 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "access_pattern": "read_by_agents",
+    "read_by": [
+      "Claude Code sessions",
+      "Letta agents",
+      "Codex agents",
+      "Gemini agents"
+    ],
+    "write_by": [
+      "memory-synthesis skill",
+      ".claude/hooks/ (memory sync)"
+    ],
+    "memory_interaction": [
+      ".memory/working/",
+      ".memory/short-term/",
+      ".memory/long-term/",
+      ".letta/agents/*/memory/"
+    ],
+    "env_vars": [
+      "SESSION_BOOTSTRAP_SCRIPT",
+      "AGENTS_MEMORY_SYNC",
+      "CLAUDE_CODE_PROVIDER",
+      "OPENROUTER_API_KEY"
+    ]
+  },
+  "summary": {
+    "read_count": 4,
+    "write_count": 2,
+    "memory_dirs_interacting": 5
+  }
+}

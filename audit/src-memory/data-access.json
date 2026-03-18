@@ -1,0 +1,47 @@
+{
+  "folder_path": "src-memory",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-memory"
+  },
+  "summary": {
+    "module_name": "src-memory",
+    "primary_responsibility": "Multi-tier memory management"
+  },
+  "data_access": {
+    "read_operations": [
+      "WorkingMemory.load_for_session()",
+      "WorkingMemory.load_latest()",
+      "ShortTermMemory.query()",
+      "ShortTermMemory.summarize_day()",
+      "LongTermMemory.load_index()",
+      "iter_events()"
+    ],
+    "write_operations": [
+      "WorkingMemory.save()",
+      "ShortTermMemory.append_event()",
+      "LongTermMemory.save_index()",
+      "LongTermMemory.record_event()",
+      "LongTermMemory.append_pattern()",
+      "LongTermMemory.write_phase_evolution()",
+      "append_event()"
+    ],
+    "data_persistence": {
+      "working": "JSON files per session",
+      "short_term": "Daily JSONL append-only logs",
+      "long_term": "Markdown + JSON index files",
+      "tasks": "JSON file in .tasks/"
+    },
+    "sensitive_data_handling": [
+      "No PII stored in memory files",
+      "Session IDs are non-guessable UUIDs",
+      "Commands tracked but not redacted"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "api_routes": [],
+  "job_management_endpoints": [
+    {"file": "src/api/v1/jobs/routes.py", "type": "route-handler"},
+    {"file": "src/api/jobs/events.py", "type": "SSE events"}
+  ],
+  "note": "src/jobs/ does not define API routes directly - it provides the underlying job orchestration logic consumed by src/api/v1/jobs/routes.py",
+  "summary": {
+    "route_count": 0,
+    "blueprint_count": 0,
+    "surface_type": "orchestration-layer"
+  }
+}

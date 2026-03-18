@@ -1,0 +1,35 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation"
+  },
+  "data_access": {
+    "read_operations": [
+      "Shopify GraphQL: products query",
+      "Shopify GraphQL: productByHandle query",
+      "Shopify GraphQL: collection queries"
+    ],
+    "write_operations": [
+      "Shopify GraphQL: productUpdate mutation"
+    ],
+    "data_persistence": {
+      "shopify": "Product SEO fields (title, description, metafields)"
+    },
+    "sensitive_data_handling": [
+      "API credentials from env vars only",
+      "No PII processed",
+      "Shopify tokens not stored in code"
+    ]
+  }
+}

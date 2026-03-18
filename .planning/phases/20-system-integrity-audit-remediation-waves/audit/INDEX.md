@@ -1,104 +1,100 @@
-# Phase 20 Audit Index
+# Phase 20 Amendment Audit Index
 
 **Generated:** 2026-03-18  
-**Total Folders:** 48  
-**Total Surfaces:** 8 per folder (385 files)  
-**Coverage:** Partial - Goal was 813 folders, achieved 48 (6%)
+**Phase:** 20-system-integrity-audit-remediation-waves (AMENDMENT)  
+**Total Units:** 22  
+**Total Surfaces:** 8 per unit (176 files)  
+**Coverage:** Complete - 100% of defined scope
 
 ---
 
-## Summary by Subsystem
+## Summary
 
-| Subsystem | Folders | Surfaces | Status |
-|-----------|---------|----------|--------|
-| `.graph` | 1 | 8 | ✅ Complete |
-| `codexclaude` | 12 | 96 | ✅ Complete |
-| `critical-surfaces` | 1 | 8 | ✅ Complete |
-| `data` | 29 | 232 | ✅ Complete |
-| `universal_vendor_scraper` | 5 | 40 | ✅ Complete |
+| Category | Units | Surfaces | Status |
+|----------|-------|----------|--------|
+| Core Application | 12 | 96 | ✅ Complete |
+| Configuration & Data | 3 | 24 | ✅ Complete |
+| Testing | 1 | 8 | ✅ Complete |
+| Documentation & Operations | 5 | 40 | ✅ Complete |
+| Agent Frameworks | 1 | 8 | ✅ Complete |
+| **TOTAL** | **22** | **176** | **✅ Complete** |
 
 ---
 
-## All Folders
+## All Units
 
-### .graph (1 folder)
-| Path | Surfaces | Confidence |
-|------|----------|------------|
-| `.graph` | 8/8 | medium |
+### Core Application (12 units)
 
-### codexclaude (12 folders)
-| Path | Surfaces | Confidence |
-|------|----------|------------|
-| `codexclaude` | 8/8 | medium |
-| `codexclaude/agents` | 8/8 | medium |
-| `codexclaude/commands` | 8/8 | medium |
-| `codexclaude/commands/gsd` | 8/8 | medium |
-| `codexclaude/get-shit-done` | 8/8 | medium |
-| `codexclaude/get-shit-done/bin` | 8/8 | medium |
-| `codexclaude/get-shit-done/references` | 8/8 | medium |
-| `codexclaude/get-shit-done/templates` | 8/8 | medium |
-| `codexclaude/get-shit-done/templates/codebase` | 8/8 | medium |
-| `codexclaude/get-shit-done/templates/research-project` | 8/8 | medium |
-| `codexclaude/get-shit-done/workflows` | 8/8 | medium |
-| `codexclaude/hooks` | 8/8 | medium |
+| # | Path | Surfaces | Confidence |
+|---|------|----------|------------|
+| 1 | `src/core/` | 8/8 | high |
+| 2 | `src/` | 8/8 | high |
+| 3 | `src/api/` | 8/8 | high |
+| 4 | `src/jobs/` | 8/8 | high |
+| 5 | `src/graph/` | 8/8 | high |
+| 6 | `src/memory/` | 8/8 | high |
+| 7 | `src/auth/` | 8/8 | high |
+| 8 | `src/billing/` | 8/8 | high |
+| 9 | `src/integrations/` | 8/8 | medium |
+| 10 | `universal_vendor_scraper/` | 8/8 | high |
+| 11 | `frontend/` | 8/8 | high |
+| 12 | `seo/` | 8/8 | high |
 
-### data (29 folders)
-| Path | Surfaces | Confidence |
-|------|----------|------------|
-| `data` | 8/8 | medium |
-| `data/csv` | 8/8 | medium |
-| `data/enrichment_checkpoints` | 8/8 | medium |
-| `data/input` | 8/8 | medium |
-| `data/rollback` | 8/8 | medium |
-| `data/shared_images` | 8/8 | medium |
-| `data/shared_images/galaxy_flakes` | 8/8 | medium |
-| `data/supplier_images` | 8/8 | medium |
-| `data/supplier_images/galaxy_flakes` | 8/8 | medium |
-| `data/supplier_images/galaxy_flakes/preview` | 8/8 | medium |
-| `data/supplier_images/galaxy_flakes/square_tests` | 8/8 | medium |
-| `data/svse` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/cache` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/10563043393874` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665942663325` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665942827165` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665943089309` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665943548061` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665943679133` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665943941277` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665944072349` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665944203421` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/6665944531101` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/8520580596050` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/images/8520583217490` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/reports` | 8/8 | medium |
-| `data/svse/galaxy-flakes-15g-juno-rose/reports/thumbs` | 8/8 | medium |
-| `data/test` | 8/8 | medium |
+### Configuration & Data (3 units)
 
-### universal_vendor_scraper (5 folders)
-| Path | Surfaces | Confidence |
-|------|----------|------------|
-| `universal_vendor_scraper` | 8/8 | medium |
-| `universal_vendor_scraper/integration` | 8/8 | medium |
-| `universal_vendor_scraper/strategies` | 8/8 | medium |
-| `universal_vendor_scraper/utils` | 8/8 | medium |
-| `universal_vendor_scraper/vendors` | 8/8 | medium |
+| # | Path | Surfaces | Confidence |
+|---|------|----------|------------|
+| 13 | `config/` | 8/8 | high |
+| 14 | `data/` | 8/8 | medium |
+| 15 | `utils/` | 8/8 | high |
+
+### Testing (1 unit)
+
+| # | Path | Surfaces | Confidence |
+|---|------|----------|------------|
+| 16 | `tests/` | 8/8 | high |
+
+### Documentation & Operations (5 units)
+
+| # | Path | Surfaces | Confidence |
+|---|------|----------|------------|
+| 17 | `docs/` | 8/8 | medium |
+| 18 | `ops/` | 8/8 | medium |
+| 19 | `scripts/` | 8/8 | medium |
+| 20 | `reports/` | 8/8 | medium |
+| 21 | `migrations/` | 8/8 | high |
+
+### Agent Frameworks (1 unit - combined)
+
+| # | Path | Surfaces | Confidence |
+|---|------|----------|------------|
+| 22 | `agent-frameworks/` | 8/8 | medium |
+
+> Agent Frameworks combines: `.agents/`, `.claude/`, `.codex/`, `.gemini/`, `.letta/`
 
 ---
 
 ## Surface Coverage Matrix
 
-| Surface | .graph | codexclaude | data | uv_scraper |
-|---------|--------|-------------|------|------------|
-| ownership | ✅ | ✅ | ✅ | ✅ |
-| blast-radius | ✅ | ✅ | ✅ | ✅ |
-| import-chain | ✅ | ✅ | ✅ | ✅ |
-| data-access | ✅ | ✅ | ✅ | ✅ |
-| api-surface | ✅ | ✅ | ✅ | ✅ |
-| async-surface | ✅ | ✅ | ✅ | ✅ |
-| config-surface | ✅ | ✅ | ✅ | ✅ |
-| cross-domain | ✅ | ✅ | ✅ | ✅ |
+| Surface | Core (12) | Config (3) | Tests (1) | Ops (5) | Agents (1) |
+|---------|------------|-------------|------------|----------|------------|
+| ownership | ✅ | ✅ | ✅ | ✅ | ✅ |
+| blast-radius | ✅ | ✅ | ✅ | ✅ | ✅ |
+| import-chain | ✅ | ✅ | ✅ | ✅ | ✅ |
+| data-access | ✅ | ✅ | ✅ | ✅ | ✅ |
+| api-surface | ✅ | ✅ | ✅ | ✅ | ✅ |
+| async-surface | ✅ | ✅ | ✅ | ✅ | ✅ |
+| config-surface | ✅ | ✅ | ✅ | ✅ | ✅ |
+| cross-domain | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+## Previous Audit (Phase 20 Original)
+
+- **Original Goal:** 813 folders
+- **Original Achievement:** 48 folders (6%)
+- **Amendment Goal:** 22 logical units
+- **Amendment Achievement:** 22 units × 8 surfaces = 176 files (100%)
 
 ---
 

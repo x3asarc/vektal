@@ -165,3 +165,237 @@ First real arbitration: Commander proposed loop_budget=2, Watson proposed 3 (COL
 **Outcome:** SUCCESS
 **Actions:** neo4j_connection_probe, connection_attempt_1, graphiti_client_validated, connection_success
 **Message:** Neo4j connection restored on attempt 1/3
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: code_fix
+**Outcome:** FAILED
+**Actions:** Validation
+**Message:** Missing 'files' parameter
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: code_fix
+**Outcome:** FAILED
+**Actions:** Validation
+**Message:** Missing 'files' parameter
+
+### 2026-03-18 | NanoFixer: code_fix
+**Outcome:** FAILED
+**Actions:** Validation
+**Message:** Missing 'files' parameter
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Probe
+**Message:** Docker probe failed: Command '['docker', 'info']' timed out after 5 seconds
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Probe
+**Message:** Docker probe failed: Command '['docker', 'info']' timed out after 5 seconds
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Daemon check
+**Message:** Docker daemon is not responsive
+**Error:** error during connect: Get "http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.51/info": open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+
+
+### 2026-03-18 | NanoFixer: code_fix
+**Outcome:** FAILED
+**Actions:** Validation
+**Message:** Missing 'files' parameter
+
+### 2026-03-18 | NanoFixer: code_fix
+**Outcome:** FAILED
+**Actions:** Validation
+**Message:** Missing 'files' parameter
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Probe
+**Message:** Docker probe failed: Command '['docker', 'info']' timed out after 5 seconds
+
+### 2026-03-18 | NanoFixer: docker
+**Outcome:** FAILED
+**Actions:** Probe
+**Message:** Docker probe failed: Command '['docker', 'info']' timed out after 5 seconds

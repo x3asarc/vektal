@@ -1,0 +1,31 @@
+{
+  "folder_path": "src/graph",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "celery_tasks": [],
+  "async_patterns": [
+    {"file": "src/graph/sentry_feedback_loop.py", "pattern": "Async loop for sentry feedback processing"},
+    {"file": "src/graph/consistency_daemon.py", "pattern": "Async consistency checking"},
+    {"file": "src/graph/incremental_sync.py", "pattern": "Async graph sync operations"}
+  ],
+  "graphiti_sync_integration": [
+    {"file": "src/graph/intent_capture.py", "pattern": "emit_episode to Celery"},
+    {"file": "src/graph/query_interface.py", "pattern": "Graphiti episode emission"}
+  ],
+  "async_graph_operations": [
+    {"pattern": "async def", "files": ["mcp_server.py", "query_interface.py"]},
+    {"pattern": "await", "files": ["mcp_server.py", "query_interface.py", "codebase_scanner.py"]}
+  ],
+  "note": "src/graph uses async Python patterns for Neo4j/graphiti operations but does not define Celery tasks. Tasks are defined in src/tasks/graphiti_sync.py",
+  "summary": {
+    "celery_task_count": 0,
+    "async_function_count": 15,
+    "surface_type": "async-graph-server"
+  }
+}

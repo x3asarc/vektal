@@ -1,0 +1,29 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:04Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "subdirectories": ["jobs", "resolution"],
+    "jobs_count": 20,
+    "resolution_count": 10,
+    "key_areas": [
+      "batch_queue",
+      "tier_routing",
+      "chat_bulk_operations",
+      "dispatcher",
+      "queue_routing",
+      "canary_rollback",
+      "snapshot_lifecycle",
+      "resolution_pipeline"
+    ],
+    "purpose": "Background job and resolution pipeline tests"
+  }
+}

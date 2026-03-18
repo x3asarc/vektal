@@ -1,0 +1,42 @@
+{
+  "folder_path": "utils",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "external_libs": [
+      "shopify",
+      "sqlalchemy",
+      "psycopg2",
+      "pandas",
+      "requests",
+      "PIL",
+      "click"
+    ],
+    "src_imports": [
+      "src/models/",
+      "src/core/"
+    ],
+    "config_imports": [
+      "config/vendor_configs.yaml"
+    ],
+    "consumed_by": [
+      "scripts/",
+      "src/enrichment/",
+      "src/scraping/"
+    ]
+  },
+  "summary": {
+    "external_lib_count": 7,
+    "consumers_count": 3,
+    "is_leaf": false
+  }
+}

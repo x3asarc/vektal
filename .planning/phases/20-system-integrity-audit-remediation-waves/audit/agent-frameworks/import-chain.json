@@ -1,0 +1,43 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "import_chain": {
+    "no_python_imports": true,
+    "agents_import": [
+      "docs/agent-system/",
+      ".planning/ROADMAP.md",
+      "ops/governance/roles/"
+    ],
+    "skills_import": [
+      "docs/",
+      "src/core/",
+      "config/"
+    ],
+    "consumed_by": [
+      "Claude Code sessions",
+      "Letta server",
+      "Codex agents",
+      "Gemini agents"
+    ],
+    "referenced_by": [
+      "AGENTS.md",
+      ".claude/settings.json",
+      ".letta/settings.json"
+    ]
+  },
+  "summary": {
+    "is_leaf": true,
+    "consumers": 4,
+    "frameworks": 5
+  }
+}

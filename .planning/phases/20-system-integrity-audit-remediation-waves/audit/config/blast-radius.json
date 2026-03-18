@@ -1,0 +1,43 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    "vendor_configs_yaml": {
+      "severity": "critical",
+      "impact": "All vendor-specific scraping, image naming, alt text, HS codes, and shipping rules break",
+      "affected_units": ["src/core/product_quality_orchestrator.py", "src/scraping/scraper.py", "universal_vendor_scraper/", "src/enrichment/"],
+      "rollback_plan": "Restore previous vendor_configs.yaml from git"
+    },
+    "image_processing_rules_yaml": {
+      "severity": "critical",
+      "impact": "Image transformation, naming strategy, upload strategy, and alt text rules break",
+      "affected_units": ["src/core/image_processor.py", "src/enrichment/vision_ai.py", "frontend/"],
+      "rollback_plan": "Restore previous image_processing_rules.yaml from git"
+    },
+    "product_quality_rules_yaml": {
+      "severity": "high",
+      "impact": "Product completeness scoring, required fields validation, and auto-repair scripts change",
+      "affected_units": ["src/core/product_quality_orchestrator.py", "src/enrichment/", "scripts/"],
+      "rollback_plan": "Restore previous product_quality_rules.yaml from git"
+    },
+    "vendors_template_yaml": {
+      "severity": "medium",
+      "impact": "New vendor onboarding template changes",
+      "affected_units": ["universal_vendor_scraper/"],
+      "rollback_plan": "Restore previous _template.yaml from git"
+    }
+  },
+  "summary": {
+    "critical_dependencies": 3,
+    "total_affected_units": 5,
+    "highest_severity": "critical"
+  }
+}

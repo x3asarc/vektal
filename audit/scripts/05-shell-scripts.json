@@ -1,0 +1,29 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:06:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "scripts"
+  },
+  "summary": {
+    "shell_scripts_count": 10,
+    "deploy_scripts": [
+      "deploy_to_hetzner.sh",
+      "deploy_frontend.sh"
+    ],
+    "daemon_scripts": [
+      "start_health_monitor.sh",
+      "stop_health_monitor.sh",
+      "status_health_monitor.sh"
+    ],
+    "database_scripts": [
+      "backup_db.sh",
+      "restore_db.sh"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration",
+      "import-graph-analysis",
+      "phase20-wave1-audit"
+    ],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src/jobs",
+    "canonical_surface": "src/jobs",
+    "related_critical_surfaces": ["src/core", "src/graph", "src/tasks", "src/models"],
+    "matched_file_count": 11,
+    "direct_file_count": 11
+  },
+  "matched_files": [
+    "src/jobs/__init__.py",
+    "src/jobs/orchestrator.py",
+    "src/jobs/dispatcher.py",
+    "src/jobs/queueing.py",
+    "src/jobs/finalizer.py",
+    "src/jobs/checkpoints.py",
+    "src/jobs/metrics.py",
+    "src/jobs/cancellation.py",
+    "src/jobs/graphiti_ingestor.py",
+    "src/jobs/progress.py"
+  ],
+  "key_components": [
+    {"name": "orchestrator.py", "purpose": "Main job orchestration logic"},
+    {"name": "dispatcher.py", "purpose": "Task dispatching to Celery"},
+    {"name": "queueing.py", "purpose": "Queue configuration and routing"},
+    {"name": "finalizer.py", "purpose": "Job completion and cleanup"},
+    {"name": "checkpoints.py", "purpose": "Job state persistence"},
+    {"name": "metrics.py", "purpose": "Job metrics collection"},
+    {"name": "cancellation.py", "purpose": "Job cancellation handling"},
+    {"name": "graphiti_ingestor.py", "purpose": "Graphiti episode ingestion"},
+    {"name": "progress.py", "purpose": "Progress tracking"}
+  ],
+  "inbound_imports": [
+    "src/celery_app.py",
+    "src/tasks/*.py"
+  ],
+  "inbound_references": [],
+  "summary": {
+    "inbound_importer_count": 2,
+    "inbound_referrer_count": 0,
+    "owned_function_count": 0,
+    "component_count": 9
+  }
+}

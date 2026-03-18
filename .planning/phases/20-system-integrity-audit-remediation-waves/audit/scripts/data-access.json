@@ -1,0 +1,38 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "data_access": {
+    "database": [
+      "PostgreSQL via src/models/",
+      "Redis via sentry/"
+    ],
+    "graph": [
+      "Neo4j via graph_sync_scripts/"
+    ],
+    "shopify": [
+      "Shopify Admin API"
+    ],
+    "env_vars": [
+      "DATABASE_URL",
+      "NEO4J_URI",
+      "SHOPIFY_ACCESS_TOKEN",
+      "SENTRY_AUTH_TOKEN",
+      "REDIS_URL"
+    ]
+  },
+  "summary": {
+    "db_access": 2,
+    "graph_access": 1,
+    "api_access": 2
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication and authorization"
+  },
+  "api_surface": {
+    "public_functions": [
+      "generate_state_token()",
+      "exchange_code_for_token()",
+      "verify_token()",
+      "generate_verification_token()",
+      "generate_verification_url()",
+      "send_verification_email()",
+      "send_welcome_email()",
+      "requires_tier()",
+      "email_verified_required()",
+      "active_account_required()"
+    ],
+    "public_classes": [],
+    "decorators": [
+      "@login_required",
+      "@requires_tier()",
+      "@email_verified_required",
+      "@active_account_required"
+    ],
+    "routes": [
+      "POST /auth/login",
+      "POST /auth/logout",
+      "GET /auth/me",
+      "GET /auth/verify-email",
+      "POST /auth/resend-verification",
+      "GET /auth/pending-verification",
+      "GET /auth/account-status",
+      "GET /oauth/shopify",
+      "GET /oauth/callback",
+      "GET /oauth/status",
+      "POST /oauth/disconnect"
+    ],
+    "telemetry": ["current_app.logger for OAuth events"]
+  }
+}

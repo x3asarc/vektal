@@ -1,0 +1,58 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration", "import-graph-analysis"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "direct_imports": {
+    "internal": [
+      "src.api.app",
+      "src.database",
+      "src.models",
+      "src.core.secrets",
+      "src.core.image_scraper",
+      "src.jobs.queueing",
+      "src.config.sentry_config",
+      "src.core.sentry_metrics",
+      "src.core.graphiti_client"
+    ],
+    "external": [
+      "flask",
+      "flask_login",
+      "celery",
+      "sqlalchemy",
+      "requests",
+      "pandas",
+      "dotenv"
+    ]
+  },
+  "transitive_imports_depth_1": {
+    "src.api.app": ["src.api.core.errors", "src.api.core.rate_limit", "src.config.sentry_config"],
+    "src.jobs.queueing": ["src.jobs.orchestrator"],
+    "src.database": ["src.models"]
+  },
+  "blast_radius_files": [
+    "src/app.py",
+    "src/celery_app.py",
+    "src/api/app.py",
+    "src/tasks/*.py",
+    "src/jobs/*.py"
+  ],
+  "impact_score": "critical",
+  "critical_dependencies": [
+    "src/app.py",
+    "src/celery_app.py",
+    "src/database.py",
+    "src/app_factory.py"
+  ],
+  "summary": {
+    "direct_import_count": 9,
+    "transitive_import_count": 5,
+    "impacted_modules": 15,
+    "change_propagation_risk": "critical"
+  }
+}

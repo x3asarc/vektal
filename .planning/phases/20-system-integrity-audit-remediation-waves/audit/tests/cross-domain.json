@@ -1,0 +1,41 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "tests_src_core": [
+      "tests/unit/test_*.py",
+      "tests/integration/"
+    ],
+    "tests_src_enrichment": [
+      "tests/unit/test_enrichment_*.py",
+      "tests/integration/test_enrichment_*.py"
+    ],
+    "tests_src_scraping": [
+      "tests/unit/test_scraping_*.py",
+      "tests/integration/test_vendor_*.py"
+    ],
+    "tests_src_graph": [
+      "tests/graph/test_*.py"
+    ],
+    "tests_src_memory": [
+      "tests/unit/test_memory_*.py"
+    ],
+    "tests_src_jobs": [
+      "tests/jobs/test_*.py"
+    ]
+  },
+  "summary": {
+    "source_units_tested": 6,
+    "cross_boundary": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "folder_path": "frontend",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "medium",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "frontend"
+  },
+  "summary": {
+    "module_name": "frontend",
+    "primary_responsibility": "Next.js React frontend"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "NEXT_PUBLIC_API_BASE_URL",
+      "NEXT_PUBLIC_DEV_AUTH_BYPASS"
+    ],
+    "default_values": {
+      "api_base_url": "empty (same-origin via Next.js rewrites)"
+    },
+    "secrets_required": [],
+    "client_side_config": [
+      "process.env.NEXT_PUBLIC_* accessible in browser",
+      "no server secrets exposed to client"
+    ]
+  }
+}

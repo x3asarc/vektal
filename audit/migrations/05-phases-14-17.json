@@ -1,0 +1,27 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:05Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "phase_14_2_migrations": [
+      "g14_2_01_tool_input_examples.py",
+      "g14_2_03_schema_json.py"
+    ],
+    "phase_15_migrations": [
+      "p15_01_sandbox_runs.py",
+      "p15_02_remedy_template_cache.py"
+    ],
+    "phase_17_migrations": [
+      "783334eae760_p17_01_product_data_contract.py",
+      "13bac515cdf9_p17_01_product_data_contract_v2.py"
+    ]
+  }
+}

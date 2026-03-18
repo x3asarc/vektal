@@ -1,0 +1,25 @@
+{
+  "folder_path": "migrations",
+  "generated_at": "2026-03-18T00:08:04Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "migrations"
+  },
+  "summary": {
+    "phase_12_migrations": [
+      "d4e5f6a7b8c9_phase12_tier_routing_and_profiles.py"
+    ],
+    "phase_13_migrations": [
+      "a9f3c7d5e1b2_phase13_runtime_policy_and_idempotency.py",
+      "b2f4c6d8e0a1_phase13_governance_recovery.py",
+      "c4d5e6f7a8b9_phase13_deploy_observability.py",
+      "e5f6a7b8c9d0_phase13_instrumentation_foundation.py",
+      "f2b3c4d5e6f7_phase13_1_enrichment_capability_policy.py"
+    ]
+  }
+}

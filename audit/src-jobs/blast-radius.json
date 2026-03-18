@@ -1,0 +1,57 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration", "import-graph-analysis"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "direct_imports": {
+    "internal": [
+      "src.jobs.orchestrator",
+      "src.jobs.checkpoints",
+      "src.jobs.metrics",
+      "src.core.graphiti_client",
+      "src.core.codebase_entities",
+      "src.core.synthex_entities",
+      "src.models"
+    ],
+    "external": [
+      "celery",
+      "sqlalchemy"
+    ]
+  },
+  "transitive_imports_depth_1": {
+    "src/jobs/orchestrator.py": ["src.jobs.checkpoints", "src.jobs.metrics", "src.models"],
+    "src/jobs/graphiti_ingestor.py": ["src.core.graphiti_client", "src.core.codebase_entities", "src.core.synthex_entities"]
+  },
+  "blast_radius_files": [
+    "src/celery_app.py",
+    "src/tasks/*.py",
+    "src/api/v1/jobs/*",
+    "src/jobs/*.py"
+  ],
+  "impact_score": "critical",
+  "critical_dependencies": [
+    "src/jobs/orchestrator.py",
+    "src/jobs/dispatcher.py",
+    "src/jobs/queueing.py",
+    "src/jobs/finalizer.py"
+  ],
+  "orchestrator_blast_radius": {
+    "if_orchestrator_changes": [
+      "All job initialization paths break",
+      "dispatcher.py routing breaks",
+      "Job state machine breaks",
+      "All Celery task execution affected"
+    ]
+  },
+  "summary": {
+    "direct_import_count": 7,
+    "transitive_import_count": 4,
+    "impacted_modules": 15,
+    "change_propagation_risk": "critical"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "folder_path": "src",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "api_routes": [
+    {"file": "src/app.py", "endpoint": "/", "methods": ["GET"], "handler": "index"},
+    {"file": "src/app.py", "endpoint": "/auth/shopify", "methods": ["GET"], "handler": "auth_shopify"},
+    {"file": "src/app.py", "endpoint": "/auth/callback", "methods": ["GET"], "handler": "auth_callback"},
+    {"file": "src/app.py", "endpoint": "/webhooks/orders/create", "methods": ["POST"], "handler": "webhook_orders_create"},
+    {"file": "src/app.py", "endpoint": "/api/status", "methods": ["GET"], "handler": "api_status"},
+    {"file": "src/app.py", "endpoint": "/api/jobs", "methods": ["GET", "POST"], "handler": "api_jobs"},
+    {"file": "src/app.py", "endpoint": "/api/jobs/<int:job_id>", "methods": ["GET"], "handler": "api_job_detail"},
+    {"file": "src/app.py", "endpoint": "/job/<int:job_id>", "methods": ["GET"], "handler": "job_page"},
+    {"file": "src/app.py", "endpoint": "/api/pipeline/dry-run", "methods": ["POST"], "handler": "api_pipeline_dry_run"},
+    {"file": "src/app.py", "endpoint": "/api/pipeline/push", "methods": ["POST"], "handler": "api_pipeline_push"},
+    {"file": "src/app.py", "endpoint": "/api/jobs/<int:job_id>/cancel", "methods": ["POST"], "handler": "api_job_cancel"}
+  ],
+  "blueprints": [],
+  "route_decorators": ["@app.route"],
+  "note": "src/app.py is the main Flask application with Shopify OAuth integration routes",
+  "summary": {
+    "route_count": 11,
+    "blueprint_count": 0,
+    "surface_type": "main-application"
+  }
+}

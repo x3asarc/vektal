@@ -6,11 +6,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Store owners can maintain accurate, SEO-optimized product catalogs from 8+ vendors without manual data entry, through an intelligent, self-healing SaaS platform.
 
-## Current Status (2026-03-06)
+## Current Status (2026-03-18)
 
-**Phase:** Phase 17 - Product Data Command Center + Chat-First Product Ops - **COMPLETE**
-**Gate Status:** `GREEN` (Phase 17 summary artifacts + verification report published)
-**Target Milestone:** Catalog health mission control with real-time sync and governed rollback
+**Phase:** Phase 20 Amendment - System Integrity Audit - **COMPLETE**
+**Gate Status:** `GREEN` (176 JSON files created, 22 units × 8 surfaces)
+**Target Milestone:** Complete codebase audit for Agent SDK routing
 
 **COMPLETED: v1.0 + Context OS Lifecycle**
 - Phases 1-13.2: Core Infrastructure, API, Frontend, AI, Governance (Complete)
@@ -19,6 +19,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 - Phase 16: Agent Context OS (entrypoint docs, graph-first broker, lifecycle memory hooks, governance gate) (Complete)
 - Phase 15.1: Sentry autonomous intake, deduped routing, and verified closure gating (Complete)
 - Phase 17: Product Data Command Center, Webhook Sync, and Live Reconcile Rollback (Complete)
+- Phase 20 Amendment: Complete codebase audit - 22 units × 8 surfaces = 176 JSON files
 
 **Next:** Future production refinement execution:
 - `priority-2-dokploy-e2e` (deployment evidence closure)
@@ -58,6 +59,7 @@ All 12 sub-plans (15-01 through 15-11b) successfully executed and verified.
 - 2026-03-03: Phase 16 context-os closure artifacts and lifecycle state sync (GREEN).
 - 2026-03-04: Completed Phase 15.1 execution plans 01-04 and published required governance reports (GREEN).
 - 2026-03-06: Completed Phase 17 execution plans 17.1-17.6; Sentry dev-integration verified; Phase summary and verification reports published (GREEN).
+- 2026-03-18: Phase 20 Amendment - COMPLETE. 22 logical units × 8 surfaces = 176 JSON audit files created.
 
 ## Recent Session Summary (2026-03-09)
 - Implemented TaskExecution node logging in Commander agent.

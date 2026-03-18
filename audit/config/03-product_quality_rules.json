@@ -1,0 +1,20 @@
+{
+  "folder_path": "config",
+  "generated_at": "2026-03-18T00:00:03Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "config"
+  },
+  "summary": {
+    "file": "config/product_quality_rules.yaml",
+    "type": "quality-rules",
+    "purpose": "Product quality validation rules and thresholds",
+    "size_bytes": 0,
+    "last_modified": "2026-03-17"
+  }
+}

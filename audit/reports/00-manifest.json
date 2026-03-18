@@ -1,0 +1,30 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "total_files": 100,
+    "type": "phase-reports",
+    "subdirs": [
+      "templates",
+      "meta",
+      "design",
+      "system",
+      "07",
+      "14.3",
+      "15",
+      "15.1",
+      "16-agent-context-os",
+      "16.1"
+    ],
+    "purpose": "Phase completion reports and audit artifacts"
+  }
+}

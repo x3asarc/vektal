@@ -1,0 +1,40 @@
+{
+  "folder_path": "src-auth",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-auth"
+  },
+  "summary": {
+    "module_name": "src-auth",
+    "primary_responsibility": "Authentication and authorization"
+  },
+  "data_access": {
+    "read_operations": [
+      "User.query.filter_by(email)",
+      "ShopifyStore.query.filter_by(user_id)",
+      "OAuthAttempt.query.filter_by(state_token)"
+    ],
+    "write_operations": [
+      "db.session.commit (user updates)",
+      "email_verification_token storage",
+      "oauth_attempt creation"
+    ],
+    "data_persistence": {
+      "users": "User model in database",
+      "sessions": "Flask session (server-side)",
+      "oauth_state": "db.session + session cookie"
+    },
+    "sensitive_data_handling": [
+      "Passwords hashed with bcrypt BEFORE storage",
+      "Email tokens hashed before storage",
+      "OAuth tokens encrypted via set_access_token()",
+      "No plaintext passwords in memory"
+    ]
+  }
+}

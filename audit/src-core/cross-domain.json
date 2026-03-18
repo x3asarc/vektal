@@ -1,0 +1,59 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["import-graph-analysis", "filesystem-enumeration"],
+    "graph_backed": true,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "cross_domain_coupling": [
+    {
+      "target_unit": "src/graph",
+      "coupling_type": "runtime-dependency",
+      "files": ["src/core/graphiti_client.py", "src/core/embeddings.py"],
+      "patterns": ["runtime_backend_mode", "get_graphiti_client", "generate_embedding"]
+    },
+    {
+      "target_unit": "src/api",
+      "coupling_type": "optional-import",
+      "files": ["src/core/evolution/observer.py"],
+      "patterns": ["SchemaObserver"]
+    },
+    {
+      "target_unit": "src/jobs",
+      "coupling_type": "data-flow",
+      "files": ["src/core/shopify_resolver.py"],
+      "patterns": ["Job, JobType"]
+    },
+    {
+      "target_unit": "src/models",
+      "coupling_type": "orm-access",
+      "files": ["src/core/evolution/observer.py"],
+      "patterns": ["Product model"]
+    }
+  ],
+  "inbound_coupling": [
+    {
+      "source_unit": "src/graph",
+      "coupling_type": "import-dependency",
+      "files": ["mcp_server.py", "query_interface.py", "codebase_scanner.py", "intent_capture.py"]
+    },
+    {
+      "source_unit": "src/tasks",
+      "coupling_type": "import-dependency",
+      "files": ["graphiti_sync.py"]
+    },
+    {
+      "source_unit": "src/api",
+      "coupling_type": "import-dependency",
+      "files": ["v1/shopify/webhooks.py"]
+    }
+  ],
+  "summary": {
+    "outbound_coupling_count": 4,
+    "inbound_coupling_count": 3,
+    "coupling_complexity": "medium"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "blast_radius": {
+    ".claude_settings_json": {
+      "severity": "critical",
+      "impact": "Claude Code session bootstrap, hooks, and provider settings break - all Claude sessions fail"
+    },
+    ".claude_hooks_": {
+      "severity": "critical",
+      "impact": "Memory sync, pre-tool-update, session-end hooks break - memory system desyncs"
+    },
+    "agent_specs_commander_md": {
+      "severity": "critical",
+      "impact": "Commander agent loses canonical spec - Forensic Partnership pipeline breaks"
+    },
+    ".claude_get-shit-done_workflows_": {
+      "severity": "high",
+      "impact": "GSD workflow automation breaks - plan-phase, execute-phase, verify-phase all fail"
+    },
+    ".letta_memory_system_": {
+      "severity": "high",
+      "impact": "Letta memory blocks desync from .memory/ - agent context loses long-term memory"
+    },
+    "SKILL_md_pattern": {
+      "severity": "medium",
+      "impact": "Skill loading breaks across all frameworks - 33+ skills become unavailable"
+    }
+  },
+  "summary": {
+    "critical": 3,
+    "high": 2,
+    "medium": 1,
+    "frameworks_affected": 5
+  }
+}

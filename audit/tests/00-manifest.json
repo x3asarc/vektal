@@ -1,0 +1,29 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "total_test_files": 100,
+    "type": "test-suite",
+    "subdirs_covered": [
+      "unit",
+      "integration",
+      "graph",
+      "jobs",
+      "resolution",
+      "tasks",
+      "integrations",
+      "daemons",
+      "planning"
+    ],
+    "purpose": "Comprehensive test coverage across all system components"
+  }
+}

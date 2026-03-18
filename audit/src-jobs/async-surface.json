@@ -1,0 +1,33 @@
+{
+  "folder_path": "src/jobs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "celery_tasks": [
+    {"file": "src/jobs/queueing.py", "task_name": "Celery task routing configuration", "type": "config-only"},
+    {"file": "src/jobs/finalizer.py", "task_name": "PHASE6_FINALIZER_MODE configuration", "type": "config-only"}
+  ],
+  "celery_configuration": [
+    {"file": "src/jobs/queueing.py", "config": "ALL_QUEUES", "purpose": "Queue definitions"},
+    {"file": "src/jobs/queueing.py", "config": "TASK_ROUTES", "purpose": "Task-to-queue routing"}
+  ],
+  "task_orchestration_patterns": [
+    {"file": "src/jobs/orchestrator.py", "pattern": "Job state machine management"},
+    {"file": "src/jobs/dispatcher.py", "pattern": "Task dispatching via Celery send_task"},
+    {"file": "src/jobs/finalizer.py", "pattern": "Job completion handling"}
+  ],
+  "async_patterns": [
+    {"file": "src/jobs/graphiti_ingestor.py", "pattern": "async graphiti client usage"}
+  ],
+  "note": "src/jobs/ defines job orchestration logic but Celery tasks are defined in src/tasks/. This module provides the business logic layer for job management.",
+  "summary": {
+    "celery_task_count": 0,
+    "celery_config_count": 2,
+    "surface_type": "job-orchestration-logic"
+  }
+}

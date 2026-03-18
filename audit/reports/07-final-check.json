@@ -1,0 +1,20 @@
+{
+  "folder_path": "reports",
+  "generated_at": "2026-03-18T00:07:07Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "reports"
+  },
+  "summary": {
+    "audit_complete": true,
+    "total_files": 100,
+    "all_present": true,
+    "integrity_check": "PASS",
+    "phases_covered": ["07", "14.3", "15", "15.1", "16"]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:03:02Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "tests"
+  },
+  "summary": {
+    "subdirectory": "integration",
+    "file_count": 10,
+    "key_areas": [
+      "vendor_yaml_integration",
+      "enrichment_pipeline",
+      "image_improvements",
+      "context_os_e2e",
+      "graph_resilience",
+      "planning_linker",
+      "research_fallback",
+      "pentart_search",
+      "gemini_verify"
+    ],
+    "purpose": "Integration tests for multi-component workflows"
+  }
+}

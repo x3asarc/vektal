@@ -1,0 +1,25 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:06:04Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "scripts"
+  },
+  "summary": {
+    "letta_scripts_count": 5,
+    "key_scripts": [
+      "register_agents.py",
+      "test_openrouter_byok.py",
+      "patch_agent_models.py",
+      "check_oracle_health.py",
+      "populate_agent_memory.py",
+      "verify_tasks.py"
+    ],
+    "purpose": "Letta agent framework management"
+  }
+}

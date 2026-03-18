@@ -1,0 +1,85 @@
+{
+  "folder_path": "seo",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "seo"
+  },
+  "summary": {
+    "module_name": "seo",
+    "primary_responsibility": "SEO content generation for Shopify products using Google Gemini AI",
+    "key_classes": ["SEOContentGenerator", "ProductFetcher", "ProductUpdater", "ShopifyClient"],
+    "files_in_unit": ["seo_generator.py", "seo_prompts.py", "seo_validator.py", "generate_seo_quick.py"],
+    "file_count": 4,
+    "estimated_loc": 900,
+    "docs": ["QUICKSTART.md", "README.md", "CHANGELOG.md", "IMPLEMENTATION.md"]
+  },
+  "ownership": {
+    "primary_owner": "seo-system",
+    "domain": "content-automation",
+    "language": "python",
+    "framework": "Google Gemini SDK",
+    "external_dependencies": ["google-genai", "requests", "dotenv", "time", "re", "json"]
+  },
+  "key_apis": {
+    "exported_functions": [
+      "SEOContentGenerator.generate_seo_content()",
+      "SEOContentGenerator._fallback_generate_seo_content()",
+      "ProductFetcher.fetch_by_sku()",
+      "ProductFetcher.fetch_by_vendor()",
+      "ProductFetcher.fetch_by_title()",
+      "ProductFetcher.fetch_by_barcode()",
+      "ProductFetcher.fetch_by_handle()",
+      "ProductFetcher.fetch_by_collection()",
+      "ProductUpdater.update_product_seo()",
+      "ProductUpdater.batch_update_products()",
+      "ShopifyClient.authenticate()",
+      "ShopifyClient.execute_graphql()",
+      "get_quick_prompt()",
+      "get_product_prompt()",
+      "SEOValidator.validate_all()",
+      "SEOValidator.truncate_if_needed()",
+      "SEOValidator.extract_json_from_text()"
+    ],
+    "entry_points": [
+      "seo/seo_generator.py",
+      "seo/generate_seo_quick.py"
+    ]
+  },
+  "data_stores": {
+    "external": ["Google Gemini API", "Shopify Admin API"]
+  },
+  "security_notes": [
+    "API keys from environment variables only",
+    "No credentials hardcoded",
+    "GraphQL queries parameterized"
+  ],
+  "integration_points": [
+    "Shopify Admin API (GraphQL)",
+    "Google Gemini AI"
+  ],
+  "async_surface": {
+    "async_functions": [],
+    "sync_only": true,
+    "notes": "All network calls use requests library (sync)"
+  },
+  "config_surface": {
+    "environment_variables": [
+      "GEMINI_API_KEY",
+      "SHOP_DOMAIN",
+      "API_VERSION",
+      "SHOPIFY_CLIENT_ID",
+      "SHOPIFY_CLIENT_SECRET"
+    ],
+    "defaults": {
+      "api_version": "2024-01",
+      "model_id": "gemini-2.5-flash",
+      "rate_limit_delay": 0.5
+    }
+  }
+}

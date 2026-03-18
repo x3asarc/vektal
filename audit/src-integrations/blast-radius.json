@@ -1,0 +1,31 @@
+{
+  "folder_path": "src-integrations",
+  "generated_at": "2026-03-18T00:00:00Z",
+  "coverage": {
+    "evidence_source": ["filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": [],
+    "canonical_prefix": "src-integrations"
+  },
+  "summary": {
+    "module_name": "src-integrations",
+    "primary_responsibility": "External AI API integrations"
+  },
+  "blast_radius": {
+    "impact_scope": "research/AI-powered features",
+    "affected_capabilities": [
+      "Product research automation",
+      "AI-enhanced descriptions"
+    ],
+    "failure_modes": [
+      "API outage: research returns error status",
+      "Rate limiting: requests fail with 429",
+      "Invalid API key: all requests fail"
+    ],
+    "contained_by": ["httpx timeout", "error logging"],
+    "contained_impact": "graceful degradation with error status returned"
+  }
+}

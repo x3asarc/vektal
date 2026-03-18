@@ -1,0 +1,23 @@
+{
+  "folder_path": "src/core",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": ["grep-pattern-matching", "filesystem-enumeration"],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true
+  },
+  "celery_tasks": [],
+  "async_patterns": [
+    {"file": "src/core/graphiti_client.py", "pattern": "async def get_graphiti_client"},
+    {"file": "src/core/graphiti_client.py", "pattern": "async def check_graph_availability"},
+    {"file": "src/core/embeddings.py", "pattern": "async def generate_embedding"}
+  ],
+  "note": "src/core contains async functions but no Celery task decorators. Tasks are defined in src/tasks/ and src/jobs/",
+  "summary": {
+    "celery_task_count": 0,
+    "async_function_count": 3,
+    "surface_type": "async-domain-logic"
+  }
+}

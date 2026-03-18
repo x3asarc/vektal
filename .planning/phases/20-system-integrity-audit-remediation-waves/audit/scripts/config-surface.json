@@ -1,0 +1,39 @@
+{
+  "folder_path": "scripts",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "env_vars": [
+      "DATABASE_URL",
+      "NEO4J_URI",
+      "NEO4J_USER",
+      "NEO4J_PASSWORD",
+      "SHOPIFY_SHOP_URL",
+      "SHOPIFY_ACCESS_TOKEN",
+      "SENTRY_AUTH_TOKEN",
+      "SENTRY_ORG",
+      "SENTRY_PROJECT",
+      "REDIS_URL",
+      "OPENROUTER_API_KEY",
+      "PERPLEXITY_API_KEY",
+      "HETZNER_API_TOKEN"
+    ],
+    "yaml_configs": [
+      "config/vendor_configs.yaml",
+      "config/product_quality_rules.yaml"
+    ]
+  },
+  "summary": {
+    "env_var_count": 13,
+    "yaml_configs": 2
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "folder_path": "tests",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "env_vars": [
+      "DATABASE_URL",
+      "SHOPIFY_SHOP_URL",
+      "SHOPIFY_ACCESS_TOKEN",
+      "NEO4J_URI",
+      "NEO4J_USER",
+      "NEO4J_PASSWORD",
+      "OPENROUTER_API_KEY",
+      "TESTING"
+    ],
+    "conftest_settings": [
+      "pytest fixtures",
+      "mock patches",
+      "test isolation"
+    ],
+    "pytest_ini": [
+      "asyncio_mode",
+      "testpaths",
+      "python_files"
+    ]
+  },
+  "summary": {
+    "env_var_count": 8,
+    "test_subdirs": 8
+  }
+}

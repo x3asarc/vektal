@@ -1,0 +1,56 @@
+{
+  "folder_path": "agent-frameworks",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "cross_domain": {
+    "agents_interact_with": {
+      "src/graph/": [
+        "Neo4j via graph sync scripts",
+        "Graphiti via aura-oracle skill"
+      ],
+      "src/memory/": [
+        ".memory/ system via memory-synthesis skill",
+        "Letta memory blocks"
+      ],
+      "src/core/": [
+        "context-os via context_broker skill",
+        "enrichment pipeline"
+      ],
+      "universal_vendor_scraper/": [
+        "forensic-lead queries scraper outputs"
+      ],
+      "config/": [
+        "all agents read vendor configs"
+      ],
+      "docs/": [
+        "all agents reference agent-system specs",
+        "ContextCurator reads MASTER_MAP.md"
+      ]
+    },
+    "skills_cross_reference": [
+      "aura-oracle skill in .agents/, .claude/, .codex/, .gemini/, .letta/",
+      "memory-synthesis skill shared across all 5 frameworks",
+      "systematic-debugging skill with multi-framework references"
+    ],
+    "memory_tiers": [
+      ".memory/working/ (session)",
+      ".memory/short-term/ (daily)",
+      ".memory/long-term/ (versioned)",
+      ".letta/agents/*/memory/ (agent memory blocks)"
+    ]
+  },
+  "summary": {
+    "source_units_interacting": 6,
+    "frameworks": 5,
+    "crosses_boundary": true
+  }
+}

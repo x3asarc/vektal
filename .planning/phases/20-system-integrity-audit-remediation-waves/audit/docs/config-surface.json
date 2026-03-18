@@ -1,0 +1,23 @@
+{
+  "folder_path": "docs",
+  "generated_at": "2026-03-18T00:00:00.000000+00:00",
+  "coverage": {
+    "evidence_source": [
+      "filesystem-enumeration"
+    ],
+    "graph_backed": false,
+    "filesystem_backed": true,
+    "coverage_confidence": "high",
+    "contract_satisfied": true,
+    "known_blind_spots": []
+  },
+  "config_surface": {
+    "env_vars": [],
+    "no_config_files": true,
+    "note": "docs/ is documentation only - no configuration keys"
+  },
+  "summary": {
+    "env_var_count": 0,
+    "is_doc_only": true
+  }
+}
