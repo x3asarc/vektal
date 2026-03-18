@@ -563,3 +563,14 @@ Plans:
 - [ ] 18.2-PLAN.md - Nanoclaw Architect (Type inference & Model rewriting)
 - [ ] 18.3-PLAN.md - The Foundry (Automated migration generation & Sandboxed application)
 - [ ] 18.4-PLAN.md - Governance GUI (Human approval queue for schema expansion)
+
+## Phase -1: Recovery and Audit Catalog (COMPLETED)
+**Goal**: Make existing Phase 20 audit artifacts navigable as single source of truth for Agent SDK
+**Depends on**: Phase 20
+**Status**: COMPLETE (2026-03-18)
+
+Artifacts:
+- `audit/INDEX.md` - Master index of 48 folders with coverage (6% of 813 goal)
+- `audit/README.md` - Architecture doc explaining 8 surfaces
+- `audit/SURFACE_REGISTRY.json` - Machine-readable registry
+- [ ] 18.4-PLAN.md - Governance GUI (Human approval queue for schema expansion)

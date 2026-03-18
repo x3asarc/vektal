@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-18",
+    "phase": "20-system-integrity-audit-remediation-waves",
+    "source_directory": ".planning/phases/20-system-integrity-audit-remediation-waves/audit",
+    "total_folders": 48,
+    "goal_folders": 813,
+    "coverage_percent": 6,
+    "total_surfaces": 8,
+    "total_json_files": 385
+  },
+  "surfaces": [
+    {"name": "ownership", "file": "ownership.json", "description": "Who owns each file"},
+    {"name": "blast_radius", "file": "blast-radius.json", "description": "Impact analysis"},
+    {"name": "import_chain", "file": "import-chain.json", "description": "Dependency tree"},
+    {"name": "data_access", "file": "data-access.json", "description": "Database models"},
+    {"name": "api_surface", "file": "api-surface.json", "description": "REST endpoints"},
+    {"name": "async_surface", "file": "async-surface.json", "description": "Celery tasks"},
+    {"name": "config_surface", "file": "config-surface.json", "description": "Env vars"},
+    {"name": "cross_domain", "file": "cross-domain.json", "description": "Cross-subsystem coupling"}
+  ],
+  "subsystems": [
+    {"name": ".graph", "folders": 1, "description": "Graph knowledge system"},
+    {"name": "codexclaude", "folders": 12, "description": "Claude agent system"},
+    {"name": "critical-surfaces", "folders": 1, "description": "Surface audits"},
+    {"name": "data", "folders": 29, "description": "Runtime data"},
+    {"name": "universal_vendor_scraper", "folders": 5, "description": "Scraping engine"}
+  ]
+}
