@@ -1,13 +1,16 @@
 """
 Database configuration and Flask application factory.
 Uses PostgreSQL with psycopg3 driver and development-friendly pool settings.
+Supports physical tenant isolation via PostgreSQL schemas.
 """
 import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
+from sqlalchemy import event
 from src.config.session_config import configure_session, configure_login_manager
 from src.models import db
+from src.core.tenancy.context import get_current_store_id, get_tenant_schema_name
 
 migrate = Migrate()
 
@@ -31,6 +34,10 @@ def create_app(config_override: dict = None) -> Flask:
 
     # Initialize extensions
     db.init_app(app)
+    
+    # Initialize Tenancy Isolation Hooks
+    setup_tenancy_hooks(app)
+    
     migrate.init_app(app, db, render_as_batch=True)  # batch mode for SQLite compat
 
     # Initialize Flask-Bcrypt for password hashing
@@ -43,6 +50,52 @@ def create_app(config_override: dict = None) -> Flask:
     configure_login_manager(app)
 
     return app
+
+
+def setup_tenancy_hooks(app: Flask) -> None:
+    """
+    Setup database hooks for physical tenant isolation.
+    
+    Sets the PostgreSQL search_path on every checkout to point
+    to the current store's schema.
+    """
+    # Middleware to set the store ID context from current_user
+    @app.before_request
+    def set_request_tenancy():
+        from flask_login import current_user
+        from src.core.tenancy.context import set_current_store_id
+        
+        # In a real app, we might also check for a store ID in headers
+        # but for v1.0, one user = one store.
+        if current_user.is_authenticated:
+            # We assume current_user has a shopify_store relationship
+            # If not yet linked, it remains None
+            store = getattr(current_user, 'shopify_store', None)
+            if store:
+                set_current_store_id(store.id)
+            else:
+                set_current_store_id(None)
+        else:
+            set_current_store_id(None)
+
+    # SQLAlchemy event listener for dynamic search_path
+    with app.app_context():
+        @event.listens_for(db.engine, "checkout")
+        def set_tenant_search_path(dbapi_connection, connection_record, connection_proxy):
+            store_id = get_current_store_id()
+            schema = get_tenant_schema_name(store_id)
+            
+            # Use raw cursor to set search_path
+            # Search path: [Tenant Schema], [Public Schema]
+            cursor = dbapi_connection.cursor()
+            try:
+                # We use a f-string here as schema name is controlled (tenant_store_{id})
+                cursor.execute(f"SET search_path TO {schema}, public")
+            except Exception:
+                # Fallback to public if schema doesn't exist yet
+                cursor.execute("SET search_path TO public")
+            finally:
+                cursor.close()
 
 
 def configure_app(app: Flask, config_override: dict = None) -> None:

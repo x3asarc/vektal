@@ -27,6 +27,7 @@ from src.models.shopify import ShopifyStore
 from src.models.oauth_attempt import OAuthAttempt
 from src.auth.decorators import email_verified_required
 from src.core.secrets import get_secret
+from src.core.tenancy.provisioning import provision_tenant_schema
 
 oauth_bp = Blueprint('oauth', __name__)
 
@@ -316,6 +317,11 @@ def shopify_callback():
             current_user.account_status = AccountStatus.ACTIVE
 
         db.session.commit()
+
+        # Provision physical tenant schema isolation (Postgres Schema-per-tenant)
+        # This creates the tenant_store_{id} schema and its private tables.
+        # This is the "Forensic Bedrock" for isolated user data.
+        provision_tenant_schema(store.id)
 
         # Log successful OAuth
         _log_oauth_result(state, 'success', None)
