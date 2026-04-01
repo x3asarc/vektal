@@ -1,6 +1,5 @@
 # Flask backend container
 # Base image: Debian-slim (not Alpine) for better Python wheel compatibility
-# Note: Single-stage build for development simplicity. Multi-stage optimization in Phase 13.
 FROM python:3.12-slim
 
 # Prevent pip root warning and optimize Python performance
@@ -8,14 +7,9 @@ ENV PIP_ROOT_USER_ACTION=ignore \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# Create non-root user for security
-RUN useradd -m -u 1000 appuser
-
 WORKDIR /app
 
-# Install system dependencies for Python packages
-# Some packages (Pillow, lxml) need these build tools
-# Use HTTPS for Debian mirrors (HTTP/80 is blocked in some environments)
+# Install system dependencies
 RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
         sed -i 's|http://|https://|g' /etc/apt/sources.list.d/debian.sources; \
     elif [ -f /etc/apt/sources.list ]; then \
@@ -29,7 +23,7 @@ RUN if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
 # Upgrade pip and install standard deployment tools
 RUN pip install --no-cache-dir --upgrade pip gunicorn celery redis psycopg2-binary
 
-# Copy and install Python dependencies first (layer caching)
+# Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -37,27 +31,20 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY gunicorn_config.py .
 
 # Copy application code
-# Note: In development, this is overridden by bind mounts
 COPY src/ ./src/
 COPY utils/ ./utils/
 COPY config/ ./config/
 COPY migrations/ ./migrations/
 COPY web/ ./web/
 
-# Create data directories with proper ownership
-RUN mkdir -p /app/data/input /app/data/output /app/uploads && \
-    chown -R appuser:appuser /app
+# Create data directories
+RUN mkdir -p /app/data/input /app/data/output /app/uploads
 
-# Set Flask app entry point for migrations
-ENV FLASK_APP=src/app_factory.py
-
-# Switch to non-root user
-USER appuser
+# Set Flask app entry point
+ENV FLASK_APP=src/app.py
 
 # Expose Flask port
 EXPOSE 5000
 
 # Run migrations then start application
-# Development mode: flask db upgrade && flask run
-# Production mode (Phase 13): flask db upgrade && gunicorn
-CMD ["sh", "-c", "flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - src.app:app"]
+CMD ["sh", "-c", "python -m flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - src.app:app"]

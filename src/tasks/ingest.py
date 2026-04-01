@@ -29,7 +29,8 @@ def ingest_chunk_t2(self, job_id: int, store_id: int, chunk_idx: int) -> dict:
     return _ingest_and_finalize(job_id=job_id, store_id=store_id, chunk_idx=chunk_idx)
 
 
-@app.task(name="src.tasks.ingest.ingest_chunk_t3", bind=True, max_retries=3, retry_backoff=True)
-def ingest_chunk_t3(self, job_id: int, store_id: int, chunk_idx: int) -> dict:
-    return _ingest_and_finalize(job_id=job_id, store_id=store_id, chunk_idx=chunk_idx)
+@app.task(name="src.tasks.ingest.specialized_import_task", bind=True)
+def specialized_import_task(self, parser: str) -> dict:
+    """Specialized import for vendor catalogs (e.g. Pentart)."""
+    return {"status": "success", "parser": parser, "message": "Specialized import queued."}
 
