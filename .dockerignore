@@ -1,0 +1,57 @@
+# Docker Ignore
+.git
+.gitignore
+.dockerignore
+Dockerfile*
+docker-compose*
+node_modules
+frontend/node_modules
+frontend/.next
+frontend/out
+.venv
+venv
+env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+htmlcov
+.mypy_cache
+.vscode
+.idea
+*.log
+data/
+uploads/
+results/
+temp/
+archive/
+tests/
+requirements-dev.txt
+docs/
+*.md
+git_push_instructions.txt
+go1.21.0.linux-amd64.tar.gz
+WhatsApp Image *
+claudesplan.md
+productionagents.md
+skillbuilding.md
+precisionworkspace.md
+solutionsarchitect.md
+TASK_14_VERIFICATION_REPORT.md
+TASK_EXECUTION_IMPLEMENTATION_SUMMARY.md
+checkpoints/
+logs/
+instance/
+*.sqlite
+*.db
+torchinductor_Hp/
+C
+nul
+# Scripts are dev-heavy
+scripts/
+# Ignore secret files
+.env
+.env.*
+secrets/

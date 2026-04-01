@@ -41,6 +41,8 @@ htmlcov/
 .dmypy.json
 dmypy.json
 .ruff_cache/
+requirements-dev.txt
+torchinductor_Hp/
 
 # --- Node / Next.js ---
 node_modules/
@@ -85,6 +87,9 @@ Thumbs.db
 # --- Windows artifacts ---
 desktop.ini
 nul
+C
+torchinductor_Hp/
+go1.21.0.linux-amd64.tar.gz
 
 # --- Broken pip install fragments in root (junk files — delete them too) ---
 =3.1.0

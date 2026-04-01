@@ -1,12 +1,5 @@
 # Shopify Multi-Supplier Platform - Docker Compose
 # Development configuration with hot reload and debug ports
-#
-# Usage:
-#   docker compose up        # Start all services
-#   docker compose up -d     # Start in background
-#   docker compose down      # Stop all services
-#   docker compose logs -f   # View logs (all services)
-#   docker compose logs -f backend  # View specific service logs
 
 x-common-logging: &common-logging
   driver: json-file
@@ -18,7 +11,6 @@ x-common-logging: &common-logging
 services:
   # ===========================================
   # Nginx Reverse Proxy
-  # Primary entry point: http://localhost:8080 (debug only)
   # ===========================================
   nginx:
     image: nginx:1.25
@@ -31,14 +23,12 @@ services:
     depends_on:
       backend:
         condition: service_started
-      # frontend dependency added when Next.js is ready (Phase 7)
     restart: unless-stopped
     networks:
       - app-network
 
   # ===========================================
   # Flask Backend API
-  # Direct access: http://localhost:5000 (debug only)
   # ===========================================
   backend:
     build:
@@ -47,13 +37,11 @@ services:
     ports:
       - "${FLASK_PORT:-5000}:5000"
     volumes:
-      # Bind mounts for hot reload
       - ./src:/app/src
       - ./utils:/app/utils
       - ./config:/app/config
       - ./migrations:/app/migrations
       - ./web:/app/web
-      # Persistent volumes
       - backend_uploads:/app/uploads
       - backend_data:/app/data
     environment:
@@ -67,44 +55,24 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
-      # AI service keys
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - OPENROUTER_TEXT_MODEL=${OPENROUTER_TEXT_MODEL:-google/gemini-3.1-flash-lite-preview}
-      - OPENROUTER_TEXT_FALLBACK_MODEL=${OPENROUTER_TEXT_FALLBACK_MODEL:-openrouter/auto}
-      - ENABLE_GEMINI_FALLBACK=${ENABLE_GEMINI_FALLBACK:-0}
-      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
-      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
-      # Shopify credentials
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
-      - API_VERSION=${API_VERSION:-2024-01}
       - APP_URL=${APP_URL}
       - FRONTEND_URL=${FRONTEND_URL}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      # Neo4j graph database (Phase 13.2)
       - NEO4J_URI=${NEO4J_URI}
       - NEO4J_USER=${NEO4J_USER}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
-      # Sentry observability (Phase 15)
       - SENTRY_DSN=${SENTRY_DSN}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
-      - SENTRY_RELEASE=${SENTRY_RELEASE}
-      - SENTRY_PROFILES_SAMPLE_RATE=${SENTRY_PROFILES_SAMPLE_RATE:-1.0}
-      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-      - SENTRY_ORG_SLUG=${SENTRY_ORG_SLUG}
-      - SENTRY_PROJECT_SLUG=${SENTRY_PROJECT_SLUG}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5).read()"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Install missing Phase 4 auth dependencies before starting
     command: >
-      sh -c "pip install --no-cache-dir flask-login flask-session[redis] flask-bcrypt redis itsdangerous flask-mail stripe tenacity flask-openapi3 flask-limiter flask-compress &&
-             python -m flask db upgrade &&
+      sh -c "python -m flask db upgrade &&
              gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --access-logfile - --error-logfile - src.app:app"
     depends_on:
       db:
@@ -118,7 +86,6 @@ services:
 
   # ===========================================
   # Celery Worker (Background Jobs)
-  # No direct port - processes jobs from Redis queue
   # ===========================================
   celery_worker:
     build:
@@ -135,36 +102,13 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      # AI service keys (for scraping tasks)
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
-      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
-      # Shopify credentials (for API tasks)
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
-      - API_VERSION=${API_VERSION:-2024-01}
-      # Neo4j graph database (Phase 13.2)
-      - NEO4J_URI=${NEO4J_URI}
-      - NEO4J_USER=${NEO4J_USER}
-      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
-      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
-      # Sentry workers project
-      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_WORKERS_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
-      - SENTRY_RELEASE=${SENTRY_RELEASE}
-      - SENTRY_WORKERS_TRACES_SAMPLE_RATE=${SENTRY_WORKERS_TRACES_SAMPLE_RATE:-1.0}
-      - SENTRY_WORKERS_PROFILES_SAMPLE_RATE=${SENTRY_WORKERS_PROFILES_SAMPLE_RATE:-1.0}
-    command: >
-      celery -A src.celery_app worker
-      --loglevel=info
-      --concurrency=${CELERY_INTERACTIVE_CONCURRENCY:-2}
-      --hostname=interactive@%h
-      -Q control,interactive.t1,interactive.t2,interactive.t3,assistant.t1,assistant.t2,assistant.t3,assistant.t3.dlq
+    command: celery -A src.celery_app worker --loglevel=info --concurrency=2
     depends_on:
       db:
         condition: service_healthy
@@ -176,8 +120,7 @@ services:
     logging: *common-logging
 
   # ===========================================
-  # Dedicated Scraper Worker (batch queues)
-  # Isolates high-volume scraping from interactive/control tasks
+  # Celery Scraper (Batch)
   # ===========================================
   celery_scraper:
     build:
@@ -194,29 +137,9 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
-      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
-      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
-      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
-      - API_VERSION=${API_VERSION:-2024-01}
-      # Sentry workers project
-      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_WORKERS_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
-      - SENTRY_RELEASE=${SENTRY_RELEASE}
-      - SENTRY_WORKERS_TRACES_SAMPLE_RATE=${SENTRY_WORKERS_TRACES_SAMPLE_RATE:-1.0}
-      - SENTRY_WORKERS_PROFILES_SAMPLE_RATE=${SENTRY_WORKERS_PROFILES_SAMPLE_RATE:-1.0}
-    command: >
-      celery -A src.celery_app worker
-      --loglevel=info
-      --concurrency=${CELERY_BATCH_CONCURRENCY:-3}
-      --hostname=batch@%h
-      -Q batch.t1,batch.t2,batch.t3
+    command: celery -A src.celery_app worker --loglevel=info --concurrency=3 -Q batch.t1,batch.t2,batch.t3
     depends_on:
       db:
         condition: service_healthy
@@ -228,8 +151,7 @@ services:
     logging: *common-logging
 
   # ===========================================
-  # Assistant runtime worker - handles assistant.t1/t2/t3 queues
-  # Previously missing: tasks sent to these queues queued indefinitely
+  # Celery Assistant (Runtime)
   # ===========================================
   celery_assistant:
     build:
@@ -246,27 +168,9 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
-      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
-      - API_VERSION=${API_VERSION:-2024-01}
-      # Sentry workers project
-      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_WORKERS_DSN=${SENTRY_WORKERS_DSN}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
-      - SENTRY_RELEASE=${SENTRY_RELEASE}
-      - SENTRY_WORKERS_TRACES_SAMPLE_RATE=${SENTRY_WORKERS_TRACES_SAMPLE_RATE:-1.0}
-      - SENTRY_WORKERS_PROFILES_SAMPLE_RATE=${SENTRY_WORKERS_PROFILES_SAMPLE_RATE:-1.0}
-    command: >
-      celery -A src.celery_app worker
-      --loglevel=info
-      --concurrency=${CELERY_ASSISTANT_CONCURRENCY:-2}
-      --hostname=assistant@%h
-      -Q assistant.t1,assistant.t2,assistant.t3,assistant.t3.dlq
+    command: celery -A src.celery_app worker --loglevel=info --concurrency=2 -Q assistant.t1,assistant.t2,assistant.t3
     depends_on:
       db:
         condition: service_healthy
@@ -278,7 +182,7 @@ services:
     logging: *common-logging
 
   # ===========================================
-  # Flower monitoring dashboard for Celery workers
+  # Flower Monitoring
   # ===========================================
   flower:
     build:
@@ -290,19 +194,10 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH:-admin:admin}
-    command: >
-      celery -A src.celery_app flower
-      --port=5555
-      --persistent=True
-      --db=/tmp/flower.db
-      --basic_auth=${FLOWER_BASIC_AUTH:-admin:admin}
+    command: celery -A src.celery_app flower --port=5555 --persistent=True --db=/tmp/flower.db
     depends_on:
       redis:
         condition: service_healthy
-      celery_worker:
-        condition: service_started
-      celery_scraper:
-        condition: service_started
     restart: unless-stopped
     networks:
       - app-network
@@ -310,8 +205,6 @@ services:
 
   # ===========================================
   # Next.js Frontend
-  # Direct access: http://localhost:3001 (debug only)
-  # Full implementation in Phase 7
   # ===========================================
   frontend:
     image: node:20-slim
@@ -319,7 +212,6 @@ services:
       - "3001:3000"
     volumes:
       - ./frontend:/app
-      # Prevent overwriting node_modules and .next
       - /app/node_modules
       - /app/.next
     working_dir: /app
@@ -328,14 +220,6 @@ services:
       - WATCHPACK_POLLING=true
       - NEXT_PRIVATE_API_PROXY_ORIGIN=http://backend:5000
       - NEXT_PUBLIC_API_BASE_URL=${APP_URL}
-      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
-      - NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=${NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE:-0.1}
-      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-      - SENTRY_ORG=${SENTRY_ORG}
-      - SENTRY_PROJECT=${SENTRY_PROJECT}
-      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
-      - SENTRY_RELEASE=${SENTRY_RELEASE}
-    # Install dependencies on first start, then run dev server
     command: sh -c "npm install && npm run dev"
     restart: unless-stopped
     networks:
@@ -343,8 +227,6 @@ services:
 
   # ===========================================
   # PostgreSQL Database
-  # Direct access: localhost:5432 (debug only)
-  # Data persists via named volume
   # ===========================================
   db:
     image: postgres:16
@@ -352,13 +234,10 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Init scripts run on first start (Phase 3)
-      # - ./db/init:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_DB=${DB_NAME:-shopify_platform}
       - POSTGRES_USER=${DB_USER:-admin}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    # Startup ordering health check - NOT automatic recovery monitoring (Phase 13)
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${DB_USER:-admin}", "-d", "${DB_NAME:-shopify_platform}"]
       interval: 5s
@@ -370,8 +249,7 @@ services:
       - app-network
 
   # ===========================================
-  # Redis (Cache + Celery Broker)
-  # Direct access: localhost:6379 (debug only)
+  # Redis
   # ===========================================
   redis:
     image: redis:7-alpine
@@ -379,18 +257,7 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    # Redis configuration for production stability (issues 101522185, 101522288)
-    command: >
-      redis-server
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
-      --tcp-keepalive 60
-      --timeout 300
-      --tcp-backlog 511
-      --save 900 1
-      --save 300 10
-      --save 60 10000
-    # Startup ordering health check - NOT automatic recovery monitoring (Phase 13)
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -402,8 +269,6 @@ services:
 
   # ===========================================
   # Neo4j Graph Database
-  # Direct access: http://localhost:7474 (browser), bolt://localhost:7687 (driver)
-  # Used for temporal knowledge storage (Phase 13.2+)
   # ===========================================
   neo4j:
     image: neo4j:5.26
@@ -415,8 +280,8 @@ services:
       - neo4j_logs:/logs
     environment:
       - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD}
-      - NEO4J_server_memory_heap_max__size=1G
-      - NEO4J_server_memory_pagecache_size=512M
+      - NEO4J_server_memory_heap_max__size=512M
+      - NEO4J_server_memory_pagecache_size=256M
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:7474"]
       interval: 30s
@@ -427,9 +292,6 @@ services:
     networks:
       - app-network
 
-# ===========================================
-# Named Volumes (persistent data)
-# ===========================================
 volumes:
   postgres_data:
     name: shopify_postgres_data
@@ -444,9 +306,6 @@ volumes:
   neo4j_logs:
     name: shopify_neo4j_logs
 
-# ===========================================
-# Networks
-# ===========================================
 networks:
   app-network:
     driver: bridge
