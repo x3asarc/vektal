@@ -155,6 +155,51 @@ archive/image_scraper_backup_*.py
 frontend/.ooda/
 
 # --- Agent runtime / working memory (not platform code) ---
-# .memory/long-term/ and .memory/events/ are tracked (platform intelligence)
-# .memory/working/ is runtime session data — local only
-.memory/working/
+.memory/
+.letta/
+.ooda/
+.sisyphus/
+.planning/
+.agents/
+! .agents/skills/
+
+# --- Screenshots & WhatsApp images ---
+*.jpeg
+*.jpg
+*.png
+WhatsApp Image *
+
+# --- Local Scripts (Dev/Test) ---
+scripts/auth_bridge*.py
+scripts/test_*.py
+scripts/verify_*.py
+scripts/fetch_*.py
+scripts/apply_*.py
+scripts/query_db.py
+scripts/find_molds_paginated.py
+scripts/fix_alt_and_seo.py
+scripts/vektal_unified_dry_run.py
+scripts/perform_live_dry_run.py
+scripts/deep_verify_results.py
+scripts/list_product_collections.py
+scripts/agents/invoke.py
+scripts/letta/
+C
+nul
+torchinductor_Hp/
+go1.21.0.linux-amd64.tar.gz
+
+# --- Config & Workspace (Local Only) ---
+precisionworkspace.md
+productionagents.md
+skillbuilding.md
+solutionsarchitect.md
+CLAUDE.md
+GEMINI.md
+LEARNINGS.md
+marketingskills/
+checkpoints/
+docs/AGENT_SDK_ENHANCEMENT_MAP.md
+docs/agent-system/README_CENTRAL.md
+TASK_14_VERIFICATION_REPORT.md
+TASK_EXECUTION_IMPLEMENTATION_SUMMARY.md
