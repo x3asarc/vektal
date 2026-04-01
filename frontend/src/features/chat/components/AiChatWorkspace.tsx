@@ -1,15 +1,27 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { Button } from "@/components/ui/Button";
-import { MessageBlockRenderer } from "./MessageBlockRenderer";
+import { useChatSession } from "@/features/chat/hooks/useChatSession";
+import { Message } from "ai";
 
 export function AiChatWorkspace() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const chatSession = useChatSession();
+
+  // Map our custom message format to AI SDK Message format
+  const initialMessages: Message[] = useMemo(() => {
+    return chatSession.messages.map(m => ({
+      id: String(m.id),
+      role: m.role as Message['role'],
+      content: m.content,
+    }));
+  }, [chatSession.messages]);
   
   const { messages, input, handleInputChange, handleSubmit, status, error } = useChat({
+    initialMessages,
     transport: new DefaultChatTransport({
       api: '/api/chat',
     }),
