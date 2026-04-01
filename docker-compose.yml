@@ -1,5 +1,5 @@
 # Shopify Multi-Supplier Platform - Docker Compose
-# Development configuration with hot reload and debug ports
+# Production-ready lean configuration for 4GB VPS
 
 x-common-logging: &common-logging
   driver: json-file
@@ -26,6 +26,7 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    logging: *common-logging
 
   # ===========================================
   # Flask Backend API
@@ -57,14 +58,28 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_TEXT_MODEL=${OPENROUTER_TEXT_MODEL:-google/gemini-3.1-flash-lite-preview}
+      - OPENROUTER_TEXT_FALLBACK_MODEL=${OPENROUTER_TEXT_FALLBACK_MODEL:-openrouter/auto}
+      - ENABLE_GEMINI_FALLBACK=${ENABLE_GEMINI_FALLBACK:-0}
+      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
+      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
       - APP_URL=${APP_URL}
       - FRONTEND_URL=${FRONTEND_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
       - NEO4J_URI=${NEO4J_URI}
       - NEO4J_USER=${NEO4J_USER}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
       - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_RELEASE=${SENTRY_RELEASE}
+      - SENTRY_PROFILES_SAMPLE_RATE=${SENTRY_PROFILES_SAMPLE_RATE:-1.0}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - SENTRY_ORG_SLUG=${SENTRY_ORG_SLUG}
+      - SENTRY_PROJECT_SLUG=${SENTRY_PROJECT_SLUG}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5).read()"]
       interval: 10s
@@ -102,12 +117,21 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
+      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
       - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
       - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
+      - NEO4J_URI=${NEO4J_URI}
+      - NEO4J_USER=${NEO4J_USER}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - GRAPH_ORACLE_ENABLED=${GRAPH_ORACLE_ENABLED:-false}
+      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
     command: celery -A src.celery_app worker --loglevel=info --concurrency=2
     depends_on:
       db:
@@ -137,8 +161,17 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - VISION_AI_PROVIDER=${VISION_AI_PROVIDER:-openrouter}
+      - VISION_AI_MODEL=${VISION_AI_MODEL:-google/gemini-flash-1.5-8b}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
+      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
     command: celery -A src.celery_app worker --loglevel=info --concurrency=3 -Q batch.t1,batch.t2,batch.t3
     depends_on:
       db:
@@ -168,8 +201,15 @@ services:
       - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
       - APP_DEPLOY_STAGE=${APP_DEPLOY_STAGE:-local}
       - DATABASE_URL=postgresql://${DB_USER:-admin}:${DB_PASSWORD}@db:5432/${DB_NAME:-shopify_platform}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-QJhl0AKnrMX7UpYIreTUkFmNceOCrajUUkUce0XeSr8=}
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - API_VERSION=${API_VERSION:-2024-01}
+      - SENTRY_DSN=${SENTRY_WORKERS_DSN}
     command: celery -A src.celery_app worker --loglevel=info --concurrency=2 -Q assistant.t1,assistant.t2,assistant.t3
     depends_on:
       db:
@@ -220,10 +260,17 @@ services:
       - WATCHPACK_POLLING=true
       - NEXT_PRIVATE_API_PROXY_ORIGIN=http://backend:5000
       - NEXT_PUBLIC_API_BASE_URL=${APP_URL}
+      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - SENTRY_ORG=${SENTRY_ORG}
+      - SENTRY_PROJECT=${SENTRY_PROJECT}
+      - SENTRY_ENVIRONMENT=${SENTRY_ENVIRONMENT:-development}
+      - SENTRY_RELEASE=${SENTRY_RELEASE}
     command: sh -c "npm install && npm run dev"
     restart: unless-stopped
     networks:
       - app-network
+    logging: *common-logging
 
   # ===========================================
   # PostgreSQL Database
@@ -257,7 +304,7 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --tcp-keepalive 60 --timeout 300
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
