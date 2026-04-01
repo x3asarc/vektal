@@ -12,8 +12,8 @@ import json
 import logging
 import uuid
 import os
-from flask import Blueprint, Response, request, stream_with_context
-from flask_login import login_required, current_user
+from src.api.v1.chat import chat_bp
+# agent_bp removed, using chat_bp
 
 from src.models import db, ChatSession, ChatMessage
 from src.core.tenancy.context import set_current_store_id
@@ -21,10 +21,9 @@ from src.assistant.prompts.forensic_context import generate_forensic_system_prom
 from src.core.search.forensic_search import ForensicSearch
 from src.celery_app import app as celery_app
 
-logger = logging.getLogger(__name__)
-agent_bp = Blueprint('agent', __name__)
+from src.api.v1.chat import chat_bp
 
-@agent_bp.route('/sessions/<int:session_id>/chat', methods=['POST'])
+@chat_bp.route('/sessions/<int:session_id>/agent/chat', methods=['POST'])
 @login_required
 def chat_with_agent(session_id: int):
     """

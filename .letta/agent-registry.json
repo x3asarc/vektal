@@ -1,24 +1,24 @@
 {
-  "_note": "Letta = memory store only. Model fields are LABELS — not used for inference. Inference = OpenRouter direct via OPENROUTER_API_KEY. See docs/agent-system/model-rationale.md.",
+  "_note": "Letta = memory store only. Model fields are LABELS — not used for inference. Inference = OpenRouter direct via OPENROUTER_API_KEY. Registry aligned to valid lc-openrouter IDs from docs/agent-system/model-rationale.md.",
   "_env_vars": "LETTA_AGENT_*_ID vars written to .env for inter-agent messaging (Pico-Warden escalation etc).",
   "commander": {
     "id": "agent-d2e3b583-5d02-4e24-98d9-98930db87cea",
-    "model": "lc-openrouter/x-ai/grok-4.1-fast",
+    "model": "lc-openrouter/x-ai/grok-3",
     "status": "created"
   },
   "watson": {
     "id": "agent-9c3bec2a-cd72-4fe3-bc23-da9acc4cd1de",
-    "model": "lc-openrouter/anthropic/claude-3.7-sonnet",
+    "model": "lc-openrouter/anthropic/claude-opus-4-6",
     "status": "created"
   },
   "bundle": {
     "id": "agent-526568af-2163-490d-bcf0-f9871b8dd64f",
-    "model": "lc-openrouter/google/gemini-3-flash-preview",
+    "model": "lc-openrouter/google/gemini-2.5-flash",
     "status": "created"
   },
   "engineering-lead": {
     "id": "agent-c3599131-49c0-4771-96fb-45ec631a0dc2",
-    "model": "lc-openrouter/openai/gpt-5.3-codex",
+    "model": "lc-openrouter/openai/gpt-4o",
     "status": "created"
   },
   "design-lead": {
@@ -33,12 +33,12 @@
   },
   "infrastructure-lead": {
     "id": "agent-2296fd7a-47a9-4849-9771-36d5f4ae2e48",
-    "model": "lc-openrouter/z-ai/glm-5",
+    "model": "lc-openrouter/z-ai/glm-4.6",
     "status": "created"
   },
   "project-lead": {
     "id": "agent-fa0f01c4-42aa-488c-b79c-085bf4ff350a",
-    "model": "lc-openrouter/google/gemini-3.1-pro-preview",
+    "model": "lc-openrouter/google/gemini-2.5-flash",
     "status": "created"
   },
   "task-observer": {
@@ -48,7 +48,7 @@
   },
   "validator": {
     "id": "agent-139a6dce-0a00-44a0-a8b6-cac02686ffe9",
-    "model": "lc-openrouter/openai/gpt-5-mini",
+    "model": "lc-openrouter/openai/gpt-4o-mini",
     "status": "created"
   }
 }

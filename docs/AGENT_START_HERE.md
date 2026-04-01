@@ -1,12 +1,12 @@
 # AGENT START HERE
 
-- Last refreshed: 2026-03-10T07:59:31Z
-- Source commit: `36d25a8`
+- Last refreshed: 2026-04-01T11:47:11Z
+- Source commit: `37ea3f8`
 
 ## Current Runtime Snapshot
-- Phase: Phase 17 - Product Data Command Center + Chat-First Product Ops - **COMPLETE**
-- Gate Status: `GREEN` (Phase 17 summary artifacts + verification report published)
-- Target Milestone: Catalog health mission control with real-time sync and governed rollback
+- Phase: Phase 20 Amendment - System Integrity Audit - **COMPLETE**
+- Gate Status: `GREEN` (176 JSON files created, 22 units × 8 surfaces)
+- Target Milestone: Complete codebase audit for Agent SDK routing
 
 ## Immediate Blockers / Next Actions
 - **Project Phase:** Phase 16 (Agent Context OS) & Phase 15.1 (Sentry Intake) — **COMPLETE**
@@ -27,8 +27,8 @@
 - `docs/CONTEXT_LINK_MAP.md`
 
 ## Memory Snapshot
-- Working sessions discovered: 22
-- Latest working file: session-claude-claude-pretool.json
+- Working sessions discovered: 26
+- Latest working file: N/A
 - Latest working task: N/A
 - View paths:
   - `.memory/working/{session_id}.json`

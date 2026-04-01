@@ -33,7 +33,7 @@ It documents intent. It does not route inference.
 | **Watson** | `anthropic/claude-opus-4-6` | Best-in-class multi-step forensic reasoning. Only Anthropic model in stack — deliberate monoculture break for adversarial review. |
 | **Commander** | `x-ai/grok-3` | 131K context, flagship xAI model. Agentic tool calling, strategic routing. |
 | **Forensic Lead** | `deepseek/deepseek-v3.2` | Distinct training lineage from Anthropic — different reasoning failure modes. Critical for independent blast-radius analysis. |
-| **Design Lead** | `moonshotai/kimi-k2.5` | Native multimodal. 262K context. Can process Shopify theme screenshots directly. |
+| **Design Lead** | `qwen/qwen-2.5-coder-32b-instruct` | Free on OpenRouter. Strong code generation, 128K context. Qwen series optimized for coding tasks. |
 | **task-observer** | `google/gemini-2.5-flash-lite` | Token-efficient telemetry. Pattern detection over large TaskExecution sets. |
 | **Lestrade** | `deepseek/deepseek-v3.2` | One-shot arbitrator — same as Forensic Lead. Non-Anthropic, non-xAI lineage breaks Commander/Watson deadlock. |
 

@@ -37,7 +37,7 @@ MODEL_MAP: dict[str, str] = {
     "watson":               "anthropic/claude-opus-4-6",
     "commander":            "x-ai/grok-3",
     "forensic-lead":        "deepseek/deepseek-v3.2",
-    "design-lead":          "moonshotai/kimi-k2.5",
+    "design-lead":          "qwen/qwen-2.5-coder-32b-instruct",
     "task-observer":        "google/gemini-2.5-flash-lite",
     "bundle":               "google/gemini-2.5-flash",
     "engineering-lead":     "openai/gpt-4o",

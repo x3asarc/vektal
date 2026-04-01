@@ -369,16 +369,16 @@ Full block definitions: `.agents/skills/aura-oracle/oracle.py`
 Summary:
 | Agent | Base model | Source |
 |---|---|---|
-| Commander | grok-4.1-fast | model-rationale.md |
+| Commander | grok-3 | model-rationale.md |
 | Watson | claude-opus-4.6 | model-rationale.md (only Anthropic in stack) |
-| Bundle | gemini-3-flash-preview | model-rationale.md |
-| Engineering Lead | gpt-5.3-codex | model-rationale.md |
+| Bundle | gemini-2.5-flash | model-rationale.md |
+| Engineering Lead | gpt-4o | model-rationale.md |
 | Design Lead | kimi-k2.5 | model-rationale.md |
 | Forensic Lead | deepseek-v3.2 | model-rationale.md |
-| Infrastructure Lead | glm-5 | model-rationale.md |
-| Project Lead | gemini-3.1-pro-preview | model-rationale.md |
+| Infrastructure Lead | glm-4.6 | model-rationale.md |
+| Project Lead | gemini-2.5-flash | model-rationale.md |
 | task-observer | gemini-2.5-flash-lite | model-rationale.md |
-| Validator | gpt-5-mini | model-rationale.md |
+| Validator | gpt-4o-mini | model-rationale.md |
 | Lestrade | o4-mini (direct API) | Watson spec — not a registered Letta agent |
 
 All via `lc-openrouter/*` prefix — routes through `OPENROUTER_API_KEY`. No Letta credits.
@@ -530,7 +530,7 @@ If Letta is down → Claude Code / Gemini / Codex execute stateless using Aura +
 
 | Feature | Status |
 |---|---|
-| Commander registered in Letta (grok-4.1-fast) | LIVE |
+| Commander registered in Letta (grok-3) | LIVE |
 | Watson registered in Letta (claude-opus-4.6) | LIVE |
 | Bundle registered + Watson-aware contract | LIVE |
 | All Leads registered with model-rationale.md models | LIVE |

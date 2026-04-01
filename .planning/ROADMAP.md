@@ -497,6 +497,15 @@ Plans:
 - [x] 16-06-PLAN.md - Context OS binary gate + operator report + runbook
 - [x] 16-07-PLAN.md - Verification harness, E2E validation, and phase closure artifacts
 
+### Phase 19: Agent SDK Foundation - Phase A
+
+**Goal:** [To be planned]
+**Depends on:** Phase 18
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 19 to break down)
+
 ---
 
 ## Progress

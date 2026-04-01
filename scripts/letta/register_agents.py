@@ -40,28 +40,29 @@ HEADERS = {
 #   - Codex        → OPENAI_BASE_URL=https://openrouter.ai/api/v1
 #
 # Source of truth: docs/agent-system/model-rationale.md
+# Letta expects OpenRouter-backed models to use the lc-openrouter/ prefix.
 # Confirmed real OpenRouter IDs used here (verified 2026-03-09).
 MODEL_MAP = {
     # High Court — Forensic Reasoning
-    "watson":              "anthropic/claude-opus-4-6",          # multi-step forensic reasoning (confirmed on OpenRouter)
+    "watson": "lc-openrouter/anthropic/claude-opus-4-6",  # multi-step forensic reasoning (confirmed on OpenRouter)
     # Command Tier — Strategic Orchestration
-    "commander":           "x-ai/grok-3",                        # 131K context, agentic (confirmed)
-    "project-lead":        "google/gemini-2.5-flash",            # long-horizon stability (upgrade to 2.5-pro when available)
+    "commander": "lc-openrouter/x-ai/grok-3",  # 131K context, agentic (confirmed)
+    "project-lead": "lc-openrouter/google/gemini-2.5-flash",  # long-horizon stability (upgrade to 2.5-pro when available)
     # Lead Tier — Production Execution
-    "engineering-lead":    "openai/gpt-4o",                      # code quality, deterministic (upgrade to o3 when available)
-    "design-lead":         "moonshotai/kimi-k2.5",               # native multimodal, 262K context (confirmed)
-    "infrastructure-lead": "z-ai/glm-4.6",                       # 203K context, multi-tenant (confirmed; glm-5 when available)
-    "forensic-lead":       "deepseek/deepseek-v3.2",             # distinct lineage, adversarial (confirmed)
+    "engineering-lead": "lc-openrouter/openai/gpt-4o",  # code quality, deterministic (upgrade to o3 when available)
+    "design-lead": "lc-openrouter/qwen/qwen-2.5-coder-32b-instruct",  # free on OpenRouter, strong coding model (confirmed)
+    "infrastructure-lead": "lc-openrouter/z-ai/glm-4.6",  # 203K context, multi-tenant (confirmed; glm-5 when available)
+    "forensic-lead": "lc-openrouter/deepseek/deepseek-v3.2",  # distinct lineage, adversarial (confirmed)
     # Guardian Tier — Validation & Logistics
-    "bundle":              "google/gemini-2.5-flash",            # near-Pro at flash speed (confirmed)
-    "task-observer":       "google/gemini-2.5-flash-lite",       # token-efficient telemetry (confirmed)
-    "validator":           "openai/gpt-4o-mini",                 # critique diversity (upgrade to gpt-5-mini when available)
+    "bundle": "lc-openrouter/google/gemini-2.5-flash",  # near-Pro at flash speed (confirmed)
+    "task-observer": "lc-openrouter/google/gemini-2.5-flash-lite",  # token-efficient telemetry (confirmed)
+    "validator": "lc-openrouter/openai/gpt-4o-mini",  # critique diversity (upgrade to gpt-5-mini when available)
     # GSD agents (used by Engineering Lead)
-    "gsd-planner":         "openai/gpt-4o",
-    "gsd-executor":        "openai/gpt-4o",
-    "gsd-verifier":        "lc-openrouter/openai/gpt-5.3-codex",
-    "gsd-plan-checker":    "lc-openrouter/openai/gpt-5.3-codex",
-    "gsd-debugger":        "lc-openrouter/openai/gpt-5.3-codex",
+    "gsd-planner": "lc-openrouter/openai/gpt-4o",
+    "gsd-executor": "lc-openrouter/openai/gpt-4o",
+    "gsd-verifier": "lc-openrouter/openai/gpt-4o",
+    "gsd-plan-checker": "lc-openrouter/openai/gpt-4o",
+    "gsd-debugger": "lc-openrouter/openai/gpt-4o",
 }
 
 # Agents to register by default (core system — not GSD utilities)
@@ -84,7 +85,7 @@ def strip_frontmatter(content: str) -> str:
     if content.startswith("---"):
         end = content.find("---", 3)
         if end != -1:
-            return content[end + 3:].lstrip("\n")
+            return content[end + 3 :].lstrip("\n")
     return content
 
 
@@ -144,9 +145,9 @@ def delete_agent(agent_id: str):
 
 
 def register(agent_names: list, force: bool = False):
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Letta Agent Registration — {LETTA_BASE}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if not LETTA_KEY:
         print("ERROR: LETTA_API_KEY not set in .env")
@@ -194,7 +195,7 @@ def register(agent_names: list, force: bool = False):
 
     save_registry(registry)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"DONE")
     print(f"  Created:  {len(results['created'])}")
     print(f"  Skipped:  {len(results['skipped'])}")
@@ -224,16 +225,16 @@ def update_env_with_registry(registry: dict):
     env_content = env_path.read_text(encoding="utf-8")
 
     env_keys = {
-        "commander":     "LETTA_AGENT_COMMANDER_ID",
-        "watson":        "LETTA_AGENT_WATSON_ID",
-        "bundle":        "LETTA_AGENT_BUNDLE_ID",
+        "commander": "LETTA_AGENT_COMMANDER_ID",
+        "watson": "LETTA_AGENT_WATSON_ID",
+        "bundle": "LETTA_AGENT_BUNDLE_ID",
         "engineering-lead": "LETTA_AGENT_ENGINEERING_LEAD_ID",
-        "design-lead":   "LETTA_AGENT_DESIGN_LEAD_ID",
+        "design-lead": "LETTA_AGENT_DESIGN_LEAD_ID",
         "forensic-lead": "LETTA_AGENT_FORENSIC_LEAD_ID",
         "infrastructure-lead": "LETTA_AGENT_INFRA_LEAD_ID",
-        "project-lead":  "LETTA_AGENT_PROJECT_LEAD_ID",
+        "project-lead": "LETTA_AGENT_PROJECT_LEAD_ID",
         "task-observer": "LETTA_AGENT_TASK_OBSERVER_ID",
-        "validator":     "LETTA_AGENT_VALIDATOR_ID",
+        "validator": "LETTA_AGENT_VALIDATOR_ID",
     }
 
     updated = []
@@ -275,14 +276,20 @@ def show_registry():
     for name, data in sorted(registry.items()):
         if name.startswith("_"):
             continue
-        print(f"{name:<25} {data['id']:<45} {data['model']:<45} {data.get('status','?')}")
+        print(
+            f"{name:<25} {data['id']:<45} {data['model']:<45} {data.get('status', '?')}"
+        )
 
 
 def main():
     parser = argparse.ArgumentParser(description="Register Vektal agents in Letta")
-    parser.add_argument("--force", action="store_true", help="Delete and recreate existing agents")
+    parser.add_argument(
+        "--force", action="store_true", help="Delete and recreate existing agents"
+    )
     parser.add_argument("--list", action="store_true", help="Show current registry")
-    parser.add_argument("--all", action="store_true", help="Register all agents including GSD utilities")
+    parser.add_argument(
+        "--all", action="store_true", help="Register all agents including GSD utilities"
+    )
     parser.add_argument("--agent", type=str, help="Register a single named agent")
     args = parser.parse_args()
 

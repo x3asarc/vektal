@@ -33,7 +33,7 @@ CORRECTED_MODELS = {
     "watson":             "lc-openrouter/anthropic/claude-opus-4-6",
     "bundle":             "lc-openrouter/google/gemini-2.5-flash",
     "engineering-lead":   "lc-openrouter/openai/gpt-4o",
-    "design-lead":        "lc-openrouter/moonshotai/kimi-k2.5",
+    "design-lead":        "lc-openrouter/qwen/qwen-2.5-coder-32b-instruct",
     "forensic-lead":      "lc-openrouter/deepseek/deepseek-v3.2",
     "infrastructure-lead":"lc-openrouter/z-ai/glm-4.6",
     "project-lead":       "lc-openrouter/google/gemini-2.5-flash",

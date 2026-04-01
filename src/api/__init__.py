@@ -102,7 +102,11 @@ def register_v1_blueprints(app):
     app.register_blueprint(resolution_bp, url_prefix='/api/v1/resolution')
     app.register_blueprint(jobs_bp, url_prefix='/api/v1/jobs')  # SSE routes
     app.register_blueprint(versioning_bp, url_prefix='/api/v1/user')
+    from src.api.v1.chat.ai_sdk import ai_sdk_bp
+    # ...
     app.register_blueprint(chat_bp, url_prefix='/api/v1/chat')
+    app.register_blueprint(ai_sdk_bp, url_prefix='/api/v1/chat')
+    app.register_blueprint(ai_sdk_bp, url_prefix='/api') # For /api/chat
     app.register_blueprint(ops_bp, url_prefix='/api/v1/ops')
     app.register_blueprint(dashboard_bp, url_prefix='/api/v1/ops/dashboard')
     app.register_blueprint(approvals_bp, url_prefix='/api/v1/approvals')

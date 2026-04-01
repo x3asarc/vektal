@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChatWorkspace } from "../../chat/components/ChatWorkspace";
+import { AiChatWorkspace } from "../../chat/components/AiChatWorkspace";
 import { Button } from "../../../components/ui/Button";
 
 interface ChatOverlayProps {
@@ -37,7 +37,7 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ isOpen, onClose }) => 
 
         {/* Content */}
         <div className="flex-1 overflow-hidden">
-          <ChatWorkspace />
+          <AiChatWorkspace />
         </div>
         
         {/* Footer info */}

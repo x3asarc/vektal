@@ -1,14 +1,22 @@
 # Phase 20 Audit Architecture
 
-> Machine-generated audit of 48 codebase folders across 8 critical surfaces.  
-> **Goal was 813 folders; 48 achieved (6% coverage).**  
-> **Purpose:** Enable Agent SDK to understand codebase structure for intelligent routing.
+> Phase 20 amendment navigation and architecture notes for the completed audit.  
+> **Amended scope:** 22 logical units across 8 critical surfaces = 176 JSON files.  
+> **Purpose:** Enable Agent SDK and operators to navigate the completed audit output accurately.
 
 ---
 
 ## What This Is
 
-Phase 20 produced a complete codebase audit across all meaningful folders. Each folder has 8 JSON files documenting:
+Phase 20 ended with a completed audit across 22 logical units. The canonical machine-readable audit payload lives in the repository-root `audit/` directory.
+
+This phase-local folder exists to hold the planning-side navigation artifacts for that work, especially:
+
+- `INDEX.md` — human-readable unit coverage index
+- `SURFACE_REGISTRY.json` — machine-readable coverage registry
+- `README.md` — architecture and interpretation guide
+
+Each audited unit is represented across 8 surfaces:
 
 1. **Ownership** - Who owns/maintains each file
 2. **Blast Radius** - Impact analysis: what breaks if you change X
@@ -58,6 +66,13 @@ What configuration does this use?
 How does this couple to other subsystems?
 
 ---
+
+## Scope Notes
+
+- **Original Phase 20 attempt:** 48 folders captured against a much larger 813-folder goal.
+- **Phase 20 amendment:** normalized the audit into 22 logical units with full 8-surface coverage.
+- **Canonical closure state:** 22/22 units complete, 176/176 surface JSON files present in `audit/`.
+- **Naming note:** some historical artifacts use `universal_vendor_scraper`; the canonical final audit unit is `universal-vendor-scraper`.
 
 ## Files
 
