@@ -1,0 +1,8 @@
+# Development Only Dependencies (Heavy AI Models)
+# These are used for local semantic search and image analysis
+# DO NOT DEPLOY TO 4GB RAM VPS
+
+open-clip-torch>=2.24.0  # CLIP embeddings
+torch>=2.1.0  # CLIP runtime
+sentence-transformers>=2.0.0  # Product embeddings for semantic search
+graphiti-core==0.26.0 # Graph Database and Temporal Knowledge (Phase 13.2)
